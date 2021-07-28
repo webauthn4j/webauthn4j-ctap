@@ -1,0 +1,3 @@
+include ':webauthn4j-ctap'
+include ':unifidokey-core'
+include ':unifidokey-handheld'

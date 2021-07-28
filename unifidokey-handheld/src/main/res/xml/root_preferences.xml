@@ -1,0 +1,143 @@
+<!--
+  ~ Copyright 2018 The app Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/header_transport_options">
+        <SwitchPreferenceCompat
+            app:key="nfcTransportEnabled"
+            app:title="@string/title_nfc_support" />
+        <SwitchPreferenceCompat
+            app:key="bleTransportEnabled"
+            app:title="@string/title_ble_support" />
+        <SwitchPreferenceCompat
+            app:key="bthidTransportEnabled"
+            app:title="@string/title_bthid_support" />
+        <Preference
+            app:key="bthidPairing"
+            app:summary="@string/summary_bthid_pairing"
+            app:title="@string/title_bthid_pairing" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/header_consent">
+
+        <ListPreference
+            app:defaultValue="if_required"
+            app:entries="@array/user_consent_entries"
+            app:entryValues="@array/user_consent_values"
+            app:key="userConsent"
+            app:title="@string/title_user_consent"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="enabled"
+            app:entries="@array/client_pin_entries"
+            app:entryValues="@array/client_pin_values"
+            app:key="clientPIN"
+            app:title="@string/title_client_pin"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:key="resetProtection"
+            app:summary="@string/summary_reset_protection"
+            app:title="@string/reset_protection" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/header_user_interface">
+
+        <ListPreference
+            app:defaultValue="authenticator"
+            app:entries="@array/credential_selector_entries"
+            app:entryValues="@array/credential_selector_values"
+            app:key="credentialSelector"
+            app:title="@string/title_credential_selector"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:key="keepScreenOn"
+            app:summary="@string/summary_keep_screen_on"
+            app:title="@string/keep_screen_on" />
+
+    </PreferenceCategory>
+
+
+    <PreferenceCategory app:title="@string/developer_options_header">
+
+        <EditTextPreference
+            app:key="aaguid"
+            app:title="@string/title_aaguid"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="cross-platform"
+            app:entries="@array/platform_entries"
+            app:entryValues="@array/platform_values"
+            app:key="platform"
+            app:title="@string/title_platform"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="ready"
+            app:entries="@array/user_verification_entries"
+            app:entryValues="@array/user_verification_values"
+            app:key="userVerification"
+            app:title="@string/title_user_verification"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="supported"
+            app:entries="@array/user_presence_entries"
+            app:entryValues="@array/user_presence_values"
+            app:key="userPresence"
+            app:title="@string/title_user_presence"
+            app:useSimpleSummaryProvider="true" />
+
+        <MultiSelectListPreference
+            app:defaultValue="@array/alg_default_values"
+            app:entries="@array/alg_entries"
+            app:entryValues="@array/alg_values"
+            app:key="alg"
+            app:title="@string/title_alg" />
+
+        <ListPreference
+            app:defaultValue="none"
+            app:entries="@array/attestation_statement_format_entries"
+            app:entryValues="@array/attestation_statement_format_values"
+            app:key="attestationStatementFormat"
+            app:title="@string/title_attestation_statement_format"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="always"
+            app:entries="@array/resident_key_entries"
+            app:entryValues="@array/resident_key_values"
+            app:key="residentKey"
+            app:title="@string/title_resident_key"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="keystore"
+            app:entries="@array/key_storage_entries"
+            app:entryValues="@array/key_storage_values"
+            app:key="keyStorage"
+            app:title="@string/title_key_storage"
+            app:useSimpleSummaryProvider="true" />
+
+
+    </PreferenceCategory>
+
+</androidx.preference.PreferenceScreen>

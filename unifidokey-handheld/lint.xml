@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="InvalidPackage">
+        <ignore regexp="bcpkix-jdk15on-1.64.jar" />
+        <ignore regexp="bcpkix-jdk15on-1.64.jar" />
+    </issue>
+</lint>

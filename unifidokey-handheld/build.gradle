@@ -1,0 +1,112 @@
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'androidx.navigation.safeargs'
+apply plugin: 'com.google.android.gms.oss-licenses-plugin'
+
+android {
+    compileSdkVersion 30 // Android 11.0
+    buildToolsVersion '30.0.2'
+
+    defaultConfig {
+        applicationId 'com.unifidokey'
+        minSdkVersion 28 // Android 9.0
+        targetSdkVersion 30 // Android 11.0
+        versionName '0.5.0-SNAPSHOT'
+        versionCode 2
+
+        buildConfigField "String", "ANDROID_SAFETY_NET_API_KEY", "${project.property("unifidokey.androidSafetyNetApiKey")}"
+
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+    buildFeatures {
+        dataBinding = true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+    packagingOptions {
+        exclude 'README.txt'
+    }
+    lintOptions {
+        lintConfig file('lint.xml')
+    }
+}
+
+dependencies {
+
+
+    // Kotlin
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-jdk8'
+
+    // Project dependencies
+    implementation project(':unifidokey-core')
+    implementation project(':webauthn4j-ctap')
+
+    // Third Party dependencies
+    implementation 'com.github.tony19:logback-android'
+    implementation 'org.slf4j:slf4j-api'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-cbor'
+
+    // Android dependencies
+    implementation 'androidx.room:room-runtime'
+
+    // Play services
+    implementation 'com.google.android.gms:play-services-oss-licenses'
+    implementation 'com.google.android.gms:play-services-fido'
+
+    // AndroidX
+    implementation 'androidx.appcompat:appcompat'
+    implementation 'androidx.constraintlayout:constraintlayout'
+    implementation 'androidx.biometric:biometric'
+    implementation 'androidx.legacy:legacy-support-v4'
+    implementation 'androidx.preference:preference'
+    implementation 'androidx.lifecycle:lifecycle-extensions'
+    implementation 'androidx.recyclerview:recyclerview'
+    implementation 'androidx.navigation:navigation-fragment'
+    implementation 'androidx.navigation:navigation-ui'
+
+    implementation 'com.google.android.material:material'
+
+    implementation 'com.google.dagger:dagger'
+    implementation 'com.google.dagger:dagger-android'
+    implementation 'com.google.dagger:dagger-android-support'
+
+
+    // Annotation processor
+    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
+    kapt "androidx.room:room-compiler:$roomVersion"
+
+    // test dependencies
+    testImplementation 'junit:junit'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'androidx.test:core:'
+    testImplementation 'androidx.test.ext:junit'
+    testImplementation 'com.google.truth:truth'
+    testImplementation 'com.google.truth.extensions:truth-java8-extension'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test'
+    testImplementation 'org.robolectric:robolectric'
+
+    kaptTest "com.google.dagger:dagger-compiler:$daggerVersion"
+    kaptTest "androidx.room:room-compiler:$roomVersion"
+
+}
+
+sonarqube {
+    skipProject = true
+}

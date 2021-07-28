@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <color name="colorPrimary">#028545</color>
+    <color name="colorPrimaryDark">#016835</color>
+    <color name="colorAccent">#EF8D18</color>
+    <color name="colorWhite">#FFFFFF</color>
+
+    <color name="mtrl_filled_background_color" tools:override="true">@color/colorWhite</color>
+
+    <color name="bgLightGray">#F1F1F1</color>
+    <color name="bgGray">#DADADA</color>
+    <color name="bgDarkGray">#AAAAAA</color>
+    <color name="textWhite">#FFFFFF</color>
+    <color name="textGray">#AAAAAA</color>
+    <color name="textBlack">#222222</color>
+    <color name="black_overlay">#33000000</color>
+    <color name="warning">#FFF9C4</color>
+</resources>

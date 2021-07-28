@@ -1,0 +1,104 @@
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 30 // Android 11.0
+    buildToolsVersion '30.0.2'
+
+    defaultConfig {
+        minSdkVersion 28 // Android 9.0
+        targetSdkVersion 30 // Android 11.0
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+    packagingOptions {
+        exclude 'README.txt'
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            //TODO: revisit proguard rules
+        }
+    }
+}
+
+description = 'Provides core functionality, which is specific to UnifidoKey but independent from Android SDK'
+
+
+dependencies {
+
+    // Kotlin
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+
+    // project dependencies
+    implementation 'com.webauthn4j:webauthn4j-core'
+    implementation project(':webauthn4j-ctap')
+
+    // Third Party dependencies
+    implementation 'org.slf4j:slf4j-api'
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-cbor'
+
+
+    // Android dependencies
+
+    // Play services
+    implementation 'com.google.android.gms:play-services-auth'
+    implementation 'com.google.android.gms:play-services-fido'
+    implementation 'com.google.android.gms:play-services-safetynet'
+
+    // AndroidX
+    implementation 'androidx.core:core-ktx'
+    implementation 'androidx.room:room-runtime'
+    implementation 'androidx.appcompat:appcompat'
+    implementation 'androidx.legacy:legacy-support-v4'
+    implementation 'androidx.preference:preference'
+    implementation 'androidx.lifecycle:lifecycle-livedata'
+    implementation 'androidx.lifecycle:lifecycle-extensions'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx'
+
+    implementation 'com.google.dagger:dagger'
+    implementation 'com.google.dagger:dagger-android'
+    implementation 'com.google.dagger:dagger-android-support'
+
+    // Annotation processor
+    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
+    kapt "androidx.room:room-compiler:$roomVersion"
+
+    // Test dependencies
+    testImplementation 'ch.qos.logback:logback-classic'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test'
+    testImplementation 'junit:junit'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'androidx.test:core:'
+    testImplementation 'androidx.test.ext:junit'
+    testImplementation 'com.google.truth:truth'
+    testImplementation 'com.google.truth.extensions:truth-java8-extension'
+    testImplementation 'org.robolectric:robolectric'
+
+    kaptTest 'com.google.dagger:dagger-compiler'
+    kaptTest 'androidx.room:room-compiler'
+
+    androidTestImplementation 'androidx.test:core'
+    androidTestImplementation 'androidx.test.ext:junit'
+    androidTestImplementation 'androidx.test:runner'
+    androidTestImplementation 'androidx.test.espresso:espresso-core'
+    androidTestImplementation 'com.google.truth:truth'
+    androidTestImplementation 'com.google.truth.extensions:truth-java8-extension'
+    androidTestImplementation 'com.android.support:support-annotations'
+
+}
+
+sonarqube {
+    skipProject = true
+}
