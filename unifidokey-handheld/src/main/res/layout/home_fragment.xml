@@ -26,6 +26,37 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
+                android:visibility="@{viewModel.isAndroidSafetyNetAttestation ? View.VISIBLE : View.GONE}"
+                tools:ignore="MissingConstraints">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/warning"
+                    android:orientation="horizontal"
+                    android:padding="5dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_warning"
+                        android:tint="@color/ic_launcher_background"
+                        app:tint="@color/bgDarkGray" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="10dp"
+                        android:text="@string/warning_androidsafetynet_attestation"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        android:textColor="?android:attr/textColorSecondary" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
                 android:visibility="@{viewModel.isNoneAttestation ? View.VISIBLE : View.GONE}"
                 tools:ignore="MissingConstraints">
 
@@ -189,6 +220,7 @@
                         <com.google.android.material.checkbox.MaterialCheckBox
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="10dp"
                             android:layout_weight="1"
                             android:buttonTint="@color/bgDarkGray"
                             android:checked="@{viewModel.isBTHIDBackgroundServiceModeEnabled}"
@@ -199,6 +231,7 @@
 
                         <com.google.android.material.button.MaterialButton
                             style="?attr/borderlessButtonStyle"
+                            android:id="@+id/bthid_pairing_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Pairing" />
@@ -265,7 +298,6 @@
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </layout>

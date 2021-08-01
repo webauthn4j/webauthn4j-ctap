@@ -7,7 +7,7 @@ import androidx.biometric.BiometricPrompt.*
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.unifidokey.R
-import com.unifidokey.app.handheld.presentation.helper.KeepScreenOnHelper
+import com.unifidokey.app.handheld.presentation.util.KeepScreenOnUtil
 import com.unifidokey.databinding.LockScreenActivityBinding
 
 /**
@@ -37,7 +37,7 @@ class LockScreenActivity : AppCompatActivity(), LockScreenViewModel.EventHandler
         if (!isPromptShownBefore) {
             showBiometricPrompt()
         }
-        KeepScreenOnHelper.configureKeepScreenOnFlag(this)
+        KeepScreenOnUtil.configureKeepScreenOnFlag(this)
     }
     //endregion
 

@@ -2,6 +2,7 @@ package com.unifidokey.driver.persistence
 
 import com.unifidokey.core.adapter.UnifidoKeyAuthenticatorPropertyStore
 import com.unifidokey.core.config.ConfigManager
+import com.unifidokey.core.config.PINRetriesConfigProperty
 import com.unifidokey.core.setting.KeyStorageSetting
 import com.unifidokey.driver.persistence.dao.KeyStoreDao
 import com.unifidokey.driver.persistence.dao.KeyStoreResidentUserCredentialKey
@@ -9,6 +10,7 @@ import com.unifidokey.driver.persistence.dao.RelyingPartyDao
 import com.unifidokey.driver.persistence.dao.UserCredentialDao
 import com.unifidokey.driver.persistence.entity.RelyingPartyEntity
 import com.unifidokey.driver.persistence.entity.UserCredentialEntity
+import com.webauthn4j.ctap.authenticator.ClientPINService
 import com.webauthn4j.ctap.authenticator.exception.StoreFullException
 import com.webauthn4j.ctap.authenticator.internal.KeyPairUtil.createCredentialKeyPair
 import com.webauthn4j.ctap.authenticator.store.ResidentUserCredential
@@ -225,7 +227,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
         val secretKey = loadEncryptionKey()
         val encrypted =
             CipherUtil.encryptWithAESCBCPKCS5Padding(clientPIN, secretKey, loadEncryptionIV())
-        configManager.clientPINEnc.value = encrypted
+        configManager.clientPINEnc.postValue(encrypted)
     }
 
     override fun loadClientPIN(): ByteArray? {
@@ -243,14 +245,14 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
     }
 
     override fun savePINRetries(pinRetries: Int) {
-        configManager.pinRetries.value = pinRetries
+        configManager.pinRetries.postValue(pinRetries)
     }
 
     override fun clear() {
         relyingPartyDao.deleteAll()
         keyStoreDao.deleteAll()
-        configManager.pinRetries.reset()
-        configManager.clientPINEnc.reset()
+        configManager.pinRetries.postValue(ClientPINService.MAX_PIN_RETRIES)
+        configManager.clientPINEnc.postValue(null)
     }
 
 }

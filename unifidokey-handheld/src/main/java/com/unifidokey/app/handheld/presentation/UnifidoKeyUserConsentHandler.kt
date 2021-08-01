@@ -1,4 +1,4 @@
-package com.unifidokey.app.handheld.presentation.helper
+package com.unifidokey.app.handheld.presentation
 
 import android.content.Context
 import com.unifidokey.app.handheld.presentation.AuthenticationConsentDialogActivityRequest

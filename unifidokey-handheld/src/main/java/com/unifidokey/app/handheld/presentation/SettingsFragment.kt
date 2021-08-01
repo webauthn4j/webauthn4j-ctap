@@ -11,6 +11,7 @@ import androidx.preference.SwitchPreferenceCompat
 import com.unifidokey.R
 import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication
+import com.unifidokey.app.handheld.presentation.util.BluetoothPairingUtil
 import com.unifidokey.core.config.*
 import com.unifidokey.core.config.ConfigManager.Companion.BTHID_PAIRING_PREF_KEY
 import com.unifidokey.core.service.BLEService
@@ -167,7 +168,7 @@ class SettingsFragment internal constructor(
         }
         findPreference<Preference>(BTHID_PAIRING_PREF_KEY)!!.let {
             it.onPreferenceClickListener = Preference.OnPreferenceClickListener {
-
+                BluetoothPairingUtil.startPairing(this.requireContext())
                 return@OnPreferenceClickListener true
             }
             it.isVisible = configManager.bthidFeatureFlag

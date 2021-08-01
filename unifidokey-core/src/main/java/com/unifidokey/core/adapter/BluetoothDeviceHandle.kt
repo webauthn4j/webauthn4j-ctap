@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import java.time.Instant
 
 data class BluetoothDeviceHandle(
-    val name: String,
+    var name: String,
     val address: String,
     var lastConnectedAt: Instant?
 ) {

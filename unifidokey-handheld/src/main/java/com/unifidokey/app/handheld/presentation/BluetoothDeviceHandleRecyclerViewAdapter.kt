@@ -52,7 +52,7 @@ class BluetoothDeviceHandleRecyclerViewAdapter(
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val bluetoothDeviceHandle = getItem(position)!!
-        viewHolder.binding.viewModel = BTHIDDeviceViewModel(context, bthidService, bluetoothDeviceHandle)
+        viewHolder.binding.viewModel = BTHIDDeviceViewModel(bthidService, bluetoothDeviceHandle)
         viewHolder.binding.lifecycleOwner = context as AppCompatActivity
     }
 

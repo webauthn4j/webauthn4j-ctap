@@ -1,11 +1,11 @@
-package com.unifidokey.app.handheld.presentation.helper
+package com.unifidokey.app.handheld.presentation.util
 
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.unifidokey.app.UnifidoKeyApplication
 import com.unifidokey.core.setting.KeepScreenOnSetting
 
-object KeepScreenOnHelper {
+object KeepScreenOnUtil {
     fun configureKeepScreenOnFlag(activity: AppCompatActivity) {
         if (getKeepScreenOnSetting(activity) == KeepScreenOnSetting.ENABLED) {
             activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)

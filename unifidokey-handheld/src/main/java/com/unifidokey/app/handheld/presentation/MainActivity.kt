@@ -17,7 +17,7 @@ import com.google.android.material.navigation.NavigationView
 import com.unifidokey.R
 import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication
-import com.unifidokey.app.handheld.presentation.helper.KeepScreenOnHelper
+import com.unifidokey.app.handheld.presentation.util.KeepScreenOnUtil
 import com.unifidokey.core.service.BLEService
 import com.unifidokey.core.service.BTHIDService
 import com.unifidokey.core.service.NFCService
@@ -110,7 +110,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onResume() {
         logger.debug("onResume")
         super.onResume()
-        KeepScreenOnHelper.configureKeepScreenOnFlag(this)
+        KeepScreenOnUtil.configureKeepScreenOnFlag(this)
     }
 
     override fun onStop() {

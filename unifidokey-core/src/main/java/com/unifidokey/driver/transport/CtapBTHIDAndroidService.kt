@@ -8,7 +8,7 @@ import android.os.Binder
 import android.os.IBinder
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.Observer
+import androidx.lifecycle.*
 import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.core.adapter.BluetoothDeviceHandle
 import com.unifidokey.core.service.BTHIDService
@@ -22,7 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 
-class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus> {
+class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObserver {
 
     companion object {
         private const val ACTION_START_ADVERTISE = "ACTION_START_ADVERTISE"
@@ -71,6 +71,7 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus> {
         registerServiceListener()
         initialize()
         bthidService.bthidStatus.observeForever(this)
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
 
     @MainThread
@@ -79,6 +80,19 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus> {
         super.onDestroy()
         unregisterServiceListener()
         bthidService.bthidStatus.removeObserver(this)
+        ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    fun onResume() {
+        logger.debug("onResume")
+        hidProfileServiceListener.configureApp() // As the App is unregistered on pause, re-register on resume.
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    fun onPause() {
+        logger.debug("onPause")
+
     }
 
     @MainThread
@@ -110,7 +124,10 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus> {
 
     fun connect(deviceHandle: BluetoothDeviceHandle) {
         val remoteDevice = bluetoothAdapter.getRemoteDevice(deviceHandle.address)
-        bluetoothHidDevice?.connect(remoteDevice)
+        val result = bluetoothHidDevice?.connect(remoteDevice)!!
+        if(!result){
+            //TODO
+        }
     }
 
     fun disconnect(deviceHandle: BluetoothDeviceHandle) {
@@ -178,14 +195,8 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus> {
 
         var isAppEnabled = false
             set(value) {
-                if (bluetoothHidDevice != null) {
-                    if (value) {
-                        registerApp()
-                    } else {
-                        unregisterApp()
-                    }
-                }
                 field = value
+                configureApp()
             }
 
         override fun onServiceConnected(profile: Int, proxy: BluetoothProfile?) {
@@ -201,7 +212,15 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus> {
         override fun onServiceDisconnected(profile: Int) {
             CoroutineScope(Dispatchers.IO).launch {
                 logger.debug("onServiceDisconnected")
+                unregisterApp()
+            }
+        }
+
+        fun configureApp(){
+            if (bluetoothHidDevice != null) {
                 if (isAppEnabled) {
+                    registerApp()
+                } else {
                     unregisterApp()
                 }
             }

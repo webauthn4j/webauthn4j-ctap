@@ -1,10 +1,6 @@
-package com.unifidokey.app.handheld.presentation.helper
+package com.unifidokey.app.handheld.presentation
 
 import android.content.Context
-import com.unifidokey.app.handheld.presentation.CredentialSelectorDialogActivityRequest
-import com.unifidokey.app.handheld.presentation.CredentialSelectorDialogActivityResponse
-import com.unifidokey.app.handheld.presentation.CredentialSelectorDialogActivityStarter
-import com.unifidokey.app.handheld.presentation.CredentialViewModel
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
 import com.webauthn4j.ctap.authenticator.store.UserCredential
 import java.io.Serializable

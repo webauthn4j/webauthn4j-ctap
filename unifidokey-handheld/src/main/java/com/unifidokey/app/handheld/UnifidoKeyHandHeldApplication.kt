@@ -2,10 +2,10 @@ package com.unifidokey.app.handheld
 
 import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.app.UnifidoKeyComponent
-import com.unifidokey.app.handheld.presentation.helper.CachingCredentialSelectionHandler
-import com.unifidokey.app.handheld.presentation.helper.CachingUserConsentHandler
-import com.unifidokey.app.handheld.presentation.helper.UnifidoKeyCredentialSelectionHandler
-import com.unifidokey.app.handheld.presentation.helper.UnifidoKeyUserConsentHandler
+import com.unifidokey.app.handheld.presentation.CachingCredentialSelectionHandler
+import com.unifidokey.app.handheld.presentation.CachingUserConsentHandler
+import com.unifidokey.app.handheld.presentation.UnifidoKeyCredentialSelectionHandler
+import com.unifidokey.app.handheld.presentation.UnifidoKeyUserConsentHandler
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.core.service.AuthenticatorService
 

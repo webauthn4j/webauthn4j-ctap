@@ -3,7 +3,7 @@ package com.unifidokey.app.handheld.presentation
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.unifidokey.R
-import com.unifidokey.app.handheld.presentation.helper.KeepScreenOnHelper
+import com.unifidokey.app.handheld.presentation.util.KeepScreenOnUtil
 
 class CredentialSelectorDialogActivity : AppCompatActivity() {
     //region## Lifecycle event handlers ##
@@ -20,7 +20,7 @@ class CredentialSelectorDialogActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        KeepScreenOnHelper.configureKeepScreenOnFlag(this)
+        KeepScreenOnUtil.configureKeepScreenOnFlag(this)
     } //endregion
 
     companion object {

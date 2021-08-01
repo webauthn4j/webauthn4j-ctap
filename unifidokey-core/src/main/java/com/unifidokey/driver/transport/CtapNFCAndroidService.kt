@@ -24,6 +24,9 @@ class CtapNFCAndroidService : HostApduService(), CoroutineScope {
     private lateinit var nfcConnector: NFCConnector
     private lateinit var nfcService: NFCService
 
+    //single thread worker to synchronize authenticator access
+    private val nfcWorker = newSingleThreadContext("nfc-worker")
+
     @WorkerThread
     override fun onCreate() {
         super.onCreate()
@@ -50,7 +53,7 @@ class CtapNFCAndroidService : HostApduService(), CoroutineScope {
 
     @WorkerThread
     override fun processCommandApdu(apdu: ByteArray, bundle: Bundle?): ByteArray? {
-        launch(Dispatchers.Default) {
+        launch(nfcWorker) {
             logger.debug("Received command APDU: {}", ArrayUtil.toHexString(apdu))
             if (nfcService.nfcStatus.value == NFCStatus.ON) {
                 val commandAPDU = CommandAPDU.parse(apdu)

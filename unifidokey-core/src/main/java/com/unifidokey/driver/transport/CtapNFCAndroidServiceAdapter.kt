@@ -8,6 +8,7 @@ import android.nfc.cardemulation.CardEmulation
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.unifidokey.core.adapter.CtapNFCAdapter
+import kotlinx.coroutines.newSingleThreadContext
 import org.slf4j.LoggerFactory
 
 class CtapNFCAndroidServiceAdapter(private val context: Application) : CtapNFCAdapter,

@@ -11,6 +11,7 @@ import com.webauthn4j.ctap.core.util.internal.HexUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
 import org.slf4j.LoggerFactory
 
 class Fido2BTHIDApplication(
@@ -20,6 +21,9 @@ class Fido2BTHIDApplication(
 ) : BluetoothHidDevice.Callback() {
 
     private val logger = LoggerFactory.getLogger(Fido2BTHIDApplication::class.java)
+
+    //single thread worker to synchronize authenticator access
+    private val bthidWorker = newSingleThreadContext("bthid-worker")
 
     private val hidConnector = HIDConnector(transactionManager, objectConverter)
 
@@ -85,7 +89,7 @@ class Fido2BTHIDApplication(
 
     @WorkerThread
     override fun onInterruptData(device: BluetoothDevice, reportId: Byte, data: ByteArray?) {
-        CoroutineScope(Dispatchers.Default).launch {
+        CoroutineScope(bthidWorker).launch {
             logger.debug(
                 "Received report: device=${device.name}, id=${reportId}, data=${
                     HexUtil.encodeToString(
@@ -97,17 +101,19 @@ class Fido2BTHIDApplication(
                 throw RuntimeException("data must not be null")
             }
             hidConnector.handle(data) { response ->
-                val result = bluetoothHidDevice.sendReport(device, reportId.toInt(), response)
-                if (!result) {
-                    throw RuntimeException("send failed")
+                CoroutineScope(bthidWorker).launch {
+                    val result = bluetoothHidDevice.sendReport(device, reportId.toInt(), response)
+                    if (!result) {
+                        throw RuntimeException("send failed")
+                    }
+                    logger.debug(
+                        "Sent report: device=${device.name}, id=${reportId}, data=${
+                            HexUtil.encodeToString(
+                                response
+                            )
+                        }"
+                    )
                 }
-                logger.debug(
-                    "Sent report: device=${device.name}, id=${reportId}, data=${
-                        HexUtil.encodeToString(
-                            response
-                        )
-                    }"
-                )
             }
         }
     }

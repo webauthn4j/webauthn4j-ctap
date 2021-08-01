@@ -12,10 +12,6 @@ class ClientPINEncConfigProperty internal constructor(configManager: ConfigManag
         return configManager.persistenceAdaptor.loadBytes(KEY)
     }
 
-    fun reset() {
-        value = null
-    }
-
     companion object {
         const val KEY = "clientPINEnc"
     }

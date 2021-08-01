@@ -1,4 +1,4 @@
-package com.unifidokey.app.handheld.presentation.helper
+package com.unifidokey.app.handheld.presentation
 
 import com.webauthn4j.ctap.authenticator.GetAssertionConsentOptions
 import com.webauthn4j.ctap.authenticator.MakeCredentialConsentOptions

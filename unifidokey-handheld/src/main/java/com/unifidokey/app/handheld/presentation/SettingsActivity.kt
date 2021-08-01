@@ -5,7 +5,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.unifidokey.R
-import com.unifidokey.app.handheld.presentation.helper.KeepScreenOnHelper
+import com.unifidokey.app.handheld.presentation.util.KeepScreenOnUtil
 import org.slf4j.LoggerFactory
 
 class SettingsActivity : AppCompatActivity() {
@@ -27,7 +27,7 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        KeepScreenOnHelper.configureKeepScreenOnFlag(this)
+        KeepScreenOnUtil.configureKeepScreenOnFlag(this)
     }
 
     //endregion

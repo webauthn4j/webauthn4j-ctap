@@ -13,7 +13,7 @@
     </data>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/history_recycler_view"
+        android:id="@+id/bluetooth_pairing_recycler_view"
         android:name="com.unifidokey.HistoryFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

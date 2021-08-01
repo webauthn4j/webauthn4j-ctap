@@ -2,18 +2,24 @@ package com.unifidokey.app.handheld.presentation
 
 import android.content.Context
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.annotation.UiThread
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.unifidokey.R
 import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication
+import com.unifidokey.app.handheld.presentation.util.BluetoothPairingUtil
 import com.unifidokey.core.service.BLEService
 import com.unifidokey.core.service.BTHIDService
 import com.unifidokey.databinding.HomeFragmentBinding
 import com.unifidokey.driver.transport.CtapBTHIDAndroidServiceContextualAdapter
 import org.slf4j.LoggerFactory
+
 
 class HomeFragment : Fragment() {
     private val logger = LoggerFactory.getLogger(HomeFragment::class.java)
@@ -53,6 +59,7 @@ class HomeFragment : Fragment() {
 
         initializeBTHIDDeviceRecyclerView(binding)
         initializeRecentHistoryRecyclerView(binding)
+        binding.root.findViewById<MaterialButton>(R.id.bthid_pairing_button).setOnClickListener(this::onBTHIDPairingButtonClick)
 
         return binding.root
     }
@@ -62,6 +69,12 @@ class HomeFragment : Fragment() {
 
 
     // Methods
+
+
+    @UiThread
+    fun onBTHIDPairingButtonClick(view: View) {
+        BluetoothPairingUtil.startPairing(this.requireContext())
+    }
 
     private fun initializeBTHIDDeviceRecyclerView(binding: HomeFragmentBinding) {
         val bthidDeviceRecyclerView =

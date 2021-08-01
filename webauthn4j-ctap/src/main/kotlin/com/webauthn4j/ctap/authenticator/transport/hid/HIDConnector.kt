@@ -9,6 +9,7 @@ import com.webauthn4j.ctap.core.data.CtapResponse
 import com.webauthn4j.ctap.core.data.CtapResponseData
 import com.webauthn4j.ctap.core.data.hid.*
 import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.MAX_PACKET_SIZE
+import com.webauthn4j.util.HexUtil
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 
@@ -52,7 +53,7 @@ class HIDConnector(
 
             var hidChannel = hidChannels[hidPacket.channelId]
             if (hidChannel == null) {
-                hidChannel = HIDChannel()
+                hidChannel = HIDChannel(hidPacket.channelId)
                 hidChannels[hidPacket.channelId] = hidChannel
             }
             hidChannel.handlePacket(hidPacket) {
@@ -71,9 +72,11 @@ class HIDConnector(
         return lastAllocatedChannelId
     }
 
-    private inner class HIDChannel {
+    private inner class HIDChannel(private val channelId: HIDChannelId) {
 
         private val hidRequestMessageBuilder = HIDRequestMessageBuilder()
+
+        private val hidKeepAliveWorker = newSingleThreadContext("hid-keepalive-worker-" + HexUtil.encodeToString(channelId.value))
 
         suspend fun handlePacket(
             hidPacket: HIDPacket,
@@ -189,7 +192,7 @@ class HIDConnector(
             responseCallback: ResponseCallback<HIDResponseMessage>
         ) {
             coroutineScope {
-                val keepAliveJob = launch(Dispatchers.IO) {
+                val keepAliveJob = launch(hidKeepAliveWorker) {
                     while (true) {
                         val keepAliveMessage = HIDKEEPALIVEResponseMessage(
                             hidMessage.channelId,

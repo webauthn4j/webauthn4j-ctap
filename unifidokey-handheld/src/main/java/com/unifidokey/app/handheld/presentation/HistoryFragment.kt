@@ -35,7 +35,7 @@ open class HistoryFragment : Fragment() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-        val recyclerView = binding.root.findViewById<RecyclerView>(R.id.history_recycler_view)
+        val recyclerView = binding.root.findViewById<RecyclerView>(R.id.bluetooth_pairing_recycler_view)
         recyclerView.adapter = adapter
         viewModel.events.observe(this.requireActivity(), { events -> adapter.submitList(events) })
 

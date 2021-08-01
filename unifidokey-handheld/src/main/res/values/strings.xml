@@ -48,13 +48,15 @@
     <string name="menu_about">About</string>
 
     <!-- Home fragment -->
-    <string name="warning_none_attestation">\'None attestation\' is not supported by Chrome</string>
+    <string name="warning_none_attestation">\'None attestation\' is not supported by Chrome.</string>
+    <string name="warning_androidsafetynet_attestation">\'AndroidSafetyNet attestation\' cannot be used with Bluetooth HID transport.</string>
 
     <string name="title_nfc">NFC</string>
     <string name="title_bluetooth_hid">Bluetooth HID</string>
     <string name="title_recent_history">Recent History</string>
     <string name="button_text_more">More</string>
     <string name="checkbox_text_background">Stay Background</string>
+    <string name="snackbar_text_connect_from_your_device">Connect from your device</string>
 
     <!-- credential list fragment -->
     <string name="menu_search">Search</string>

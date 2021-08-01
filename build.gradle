@@ -6,7 +6,7 @@ buildscript {
     ext.coreKtxVersion = "1.6.0"
     ext.kotlinxCoroutinesVersion = "1.5.1-native-mt"
 
-    ext.daggerVersion = "2.38"
+    ext.daggerVersion = "2.38.1"
     ext.roomVersion = "2.3.0"
 
     // Android libraries
@@ -24,15 +24,15 @@ buildscript {
     ext.googlePlayServicesFidoVersion = "18.1.0"
     ext.googlePlayServicesSafetyNetVersion = "17.0.1"
     ext.googlePlayServicesOSSLicensesVersion = "17.0.0"
-    ext.androidGradlePluginVersion = "4.2.2"
-    ext.navigationSafeArgsGradlePluginVersion = "2.3.5"
+    ext.androidGradlePluginVersion = "7.0.0"
+    ext.navigationSafeArgsGradlePluginVersion = "2.4.0-alpha04"
     ext.ossLicensesPluginVersion = "0.10.4"
 
     // Third party libraries
     ext.springBootVersion = "2.5.3"
     ext.bouncyCastleVersion = "1.69"
     ext.logbackAndroidVersion = "2.0.0"
-    ext.webauthn4jVersion = "0.16.2.RELEASE"
+    ext.webauthn4jVersion = "0.17.0.RELEASE"
     ext.mockitoVersion = "3.11.2"
     ext.mockitoKotlinVersion = "3.2.0"
 
@@ -104,6 +104,7 @@ subprojects {
     dependencies {
         constraints {
             // kotlin
+
             implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
             implementation("androidx.core:core-ktx:$coreKtxVersion")
@@ -141,7 +142,6 @@ subprojects {
             implementation("org.bouncycastle:bcpkix-jdk15on:$bouncyCastleVersion")
             implementation("com.webauthn4j:webauthn4j-util:$webauthn4jVersion")
             implementation("com.webauthn4j:webauthn4j-core:$webauthn4jVersion")
-            implementation("com.webauthn4j:webauthn4j-test:$webauthn4jVersion")
             implementation("com.webauthn4j:webauthn4j-test:$webauthn4jVersion")
             implementation("org.mockito:mockito-core:$mockitoVersion")
             implementation("org.mockito:mockito-inline:$mockitoVersion")

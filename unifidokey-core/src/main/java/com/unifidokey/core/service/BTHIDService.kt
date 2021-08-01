@@ -60,10 +60,11 @@ class BTHIDService constructor(
     }
 
 
+
     @UiThread
     fun toggleConnection(deviceHandle: BluetoothDeviceHandle) {
-        // disconnect other devices
-        bluetoothDevices.value?.filterNot { it == deviceHandle }?.forEach {
+        // disconnect all devices
+        bluetoothDevices.value?.forEach {
             ctapBTHIDAdapter.disconnect(it)
         }
         if (deviceHandle.connectionState.value == "connected") {
