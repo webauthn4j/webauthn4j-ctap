@@ -16,7 +16,7 @@ test {
 dependencies {
 
     // Project dependencies
-    api 'com.webauthn4j:webauthn4j-core'
+    api 'com.github.webauthn4j.webauthn4j:webauthn4j-core'
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core'
 
@@ -30,7 +30,7 @@ dependencies {
     implementation 'org.bouncycastle:bcpkix-jdk15on'
 
     // Test dependencies
-    testImplementation 'com.webauthn4j:webauthn4j-test'
+    testImplementation 'com.github.webauthn4j.webauthn4j:webauthn4j-test'
     testImplementation 'ch.qos.logback:logback-classic'
     testImplementation 'org.mockito:mockito-core'
     testImplementation 'org.mockito:mockito-inline'

@@ -37,7 +37,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 
     // project dependencies
-    implementation 'com.webauthn4j:webauthn4j-core'
+    implementation 'com.github.webauthn4j.webauthn4j:webauthn4j-core'
     implementation project(':webauthn4j-ctap')
 
     // Third Party dependencies
