@@ -18,6 +18,10 @@ import com.webauthn4j.ctap.authenticator.store.ResidentUserCredentialKey
 import com.webauthn4j.ctap.authenticator.store.UserCredentialKey
 import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.Serializable
 import java.security.KeyPair
 import java.util.*
@@ -227,7 +231,11 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
         val secretKey = loadEncryptionKey()
         val encrypted =
             CipherUtil.encryptWithAESCBCPKCS5Padding(clientPIN, secretKey, loadEncryptionIV())
-        configManager.clientPINEnc.postValue(encrypted)
+        runBlocking {
+            launch(Dispatchers.Main.immediate){
+                configManager.clientPINEnc.value = encrypted
+            }
+        }
     }
 
     override fun loadClientPIN(): ByteArray? {
@@ -245,14 +253,22 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
     }
 
     override fun savePINRetries(pinRetries: Int) {
-        configManager.pinRetries.postValue(pinRetries)
+        runBlocking {
+            launch(Dispatchers.Main.immediate){
+                configManager.pinRetries.value = pinRetries
+            }
+        }
     }
 
     override fun clear() {
         relyingPartyDao.deleteAll()
         keyStoreDao.deleteAll()
-        configManager.pinRetries.postValue(ClientPINService.MAX_PIN_RETRIES)
-        configManager.clientPINEnc.postValue(null)
+        runBlocking {
+            launch(Dispatchers.Main.immediate){
+                configManager.pinRetries.reset()
+                configManager.clientPINEnc.reset()
+            }
+        }
     }
 
 }

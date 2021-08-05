@@ -14,6 +14,10 @@ class PINRetriesConfigProperty internal constructor(configManager: ConfigManager
         return configManager.persistenceAdaptor.loadPrimitiveInt(KEY)
     }
 
+    fun reset() {
+        value = ClientPINService.MAX_PIN_RETRIES
+    }
+
 
     companion object {
         const val KEY = "pinRetries"

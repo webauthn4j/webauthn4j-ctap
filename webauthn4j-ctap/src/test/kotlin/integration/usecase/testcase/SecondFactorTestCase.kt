@@ -37,6 +37,7 @@ class SecondFactorTestCase : IntegrationTestCaseBase() {
         )
         val registrationParameters = RegistrationParameters(
             relyingParty.registration.backend.serverProperty,
+            null,
             relyingParty.registration.backend.userVerificationRequired,
             relyingParty.registration.backend.userPresenceRequired
         )
@@ -79,6 +80,7 @@ class SecondFactorTestCase : IntegrationTestCaseBase() {
         val authenticationParameters = AuthenticationParameters(
             relyingParty.authentication.backend.serverProperty,
             authenticatorImpl,
+            null,
             relyingParty.authentication.backend.userVerificationRequired,
             relyingParty.authentication.backend.userPresenceRequired
         )

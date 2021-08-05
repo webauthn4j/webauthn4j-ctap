@@ -25,7 +25,12 @@ abstract class CtapCommandExecutionBase<TC : CtapRequest, TR : CtapResponse<*>>(
     }
 
     private fun onFailure(e: CtapCommandExecutionException): TR {
-        logger.debug("Failed ctap2 command processing. StatusCode: {} ", e.statusCode, e)
+        if(e.statusCode == StatusCode.CTAP1_ERR_OTHER){
+            logger.error("Failed ctap2 command processing. StatusCode: {} ", e.statusCode, e)
+        }
+        else{
+            logger.debug("Failed ctap2 command processing. StatusCode: {} ", e.statusCode)
+        }
         return createErrorResponse(e.statusCode)
     }
 
