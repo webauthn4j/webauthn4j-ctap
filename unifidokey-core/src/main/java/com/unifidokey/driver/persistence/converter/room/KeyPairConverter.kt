@@ -10,6 +10,7 @@ import com.webauthn4j.util.Base64Util
 import java.security.KeyPair
 import java.security.interfaces.ECPrivateKey
 import java.security.interfaces.ECPublicKey
+import java.security.interfaces.RSAPrivateKey
 import java.security.interfaces.RSAPublicKey
 
 class KeyPairConverter {
@@ -22,7 +23,7 @@ class KeyPairConverter {
         }
         val privateKey = value.private
         val publicKey = value.public
-        return if (privateKey is RSAPublicKey && publicKey is RSAPublicKey) {
+        return if (privateKey is RSAPrivateKey && publicKey is RSAPublicKey) {
             val rsaCoseKey = RSACOSEKey.create(value)
             Base64Util.encodeToString(cborConverter.writeValueAsBytes(rsaCoseKey))
         } else if (privateKey is ECPrivateKey && publicKey is ECPublicKey) {

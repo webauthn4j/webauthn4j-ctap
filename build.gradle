@@ -1,6 +1,25 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import org.asciidoctor.gradle.jvm.AsciidoctorTask
+
+/*
+ * Copyright 2018 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 buildscript {
+    //UnifidoKey
+    ext.unifidoKeyVersion = '0.7.0-SNAPSHOT'
+
     //kotlin
     ext.kotlinVersion = '1.5.20'
     ext.coreKtxVersion = "1.6.0"
@@ -35,6 +54,7 @@ buildscript {
     ext.webauthn4jVersion = "toString-SNAPSHOT"
     ext.mockitoVersion = "3.11.2"
     ext.mockitoKotlinVersion = "3.2.0"
+    ext.asciidoctorGradleVersion = "3.3.2"
 
     // Test libraries
     ext.truthVersion = "1.1.3"
@@ -48,6 +68,9 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
@@ -55,6 +78,7 @@ buildscript {
         classpath "com.google.android.gms:oss-licenses-plugin:$ossLicensesPluginVersion"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationSafeArgsGradlePluginVersion"
 
+        classpath "org.asciidoctor:asciidoctor-gradle-jvm:$asciidoctorGradleVersion"
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:$sonarqubeVersion"
 
         // workaround from https://issuetracker.google.com/issues/159151549
@@ -67,6 +91,7 @@ buildscript {
     }
 }
 
+apply plugin: 'org.asciidoctor.jvm.convert'
 apply plugin: 'org.sonarqube'
 
 allprojects {
@@ -78,6 +103,11 @@ allprojects {
             project.ext.set(prop.key, prop.value)
         }
     }
+}
+
+repositories {
+    google()
+    mavenCentral()
 }
 
 // To use dependencies block in this parent file, apply plugins in this file first
@@ -165,8 +195,48 @@ subprojects {
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+//task clean(type: Delete) {
+//    delete rootProject.buildDir
+//}
+
+task generateUserGuideJA(type: AsciidoctorTask) {
+    group = "documentation"
+    baseDirFollowsSourceDir()
+    sourceDir = file("docs/user-guide/ja")
+    outputDir = file("build/docs/asciidoc/html5/ja")
+    options eruby: 'erubis'
+    //noinspection GroovyAssignabilityCheck
+    attributes docinfo: '',
+            copycss: '',
+            icons: 'font',
+            'source-highlighter': 'prettify',
+            sectanchors: '',
+            toc2: '',
+            idprefix: '',
+            idseparator: '-',
+            doctype: 'book',
+            numbered: '',
+            revnumber: "${unifidoKeyVersion}"
+}
+
+task generateUserGuideEN(type: AsciidoctorTask) {
+    group = "documentation"
+    baseDirFollowsSourceDir()
+    sourceDir = file("docs/user-guide/en")
+    outputDir = file("build/docs/asciidoc/html5/en")
+    options eruby: 'erubis'
+    //noinspection GroovyAssignabilityCheck
+    attributes docinfo: '',
+            copycss: '',
+            icons: 'font',
+            'source-highlighter': 'prettify',
+            sectanchors: '',
+            toc2: '',
+            idprefix: '',
+            idseparator: '-',
+            doctype: 'book',
+            numbered: '',
+            revnumber: "${unifidoKeyVersion}"
 }
 
 sonarqube {

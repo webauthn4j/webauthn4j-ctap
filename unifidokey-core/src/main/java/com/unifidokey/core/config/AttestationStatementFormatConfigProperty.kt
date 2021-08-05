@@ -7,7 +7,7 @@ class AttestationStatementFormatConfigProperty internal constructor(configManage
     ConfigPropertyBase<AttestationStatementFormatSetting>(
         configManager,
         KEY,
-        AttestationStatementFormatSetting.ANDROID_SAFETYNET
+        AttestationStatementFormatSetting.ANDROID_KEY
     ) {
 
     override fun save(value: AttestationStatementFormatSetting) {

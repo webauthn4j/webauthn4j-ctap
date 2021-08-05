@@ -19,8 +19,12 @@ class FIDOU2FAttestationStatementGenerator(
         AttestationCertificatePath(attestationCertificate, emptyList())
 
     override suspend fun generate(attestationStatementRequest: AttestationStatementRequest): AttestationStatement {
+        val publicKey = attestationStatementRequest.userCredentialKey.keyPair!!.public
+        if(publicKey !is ECPublicKey){
+            throw IllegalArgumentException("attestationStatementRequest.userCredentialKey.keyPair must be Elliptic Curve key pair.")
+        }
         val credentialPublicKey =
-            EC2COSEKey.create((attestationStatementRequest.userCredentialKey.keyPair!!.public as ECPublicKey))
+            EC2COSEKey.create(publicKey)
         val clientDataHash = attestationStatementRequest.clientDataHash
         val signedData = getSignedData(
             attestationStatementRequest.rpIdHash,

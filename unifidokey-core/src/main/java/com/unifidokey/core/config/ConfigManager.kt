@@ -6,6 +6,7 @@ import com.unifidokey.core.setting.KeyStorageSetting
 import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting
 import com.webauthn4j.ctap.authenticator.settings.ResidentKeySetting
 import com.webauthn4j.data.attestation.authenticator.AAGUID
+import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import java.security.SecureRandom
 
 class ConfigManager(
@@ -94,23 +95,30 @@ class ConfigManager(
     private fun setupCorrelationRules() {
         keyStorage.liveData.observeForever { value ->
             if (value != KeyStorageSetting.KEYSTORE && attestationStatementFormat.value == AttestationStatementFormatSetting.ANDROID_KEY) {
-                attestationStatementFormat.value =
-                    AttestationStatementFormatSetting.ANDROID_SAFETYNET
+                attestationStatementFormat.value = AttestationStatementFormatSetting.PACKED
             }
         }
-        attestationStatementFormat.liveData.observeForever { value: AttestationStatementFormatSetting ->
-            if (value == AttestationStatementFormatSetting.ANDROID_KEY) {
-                residentKey.value = ResidentKeySetting.ALWAYS
-                keyStorage.value = KeyStorageSetting.KEYSTORE
+        algorithms.liveData.observeForever{ value ->
+            if(value != setOf(COSEAlgorithmIdentifier.ES256) && attestationStatementFormat.value == AttestationStatementFormatSetting.FIDO_U2F){
+                attestationStatementFormat.value = AttestationStatementFormatSetting.PACKED
             }
-            if (value == AttestationStatementFormatSetting.FIDO_U2F) {
-                aaguid.value = AAGUID.ZERO
+        }
+        attestationStatementFormat.liveData.observeForever { value ->
+            when (value) {
+                AttestationStatementFormatSetting.ANDROID_KEY -> {
+                    residentKey.value = ResidentKeySetting.ALWAYS
+                    keyStorage.value = KeyStorageSetting.KEYSTORE
+                }
+                AttestationStatementFormatSetting.FIDO_U2F -> {
+                    aaguid.value = AAGUID.ZERO
+                    algorithms.value = setOf(COSEAlgorithmIdentifier.ES256)
+                }
+                else -> { /*nop*/ }
             }
         }
         residentKey.liveData.observeForever { value: ResidentKeySetting ->
             if (value !== ResidentKeySetting.ALWAYS && attestationStatementFormat.value == AttestationStatementFormatSetting.ANDROID_KEY) {
-                attestationStatementFormat.value =
-                    AttestationStatementFormatSetting.ANDROID_SAFETYNET
+                attestationStatementFormat.value = AttestationStatementFormatSetting.PACKED
             }
         }
     }

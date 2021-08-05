@@ -104,16 +104,6 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun setAlgorithms(algorithms: Set<COSEAlgorithmIdentifier>): Boolean {
-        return try {
-            configManager.algorithms.value = algorithms
-            true
-        } catch (e: RuntimeException) {
-            logger.error("Unexpected exception is thrown", e)
-            false
-        }
-    }
-
     fun setClientPINSetting(clientPINSetting: ClientPINSetting): Boolean {
         return try {
             configManager.clientPIN.value = clientPINSetting
@@ -167,6 +157,16 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun setPlatformSetting(platformSetting: PlatformSetting): Boolean {
         return try {
             configManager.platform.value = platformSetting
+            true
+        } catch (e: RuntimeException) {
+            logger.error("Unexpected exception is thrown", e)
+            false
+        }
+    }
+
+    fun setAlgorithms(algorithms: Set<COSEAlgorithmIdentifier>): Boolean {
+        return try {
+            configManager.algorithms.value = algorithms
             true
         } catch (e: RuntimeException) {
             logger.error("Unexpected exception is thrown", e)

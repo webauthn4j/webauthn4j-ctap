@@ -32,7 +32,6 @@ class AlgorithmsTest {
         }
 
         @Test
-        @Throws(ExecutionException::class, InterruptedException::class)
         fun authenticator_supports_ES256_test() = runBlockingTest {
             passwordlessTestCase.authenticator.algorithms = setOf(COSEAlgorithmIdentifier.ES256)
             passwordlessTestCase.step1_createCredential()
@@ -80,7 +79,6 @@ class AlgorithmsTest {
         }
 
         @Test
-        @Throws(ExecutionException::class, InterruptedException::class)
         fun authenticator_supports_RS256_test() = runBlockingTest {
             passwordlessTestCase.authenticator.algorithms = setOf(COSEAlgorithmIdentifier.RS256)
             passwordlessTestCase.step1_createCredential()
@@ -106,7 +104,6 @@ class AlgorithmsTest {
         }
 
         @Test
-        @Throws(ExecutionException::class, InterruptedException::class)
         fun authenticator_supports_RS1_test() = runBlockingTest {
             passwordlessTestCase.authenticator.algorithms = setOf(COSEAlgorithmIdentifier.RS1)
             passwordlessTestCase.step1_createCredential()

@@ -52,6 +52,7 @@ class AndroidKeyStoreDao : KeyStoreDaoBase(createKeyStore(), "") {
                 KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
             )
                 .setDigests(digest)
+                .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1) //TODO: PSS対応
                 .setAttestationChallenge(attestationChallenge)
             if (algorithmParameterSpec != null) {
                 builder.setAlgorithmParameterSpec(algorithmParameterSpec)
