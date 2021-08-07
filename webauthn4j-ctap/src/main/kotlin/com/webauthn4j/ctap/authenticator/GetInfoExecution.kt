@@ -12,6 +12,7 @@ internal class GetInfoExecution(
     private val ctapAuthenticator: CtapAuthenticator,
     authenticatorGetInfoCommand: AuthenticatorGetInfoRequest
 ) : CtapCommandExecutionBase<AuthenticatorGetInfoRequest, AuthenticatorGetInfoResponse>(
+    ctapAuthenticator,
     authenticatorGetInfoCommand
 ) {
 

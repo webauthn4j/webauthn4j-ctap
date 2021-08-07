@@ -78,7 +78,7 @@ internal class MakeCredentialExecution :
     constructor(
         ctapAuthenticator: CtapAuthenticator,
         authenticatorMakeCredentialCommand: AuthenticatorMakeCredentialRequest
-    ) : super(authenticatorMakeCredentialCommand) {
+    ) : super(ctapAuthenticator, authenticatorMakeCredentialCommand) {
         this.ctapAuthenticator = ctapAuthenticator
         this.authenticatorMakeCredentialCommand = authenticatorMakeCredentialCommand
 

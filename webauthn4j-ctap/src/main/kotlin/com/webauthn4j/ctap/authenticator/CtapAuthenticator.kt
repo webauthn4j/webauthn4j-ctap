@@ -19,6 +19,7 @@ import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import org.slf4j.LoggerFactory
 import java.io.Serializable
+import java.lang.Exception
 
 class CtapAuthenticator @JvmOverloads constructor(
     // Core logic delegates
@@ -82,6 +83,7 @@ class CtapAuthenticator @JvmOverloads constructor(
     var userConsentHandler: UserConsentHandler = DefaultUserConsentHandler()
     var credentialSelectionHandler: CredentialSelectionHandler = DefaultCredentialSelectionHandler()
     var eventListeners: MutableList<EventListener> = mutableListOf()
+    var exceptionReporters: MutableList<ExceptionReporter> = mutableListOf()
 
 
     init {
@@ -158,6 +160,18 @@ class CtapAuthenticator @JvmOverloads constructor(
 
     internal fun publishEvent(event: Event) {
         eventListeners.forEach { it.onEvent(event) }
+    }
+
+    fun registerExceptionReporter(exceptionReporter: ExceptionReporter){
+        exceptionReporters.add(exceptionReporter)
+    }
+
+    fun unregisterExceptionReporter(exceptionReporter: ExceptionReporter){
+        exceptionReporters.remove(exceptionReporter)
+    }
+
+    internal fun reportException(exception: Exception){
+        exceptionReporters.forEach{ it.report(exception) }
     }
 
     private class DefaultUserConsentHandler : UserConsentHandler {

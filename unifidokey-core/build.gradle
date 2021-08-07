@@ -71,6 +71,11 @@ dependencies {
     implementation 'com.google.dagger:dagger-android'
     implementation 'com.google.dagger:dagger-android-support'
 
+    //Firebase
+    implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.google.firebase:firebase-analytics'
+
+
     // Annotation processor
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
     kapt "androidx.room:room-compiler:$roomVersion"

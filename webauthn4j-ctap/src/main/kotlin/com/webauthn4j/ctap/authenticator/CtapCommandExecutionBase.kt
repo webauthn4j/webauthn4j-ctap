@@ -6,7 +6,7 @@ import com.webauthn4j.ctap.core.data.CtapResponse
 import com.webauthn4j.ctap.core.data.StatusCode
 import org.slf4j.LoggerFactory
 
-abstract class CtapCommandExecutionBase<TC : CtapRequest, TR : CtapResponse<*>>(private val ctapCommand: TC) {
+abstract class CtapCommandExecutionBase<TC : CtapRequest, TR : CtapResponse<*>>(private val ctapAuthenticator: CtapAuthenticator, private val ctapCommand: TC) {
 
     private val logger = LoggerFactory.getLogger(CtapCommandExecutionBase::class.java)
 
@@ -27,6 +27,7 @@ abstract class CtapCommandExecutionBase<TC : CtapRequest, TR : CtapResponse<*>>(
     private fun onFailure(e: CtapCommandExecutionException): TR {
         if(e.statusCode == StatusCode.CTAP1_ERR_OTHER){
             logger.error("Failed ctap2 command processing. StatusCode: {} ", e.statusCode, e)
+            ctapAuthenticator.reportException(e)
         }
         else{
             logger.debug("Failed ctap2 command processing. StatusCode: {} ", e.statusCode)

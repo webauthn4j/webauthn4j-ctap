@@ -63,7 +63,7 @@ internal class GetAssertionExecution :
     constructor(
         ctapAuthenticator: CtapAuthenticator,
         authenticatorGetAssertionCommand: AuthenticatorGetAssertionRequest
-    ) : super(authenticatorGetAssertionCommand) {
+    ) : super(ctapAuthenticator, authenticatorGetAssertionCommand) {
         this.ctapAuthenticator = ctapAuthenticator
         this.authenticatorGetAssertionCommand = authenticatorGetAssertionCommand
         this.authenticatorPropertyStore = ctapAuthenticator.authenticatorPropertyStore

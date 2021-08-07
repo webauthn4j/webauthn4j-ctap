@@ -10,6 +10,7 @@ internal class ClientPINExecution(
     private val ctapAuthenticator: CtapAuthenticator,
     private val authenticatorClientPINCommand: AuthenticatorClientPINRequest
 ) : CtapCommandExecutionBase<AuthenticatorClientPINRequest, AuthenticatorClientPINResponse>(
+    ctapAuthenticator,
     authenticatorClientPINCommand
 ) {
     private val logger = LoggerFactory.getLogger(ClientPINExecution::class.java)

@@ -19,6 +19,7 @@ internal class GetNextAssertionExecution(
     private val ctapAuthenticator: CtapAuthenticator,
     authenticatorGetNextAssertionCommand: AuthenticatorGetNextAssertionRequest
 ) : CtapCommandExecutionBase<AuthenticatorGetNextAssertionRequest, AuthenticatorGetNextAssertionResponse>(
+    ctapAuthenticator,
     authenticatorGetNextAssertionCommand
 ) {
 

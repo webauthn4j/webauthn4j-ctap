@@ -34,3 +34,4 @@ sample/node_modules
 sample/src/main/resources/application-local-with-services.yml
 local.properties
 secret.properties
+unifidokey-handheld/google-services.json

@@ -1,6 +1,6 @@
 # WebAuthn4J UnifidoKey
 
-[![Actions Status](https://github.com/webauthn4j/unifidokey/workflows/CI/badge.svg)](https://github.com/webauthn4j/unifidokey/actions)
+[![Actions Status](https://github.com/webauthn4j/UnifidoKey/workflows/CI/badge.svg)](https://github.com/webauthn4j/unifidokey/actions)
 
 WebAuthn4J UnifidoKey is an Android app which act as a WebAuthn security key.
 No longer need to buy an expensive physical security key and carry it everyday. 

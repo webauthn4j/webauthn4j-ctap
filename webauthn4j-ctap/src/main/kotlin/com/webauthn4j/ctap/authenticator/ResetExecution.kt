@@ -14,6 +14,7 @@ class ResetExecution internal constructor(
     private val ctapAuthenticator: CtapAuthenticator,
     authenticatorResetCommand: AuthenticatorResetRequest
 ) : CtapCommandExecutionBase<AuthenticatorResetRequest, AuthenticatorResetResponse>(
+    ctapAuthenticator,
     authenticatorResetCommand
 ) {
 

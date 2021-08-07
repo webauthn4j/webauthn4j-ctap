@@ -3,6 +3,7 @@ package com.unifidokey.core.service
 import androidx.annotation.UiThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.unifidokey.core.adapter.UnifidoKeyAuthenticatorPropertyStore
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.driver.persistence.converter.EventConverter
@@ -14,6 +15,7 @@ import com.webauthn4j.ctap.authenticator.event.Event
 import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import kotlinx.coroutines.runBlocking
+import java.lang.Exception
 
 /**
  * Domain service for authenticator
@@ -131,11 +133,16 @@ class AuthenticatorService(
             }
         }
         ctapAuthenticator.registerEventListener(this::onEvent)
+        ctapAuthenticator.registerExceptionReporter(this::onException)
         this@AuthenticatorService.ctapAuthenticator = ctapAuthenticator
     }
 
     private fun onEvent(event: Event) {
         val eventEntity = eventConverter.toEventEntity(event)
         eventDao.create(eventEntity)
+    }
+
+    private fun onException(exception: Exception){
+        FirebaseCrashlytics.getInstance().recordException(exception)
     }
 }
