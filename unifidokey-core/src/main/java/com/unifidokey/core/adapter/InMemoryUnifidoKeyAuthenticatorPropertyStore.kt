@@ -8,4 +8,4 @@ import java.io.Serializable
 class InMemoryUnifidoKeyAuthenticatorPropertyStore(
     override var algorithms: Set<COSEAlgorithmIdentifier>,
     override var keyStorageSetting: KeyStorageSetting
-) : InMemoryAuthenticatorPropertyStore<Serializable?>(), UnifidoKeyAuthenticatorPropertyStore
+) : InMemoryAuthenticatorPropertyStore(), UnifidoKeyAuthenticatorPropertyStore

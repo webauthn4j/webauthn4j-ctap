@@ -54,7 +54,7 @@ buildscript {
     ext.springBootVersion = "2.5.3"
     ext.bouncyCastleVersion = "1.69"
     ext.logbackAndroidVersion = "2.0.0"
-    ext.webauthn4jVersion = "toString-SNAPSHOT"
+    ext.webauthn4jVersion = "hmac-secret-SNAPSHOT"
     ext.mockitoVersion = "3.11.2"
     ext.mockitoKotlinVersion = "3.2.0"
     ext.asciidoctorGradleVersion = "3.3.2"
@@ -107,6 +107,10 @@ allprojects {
         props.each { prop ->
             project.ext.set(prop.key, prop.value)
         }
+    }
+
+    configurations.all {
+        resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
     }
 }
 

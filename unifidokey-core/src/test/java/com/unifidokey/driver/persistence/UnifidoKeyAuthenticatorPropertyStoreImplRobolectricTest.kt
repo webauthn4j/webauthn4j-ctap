@@ -18,12 +18,11 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import java.io.Serializable
 import java.time.Instant
 
 @RunWith(RobolectricTestRunner::class)
 class UnifidoKeyAuthenticatorPropertyStoreImplRobolectricTest {
-    private lateinit var target: AuthenticatorPropertyStore<Serializable?>
+    private lateinit var target: AuthenticatorPropertyStore
 
     @Before
     fun setup() {
@@ -57,7 +56,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImplRobolectricTest {
         val counter: Long = 123
         val createdAt = Instant.now()
         val residentKey = true
-        val userCredential: ResidentUserCredential<Serializable?> = ResidentUserCredential(
+        val userCredential: ResidentUserCredential = ResidentUserCredential(
             credentialId,
             ResidentUserCredentialKey(SignatureAlgorithm.ES256, ECUtil.createKeyPair()),
             userHandle,
@@ -67,7 +66,8 @@ class UnifidoKeyAuthenticatorPropertyStoreImplRobolectricTest {
             rpName,
             counter,
             createdAt,
-            null
+            null,
+            emptyMap()
         )
         target.saveUserCredential(userCredential)
         val retrieved = target.loadUserCredential(rpId, userHandle)!!
@@ -81,6 +81,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImplRobolectricTest {
         assertThat(retrieved.counter).isEqualTo(counter)
         assertThat(retrieved.createdAt.epochSecond).isEqualTo(createdAt.epochSecond)
         assertThat(retrieved.isResidentKey).isEqualTo(residentKey)
+        assertThat(retrieved.details).isEqualTo(emptyMap<String, String>())
     }
 
 
@@ -226,7 +227,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImplRobolectricTest {
         val rpName = "rpName"
         val counter: Long = 123
         val createdAt = Instant.now()
-        val userCredential = ResidentUserCredential<Serializable?>(
+        val userCredential = ResidentUserCredential(
             credentialId,
             ResidentUserCredentialKey(
                 SignatureAlgorithm.ES256,
@@ -239,7 +240,8 @@ class UnifidoKeyAuthenticatorPropertyStoreImplRobolectricTest {
             rpName,
             counter,
             createdAt,
-            null
+            null,
+            emptyMap()
         )
         target.saveUserCredential(userCredential)
         target.clear()

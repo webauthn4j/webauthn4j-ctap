@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.io.Serializable
 import java.time.Instant
 
-class ResidentUserCredential<T : Serializable?> @JsonCreator constructor(
+class ResidentUserCredential @JsonCreator constructor(
     @JsonProperty("id") val id: ByteArray,
     @JsonProperty("userCredentialKey") override val userCredentialKey: ResidentUserCredentialKey,
     @JsonProperty("userHandle") override val userHandle: ByteArray,
@@ -15,8 +15,9 @@ class ResidentUserCredential<T : Serializable?> @JsonCreator constructor(
     @JsonProperty("rpName") override val rpName: String,
     @JsonProperty("counter") override var counter: Long,
     @JsonProperty("createdAt") override val createdAt: Instant,
-    @JsonProperty("otherUI") override val otherUI: T
-) : UserCredential<T> {
+    @JsonProperty("otherUI") override val otherUI: Serializable?,
+    @JsonProperty("details") override val details: Map<String, String>
+) : UserCredential {
 
     override val credentialId: ByteArray
         get() = id

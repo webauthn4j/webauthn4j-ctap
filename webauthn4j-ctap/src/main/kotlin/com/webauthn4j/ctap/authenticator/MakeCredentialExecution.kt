@@ -5,13 +5,14 @@ import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementRequest
 import com.webauthn4j.ctap.authenticator.event.MakeCredentialEvent
 import com.webauthn4j.ctap.authenticator.exception.CtapCommandExecutionException
 import com.webauthn4j.ctap.authenticator.exception.StoreFullException
+import com.webauthn4j.ctap.authenticator.extension.RegistrationExtensionContext
+import com.webauthn4j.ctap.authenticator.extension.RegistrationExtensionProcessor
 import com.webauthn4j.ctap.authenticator.internal.KeyPairUtil.createCredentialKeyPair
 import com.webauthn4j.ctap.authenticator.settings.ResidentKeySetting
 import com.webauthn4j.ctap.authenticator.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.settings.UserVerificationSetting
 import com.webauthn4j.ctap.authenticator.store.*
 import com.webauthn4j.ctap.core.data.*
-import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialParameters
 import com.webauthn4j.data.PublicKeyCredentialRpEntity
@@ -28,7 +29,6 @@ import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenti
 import com.webauthn4j.util.MessageDigestUtil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.io.Serializable
 import java.nio.charset.StandardCharsets
 import java.security.SecureRandom
 import java.time.Instant
@@ -46,9 +46,9 @@ internal class MakeCredentialExecution :
 
     @Suppress("JoinDeclarationAndAssignment")
     private val ctapAuthenticator: CtapAuthenticator
-    private val authenticatorMakeCredentialCommand: AuthenticatorMakeCredentialRequest
+    private val authenticatorMakeCredentialRequest: AuthenticatorMakeCredentialRequest
 
-    private val authenticatorPropertyStore: AuthenticatorPropertyStore<Serializable?>
+    private val authenticatorPropertyStore: AuthenticatorPropertyStore
     private val cborConverter: CborConverter
     private val secureRandom = SecureRandom()
 
@@ -59,11 +59,13 @@ internal class MakeCredentialExecution :
     private val user: PublicKeyCredentialUserEntity
     private val pubKeyCredParams: List<PublicKeyCredentialParameters>
     private val excludeList: List<PublicKeyCredentialDescriptor>?
-    private val extensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>?
+    private val registrationExtensionAuthenticatorInputs: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>?
     private val options: AuthenticatorMakeCredentialRequest.Options?
     private val pinAuth: ByteArray?
     private val pinProtocol: PinProtocolVersion?
 
+
+    private val userCredentialBuilder: UserCredentialBuilder
 
     private val counter: Long = 0
     private var residentKeyPlan = false
@@ -73,20 +75,17 @@ internal class MakeCredentialExecution :
     private var userPresenceResult = false
     private lateinit var algorithmIdentifier: COSEAlgorithmIdentifier
 
-    private val registrationExtensionAuthenticatorOutputs: AuthenticationExtensionsAuthenticatorOutputs<RegistrationExtensionAuthenticatorOutput>
+    private var registrationExtensionAuthenticatorOutputs: AuthenticationExtensionsAuthenticatorOutputs<RegistrationExtensionAuthenticatorOutput> = AuthenticationExtensionsAuthenticatorOutputs()
 
     constructor(
         ctapAuthenticator: CtapAuthenticator,
         authenticatorMakeCredentialCommand: AuthenticatorMakeCredentialRequest
     ) : super(ctapAuthenticator, authenticatorMakeCredentialCommand) {
         this.ctapAuthenticator = ctapAuthenticator
-        this.authenticatorMakeCredentialCommand = authenticatorMakeCredentialCommand
+        this.authenticatorMakeCredentialRequest = authenticatorMakeCredentialCommand
 
         this.authenticatorPropertyStore = ctapAuthenticator.authenticatorPropertyStore
         this.cborConverter = ctapAuthenticator.objectConverter.cborConverter
-
-        this.registrationExtensionAuthenticatorOutputs =
-            AuthenticationExtensionsAuthenticatorOutputs<RegistrationExtensionAuthenticatorOutput>()
 
         // command properties initialization and validation
         this.clientDataHash = authenticatorMakeCredentialCommand.clientDataHash
@@ -95,10 +94,21 @@ internal class MakeCredentialExecution :
         this.user = authenticatorMakeCredentialCommand.user
         this.pubKeyCredParams = authenticatorMakeCredentialCommand.pubKeyCredParams
         this.excludeList = authenticatorMakeCredentialCommand.excludeList
-        this.extensions = authenticatorMakeCredentialCommand.extensions
+        this.registrationExtensionAuthenticatorInputs = authenticatorMakeCredentialCommand.extensions
         this.options = authenticatorMakeCredentialCommand.options
         this.pinAuth = authenticatorMakeCredentialCommand.pinAuth
         this.pinProtocol = authenticatorMakeCredentialCommand.pinProtocol
+
+        // user credential builder initialization
+        this.userCredentialBuilder = UserCredentialBuilder(ctapAuthenticator.objectConverter, authenticatorPropertyStore.loadEncryptionKey(), authenticatorPropertyStore.loadEncryptionIV())
+
+        userCredentialBuilder.userHandle(user.id)
+        userCredentialBuilder.username(user.name)
+        userCredentialBuilder.displayName(user.displayName)
+        userCredentialBuilder.rpId(rpId!!)
+        userCredentialBuilder.rpName(rp.name)
+        userCredentialBuilder.counter(counter)
+        userCredentialBuilder.otherUI(null)
     }
 
     override suspend fun doExecute(): AuthenticatorMakeCredentialResponse {
@@ -215,7 +225,19 @@ internal class MakeCredentialExecution :
     //spec| Optionally, if the extensions parameter is present, process any extensions that this authenticator supports.
     //spec| Authenticator extension outputs generated by the authenticator extension processing are returned in the authenticator data.
     private fun execStep4ProcessExtensions() {
-        // TODO
+        val inputs = this.registrationExtensionAuthenticatorInputs
+        val outputsBuilder = AuthenticationExtensionsAuthenticatorOutputs.BuilderForRegistration()
+        if(inputs != null){
+            inputs.extensions.forEach{
+                ctapAuthenticator.extensionProcessors.filterIsInstance<RegistrationExtensionProcessor>().forEach{ processor ->
+                    if(processor.supportsRegistrationExtension(inputs)){
+                        val context = RegistrationExtensionContext(ctapAuthenticator, authenticatorMakeCredentialRequest)
+                        processor.processRegistrationExtension(context, userCredentialBuilder, outputsBuilder)
+                    }
+                }
+            }
+            registrationExtensionAuthenticatorOutputs = outputsBuilder.build()
+        }
     }
 
     //spec| Step5
@@ -260,7 +282,7 @@ internal class MakeCredentialExecution :
     //spec| Step7
     //spec| If pinAuth parameter is present and the pinProtocol is not supported, return CTAP2_ERR_PIN_AUTH_INVALID.
     private fun execStep7ValidatePinProtocol() {
-        if (authenticatorMakeCredentialCommand.pinAuth != null && authenticatorMakeCredentialCommand.pinProtocol != PinProtocolVersion.VERSION_1) {
+        if (authenticatorMakeCredentialRequest.pinAuth != null && authenticatorMakeCredentialRequest.pinProtocol != PinProtocolVersion.VERSION_1) {
             throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
         }
     }
@@ -313,7 +335,7 @@ internal class MakeCredentialExecution :
             rpIdHash,
             alg,
             userCredential.credentialId,
-            authenticatorMakeCredentialCommand.clientDataHash,
+            authenticatorMakeCredentialRequest.clientDataHash,
             residentKeyPlan,
             userCredential.userCredentialKey,
             authenticatorDataProvider
@@ -327,32 +349,34 @@ internal class MakeCredentialExecution :
                 attestationStatementRequest.authenticatorData,
                 attestationStatement
             )
-            if (userCredential is ResidentUserCredential<*>) {
+            if (userCredential is ResidentUserCredential) {
                 try {
-                    authenticatorPropertyStore.saveUserCredential((userCredential as ResidentUserCredential<Serializable?>))
+                    authenticatorPropertyStore.saveUserCredential(userCredential)
                 } catch (e: StoreFullException) {
                     throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_KEY_STORE_FULL)
                 }
             }
             return AuthenticatorMakeCredentialResponse(StatusCode.CTAP2_OK, responseData)
         } catch (e: java.lang.RuntimeException) {
-            if (userCredential is ResidentUserCredential<*>) {
-                removeHalfwayResources(userCredential as ResidentUserCredential<Serializable?>)
+            if (userCredential is ResidentUserCredential) {
+                removeInCompleteUserCredential(userCredential)
             }
             throw e
         }
     }
 
-    private fun createUserCredential(): UserCredential<Serializable?> {
-        val userCredential: UserCredential<Serializable?>
-        val userEntity = user
-        val rpEntity = rp
-        val createdAt = Instant.now()
-        userCredential = if (residentKeyPlan) {
-            if (!authenticatorPropertyStore.supports(algorithmIdentifier)) {
-                throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_UNSUPPORTED_ALGORITHM)
-            }
-            val userCredentialKey: ResidentUserCredentialKey
+    private fun createUserCredential(): UserCredential {
+
+        if (!authenticatorPropertyStore.supports(algorithmIdentifier)) {
+            throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_UNSUPPORTED_ALGORITHM)
+        }
+
+        val userCredentialKey: UserCredentialKey
+        if (residentKeyPlan) {
+            val credentialId = ByteArray(32)
+            secureRandom.nextBytes(credentialId)
+            userCredentialBuilder.credentialId(credentialId)
+
             try {
                 userCredentialKey = authenticatorPropertyStore.createUserCredentialKey(
                     algorithmIdentifier,
@@ -361,66 +385,23 @@ internal class MakeCredentialExecution :
             } catch (e: StoreFullException) {
                 throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_KEY_STORE_FULL, e)
             }
-            val credentialId = ByteArray(32)
-            secureRandom.nextBytes(credentialId)
-            val userHandle = userEntity.id
-            ResidentUserCredential(
-                credentialId,
-                userCredentialKey,
-                userHandle,
-                userEntity.name,
-                userEntity.displayName,
-                rpId!!,
-                rpEntity.name,
-                counter,
-                createdAt,
-                null
-            )
         } else {
-            val userCredentialKey = NonResidentUserCredentialKey(
+            userCredentialKey = NonResidentUserCredentialKey(
                 algorithmIdentifier.toSignatureAlgorithm(),
                 createCredentialKeyPair(algorithmIdentifier)
             )
-            // Let credentialId be the result of serializing and encrypting credentialSource
-            // so that only this authenticator can decrypt it.
-            val userHandle = userEntity.id
-            val nonResidentUserCredentialEnvelope = NonResidentUserCredentialSource<Serializable?>(
-                userCredentialKey,
-                userHandle,
-                userEntity.name,
-                userEntity.displayName,
-                rpId!!,
-                rpEntity.name,
-                createdAt,
-                null
-            )
-            val data = cborConverter.writeValueAsBytes(nonResidentUserCredentialEnvelope)
-            val credentialId = CipherUtil.encryptWithAESCBCPKCS5Padding(
-                data,
-                authenticatorPropertyStore.loadEncryptionKey(),
-                authenticatorPropertyStore.loadEncryptionIV()
-            )
-            NonResidentUserCredential(
-                credentialId,
-                userCredentialKey,
-                userHandle,
-                userEntity.name,
-                userEntity.displayName,
-                rpId,
-                rpEntity.name,
-                createdAt,
-                null
-            )
         }
-        return userCredential
+        userCredentialBuilder.userCredentialKey(userCredentialKey)
+        userCredentialBuilder.createdAt(Instant.now())
+        return userCredentialBuilder.build()
     }
 
-    private fun removeHalfwayResources(userCredential: ResidentUserCredential<Serializable?>?) {
+    private fun removeInCompleteUserCredential(userCredential: ResidentUserCredential?) {
         if (userCredential != null) {
             try {
                 authenticatorPropertyStore.removeUserCredential(userCredential.credentialId)
             } catch (e: RuntimeException) {
-                logger.error("Failed to remove halfway resources.", e)
+                logger.error("Failed to remove in complete credential.", e)
             }
         }
     }

@@ -12,16 +12,16 @@ import java.util.stream.Collectors
 class CachingCredentialSelectionHandler(private val credentialSelectionHandler: CredentialSelectionHandler) :
     CredentialSelectionHandler {
     private val logger = LoggerFactory.getLogger(CachingCredentialSelectionHandler::class.java)
-    private var previousList: List<UserCredential<Serializable?>>? = null
-    private var previousSelection: UserCredential<Serializable?>? = null
+    private var previousList: List<UserCredential>? = null
+    private var previousSelection: UserCredential? = null
     private var cachedAt: Instant? = null
 
-    override suspend fun select(list: List<UserCredential<Serializable?>>): UserCredential<Serializable?> {
+    override suspend fun select(list: List<UserCredential>): UserCredential {
         val idList = list.stream()
-            .map { item: UserCredential<Serializable?> -> Base64UrlUtil.encodeToString(item.credentialId) }
+            .map { item: UserCredential -> Base64UrlUtil.encodeToString(item.credentialId) }
             .collect(Collectors.toList())
         val previousIdList = if (previousList == null) null else previousList!!.stream()
-            .map { item: UserCredential<Serializable?> -> Base64UrlUtil.encodeToString(item.credentialId) }
+            .map { item: UserCredential -> Base64UrlUtil.encodeToString(item.credentialId) }
             .collect(Collectors.toList())
         return if (idList == previousIdList && cachedAt!!.isAfter(Instant.now().minus(TTL))) {
             logger.info("Cached selected credential is used.")

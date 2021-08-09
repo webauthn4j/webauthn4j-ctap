@@ -30,7 +30,6 @@ import com.webauthn4j.data.extension.client.AuthenticationExtensionClientInput
 import com.webauthn4j.data.extension.client.AuthenticationExtensionsClientInputs
 import com.webauthn4j.data.extension.client.RegistrationExtensionClientInput
 import com.webauthn4j.server.ServerProperty
-import java.io.Serializable
 import java.util.*
 import java.util.function.Supplier
 import kotlin.reflect.KProperty
@@ -92,13 +91,13 @@ abstract class IntegrationTestCaseBase {
         private val credentialSelectionHandlerParameter =
             TestParameter<CredentialSelectionHandler> {
                 object : CredentialSelectionHandler {
-                    override suspend fun select(list: List<UserCredential<Serializable?>>): UserCredential<Serializable?> =
+                    override suspend fun select(list: List<UserCredential>): UserCredential =
                         list.first()
                 }
             }
         private val authenticatorPropertyStoreParameter =
-            TestParameter<AuthenticatorPropertyStore<Serializable?>> {
-                InMemoryAuthenticatorPropertyStore<Serializable?>().also {
+            TestParameter<AuthenticatorPropertyStore> {
+                InMemoryAuthenticatorPropertyStore().also {
                     it.saveClientPIN(clientPIN.toByteArray())
                     it.algorithms = algorithms
                 }
@@ -106,6 +105,7 @@ abstract class IntegrationTestCaseBase {
         internal val ctapAuthenticatorParameter = TestParameter {
             val ctapAuthenticator = CtapAuthenticator(
                 attestationStatementGenerator,
+                emptyList(),
                 authenticatorPropertyStore,
                 objectConverter,
                 ctapAuthenticatorSettings

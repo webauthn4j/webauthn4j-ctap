@@ -12,6 +12,7 @@ import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.*
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementGenerator
 import com.webauthn4j.ctap.authenticator.event.Event
+import com.webauthn4j.ctap.authenticator.extension.HMACSecretExtensionProcessor
 import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import kotlinx.coroutines.runBlocking
@@ -116,8 +117,10 @@ class AuthenticatorService(
                         attestationStatementFormatSetting
                     )
                 )
+        val extensionProcessors = listOf(HMACSecretExtensionProcessor())
         val ctapAuthenticator = CtapAuthenticator(
             attestationStatementGenerator,
+            extensionProcessors,
             authenticatorPropertyStore,
             objectConverter,
             settings

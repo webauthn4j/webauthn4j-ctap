@@ -23,7 +23,7 @@ import java.util.*
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 
-class ClientPINService(private val authenticatorPropertyStore: AuthenticatorPropertyStore<Serializable?>) {
+class ClientPINService(private val authenticatorPropertyStore: AuthenticatorPropertyStore) {
 
     companion object {
         const val MAX_PIN_RETRIES = 8
@@ -50,7 +50,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
     }
 
     private var volatilePinRetryCounter = MAX_VOLATILE_PIN_RETRIES
-    private var authenticatorKeyAgreementKey = ECUtil.createKeyPair()
+    var authenticatorKeyAgreementKey = ECUtil.createKeyPair() //TODO: セッションを跨いで再利用されているが大丈夫か？
     val pinToken: ByteArray = ByteArray(16)
 
     init {
@@ -63,31 +63,29 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
     //spec| -- pinProtocol: 0x01
     //spec| -- subCommand: getRetries(0x01)
     //spec| - Authenticator responds back with retries.
-    val pinRetries: AuthenticatorClientPINResponse
-        get() {
-            //spec| Retries count is the number of attempts remaining before lockout. When the device is nearing authenticator lockout, the platform can optionally warn the user to be careful while entering the PIN.
-            //spec| Platform performs the following operations to get retries:
-            //spec| - Platform sends authenticatorClientPIN command with following parameters to the authenticator:
-            //spec| -- pinProtocol: 0x01
-            //spec| -- subCommand: getRetries(0x01)
-            //spec| - Authenticator responds back with retries.
-            val pinRetries = authenticatorPropertyStore.loadPINRetries()
-            val responseData = AuthenticatorClientPINResponseData(null, null, pinRetries.toLong())
-            return AuthenticatorClientPINResponse(StatusCode.CTAP2_OK, responseData)
-        }
+    fun getPinRetries(): AuthenticatorClientPINResponse {
+        //spec| Retries count is the number of attempts remaining before lockout. When the device is nearing authenticator lockout, the platform can optionally warn the user to be careful while entering the PIN.
+        //spec| Platform performs the following operations to get retries:
+        //spec| - Platform sends authenticatorClientPIN command with following parameters to the authenticator:
+        //spec| -- pinProtocol: 0x01
+        //spec| -- subCommand: getRetries(0x01)
+        //spec| - Authenticator responds back with retries.
+        val pinRetries = authenticatorPropertyStore.loadPINRetries()
+        val responseData = AuthenticatorClientPINResponseData(null, null, pinRetries.toLong())
+        return AuthenticatorClientPINResponse(StatusCode.CTAP2_OK, responseData)
+    }
 
     //spec| - Authenticator responds back with public key of authenticatorKeyAgreementKey, "aG".
-    val keyAgreement: AuthenticatorClientPINResponse
-        get() {
+    fun getKeyAgreement(): AuthenticatorClientPINResponse{
 
-            //spec| - Authenticator responds back with public key of authenticatorKeyAgreementKey, "aG".
-            val keyAgreement = EC2COSEKey.create(
-                (authenticatorKeyAgreementKey.public as ECPublicKey),
-                ECDH_ES_HKDF_256
-            )
-            val responseData = AuthenticatorClientPINResponseData(keyAgreement, null, null)
-            return AuthenticatorClientPINResponse(StatusCode.CTAP2_OK, responseData)
-        }
+        //spec| - Authenticator responds back with public key of authenticatorKeyAgreementKey, "aG".
+        val keyAgreement = EC2COSEKey.create(
+            (authenticatorKeyAgreementKey.public as ECPublicKey),
+            ECDH_ES_HKDF_256
+        )
+        val responseData = AuthenticatorClientPINResponseData(keyAgreement, null, null)
+        return AuthenticatorClientPINResponse(StatusCode.CTAP2_OK, responseData)
+    }
 
     fun setPIN(
         platformKeyAgreementKey: COSEKey?,
@@ -107,12 +105,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
         //spec| -- Authenticator generates "sharedSecret": SHA-256((abG).x) using private key of authenticatorKeyAgreementKey, "a" and public key of platformKeyAgreementKey, "bG".
         //spec| --- SHA-256 is done over only "x" curve point of "abG"
         //spec| --- See [RFC6090] Section 4.1 and appendix (C.2) of [SP800-56A] for more ECDH key agreement protocol details and key representation.
-        val sharedSecret = MessageDigestUtil.createSHA256().digest(
-            KeyAgreementUtil.generateSecret(
-                authenticatorKeyAgreementKey.private as ECPrivateKey,
-                platformKeyAgreementKey.publicKey as ECPublicKey?
-            )
-        )
+        val sharedSecret = generateSharedSecret(platformKeyAgreementKey)
 
         //spec| -- Authenticator verifies pinAuth by generating LEFT(HMAC-SHA-256(sharedSecret, newPinEnc), 16) and matching against input pinAuth parameter.
         //spec| --- If pinAuth verification fails, authenticator returns CTAP2_ERR_PIN_AUTH_INVALID error.
@@ -165,12 +158,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
         //spec| -- Authenticator generates "sharedSecret": SHA-256((abG).x) using private key of authenticatorKeyAgreementKey, "a" and public key of platformKeyAgreementKey, "bG".
         //spec| --- SHA-256 is done over only "x" curve point of "abG"
         //spec| ---- See [RFC6090] Section 4.1 and appendix (C.2) of [SP800-56A] for more ECDH key agreement protocol details and key representation.
-        val sharedSecret = MessageDigestUtil.createSHA256().digest(
-            KeyAgreementUtil.generateSecret(
-                authenticatorKeyAgreementKey.private as ECPrivateKey,
-                platformKeyAgreementKey.publicKey as ECPublicKey?
-            )
-        )
+        val sharedSecret = generateSharedSecret(platformKeyAgreementKey)
         //spec| -- Authenticator verifies pinAuth by generating LEFT(HMAC-SHA-256(sharedSecret, newPinEnc || pinHashEnc), 16) and matching against input pinAuth parameter.
         //spec| --- If pinAuth verification fails, authenticator returns CTAP2_ERR_PIN_AUTH_INVALID error.
         val joined =
@@ -254,12 +242,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
         //spec| -- Authenticator generates "sharedSecret": SHA-256((abG).x) using private key of authenticatorKeyAgreementKey, "a" and public key of platformKeyAgreementKey, "bG".
         //spec| --- SHA-256 is done over only "x" curve point of "abG"
         //spec| --- See [RFC6090] Section 4.1 and appendix (C.2) of [SP800-56A] for more ECDH key agreement protocol details and key representation.
-        val sharedSecret = MessageDigestUtil.createSHA256().digest(
-            KeyAgreementUtil.generateSecret(
-                authenticatorKeyAgreementKey.private as ECPrivateKey,
-                platformKeyAgreementKey.publicKey as ECPublicKey?
-            )
-        )
+        val sharedSecret = generateSharedSecret(platformKeyAgreementKey)
         //spec| -- Authenticator decrements the retries counter by 1.
         authenticatorPropertyStore.savePINRetries(authenticatorPropertyStore.loadPINRetries() - 1)
         volatilePinRetryCounter--
@@ -297,6 +280,15 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
         val responseData =
             AuthenticatorClientPINResponseData(null, pinTokenEnc, pinRetries.toLong())
         return AuthenticatorClientPINResponse(StatusCode.CTAP2_OK, responseData)
+    }
+
+    fun generateSharedSecret(platformKeyAgreementKey: COSEKey): ByteArray{
+        return MessageDigestUtil.createSHA256().digest(
+            KeyAgreementUtil.generateSecret(
+                authenticatorKeyAgreementKey.private as ECPrivateKey,
+                platformKeyAgreementKey.publicKey as ECPublicKey?
+            )
+        )
     }
 
     fun validatePINAuth(pinAuth: ByteArray?, clientDataHash: ByteArray?) {

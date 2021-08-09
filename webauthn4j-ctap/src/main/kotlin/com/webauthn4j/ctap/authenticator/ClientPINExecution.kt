@@ -25,11 +25,11 @@ internal class ClientPINExecution(
         return when (authenticatorClientPINCommand.subCommand) {
             PinSubCommand.GET_PIN_RETRIES -> {
                 logger.debug("Processing clientPIN getRetries sub-command")
-                clientPINService.pinRetries
+                clientPINService.getPinRetries()
             }
             PinSubCommand.GET_KEY_AGREEMENT -> {
                 logger.debug("Processing clientPIN getKeyAgreement sub-command")
-                clientPINService.keyAgreement
+                clientPINService.getKeyAgreement()
             }
             PinSubCommand.SET_PIN -> {
                 logger.debug("Processing clientPIN setPIN sub-command")

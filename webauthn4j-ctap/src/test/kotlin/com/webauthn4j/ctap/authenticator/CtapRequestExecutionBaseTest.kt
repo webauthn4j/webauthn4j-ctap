@@ -16,7 +16,8 @@ internal class CtapRequestExecutionBaseTest {
     @Test
     fun unexpected_execution_error_test() = runBlockingTest {
 
-        val target = TestCtapCommandExecution(mock(CtapRequest::class.java))
+        val ctapAuthenticator = CtapAuthenticator()
+        val target = TestCtapCommandExecution(ctapAuthenticator, mock(CtapRequest::class.java))
         assertThatCode {
             runBlockingTest {
                 target.execute()
@@ -24,8 +25,8 @@ internal class CtapRequestExecutionBaseTest {
         }.doesNotThrowAnyException()
     }
 
-    inner class TestCtapCommandExecution(ctapRequest: CtapRequest) :
-        CtapCommandExecutionBase<CtapRequest, CtapResponse<CtapResponseData>>(ctapRequest) {
+    inner class TestCtapCommandExecution(ctapAuthenticator: CtapAuthenticator, ctapRequest: CtapRequest) :
+        CtapCommandExecutionBase<CtapRequest, CtapResponse<CtapResponseData>>(ctapAuthenticator, ctapRequest) {
 
         override val commandName: String
             get() = "TestCtapCommand"

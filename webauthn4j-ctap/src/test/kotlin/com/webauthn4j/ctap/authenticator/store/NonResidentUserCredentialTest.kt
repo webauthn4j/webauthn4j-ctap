@@ -12,7 +12,6 @@ import com.webauthn4j.util.ECUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.io.Serializable
 import java.time.Instant
 
 internal class NonResidentUserCredentialTest {
@@ -40,11 +39,11 @@ internal class NonResidentUserCredentialTest {
         val bytes = cborConverter.writeValueAsBytes(target)
         val data = cborConverter.readValue(
             bytes,
-            object : TypeReference<NonResidentUserCredential<Serializable?>>() {})
+            object : TypeReference<NonResidentUserCredential>() {})
         assertThat(data).isEqualTo(target)
     }
 
-    private fun createNonResidentUserCredential(): NonResidentUserCredential<Serializable?> {
+    private fun createNonResidentUserCredential(): NonResidentUserCredential {
         val credentialId = ByteArray(32)
         val userCredentialKey =
             NonResidentUserCredentialKey(SignatureAlgorithm.ES256, ECUtil.createKeyPair())
@@ -58,7 +57,8 @@ internal class NonResidentUserCredentialTest {
             "rpId",
             "rpName",
             Instant.now(),
-            null
+            null,
+            emptyMap()
         )
     }
 }

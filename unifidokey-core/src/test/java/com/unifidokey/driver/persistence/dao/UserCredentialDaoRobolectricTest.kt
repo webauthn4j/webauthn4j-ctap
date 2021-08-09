@@ -50,7 +50,8 @@ class UserCredentialDaoRobolectricTest {
             rpId,
             0,
             Instant.parse("2020-01-01T00:00:00.00Z"),
-            null
+            null,
+            "{}"
         )
         relyingPartyDao!!.create(relyingParty)
         val id = target!!.create(userCredential)
@@ -67,7 +68,8 @@ class UserCredentialDaoRobolectricTest {
             rpId,
             0,
             Instant.parse("2020-01-01T00:00:00.00Z"),
-            null
+            null,
+            "{}"
         )
         Truth.assertThat(fetched).isEqualTo(expected)
     }
@@ -91,7 +93,8 @@ class UserCredentialDaoRobolectricTest {
             rpId,
             0,
             Instant.parse("2020-01-01T00:00:00.00Z"),
-            null
+            null,
+            "{}"
         )
         val userCredential1 = UserCredentialEntity(
             credentialId1,
@@ -104,7 +107,8 @@ class UserCredentialDaoRobolectricTest {
             rpId,
             0,
             Instant.parse("2020-01-01T00:00:00.00Z"),
-            null
+            null,
+            "{}"
         )
         relyingPartyDao!!.create(relyingParty)
         target!!.create(userCredential0)
@@ -130,7 +134,8 @@ class UserCredentialDaoRobolectricTest {
             rpId,
             0,
             Instant.parse("2020-01-01T00:00:00.00Z"),
-            null
+            null,
+            "{}"
         )
         target!!.create(userCredential)
     }
@@ -153,7 +158,8 @@ class UserCredentialDaoRobolectricTest {
             rpId,
             0,
             Instant.parse("2020-01-01T00:00:00.00Z"),
-            null
+            null,
+            "{}"
         )
         val id = relyingPartyDao!!.create(relyingParty)
         target!!.create(userCredential)
@@ -169,7 +175,8 @@ class UserCredentialDaoRobolectricTest {
             rpId,
             0,
             Instant.parse("2020-01-01T00:00:00.00Z"),
-            null
+            null,
+            "{}"
         )
         target!!.update(update)
         val fetched = target!!.findOne(credentialId)
@@ -194,7 +201,8 @@ class UserCredentialDaoRobolectricTest {
             rpId,
             0,
             Instant.parse("2020-01-01T00:00:00.00Z"),
-            null
+            null,
+            "{}"
         )
         relyingPartyDao!!.create(relyingParty)
         val id = target!!.create(userCredential)
@@ -210,7 +218,8 @@ class UserCredentialDaoRobolectricTest {
             rpId,
             0,
             Instant.parse("2020-01-01T00:00:00.00Z"),
-            null
+            null,
+            "{}"
         )
         target!!.delete(delete)
         val fetched = target!!.findOne(credentialId)

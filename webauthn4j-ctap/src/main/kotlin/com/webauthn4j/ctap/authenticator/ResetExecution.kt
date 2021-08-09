@@ -7,7 +7,6 @@ import com.webauthn4j.ctap.core.data.AuthenticatorResetRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorResetResponse
 import com.webauthn4j.ctap.core.data.StatusCode
 import org.slf4j.LoggerFactory
-import java.io.Serializable
 import java.time.Instant
 
 class ResetExecution internal constructor(
@@ -18,7 +17,7 @@ class ResetExecution internal constructor(
     authenticatorResetCommand
 ) {
 
-    private val authenticatorPropertyStore: AuthenticatorPropertyStore<Serializable?> =
+    private val authenticatorPropertyStore: AuthenticatorPropertyStore =
         ctapAuthenticator.authenticatorPropertyStore
     private val logger = LoggerFactory.getLogger(MakeCredentialExecution::class.java)
 

@@ -1,7 +1,6 @@
 package com.webauthn4j.ctap.authenticator
 
 import com.webauthn4j.ctap.authenticator.SignatureCalculator.calculate
-import com.webauthn4j.ctap.authenticator.store.UserCredential
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponseData
@@ -12,7 +11,6 @@ import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.io.Serializable
 import java.nio.ByteBuffer
 
 internal class GetNextAssertionExecution(
@@ -27,19 +25,21 @@ internal class GetNextAssertionExecution(
     override val commandName: String = "GetNextAssertion"
 
     override suspend fun doExecute(): AuthenticatorGetNextAssertionResponse {
-        val getAssertionSession = ctapAuthenticator.onGoingGetAssertionSession
-            ?: return AuthenticatorGetNextAssertionResponse(StatusCode.CTAP2_ERR_NOT_ALLOWED)
 
         //spec| Step1
         //spec| If authenticator does not remember any authenticatorGetAssertion parameters, return CTAP2_ERR_NOT_ALLOWED.
+        val getAssertionSession = ctapAuthenticator.onGoingGetAssertionSession?: return AuthenticatorGetNextAssertionResponse(StatusCode.CTAP2_ERR_NOT_ALLOWED)
+
         //spec| Step2
         //spec| If the credentialCounter is equal to or greater than numberOfCredentials, return CTAP2_ERR_NOT_ALLOWED.
-        val userCredential: UserCredential<Serializable?>
+        val assertionObject: GetAssertionSession.AssertionObject
         try {
-            userCredential = getAssertionSession.nextUserCredential()
+            assertionObject = getAssertionSession.nextAssertionObject()
         } catch (e: NoSuchElementException) {
             return AuthenticatorGetNextAssertionResponse(StatusCode.CTAP2_ERR_NOT_ALLOWED)
         }
+        val userCredential = assertionObject.userCredential
+
         //spec| Step3
         //spec| If timer since the last call to authenticatorGetAssertion/authenticatorGetNextAssertion is greater than 30 seconds,
         //spec| discard the current authenticatorGetAssertion state and return CTAP2_ERR_NOT_ALLOWED.
@@ -59,9 +59,9 @@ internal class GetNextAssertionExecution(
         val counter = userCredential.counter
         val authenticatorDataObject = AuthenticatorData(
             getAssertionSession.rpIdHash,
-            getAssertionSession.flags,
+            assertionObject.flags,
             counter,
-            getAssertionSession.extensions
+            assertionObject.extensions
         )
         val authData = ctapAuthenticator.authenticatorDataConverter.convert(authenticatorDataObject)
         val clientDataHash = getAssertionSession.clientDataHash

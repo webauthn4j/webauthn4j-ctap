@@ -5,6 +5,8 @@ import com.webauthn4j.ctap.authenticator.SignatureCalculator.calculate
 import com.webauthn4j.ctap.authenticator.event.GetAssertionEvent
 import com.webauthn4j.ctap.authenticator.exception.CtapCommandExecutionException
 import com.webauthn4j.ctap.authenticator.exception.StoreFullException
+import com.webauthn4j.ctap.authenticator.extension.AuthenticationExtensionContext
+import com.webauthn4j.ctap.authenticator.extension.AuthenticationExtensionProcessor
 import com.webauthn4j.ctap.authenticator.settings.CredentialSelectorSetting
 import com.webauthn4j.ctap.authenticator.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.settings.UserVerificationSetting
@@ -18,12 +20,10 @@ import com.webauthn4j.data.PublicKeyCredentialType
 import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthenticatorInput
-import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthenticatorOutput
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorOutputs
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.io.Serializable
 import java.nio.ByteBuffer
 import java.time.Instant
 import java.util.*
@@ -41,42 +41,48 @@ internal class GetAssertionExecution :
     private val authenticatorGetAssertionCommand: AuthenticatorGetAssertionRequest
 
     private val logger: Logger = LoggerFactory.getLogger(GetAssertionExecution::class.java)
-    private val authenticatorPropertyStore: AuthenticatorPropertyStore<Serializable?>
+    private val authenticatorPropertyStore: AuthenticatorPropertyStore
 
     //Command properties
+    private val authenticatorGetAssertionRequest: AuthenticatorGetAssertionRequest
     private val rpId: String
     private val clientDataHash: ByteArray
     private val allowList: List<PublicKeyCredentialDescriptor>?
-    private val extensions: AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>?
+    private val authenticationExtensionsAuthenticatorInputs: AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>?
     private val options: AuthenticatorGetAssertionRequest.Options?
     private val pinAuth: ByteArray?
     private val pinProtocol: PinProtocolVersion?
 
-    private var userCredentials: List<UserCredential<Serializable?>>
+    // initialized in Step1
+    private lateinit var userCredentials: List<UserCredential>
+    // initialized in Step6
+    private lateinit var assertionObjects: List<GetAssertionSession.AssertionObject>
+    // initialized in Step10
+    private lateinit var onGoingGetAssertionSession: GetAssertionSession
+
     private var userVerificationPlan = false
     private var userPresencePlan = false
     private var userVerificationResult = false
     private var userPresenceResult = false
 
-    private lateinit var onGoingGetAssertionSession: GetAssertionSession
 
     constructor(
         ctapAuthenticator: CtapAuthenticator,
-        authenticatorGetAssertionCommand: AuthenticatorGetAssertionRequest
-    ) : super(ctapAuthenticator, authenticatorGetAssertionCommand) {
+        authenticatorGetAssertionRequest: AuthenticatorGetAssertionRequest
+    ) : super(ctapAuthenticator, authenticatorGetAssertionRequest) {
+        this.authenticatorGetAssertionRequest = authenticatorGetAssertionRequest
         this.ctapAuthenticator = ctapAuthenticator
-        this.authenticatorGetAssertionCommand = authenticatorGetAssertionCommand
+        this.authenticatorGetAssertionCommand = authenticatorGetAssertionRequest
         this.authenticatorPropertyStore = ctapAuthenticator.authenticatorPropertyStore
-        this.userCredentials = emptyList()
 
         // command properties initialization and validation
-        this.rpId = authenticatorGetAssertionCommand.rpId
-        this.clientDataHash = authenticatorGetAssertionCommand.clientDataHash
-        this.allowList = authenticatorGetAssertionCommand.allowList
-        this.extensions = authenticatorGetAssertionCommand.extensions
-        this.options = authenticatorGetAssertionCommand.options
-        this.pinAuth = authenticatorGetAssertionCommand.pinAuth
-        this.pinProtocol = authenticatorGetAssertionCommand.pinProtocol
+        this.rpId = authenticatorGetAssertionRequest.rpId
+        this.clientDataHash = authenticatorGetAssertionRequest.clientDataHash
+        this.allowList = authenticatorGetAssertionRequest.allowList
+        this.authenticationExtensionsAuthenticatorInputs = authenticatorGetAssertionRequest.extensions
+        this.options = authenticatorGetAssertionRequest.options
+        this.pinAuth = authenticatorGetAssertionRequest.pinAuth
+        this.pinProtocol = authenticatorGetAssertionRequest.pinProtocol
     }
 
     override suspend fun doExecute(): AuthenticatorGetAssertionResponse {
@@ -92,14 +98,14 @@ internal class GetAssertionExecution :
         execStep10PrepareGetAssertionSession()
         execStep11SelectUserCredentialIfCredentialSelectorIsAuthenticator()
         val response = execStep12SignClientDataHashAndAuthData()
-        val userDetails = onGoingGetAssertionSession.userCredentials.map {
+        val userCredentials = onGoingGetAssertionSession.assertionObjects.map {
             GetAssertionEvent.UserCredential(
-                it.username,
-                it.displayName
+                it.userCredential.username,
+                it.userCredential.displayName
             )
         }
-        val rpName = onGoingGetAssertionSession.userCredentials.first().rpName
-        val event = GetAssertionEvent(Instant.now(), rpId, rpName, userDetails, mapOf())
+        val rpName = onGoingGetAssertionSession.assertionObjects.first().userCredential.rpName
+        val event = GetAssertionEvent(Instant.now(), rpId, rpName, userCredentials, mapOf())
         ctapAuthenticator.publishEvent(event)
         return response
     }
@@ -137,8 +143,7 @@ internal class GetAssertionExecution :
                     val nonResidentUserCredentialEnvelope =
                         ctapAuthenticator.objectConverter.cborConverter.readValue(
                             decrypted,
-                            object :
-                                TypeReference<NonResidentUserCredentialSource<Serializable?>>() {})!!
+                            object : TypeReference<NonResidentUserCredentialSource>() {})!!
                     return@map NonResidentUserCredential(
                         it.id,
                         nonResidentUserCredentialEnvelope.userCredentialKey,
@@ -148,7 +153,8 @@ internal class GetAssertionExecution :
                         nonResidentUserCredentialEnvelope.rpId,
                         nonResidentUserCredentialEnvelope.rpName,
                         nonResidentUserCredentialEnvelope.createdAt,
-                        nonResidentUserCredentialEnvelope.otherUI
+                        nonResidentUserCredentialEnvelope.otherUI,
+                        nonResidentUserCredentialEnvelope.details
                     )
                 } catch (e: RuntimeException) {
                     logger.debug(
@@ -163,12 +169,12 @@ internal class GetAssertionExecution :
                     return@map null
                 }
             }.filterNotNull()
-            val result: MutableList<UserCredential<Serializable?>> = ArrayList()
+            val result: MutableList<UserCredential> = ArrayList()
             result.addAll(storedCredentials)
             result.addAll(derivedCredentials)
             result
         } else {
-            ArrayList<UserCredential<Serializable?>>(
+            ArrayList<UserCredential>(
                 authenticatorPropertyStore.loadUserCredentials(
                     rpId
                 )
@@ -234,7 +240,19 @@ internal class GetAssertionExecution :
     //spec| Optionally, if the extensions parameter is present, process any extensions that this authenticator supports.
     //spec| Authenticator extension outputs generated by the authenticator extension processing are returned in the authenticator data.
     private fun execStep6ProcessExtensions() {
-        // TODO
+        val inputs = this.authenticationExtensionsAuthenticatorInputs
+        assertionObjects = userCredentials.map{ userCredential ->
+            val outputsBuilder = AuthenticationExtensionsAuthenticatorOutputs.BuilderForAuthentication()
+            if(inputs != null){
+                val context = AuthenticationExtensionContext(ctapAuthenticator, authenticatorGetAssertionRequest, userCredential, userVerificationPlan, userPresencePlan)
+                ctapAuthenticator.extensionProcessors.filterIsInstance<AuthenticationExtensionProcessor>().forEach{ processor ->
+                    if(processor.supportsAuthenticationExtension(inputs)){
+                        processor.processAuthenticationExtension(context, outputsBuilder)
+                    }
+                }
+            }
+            GetAssertionSession.AssertionObject(userCredential, outputsBuilder.build(), 0)
+        }
     }
 
     //spec| Step7
@@ -303,13 +321,14 @@ internal class GetAssertionExecution :
         }
         // Let processedExtensions be the result of authenticator extension processing for each supported
         // extension identifier -> authenticator extension input in extensions.
-        val processedExtensions =
-            AuthenticationExtensionsAuthenticatorOutputs<AuthenticationExtensionAuthenticatorOutput>()
-        if (processedExtensions.keys.isNotEmpty()) {
-            flags = flags or AuthenticatorData.BIT_ED
+
+        assertionObjects.forEach{ assertionObject ->
+            assertionObject.flags = flags
+            if (assertionObject.extensions.keys.isNotEmpty()) {
+                assertionObject.flags = assertionObject.flags or AuthenticatorData.BIT_ED
+            }
         }
-        onGoingGetAssertionSession =
-            GetAssertionSession(userCredentials, clientDataHash, rpId, flags, processedExtensions)
+        onGoingGetAssertionSession = GetAssertionSession(assertionObjects, clientDataHash, rpId)
         ctapAuthenticator.onGoingGetAssertionSession = onGoingGetAssertionSession
     }
 
@@ -321,10 +340,9 @@ internal class GetAssertionExecution :
     //spec|   terminate this procedure and return the CTAP2_ERR_OPERATION_DENIED error.
     private suspend fun execStep11SelectUserCredentialIfCredentialSelectorIsAuthenticator() {
         if (ctapAuthenticator.credentialSelectorSetting == CredentialSelectorSetting.AUTHENTICATOR) {
-            val selectedUserCredential: UserCredential<Serializable?> =
-                ctapAuthenticator.credentialSelectionHandler.select(userCredentials)
-            onGoingGetAssertionSession =
-                onGoingGetAssertionSession.withUserCredentials(listOf(selectedUserCredential))
+            val selectedUserCredential: UserCredential = ctapAuthenticator.credentialSelectionHandler.select(userCredentials)
+            val selectedAssertionObject = assertionObjects.find { it.userCredential == selectedUserCredential }?: throw IllegalStateException("Selected UserCredential is not found in AssertionObject list")
+            onGoingGetAssertionSession = onGoingGetAssertionSession.withAssertionObjects(listOf(selectedAssertionObject))
             ctapAuthenticator.onGoingGetAssertionSession = onGoingGetAssertionSession
         }
     }
@@ -332,7 +350,8 @@ internal class GetAssertionExecution :
     //spec| Step12
     //spec| Sign the clientDataHash along with authData with the selected credential, using the structure specified in [WebAuthn].
     private fun execStep12SignClientDataHashAndAuthData(): AuthenticatorGetAssertionResponse {
-        val userCredential = onGoingGetAssertionSession.nextUserCredential()
+        val assertionObject = onGoingGetAssertionSession.nextAssertionObject()
+        val userCredential = assertionObject.userCredential
         val descriptor = PublicKeyCredentialDescriptor(
             PublicKeyCredentialType.PUBLIC_KEY,
             userCredential.credentialId,
@@ -341,9 +360,9 @@ internal class GetAssertionExecution :
         val counter = userCredential.counter
         val authenticatorDataObject = AuthenticatorData(
             onGoingGetAssertionSession.rpIdHash,
-            onGoingGetAssertionSession.flags,
+            assertionObject.flags,
             counter,
-            onGoingGetAssertionSession.extensions
+            assertionObject.extensions
         )
         val authData = ctapAuthenticator.authenticatorDataConverter.convert(authenticatorDataObject)
 
@@ -364,7 +383,7 @@ internal class GetAssertionExecution :
             userCredential.username,
             userCredential.displayName
         )
-        val numberOfCredentials = onGoingGetAssertionSession.numberOfCredentials
+        val numberOfCredentials = onGoingGetAssertionSession.numberOfAssertionObjects
 
         //spec| On success, the authenticator returns an attestation object in its response as defined in [WebAuthn]:
         val responseData = AuthenticatorGetAssertionResponseData(
@@ -376,11 +395,10 @@ internal class GetAssertionExecution :
         )
 
         // update counter
-        if (userCredential is ResidentUserCredential<*>) {
-            val residentUserCredential = userCredential as ResidentUserCredential<Serializable?>
-            residentUserCredential.counter = counter + 1
+        if (userCredential is ResidentUserCredential) {
+            userCredential.counter = counter + 1
             try {
-                authenticatorPropertyStore.saveUserCredential(residentUserCredential)
+                authenticatorPropertyStore.saveUserCredential(userCredential)
             } catch (e: StoreFullException) {
                 throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_KEY_STORE_FULL)
             }

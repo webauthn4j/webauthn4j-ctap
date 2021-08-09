@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.io.Serializable
 import java.time.Instant
 
-data class NonResidentUserCredential<T : Serializable?> @JsonCreator constructor(
+data class NonResidentUserCredential @JsonCreator constructor(
     @JsonProperty("credentialId") override val credentialId: ByteArray,
     @JsonProperty("userCredentialKey") override val userCredentialKey: NonResidentUserCredentialKey,
     @JsonProperty("userHandle") override val userHandle: ByteArray?,
@@ -14,8 +14,9 @@ data class NonResidentUserCredential<T : Serializable?> @JsonCreator constructor
     @JsonProperty("rpId") override val rpId: String,
     @JsonProperty("rpName") override val rpName: String,
     @JsonProperty("createdAt") override val createdAt: Instant,
-    @JsonProperty("otherUI") override val otherUI: T
-) : UserCredential<T> {
+    @JsonProperty("otherUI") override val otherUI: Serializable?,
+    @JsonProperty("details") override val details: Map<String, String>
+) : UserCredential {
 
     override val counter: Long
         get() = 0
@@ -24,9 +25,7 @@ data class NonResidentUserCredential<T : Serializable?> @JsonCreator constructor
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as NonResidentUserCredential<*>
+        if (other !is NonResidentUserCredential) return false
 
         if (!credentialId.contentEquals(other.credentialId)) return false
         if (userCredentialKey != other.userCredentialKey) return false
@@ -40,6 +39,7 @@ data class NonResidentUserCredential<T : Serializable?> @JsonCreator constructor
         if (rpName != other.rpName) return false
         if (createdAt != other.createdAt) return false
         if (otherUI != other.otherUI) return false
+        if (details != other.details) return false
 
         return true
     }
@@ -54,6 +54,9 @@ data class NonResidentUserCredential<T : Serializable?> @JsonCreator constructor
         result = 31 * result + rpName.hashCode()
         result = 31 * result + createdAt.hashCode()
         result = 31 * result + (otherUI?.hashCode() ?: 0)
+        result = 31 * result + details.hashCode()
         return result
     }
+
+
 }

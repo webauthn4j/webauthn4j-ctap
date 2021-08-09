@@ -8,6 +8,7 @@ import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementGenerator
 import com.webauthn4j.ctap.authenticator.attestation.NoneAttestationStatementGenerator
 import com.webauthn4j.ctap.authenticator.event.Event
+import com.webauthn4j.ctap.authenticator.extension.ExtensionProcessor
 import com.webauthn4j.ctap.authenticator.settings.*
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
@@ -18,15 +19,15 @@ import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import org.slf4j.LoggerFactory
-import java.io.Serializable
 import java.lang.Exception
 
 class CtapAuthenticator @JvmOverloads constructor(
     // Core logic delegates
     // These are final as it should not be updated on the fly for integrity. To update these, new instance should be created.
     val attestationStatementGenerator: AttestationStatementGenerator = NoneAttestationStatementGenerator(),
+    val extensionProcessors: List<ExtensionProcessor> = listOf(),
     // Handlers
-    var authenticatorPropertyStore: AuthenticatorPropertyStore<Serializable?> = InMemoryAuthenticatorPropertyStore(),
+    var authenticatorPropertyStore: AuthenticatorPropertyStore = InMemoryAuthenticatorPropertyStore(),
     val objectConverter: ObjectConverter = createObjectConverter(),
     settings: CtapAuthenticatorSettings = CtapAuthenticatorSettings()
 ) {
@@ -48,7 +49,6 @@ class CtapAuthenticator @JvmOverloads constructor(
             AuthenticatorTransport.BLE,
             AuthenticatorTransport.USB
         )
-        val EXTENSIONS = emptyList<String>()
         private fun createObjectConverter(): ObjectConverter {
             val jsonMapper = ObjectMapper()
             val cborMapper = ObjectMapper(CBORFactory())
@@ -87,7 +87,6 @@ class CtapAuthenticator @JvmOverloads constructor(
 
 
     init {
-
         // authenticator settings
         platformSetting = settings.platform
         residentKeySetting = settings.residentKey
@@ -185,7 +184,7 @@ class CtapAuthenticator @JvmOverloads constructor(
     }
 
     private class DefaultCredentialSelectionHandler : CredentialSelectionHandler {
-        override suspend fun select(list: List<UserCredential<Serializable?>>): UserCredential<Serializable?> {
+        override suspend fun select(list: List<UserCredential>): UserCredential {
             return list.first()
         }
     }

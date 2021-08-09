@@ -73,7 +73,8 @@ class RelyingPartyDaoRobolectricTest {
             rpId,
             0,
             Instant.parse("2020-01-01T00:00:00.00Z"),
-            null
+            null,
+            "{}"
         )
         val userCredential1 = UserCredentialEntity(
             credentialId1,
@@ -86,7 +87,8 @@ class RelyingPartyDaoRobolectricTest {
             rpId,
             0,
             Instant.parse("2020-01-01T00:00:00.00Z"),
-            null
+            null,
+            "{}"
         )
         userCredentialDao.create(userCredential0)
         userCredentialDao.create(userCredential1)

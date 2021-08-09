@@ -44,11 +44,12 @@ internal class GetInfoExecution(
             UserVerificationSetting.NOT_READY -> UserVerificationOption.NOT_READY
             UserVerificationSetting.NOT_SUPPORTED -> UserVerificationOption.NOT_SUPPORTED
         }
+        val extensions = ctapAuthenticator.extensionProcessors.map { it.extensionId }
         return AuthenticatorGetInfoResponse(
             StatusCode.CTAP2_OK,
             AuthenticatorGetInfoResponseData(
                 CtapAuthenticator.VERSIONS,
-                CtapAuthenticator.EXTENSIONS,
+                extensions,
                 ctapAuthenticator.aaguid,
                 AuthenticatorGetInfoResponseData.Options(plat, rk, clientPin, up, uv),
                 2048L,

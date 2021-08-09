@@ -10,7 +10,7 @@ import javax.crypto.SecretKey
  *
  * @param <T> user credential extra data
 </T> */
-interface AuthenticatorPropertyStore<T : Serializable?> {
+interface AuthenticatorPropertyStore{
     /**
      * Create a new [ResidentUserCredentialKey]. This method doesn't require to persist a credential key.
      *
@@ -29,7 +29,7 @@ interface AuthenticatorPropertyStore<T : Serializable?> {
      * @throws StoreFullException if underling storage is full
      */
     @Throws(StoreFullException::class)
-    fun saveUserCredential(userCredential: ResidentUserCredential<T>)
+    fun saveUserCredential(userCredential: ResidentUserCredential)
 
     /**
      * Load [ResidentUserCredential]s by rpId
@@ -37,7 +37,7 @@ interface AuthenticatorPropertyStore<T : Serializable?> {
      * @param rpId rpId for look up key
      * @return user credentials
      */
-    fun loadUserCredentials(rpId: String?): List<ResidentUserCredential<T>>
+    fun loadUserCredentials(rpId: String?): List<ResidentUserCredential>
 
     /**
      * Load single user credential by rpId and userHandle
@@ -47,7 +47,7 @@ interface AuthenticatorPropertyStore<T : Serializable?> {
      * @return user credential
      */
     //TODO: revisit
-    fun loadUserCredential(rpId: String?, userHandle: ByteArray): ResidentUserCredential<T>?
+    fun loadUserCredential(rpId: String?, userHandle: ByteArray): ResidentUserCredential?
     fun removeUserCredential(credentialId: ByteArray)
     fun supports(alg: COSEAlgorithmIdentifier): Boolean
 
@@ -56,14 +56,14 @@ interface AuthenticatorPropertyStore<T : Serializable?> {
      *
      * @return encryption key for credential source
      */
-    fun loadEncryptionKey(): SecretKey?
+    fun loadEncryptionKey(): SecretKey
 
     /**
      * Load encryption iv for credential source
      *
      * @return encryption iv for credential source
      */
-    fun loadEncryptionIV(): ByteArray?
+    fun loadEncryptionIV(): ByteArray
 
     /**
      * Save clientPIN

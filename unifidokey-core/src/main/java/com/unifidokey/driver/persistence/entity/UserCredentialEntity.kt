@@ -28,7 +28,8 @@ class UserCredentialEntity(
     @field:ColumnInfo(name = "rp_id") val rpId: String,
     val counter: Long,
     @field:ColumnInfo(name = "created_at") val createdAt: Instant,
-    @field:ColumnInfo(name = "other_ui") val otherUI: Serializable?
+    @field:ColumnInfo(name = "other_ui") val otherUI: Serializable?,
+    @field:ColumnInfo(name = "details") val details: String
 ) : Serializable {
 
     @Ignore
@@ -43,7 +44,8 @@ class UserCredentialEntity(
         rpId: String,
         counter: Long,
         createdAt: Instant,
-        otherUI: Serializable?
+        otherUI: Serializable?,
+        details: String
     ) : this(
         null,
         credentialId,
@@ -56,7 +58,8 @@ class UserCredentialEntity(
         rpId,
         counter,
         createdAt,
-        otherUI
+        otherUI,
+        details
     )
 
     private fun equalsKeyPair(a: KeyPair?, b: KeyPair?): Boolean {
@@ -69,14 +72,12 @@ class UserCredentialEntity(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as UserCredentialEntity
+        if (other !is UserCredentialEntity) return false
 
         if (sid != other.sid) return false
         if (!credentialId.contentEquals(other.credentialId)) return false
         if (alg != other.alg) return false
-        if (!equalsKeyPair(keyPair, other.keyPair)) return false
+        if (keyPair != other.keyPair) return false
         if (keyAlias != other.keyAlias) return false
         if (!userHandle.contentEquals(other.userHandle)) return false
         if (username != other.username) return false
@@ -85,6 +86,7 @@ class UserCredentialEntity(
         if (counter != other.counter) return false
         if (createdAt != other.createdAt) return false
         if (otherUI != other.otherUI) return false
+        if (details != other.details) return false
 
         return true
     }
@@ -102,6 +104,7 @@ class UserCredentialEntity(
         result = 31 * result + counter.hashCode()
         result = 31 * result + createdAt.hashCode()
         result = 31 * result + (otherUI?.hashCode() ?: 0)
+        result = 31 * result + details.hashCode()
         return result
     }
 

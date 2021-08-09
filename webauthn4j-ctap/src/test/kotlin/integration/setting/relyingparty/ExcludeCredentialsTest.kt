@@ -26,7 +26,7 @@ class ExcludeCredentialsTest {
                     CredentialSelectorSetting.AUTHENTICATOR
                 passwordlessTestCase.authenticator.credentialSelectionHandler =
                     object : CredentialSelectionHandler {
-                        override suspend fun select(list: List<UserCredential<Serializable?>>): UserCredential<Serializable?> {
+                        override suspend fun select(list: List<UserCredential>): UserCredential {
                             return list.first { item -> item.credentialId.contentEquals(result?.rawId) }
                         }
                     }
@@ -52,7 +52,7 @@ class ExcludeCredentialsTest {
             CredentialSelectorSetting.AUTHENTICATOR
         passwordlessTestCase.authenticator.credentialSelectionHandler =
             object : CredentialSelectionHandler {
-                override suspend fun select(list: List<UserCredential<Serializable?>>): UserCredential<Serializable?> {
+                override suspend fun select(list: List<UserCredential>): UserCredential {
                     return list.first { item -> item.credentialId.contentEquals(result?.rawId) }
                 }
             }

@@ -8,7 +8,7 @@ import java.time.Instant
  *
  * @param <T> extra data
 </T> */
-interface UserCredential<T : Serializable?> : Serializable {
+interface UserCredential : Serializable {
     /**
      * @return credentialId
      */
@@ -65,11 +65,16 @@ interface UserCredential<T : Serializable?> : Serializable {
     val createdAt: Instant
 
     /**
-     * Return extra data
+     * Return other information used by the authenticator to inform its UI
      *
-     * @return extra data
+     * @return other information used by the authenticator to inform its UI
      */
-    val otherUI: T
+    val otherUI: Serializable?
+
+    /**
+     * Return extra data
+     */
+    val details: Map<String, String>
 
     /**
      * Return `true` if it is resident key. Otherwise return `false`

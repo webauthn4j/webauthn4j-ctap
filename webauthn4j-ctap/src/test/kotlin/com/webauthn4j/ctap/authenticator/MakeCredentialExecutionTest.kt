@@ -26,7 +26,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
-import java.io.Serializable
 
 @ExperimentalCoroutinesApi
 internal class MakeCredentialExecutionTest {
@@ -102,7 +101,7 @@ internal class MakeCredentialExecutionTest {
 
     @Test
     fun store_full_test() = runBlockingTest {
-        val authenticatorPropertyStore = mock<InMemoryAuthenticatorPropertyStore<Serializable?>> {
+        val authenticatorPropertyStore = mock<InMemoryAuthenticatorPropertyStore> {
             on {
                 createUserCredentialKey(
                     any(),

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import java.io.Serializable
 
 internal class InMemoryAuthenticatorPropertyStoreTest {
-    private val target = InMemoryAuthenticatorPropertyStore<Serializable>()
+    private val target = InMemoryAuthenticatorPropertyStore()
 
     @Test
     fun loadCredentialSourceEncryptionIV_test() {

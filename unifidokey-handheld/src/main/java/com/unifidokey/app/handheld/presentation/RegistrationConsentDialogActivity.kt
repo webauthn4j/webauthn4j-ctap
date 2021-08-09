@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.unifidokey.R
 import com.unifidokey.app.handheld.presentation.util.KeepScreenOnUtil
+import com.unifidokey.app.handheld.presentation.util.WakeLockUtil
 import com.unifidokey.databinding.RegistrationConsentDialogActivityBinding
 
 /**
@@ -44,6 +45,7 @@ class RegistrationConsentDialogActivity : AppCompatActivity(),
 
     override fun onResume() {
         super.onResume()
+        WakeLockUtil.acquireWakeLock(this)
         KeepScreenOnUtil.configureKeepScreenOnFlag(this)
     }
 

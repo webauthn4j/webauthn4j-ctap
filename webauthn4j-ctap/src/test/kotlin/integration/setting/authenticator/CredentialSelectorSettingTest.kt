@@ -32,7 +32,7 @@ class CredentialSelectorSettingTest {
                 CredentialSelectorSetting.AUTHENTICATOR
             passwordlessTestCase.authenticator.credentialSelectionHandler = object :
                 CredentialSelectionHandler { // This credentialSelectionHandler selects 2nd (correct) credential
-                override suspend fun select(list: List<UserCredential<Serializable?>>): UserCredential<Serializable?> {
+                override suspend fun select(list: List<UserCredential>): UserCredential {
                     return list.first { it.credentialId.contentEquals(publicKeyCredential!!.rawId) }
                 }
             }
@@ -53,7 +53,7 @@ class CredentialSelectorSettingTest {
                 CredentialSelectorSetting.AUTHENTICATOR
             passwordlessTestCase.authenticator.credentialSelectionHandler = object :
                 CredentialSelectionHandler { // This credentialSelectionHandler selects 1st (incorrect) credential
-                override suspend fun select(list: List<UserCredential<Serializable?>>): UserCredential<Serializable?> {
+                override suspend fun select(list: List<UserCredential>): UserCredential {
                     return list.first { it.credentialId.contentEquals(publicKeyCredential!!.rawId) }
                 }
             }

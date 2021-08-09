@@ -7,20 +7,19 @@ import com.webauthn4j.ctap.authenticator.internal.KeyPairUtil.createCredentialKe
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import com.webauthn4j.util.ArrayUtil
 import com.webauthn4j.util.exception.UnexpectedCheckedException
-import java.io.Serializable
 import java.security.NoSuchAlgorithmException
 import java.security.SecureRandom
 import java.util.function.Consumer
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 
-open class InMemoryAuthenticatorPropertyStore<T : Serializable?> : AuthenticatorPropertyStore<T> {
+open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
 
     override var algorithms = setOf(COSEAlgorithmIdentifier.ES256)
 
-    private val map: MutableMap<String, MutableMap<ByteArray, ResidentUserCredential<T>>> =
+    private val map: MutableMap<String, MutableMap<ByteArray, ResidentUserCredential>> =
         HashMap()
-    private var credentialSourceEncryptionKey: SecretKey? = null
+    private lateinit var credentialSourceEncryptionKey: SecretKey
     private lateinit var credentialSourceEncryptionIV: ByteArray
     private var clientPIN: ByteArray? = null
     private var pinRetries = 0
@@ -46,7 +45,7 @@ open class InMemoryAuthenticatorPropertyStore<T : Serializable?> : Authenticator
         return ResidentUserCredentialKey(algorithmIdentifier.toSignatureAlgorithm(), keyPair)
     }
 
-    override fun saveUserCredential(userCredential: ResidentUserCredential<T>) {
+    override fun saveUserCredential(userCredential: ResidentUserCredential) {
         val rpId = userCredential.rpId
         var userCredentials = map[rpId]
         if (userCredentials == null) {
@@ -56,7 +55,7 @@ open class InMemoryAuthenticatorPropertyStore<T : Serializable?> : Authenticator
         userCredentials[userCredential.id] = userCredential
     }
 
-    override fun loadUserCredentials(rpId: String?): List<ResidentUserCredential<T>> {
+    override fun loadUserCredentials(rpId: String?): List<ResidentUserCredential> {
         if (rpId == null) {
             return emptyList()
         }
@@ -66,11 +65,11 @@ open class InMemoryAuthenticatorPropertyStore<T : Serializable?> : Authenticator
     override fun loadUserCredential(
         rpId: String?,
         userHandle: ByteArray
-    ): ResidentUserCredential<T>? {
+    ): ResidentUserCredential? {
         if (rpId == null) {
             return null //TODO: revisit: should throw RelyingPartyNotFoundException?
         }
-        return loadUserCredentials(rpId).firstOrNull { userCredential: ResidentUserCredential<T> ->
+        return loadUserCredentials(rpId).firstOrNull { userCredential: ResidentUserCredential ->
             userCredential.userHandle.contentEquals(
                 userHandle
             )
@@ -91,11 +90,11 @@ open class InMemoryAuthenticatorPropertyStore<T : Serializable?> : Authenticator
         return algorithms.contains(alg)
     }
 
-    override fun loadEncryptionKey(): SecretKey? {
+    override fun loadEncryptionKey(): SecretKey {
         return credentialSourceEncryptionKey
     }
 
-    override fun loadEncryptionIV(): ByteArray? {
+    override fun loadEncryptionIV(): ByteArray {
         return ArrayUtil.clone(credentialSourceEncryptionIV)
     }
 

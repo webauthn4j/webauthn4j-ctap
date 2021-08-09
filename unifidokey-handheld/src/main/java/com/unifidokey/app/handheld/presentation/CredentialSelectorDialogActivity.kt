@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.unifidokey.R
 import com.unifidokey.app.handheld.presentation.util.KeepScreenOnUtil
+import com.unifidokey.app.handheld.presentation.util.WakeLockUtil
 
 class CredentialSelectorDialogActivity : AppCompatActivity() {
     //region## Lifecycle event handlers ##
@@ -20,8 +21,10 @@ class CredentialSelectorDialogActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        WakeLockUtil.acquireWakeLock(this)
         KeepScreenOnUtil.configureKeepScreenOnFlag(this)
-    } //endregion
+    }
+    //endregion
 
     companion object {
         const val ACTION_OPEN =

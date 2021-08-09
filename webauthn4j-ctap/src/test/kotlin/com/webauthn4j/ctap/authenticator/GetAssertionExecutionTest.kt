@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.mockito.Mockito
-import java.io.Serializable
 
 @ExperimentalCoroutinesApi
 internal class GetAssertionExecutionTest {
@@ -144,8 +143,8 @@ internal class GetAssertionExecutionTest {
     fun store_full_test() = runBlockingTest {
         var isFull = false
         val authenticatorPropertyStoreSpy =
-            object : InMemoryAuthenticatorPropertyStore<Serializable?>() {
-                override fun saveUserCredential(userCredential: ResidentUserCredential<Serializable?>) {
+            object : InMemoryAuthenticatorPropertyStore() {
+                override fun saveUserCredential(userCredential: ResidentUserCredential) {
                     if (isFull) {
                         throw StoreFullException("AuthenticatorPropertyStore is full")
                     } else {
@@ -196,6 +195,7 @@ internal class GetAssertionExecutionTest {
         makeCredential(ctapAuthenticator)
         ctapAuthenticator = CtapAuthenticator(
             ctapAuthenticator.attestationStatementGenerator,
+            emptyList(),
             ctapAuthenticator.authenticatorPropertyStore,
             ctapAuthenticator.objectConverter,
             CtapAuthenticatorSettings(userPresence = userPresenceSetting)
