@@ -5,7 +5,7 @@ import com.webauthn4j.ctap.authenticator.settings.*
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
-import com.webauthn4j.ctap.core.data.StatusCode
+import com.webauthn4j.ctap.core.data.CtapStatusCode
 import org.slf4j.LoggerFactory
 
 internal class GetInfoExecution(
@@ -46,7 +46,7 @@ internal class GetInfoExecution(
         }
         val extensions = ctapAuthenticator.extensionProcessors.map { it.extensionId }
         return AuthenticatorGetInfoResponse(
-            StatusCode.CTAP2_OK,
+            CtapStatusCode.CTAP2_OK,
             AuthenticatorGetInfoResponseData(
                 CtapAuthenticator.VERSIONS,
                 extensions,
@@ -58,7 +58,7 @@ internal class GetInfoExecution(
         )
     }
 
-    override fun createErrorResponse(statusCode: StatusCode): AuthenticatorGetInfoResponse {
+    override fun createErrorResponse(statusCode: CtapStatusCode): AuthenticatorGetInfoResponse {
         return AuthenticatorGetInfoResponse(statusCode)
     }
 }

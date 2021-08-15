@@ -11,7 +11,7 @@ class AuthenticationConsentDialogViewModel(application: Application) :
     val description: String
         get() = getApplication<Application>().resources.getText(R.string.desc_authentication_request)
             .toString()
-    val service: String
+    val service: String?
         get() = request.rpId
 
     fun onProceed() {

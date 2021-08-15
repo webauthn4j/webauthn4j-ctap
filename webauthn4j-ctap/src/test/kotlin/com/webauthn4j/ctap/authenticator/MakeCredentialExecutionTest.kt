@@ -8,10 +8,10 @@ import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStor
 import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialResponse
 import com.webauthn4j.ctap.core.data.PinProtocolVersion
-import com.webauthn4j.ctap.core.data.StatusCode
-import com.webauthn4j.ctap.core.data.StatusCode.Companion.CTAP2_ERR_MISSING_PARAMETER
-import com.webauthn4j.ctap.core.data.StatusCode.Companion.CTAP2_ERR_OPERATION_DENIED
-import com.webauthn4j.ctap.core.data.StatusCode.Companion.CTAP2_ERR_UNSUPPORTED_ALGORITHM
+import com.webauthn4j.ctap.core.data.CtapStatusCode
+import com.webauthn4j.ctap.core.data.CtapStatusCode.Companion.CTAP2_ERR_MISSING_PARAMETER
+import com.webauthn4j.ctap.core.data.CtapStatusCode.Companion.CTAP2_ERR_OPERATION_DENIED
+import com.webauthn4j.ctap.core.data.CtapStatusCode.Companion.CTAP2_ERR_UNSUPPORTED_ALGORITHM
 import com.webauthn4j.data.*
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
@@ -60,7 +60,7 @@ internal class MakeCredentialExecutionTest {
             pinProtocol
         )
         val response = ctapAuthenticator.makeCredential(command)
-        assertThat(response.statusCode).isEqualTo(StatusCode.CTAP2_OK)
+        assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
         assertThat(response.responseData).isNotNull
         assertThat(response.responseData!!.attestationStatement).isNotNull
         assertThat(response.responseData!!.authenticatorData).isNotNull
@@ -140,7 +140,7 @@ internal class MakeCredentialExecutionTest {
             pinProtocol
         )
         val response = ctapAuthenticator.makeCredential(command)
-        assertThat(response.statusCode).isEqualTo(StatusCode.CTAP2_ERR_KEY_STORE_FULL)
+        assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_ERR_KEY_STORE_FULL)
     }
 
     @ParameterizedTest
@@ -153,7 +153,7 @@ internal class MakeCredentialExecutionTest {
     )
     fun options_null_residentKey_variation_test(
         residentKeySetting: ResidentKeySetting,
-        statusCode: StatusCode,
+        statusCode: CtapStatusCode,
         createdResidentKeyCount: Int
     ) = runBlockingTest {
         val clientDataHash = ByteArray(0)
@@ -206,7 +206,7 @@ internal class MakeCredentialExecutionTest {
     fun rk_and_residentKey_matrix_test(
         rk: Boolean,
         residentKeySetting: ResidentKeySetting,
-        statusCode: StatusCode,
+        statusCode: CtapStatusCode,
         createdResidentKeyCount: Int
     ) = runBlockingTest {
         val clientDataHash = ByteArray(0)
@@ -261,7 +261,7 @@ internal class MakeCredentialExecutionTest {
     fun uv_and_userVerification_test(
         uv: Boolean,
         userVerificationSetting: UserVerificationSetting,
-        statusCode: StatusCode
+        statusCode: CtapStatusCode
     ) = runBlockingTest {
         val clientDataHash = ByteArray(0)
         val rp = PublicKeyCredentialRpEntity("example.com", "example")
@@ -305,7 +305,7 @@ internal class MakeCredentialExecutionTest {
             "NOT_SUPPORTED, CTAP2_ERR_UNSUPPORTED_OPTION",
         ]
     )
-    fun userPresence_test(userPresenceSetting: UserPresenceSetting, statusCode: StatusCode) =
+    fun userPresence_test(userPresenceSetting: UserPresenceSetting, statusCode: CtapStatusCode) =
         runBlockingTest {
             val clientDataHash = ByteArray(0)
             val rp = PublicKeyCredentialRpEntity("example.com", "example")

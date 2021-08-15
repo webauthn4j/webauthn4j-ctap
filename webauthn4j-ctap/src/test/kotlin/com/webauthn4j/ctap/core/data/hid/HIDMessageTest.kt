@@ -5,7 +5,7 @@ import com.webauthn4j.ctap.authenticator.options.*
 import com.webauthn4j.ctap.authenticator.transport.hid.HIDResponseMessageBuilder
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
-import com.webauthn4j.ctap.core.data.StatusCode.Companion.CTAP2_OK
+import com.webauthn4j.ctap.core.data.CtapStatusCode.Companion.CTAP2_OK
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

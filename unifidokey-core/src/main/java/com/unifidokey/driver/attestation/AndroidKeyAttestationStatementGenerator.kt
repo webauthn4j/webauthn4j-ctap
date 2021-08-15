@@ -17,7 +17,7 @@ class AndroidKeyAttestationStatementGenerator(objectConverter: ObjectConverter) 
     private val authenticatorDataConverter: AuthenticatorDataConverter =
         AuthenticatorDataConverter(objectConverter)
 
-    override suspend fun generate(attestationStatementRequest: AttestationStatementRequest): AttestationStatement {
+    override suspend fun generate(attestationStatementRequest: AttestationStatementRequest): AndroidKeyAttestationStatement {
         val clientDataHash = attestationStatementRequest.clientDataHash
         val authenticatorData = attestationStatementRequest.authenticatorData
         val authenticatorDataBytes = authenticatorDataConverter.convert(authenticatorData)

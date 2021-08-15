@@ -34,7 +34,7 @@ class AndroidSafetyNetAttestationStatementGenerator : AttestationStatementGenera
     }
 
 
-    override suspend fun generate(attestationStatementRequest: AttestationStatementRequest): AttestationStatement {
+    override suspend fun generate(attestationStatementRequest: AttestationStatementRequest): AndroidSafetyNetAttestationStatement {
         val ver = "12685023"
         val authenticatorData =
             authenticatorDataConverter.convert(attestationStatementRequest.authenticatorData)

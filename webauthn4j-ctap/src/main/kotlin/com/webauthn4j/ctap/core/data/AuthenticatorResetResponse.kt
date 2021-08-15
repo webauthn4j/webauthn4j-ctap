@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.core.data
 
-class AuthenticatorResetResponse(statusCode: StatusCode) :
+class AuthenticatorResetResponse(statusCode: CtapStatusCode) :
     AbstractCtapResponse<AuthenticatorResetResponseData>(statusCode) {
 
     override val command: CtapCommand = CtapCommand.RESET

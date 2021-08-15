@@ -23,7 +23,6 @@ import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementGenerat
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementGenerator
 import com.webauthn4j.ctap.authenticator.attestation.NoneAttestationStatementGenerator
 import com.webauthn4j.ctap.authenticator.attestation.PackedAttestationStatementGenerator
-import com.webauthn4j.ctap.authenticator.attestation.PackedAttestationStatementGenerator.Companion.createWithDemoAttestation
 import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
 import com.webauthn4j.ctap.core.converter.jackson.PublicKeyCredentialSourceCBORModule
@@ -102,18 +101,13 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
     @Singleton
     @Provides
     fun providePackedAttestationStatementGenerator(): PackedAttestationStatementGenerator {
-        return createWithDemoAttestation() //TODO revisit
+        return PackedAttestationStatementGenerator.createWithDemoAttestation() //TODO revisit
     }
 
     @Singleton
     @Provides
-    fun provideFidoU2FAttestationStatementGenerator(keyStoreDao: KeyStoreDao): FIDOU2FAttestationStatementGenerator {
-        val privateKey = keyStoreDao.findOrCreateDeviceAttestationPrivateKey()
-        val attestationCertificatePath = keyStoreDao.findOrCreateDeviceAttestationCertificatePath()
-        return FIDOU2FAttestationStatementGenerator(
-            privateKey,
-            attestationCertificatePath.endEntityAttestationCertificate.certificate
-        )
+    fun provideFidoU2FAttestationStatementGenerator(): FIDOU2FAttestationStatementGenerator {
+        return FIDOU2FAttestationStatementGenerator.createWithDemoAttestation()  //TODO revisit
     }
 
     @Singleton

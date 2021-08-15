@@ -77,15 +77,14 @@ class RegistrationConsentDialogActivity : AppCompatActivity(),
         onSuccessHandler: RegistrationConsentDialogViewModel.Callbacks.OnSuccessHandler?,
         onFailureHandler: RegistrationConsentDialogViewModel.Callbacks.OnFailureHandler?
     ) {
+        val rp = viewModel.request.rp
+        val subtitle = when (rp){
+            null -> "Legacy Service(U2F) requires user verification."
+            else -> String.format("Service %s (%s) requires user verification.", rp.name, rp.id)
+        }
         val promptInfo = PromptInfo.Builder()
             .setTitle("Authenticate to continue")
-            .setSubtitle(
-                String.format(
-                    "Service %s (%s) requires user verification.",
-                    viewModel.request.rp.name,
-                    viewModel.request.rp.id
-                )
-            )
+            .setSubtitle(subtitle)
             .setNegativeButtonText("Cancel")
             .build()
         biometricPrompt.authenticate(promptInfo)

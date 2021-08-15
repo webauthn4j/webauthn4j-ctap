@@ -48,14 +48,22 @@ class LockScreenActivity : AppCompatActivity(), LockScreenViewModel.EventHandler
     }
 
     private fun showBiometricPrompt() {
-        val serviceString = String.format("Service %s (%s)", request.rp.name, request.rp.id)
-        val userString = String.format("User %s", request.user.displayName)
-        val promptInfo = PromptInfo.Builder()
+        val builder = PromptInfo.Builder()
             .setTitle("Authenticate to continue")
-            .setSubtitle(String.format("%s requires user verification.", serviceString))
-            .setDescription(String.format("%s is your account", userString))
             .setNegativeButtonText("Cancel")
-            .build()
+        val rp = request.rp
+        val user = request.user
+        if (rp != null) {
+            val serviceString = String.format("Service %s (%s)", rp.name, rp.id)
+            builder.setSubtitle(String.format("%s requires user verification.", serviceString))
+        } else {
+            builder.setSubtitle("Service requires user verification.")
+        }
+        if (user != null) {
+            val userString = String.format("User %s", user.displayName)
+            builder.setDescription(String.format("%s is your account", userString))
+        }
+        val promptInfo = builder.build()
         biometricPrompt!!.authenticate(promptInfo)
         isPromptShownBefore = true
     }

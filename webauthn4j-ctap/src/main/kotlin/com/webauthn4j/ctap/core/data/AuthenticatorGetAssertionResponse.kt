@@ -3,11 +3,11 @@ package com.webauthn4j.ctap.core.data
 class AuthenticatorGetAssertionResponse :
     AbstractCtapResponse<AuthenticatorGetAssertionResponseData> {
     constructor(
-        statusCode: StatusCode,
+        statusCode: CtapStatusCode,
         responseData: AuthenticatorGetAssertionResponseData?
     ) : super(statusCode, responseData)
 
-    constructor(statusCode: StatusCode) : super(statusCode, null)
+    constructor(statusCode: CtapStatusCode) : super(statusCode, null)
 
     override val command: CtapCommand = CtapCommand.GET_ASSERTION
 

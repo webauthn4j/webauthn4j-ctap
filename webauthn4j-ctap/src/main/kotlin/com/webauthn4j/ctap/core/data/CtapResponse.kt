@@ -1,7 +1,7 @@
 package com.webauthn4j.ctap.core.data
 
-interface CtapResponse<T : CtapResponseData> {
+interface CtapResponse : AuthenticatorResponse {
     val command: CtapCommand
-    val statusCode: StatusCode
-    val responseData: T?
+    val statusCode: CtapStatusCode
+    val responseData: CtapResponseData?
 }

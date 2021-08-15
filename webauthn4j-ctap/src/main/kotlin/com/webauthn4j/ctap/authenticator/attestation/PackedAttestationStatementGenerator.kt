@@ -7,7 +7,6 @@ import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData
 import com.webauthn4j.data.attestation.statement.AttestationCertificatePath
-import com.webauthn4j.data.attestation.statement.AttestationStatement
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import com.webauthn4j.data.attestation.statement.PackedAttestationStatement
 import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenticatorOutput
@@ -56,7 +55,7 @@ class PackedAttestationStatementGenerator : AttestationStatementGenerator {
         authenticatorDataConverter = AuthenticatorDataConverter(objectConverter)
     }
 
-    override suspend fun generate(attestationStatementRequest: AttestationStatementRequest): AttestationStatement {
+    override suspend fun generate(attestationStatementRequest: AttestationStatementRequest): PackedAttestationStatement {
         val authenticatorData: AuthenticatorData<RegistrationExtensionAuthenticatorOutput> =
             attestationStatementRequest.authenticatorData
         val authenticatorDataBytes = authenticatorDataConverter.convert(authenticatorData)

@@ -60,7 +60,7 @@ internal class CtapAuthenticatorTest {
             pinProtocol
         )
         val response: AuthenticatorGetAssertionResponse = ctapAuthenticator.getAssertion(command)
-        Assertions.assertThat(response.statusCode).isEqualTo(StatusCode.CTAP2_OK)
+        Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
         Assertions.assertThat(response.responseData).isNotNull
     }
 

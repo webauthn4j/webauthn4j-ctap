@@ -1,12 +1,12 @@
 package com.webauthn4j.ctap.core.data
 
 class AuthenticatorClientPINResponse : AbstractCtapResponse<AuthenticatorClientPINResponseData> {
-    constructor(statusCode: StatusCode, responseData: AuthenticatorClientPINResponseData?) : super(
+    constructor(statusCode: CtapStatusCode, responseData: AuthenticatorClientPINResponseData?) : super(
         statusCode,
         responseData
     )
 
-    constructor(statusCode: StatusCode) : super(statusCode, null)
+    constructor(statusCode: CtapStatusCode) : super(statusCode, null)
 
     override val command: CtapCommand = CtapCommand.CLIENT_PIN
 

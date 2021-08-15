@@ -1,10 +1,10 @@
 package com.webauthn4j.ctap.authenticator.attestation
 
-import com.webauthn4j.ctap.authenticator.SignatureCalculator.calculate
-import com.webauthn4j.data.attestation.authenticator.EC2COSEKey
+import com.webauthn4j.ctap.authenticator.SignatureCalculator
+import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.data.attestation.statement.AttestationCertificatePath
-import com.webauthn4j.data.attestation.statement.AttestationStatement
 import com.webauthn4j.data.attestation.statement.FIDOU2FAttestationStatement
+import com.webauthn4j.util.ECUtil
 import java.nio.ByteBuffer
 import java.security.PrivateKey
 import java.security.cert.X509Certificate
@@ -15,48 +15,52 @@ class FIDOU2FAttestationStatementGenerator(
     attestationCertificate: X509Certificate
 ) : AttestationStatementGenerator {
 
+    companion object {
+        /**
+         * DO NOT USE for production use-case as the certificates are signed with hard coded private keys
+         */
+        @JvmStatic
+        fun createWithDemoAttestation(): FIDOU2FAttestationStatementGenerator {
+            return FIDOU2FAttestationStatementGenerator(
+                DemoAttestationConstants.DEMO_ROOT_CA_PRIVATE_KEY,
+                DemoAttestationConstants.DEMO_ROOT_CA_CERTIFICATE
+            )
+        }
+    }
+
     private val attestationCertificatePath: AttestationCertificatePath =
         AttestationCertificatePath(attestationCertificate, emptyList())
 
-    override suspend fun generate(attestationStatementRequest: AttestationStatementRequest): AttestationStatement {
+    override suspend fun generate(attestationStatementRequest: AttestationStatementRequest): FIDOU2FAttestationStatement {
+
         val publicKey = attestationStatementRequest.userCredentialKey.keyPair!!.public
         if(publicKey !is ECPublicKey){
             throw IllegalArgumentException("attestationStatementRequest.userCredentialKey.keyPair must be Elliptic Curve key pair.")
         }
-        val credentialPublicKey =
-            EC2COSEKey.create(publicKey)
-        val clientDataHash = attestationStatementRequest.clientDataHash
-        val signedData = getSignedData(
-            attestationStatementRequest.rpIdHash,
-            attestationStatementRequest.credentialId,
-            credentialPublicKey,
-            clientDataHash
+
+        val request = FIDOU2FAttestationStatementRequest(
+            userPublicKey = attestationStatementRequest.userCredentialKey.keyPair!!.public as ECPublicKey,
+            keyHandle = attestationStatementRequest.credentialId,
+            applicationParameter = attestationStatementRequest.rpIdHash,
+            challengeParameter = attestationStatementRequest.clientDataHash
         )
-        val sig = calculate(
-            attestationStatementRequest.algorithmIdentifier.toSignatureAlgorithm(),
+        return generate(request)
+    }
+
+    suspend fun generate(attestationStatementRequest: FIDOU2FAttestationStatementRequest): FIDOU2FAttestationStatement {
+        val rfu: Byte = 0x00
+        val signedData = ByteBuffer.allocate(1 + 32 + 32 + attestationStatementRequest.keyHandle.size + 65)
+            .put(rfu)
+            .put(attestationStatementRequest.applicationParameter)
+            .put(attestationStatementRequest.challengeParameter)
+            .put(attestationStatementRequest.keyHandle)
+            .put(ECUtil.createUncompressedPublicKey(attestationStatementRequest.userPublicKey))
+            .array()
+        val sig = SignatureCalculator.calculate(
+            SignatureAlgorithm.ES256,
             attestationPrivateKey,
             signedData
         )
         return FIDOU2FAttestationStatement(attestationCertificatePath, sig)
     }
-
-    private fun getSignedData(
-        rpIdHash: ByteArray,
-        credentialId: ByteArray,
-        credentialPublicKey: EC2COSEKey,
-        clientDataHash: ByteArray
-    ): ByteArray {
-        val rfu: Byte = 0x00
-        val userPublicKey = getPublicKeyBytes(credentialPublicKey)
-        return ByteBuffer.allocate(1 + rpIdHash.size + clientDataHash.size + credentialId.size + userPublicKey.size)
-            .put(rfu).put(rpIdHash).put(clientDataHash).put(credentialId).put(userPublicKey).array()
-    }
-
-    private fun getPublicKeyBytes(ec2CoseKey: EC2COSEKey): ByteArray {
-        val x = ec2CoseKey.x
-        val y = ec2CoseKey.y
-        val format: Byte = 4
-        return ByteBuffer.allocate(1 + x.size + y.size).put(format).put(x).put(y).array()
-    }
-
 }

@@ -9,7 +9,6 @@ import kotlin.experimental.inv
 class HIDPacketConverter {
 
 
-    @ExperimentalUnsignedTypes
     fun convert(source: ByteArray): HIDPacket {
 //        require(source.size == MAX_PACKET_SIZE) { "source must be %d bytes".format(MAX_PACKET_SIZE) }
         val cid = HIDChannelId(source.copyOfRange(0, 4))

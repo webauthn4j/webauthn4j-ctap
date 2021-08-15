@@ -18,15 +18,16 @@ import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialType
 import com.webauthn4j.data.PublicKeyCredentialUserEntity
+import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthenticatorInput
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorOutputs
+import com.webauthn4j.util.MessageDigestUtil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.nio.ByteBuffer
 import java.time.Instant
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.experimental.or
 
@@ -111,7 +112,7 @@ internal class GetAssertionExecution :
     }
 
 
-    override fun createErrorResponse(statusCode: StatusCode): AuthenticatorGetAssertionResponse {
+    override fun createErrorResponse(statusCode: CtapStatusCode): AuthenticatorGetAssertionResponse {
         return AuthenticatorGetAssertionResponse(statusCode)
     }
 
@@ -123,8 +124,6 @@ internal class GetAssertionExecution :
     private fun execStep1LoadEligibleUserCredentials() {
         val rpId = rpId
         userCredentials = if (allowList != null && allowList.isNotEmpty()) {
-            val credentialSourceEncryptionKey = authenticatorPropertyStore.loadEncryptionKey()
-            val credentialSourceEncryptionIV = authenticatorPropertyStore.loadEncryptionIV()
             val storedCredentials = authenticatorPropertyStore.loadUserCredentials(rpId)
                 .filter {
                     allowList.any { allowed: PublicKeyCredentialDescriptor ->
@@ -133,42 +132,7 @@ internal class GetAssertionExecution :
                         )
                     }
                 }
-            val derivedCredentials = allowList.map {
-                try {
-                    val decrypted = CipherUtil.decryptWithAESCBCPKCS5Padding(
-                        it.id,
-                        credentialSourceEncryptionKey,
-                        credentialSourceEncryptionIV
-                    )
-                    val nonResidentUserCredentialEnvelope =
-                        ctapAuthenticator.objectConverter.cborConverter.readValue(
-                            decrypted,
-                            object : TypeReference<NonResidentUserCredentialSource>() {})!!
-                    return@map NonResidentUserCredential(
-                        it.id,
-                        nonResidentUserCredentialEnvelope.userCredentialKey,
-                        nonResidentUserCredentialEnvelope.userHandle,
-                        nonResidentUserCredentialEnvelope.username,
-                        nonResidentUserCredentialEnvelope.displayName,
-                        nonResidentUserCredentialEnvelope.rpId,
-                        nonResidentUserCredentialEnvelope.rpName,
-                        nonResidentUserCredentialEnvelope.createdAt,
-                        nonResidentUserCredentialEnvelope.otherUI,
-                        nonResidentUserCredentialEnvelope.details
-                    )
-                } catch (e: RuntimeException) {
-                    logger.debug(
-                        "Skipped credentialId: %s as it doesn't contain valid NonResidentUserCredentialSource.".format(
-                            HexUtil.encodeToString(it.id)
-                        )
-                    )
-                    logger.trace(
-                        "Failed to load NonResidentUserCredentialSource from credentialId",
-                        e
-                    )
-                    return@map null
-                }
-            }.filterNotNull()
+            val derivedCredentials = allowList.mapNotNull(this::deriveUserCredential).filter { it.rpId == rpId }
             val result: MutableList<UserCredential> = ArrayList()
             result.addAll(storedCredentials)
             result.addAll(derivedCredentials)
@@ -180,6 +144,75 @@ internal class GetAssertionExecution :
                 )
             )
         }
+    }
+
+    private fun deriveUserCredential(descriptor: PublicKeyCredentialDescriptor): UserCredential? {
+        val credentialSourceEncryptionKey = authenticatorPropertyStore.loadEncryptionKey()
+        val credentialSourceEncryptionIV = authenticatorPropertyStore.loadEncryptionIV()
+        val decrypted : ByteArray
+        try{
+            decrypted = CipherUtil.decryptWithAESCBCPKCS5Padding(
+                descriptor.id,
+                credentialSourceEncryptionKey,
+                credentialSourceEncryptionIV
+            )!!
+        }
+        catch (e: RuntimeException){
+            logger.debug(
+                "Skipped credentialId: %s as it doesn't contain valid NonResidentUserCredentialSource.".format(
+                    HexUtil.encodeToString(descriptor.id)
+                )
+            )
+            return null
+        }
+        try {
+            val nonResidentUserCredentialEnvelope =
+                ctapAuthenticator.objectConverter.cborConverter.readValue(
+                    decrypted,
+                    object : TypeReference<NonResidentUserCredentialSource>() {})!!
+            return NonResidentUserCredential(
+                descriptor.id,
+                nonResidentUserCredentialEnvelope.userCredentialKey,
+                nonResidentUserCredentialEnvelope.userHandle,
+                nonResidentUserCredentialEnvelope.username,
+                nonResidentUserCredentialEnvelope.displayName,
+                nonResidentUserCredentialEnvelope.rpId,
+                nonResidentUserCredentialEnvelope.rpName,
+                nonResidentUserCredentialEnvelope.createdAt,
+                nonResidentUserCredentialEnvelope.otherUI,
+                nonResidentUserCredentialEnvelope.details
+            )
+        } catch (e: RuntimeException) {
+            logger.trace("Failed to load NonResidentUserCredentialSource from credentialId", e)
+        }
+        try{
+            val u2fKeyEnvelope =
+                ctapAuthenticator.objectConverter.cborConverter.readValue(
+                    decrypted,
+                    object : TypeReference<U2FKeyEnvelope>() {})!!
+
+            val expectedRpIdHash = MessageDigestUtil.createSHA256().digest(rpId.toByteArray())
+            if(!descriptor.id.contentEquals(expectedRpIdHash)){
+                return null
+            }
+            val key = NonResidentUserCredentialKey(SignatureAlgorithm.ES256, u2fKeyEnvelope.privateKey.publicKey!!, u2fKeyEnvelope.privateKey.privateKey!!)
+            return NonResidentUserCredential(
+                descriptor.id,
+                key,
+                null,
+                "unknown (U2F)",
+                "unknown (U2F)",
+                rpId,
+                "unknown (U2F)",
+                u2fKeyEnvelope.createdAt,
+                null,
+                emptyMap()
+            )
+        }
+        catch (e: RuntimeException){
+            logger.trace("Failed to load U2FKeyEnvelope from credentialId", e)
+        }
+        return null
     }
 
     //spec| Step2
@@ -199,7 +232,7 @@ internal class GetAssertionExecution :
     //spec| If pinAuth parameter is present and the pinProtocol is not supported, return CTAP2_ERR_PIN_AUTH_INVALID.
     private fun execStep3ValidatePinProtocol() {
         if (pinAuth != null && pinProtocol != PinProtocolVersion.VERSION_1) {
-            throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
+            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
         }
     }
 
@@ -224,13 +257,13 @@ internal class GetAssertionExecution :
             if (BooleanUtil.isTrue(options.uv)) {
                 userVerificationPlan = when (ctapAuthenticator.userVerificationSetting) {
                     UserVerificationSetting.READY -> true
-                    else -> throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
+                    else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
                 }
             }
             if (BooleanUtil.isTrue(options.up)) {
                 userPresencePlan = when (ctapAuthenticator.userPresenceSetting) {
                     UserPresenceSetting.SUPPORTED -> true
-                    else -> throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
+                    else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
                 }
             }
         }
@@ -275,7 +308,7 @@ internal class GetAssertionExecution :
                 userPresenceResult = true
             }
         } else {
-            throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_OPERATION_DENIED)
+            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
         }
 
     }
@@ -284,7 +317,7 @@ internal class GetAssertionExecution :
     //spec| If no userCredentials were located in step 1, return CTAP2_ERR_NO_CREDENTIALS.
     private fun execStep8CheckUserCredentialCandidatesExistence() {
         if (userCredentials.isEmpty()) {
-            throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_NO_CREDENTIALS)
+            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_NO_CREDENTIALS)
         }
     }
 
@@ -400,10 +433,10 @@ internal class GetAssertionExecution :
             try {
                 authenticatorPropertyStore.saveUserCredential(userCredential)
             } catch (e: StoreFullException) {
-                throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_KEY_STORE_FULL)
+                throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_KEY_STORE_FULL)
             }
         }
-        return AuthenticatorGetAssertionResponse(StatusCode.CTAP2_OK, responseData)
+        return AuthenticatorGetAssertionResponse(CtapStatusCode.CTAP2_OK, responseData)
     }
 
 }

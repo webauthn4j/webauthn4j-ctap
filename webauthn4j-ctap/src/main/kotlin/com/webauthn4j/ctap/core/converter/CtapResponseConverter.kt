@@ -16,12 +16,12 @@ class CtapResponseConverter(objectConverter: ObjectConverter) {
      * @param source the source byte array to convert
      * @return the converted object
      */
-    fun convert(source: ByteArray?, responseType: Class<*>): CtapResponse<*>? {
+    fun convert(source: ByteArray?, responseType: Class<*>): CtapResponse? {
         if (source == null) {
             return null
         }
         require(source.isNotEmpty()) { "source must have statusCode byte." }
-        val statusCode = StatusCode.create(source.first())
+        val statusCode = CtapStatusCode.create(source.first())
         val responseDataBytes = Arrays.copyOfRange(source, 1, source.size)
         return when (responseType) {
             AuthenticatorMakeCredentialResponse::class.java -> {
@@ -72,7 +72,7 @@ class CtapResponseConverter(objectConverter: ObjectConverter) {
      * @param source the source object to convert
      * @return the converted byte array
      */
-    fun convertToBytes(source: CtapResponse<*>): ByteArray {
+    fun convertToBytes(source: CtapResponse): ByteArray {
         return if (source.responseData == null) {
             return byteArrayOf(source.statusCode.byte)
         } else {
@@ -82,7 +82,7 @@ class CtapResponseConverter(objectConverter: ObjectConverter) {
         }
     }
 
-    fun convertToResponseDataBytes(source: CtapResponse<*>): ByteArray {
+    fun convertToResponseDataBytes(source: CtapResponse): ByteArray {
         return if (source.responseData == null) {
             byteArrayOf()
         } else {

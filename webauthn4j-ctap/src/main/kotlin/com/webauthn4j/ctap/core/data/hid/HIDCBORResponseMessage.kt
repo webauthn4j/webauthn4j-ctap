@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.core.data.hid
 
-import com.webauthn4j.ctap.core.data.StatusCode
+import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.util.ArrayUtil
 import java.nio.ByteBuffer
@@ -8,9 +8,9 @@ import java.nio.ByteBuffer
 class HIDCBORResponseMessage : HIDResponseMessage, HIDMessageBase {
 
     @Suppress("JoinDeclarationAndAssignment")
-    val statusCode: StatusCode
+    val statusCode: CtapStatusCode
 
-    constructor(channelId: HIDChannelId, statusCode: StatusCode, cbor: ByteArray) : super(
+    constructor(channelId: HIDChannelId, statusCode: CtapStatusCode, cbor: ByteArray) : super(
         channelId,
         HIDCommand.CTAPHID_CBOR
     ) {

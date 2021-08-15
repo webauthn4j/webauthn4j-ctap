@@ -22,10 +22,10 @@ class GetNextAssertionExecutionTest {
         val response = GetNextAssertionExecution(
             Mockito.mock(CtapAuthenticator::class.java),
             Mockito.mock(AuthenticatorGetNextAssertionRequest::class.java)
-        ).createErrorResponse(StatusCode.CTAP1_ERR_OTHER)
+        ).createErrorResponse(CtapStatusCode.CTAP1_ERR_OTHER)
         Assertions.assertThat(response)
             .isInstanceOf(AuthenticatorGetNextAssertionResponse::class.java)
-        Assertions.assertThat(response.statusCode).isEqualTo(StatusCode.CTAP1_ERR_OTHER)
+        Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP1_ERR_OTHER)
     }
 
     @Test
@@ -53,7 +53,7 @@ class GetNextAssertionExecutionTest {
         )
         ctapAuthenticator.getAssertion(command)
         val response = ctapAuthenticator.getNextAssertion()
-        Assertions.assertThat(response.statusCode).isEqualTo(StatusCode.CTAP2_OK)
+        Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
         Assertions.assertThat(response.responseData).isNotNull
     }
 
@@ -64,7 +64,7 @@ class GetNextAssertionExecutionTest {
         makeCredential(ctapAuthenticator)
 
         val response = ctapAuthenticator.getNextAssertion(AuthenticatorGetNextAssertionRequest())
-        Assertions.assertThat(response.statusCode).isEqualTo(StatusCode.CTAP2_ERR_NOT_ALLOWED)
+        Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_ERR_NOT_ALLOWED)
     }
 
     @Test
@@ -94,7 +94,7 @@ class GetNextAssertionExecutionTest {
         ctapAuthenticator.getNextAssertion(AuthenticatorGetNextAssertionRequest()) // fetch 2nd credential
         val response =
             ctapAuthenticator.getNextAssertion(AuthenticatorGetNextAssertionRequest()) // return error as 3rd credential doesn't exist
-        Assertions.assertThat(response.statusCode).isEqualTo(StatusCode.CTAP2_ERR_NOT_ALLOWED)
+        Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_ERR_NOT_ALLOWED)
     }
 
     @Test
@@ -136,7 +136,7 @@ class GetNextAssertionExecutionTest {
                 .thenReturn(expiredInstant) // override current time to fixed time (expired)
             val response =
                 ctapAuthenticator.getNextAssertion(AuthenticatorGetNextAssertionRequest())
-            Assertions.assertThat(response.statusCode).isEqualTo(StatusCode.CTAP2_ERR_NOT_ALLOWED)
+            Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_ERR_NOT_ALLOWED)
         }
     }
 
@@ -174,7 +174,7 @@ class GetNextAssertionExecutionTest {
             pinProtocol
         )
         val response = ctapAuthenticator.makeCredential(command)
-        Assertions.assertThat(response.statusCode).isEqualTo(StatusCode.CTAP2_OK)
+        Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
         Assertions.assertThat(response.responseData).isNotNull
         Assertions.assertThat(response.responseData!!.attestationStatement).isNotNull
         Assertions.assertThat(response.responseData!!.authenticatorData).isNotNull

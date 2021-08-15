@@ -8,7 +8,7 @@ open class TransactionManager(ctapAuthenticator: CtapAuthenticator = CtapAuthent
     //single thread worker to synchronize authenticator access
     private val authenticatorWorker = newSingleThreadContext("authenticator-worker")
 
-    private var transaction: Transaction<*, *>? = null
+    private var transaction: Transaction<*>? = null
 
     var ctapAuthenticator: CtapAuthenticator = ctapAuthenticator
         set(value) {
@@ -19,7 +19,7 @@ open class TransactionManager(ctapAuthenticator: CtapAuthenticator = CtapAuthent
             }
         }
 
-    fun <TC : CtapRequest, TR : CtapResponse<TRD>?, TRD : CtapResponseData> startCommand(command: TC): Transaction<TR, TRD> {
+    fun <TC : AuthenticatorRequest, TR : AuthenticatorResponse> startCommand(command: TC): Transaction<TR> {
         val deferred: Deferred<TR> = CoroutineScope(authenticatorWorker).async {
             return@async ctapAuthenticator.invokeCommand(command)
         }
@@ -28,10 +28,10 @@ open class TransactionManager(ctapAuthenticator: CtapAuthenticator = CtapAuthent
         return transaction
     }
 
-    suspend fun <TC : CtapRequest, TR : CtapResponse<TRD>?, TRD : CtapResponseData> invokeCommand(
+    suspend fun <TC : AuthenticatorRequest, TR : AuthenticatorResponse> invokeCommand(
         command: TC
     ): TR {
-        return startCommand<TC, TR, TRD>(command).await()
+        return startCommand<TC, TR>(command).await()
     }
 
     fun cancelOnGoingTransaction() {

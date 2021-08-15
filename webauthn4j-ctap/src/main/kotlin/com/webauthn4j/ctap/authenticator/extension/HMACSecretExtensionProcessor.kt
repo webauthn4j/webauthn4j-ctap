@@ -3,10 +3,9 @@ package com.webauthn4j.ctap.authenticator.extension
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.UserCredentialBuilder
 import com.webauthn4j.ctap.authenticator.exception.CtapCommandExecutionException
-import com.webauthn4j.ctap.core.data.StatusCode
+import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import com.webauthn4j.data.extension.authenticator.*
 import com.webauthn4j.util.MACUtil
@@ -58,11 +57,11 @@ class HMACSecretExtensionProcessor : RegistrationExtensionProcessor,
         }
         //spec| If "up" is set to false, authenticator returns CTAP2_ERR_UNSUPPORTED_OPTION.
         if(context.getAssertionRequest.options?.up == false){
-            throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
+            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
         }
         val hmacGetSecretAuthenticatorInput = context.getAssertionRequest.extensions?.hmacGetSecret!!
 
-        val json = context.userCredential.details[DETAILS_ID_HMAC_SECRET_EXTENSION] ?: throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
+        val json = context.userCredential.details[DETAILS_ID_HMAC_SECRET_EXTENSION] ?: throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
         val hmacSecretUserDetails = jsonConverter.readValue(json, HMACSecretUserDetails::class.java)!!
         val platformKeyAgreementKey = hmacGetSecretAuthenticatorInput.keyAgreement
         val saltEnc = hmacGetSecretAuthenticatorInput.saltEnc
@@ -86,7 +85,7 @@ class HMACSecretExtensionProcessor : RegistrationExtensionProcessor,
         //spec| The authenticator verifies saltEnc by generating LEFT(HMAC-SHA-256(sharedSecret, saltEnc), 16) and matching against the input saltAuth parameter.
         val mac = MACUtil.calculateHmacSHA256(saltEnc, sharedSecret, 16)
         if(!mac.contentEquals(saltAuth)){
-            throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_UNSUPPORTED_OPTION) //TODO: revisit error code
+            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION) //TODO: revisit error code
         }
 
         //spec| The authenticator chooses which CredRandom to use for next step based on whether user verification was done or not in above steps.

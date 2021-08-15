@@ -93,7 +93,7 @@ class CtapAuthenticatorTest {
         val response: AuthenticatorMakeCredentialResponse =
             ctapAuthenticator.makeCredential(makeCredentialCommand)
         Truth.assertThat(response).isNotNull()
-        Truth.assertThat(response.statusCode).isEqualTo(StatusCode.CTAP2_OK)
+        Truth.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
     }
 
     @Test
@@ -119,7 +119,7 @@ class CtapAuthenticatorTest {
         val response: AuthenticatorGetAssertionResponse =
             ctapAuthenticator.getAssertion(getAssertionCommand)
         Truth.assertThat(response).isNotNull()
-        Truth.assertThat(response.statusCode).isEqualTo(StatusCode.CTAP2_OK)
+        Truth.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
     }
 
     private suspend fun makeCredential(): AuthenticatorMakeCredentialResponse {

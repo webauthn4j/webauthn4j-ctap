@@ -83,7 +83,7 @@ class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
                     clientPIN =
                         makeCredentialRequest.clientPINUserVerificationHandler.onClientPINRequested()
                 } catch (e: ClientPINUserVerificationCanceledException) {
-                    throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_PIN_REQUIRED, e)
+                    throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_REQUIRED, e)
                 }
                 val pinToken: ByteArray =
                     requestPINToken(clientPIN.toByteArray(StandardCharsets.UTF_8))
@@ -161,7 +161,7 @@ class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
                     clientPIN =
                         getAssertionsRequest.clientPINUserVerificationHandler.onClientPINRequested()
                 } catch (e: ClientPINUserVerificationCanceledException) {
-                    throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_PIN_REQUIRED, e)
+                    throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_REQUIRED, e)
                 }
                 val pinToken: ByteArray =
                     requestPINToken(clientPIN.toByteArray(StandardCharsets.UTF_8))

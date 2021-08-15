@@ -12,6 +12,7 @@ import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.MAX_PACKET_SIZE
 import com.webauthn4j.util.HexUtil
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
+import kotlin.experimental.or
 
 class HIDConnector(
     private val transactionManager: TransactionManager,
@@ -25,7 +26,7 @@ class HIDConnector(
         private const val MINOR_DEVICE_VERSION_NUMBER: Byte = 1
         private const val BUILD_DEVICE_VERSION_NUMBER: Byte = 0
         private val CAPABILITIES =
-            HIDCapability((HIDCapability.CBOR.value + HIDCapability.NMSG.value).toByte())
+            HIDCapability((HIDCapability.CBOR.value or HIDCapability.NMSG.value))
     }
 
     private val logger = LoggerFactory.getLogger(HIDConnector::class.java)
@@ -203,7 +204,7 @@ class HIDConnector(
                     }
                 }
                 val ctapCommand = ctapRequestConverter.convert(hidMessage.data)
-                var ctapResponse: CtapResponse<CtapResponseData>
+                var ctapResponse: CtapResponse
                 withContext(Dispatchers.Default) {
                     ctapResponse = transactionManager.invokeCommand(ctapCommand)
                 }

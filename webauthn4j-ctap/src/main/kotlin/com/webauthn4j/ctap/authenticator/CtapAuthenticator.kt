@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.webauthn4j.converter.AuthenticatorDataConverter
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementGenerator
+import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementGenerator
 import com.webauthn4j.ctap.authenticator.attestation.NoneAttestationStatementGenerator
 import com.webauthn4j.ctap.authenticator.event.Event
 import com.webauthn4j.ctap.authenticator.extension.ExtensionProcessor
@@ -25,6 +26,7 @@ class CtapAuthenticator @JvmOverloads constructor(
     // Core logic delegates
     // These are final as it should not be updated on the fly for integrity. To update these, new instance should be created.
     val attestationStatementGenerator: AttestationStatementGenerator = NoneAttestationStatementGenerator(),
+    val fidoU2FAttestationStatementGenerator: FIDOU2FAttestationStatementGenerator = FIDOU2FAttestationStatementGenerator.createWithDemoAttestation(),
     val extensionProcessors: List<ExtensionProcessor> = listOf(),
     // Handlers
     var authenticatorPropertyStore: AuthenticatorPropertyStore = InMemoryAuthenticatorPropertyStore(),
@@ -49,6 +51,7 @@ class CtapAuthenticator @JvmOverloads constructor(
             AuthenticatorTransport.BLE,
             AuthenticatorTransport.USB
         )
+
         private fun createObjectConverter(): ObjectConverter {
             val jsonMapper = ObjectMapper()
             val cborMapper = ObjectMapper(CBORFactory())
@@ -97,25 +100,33 @@ class CtapAuthenticator @JvmOverloads constructor(
         credentialSelectorSetting = settings.credentialSelector
     }
 
-    suspend fun <TC : CtapRequest, TR : CtapResponse<TRD>?, TRD : CtapResponseData?> invokeCommand(
-        command: TC
-    ): TR {
-        val response = when (command) {
-            is AuthenticatorMakeCredentialRequest -> makeCredential(command)
-            is AuthenticatorGetAssertionRequest -> getAssertion(command)
-            is AuthenticatorGetNextAssertionRequest -> getNextAssertion(command)
-            is AuthenticatorGetInfoRequest -> getInfo(command)
-            is AuthenticatorClientPINRequest -> clientPIN(command)
-            is AuthenticatorResetRequest -> reset(command)
+    suspend fun <TC : AuthenticatorRequest, TR : AuthenticatorResponse?> invokeCommand(request: TC): TR {
+        val response = when (request) {
+            is AuthenticatorMakeCredentialRequest -> makeCredential(request)
+            is AuthenticatorGetAssertionRequest -> getAssertion(request)
+            is AuthenticatorGetNextAssertionRequest -> getNextAssertion(request)
+            is AuthenticatorGetInfoRequest -> getInfo(request)
+            is AuthenticatorClientPINRequest -> clientPIN(request)
+            is AuthenticatorResetRequest -> reset(request)
+            is U2FRegistrationRequest -> u2fRegister(request)
+            is U2FAuthenticationRequest -> u2fSign(request)
             else -> throw IllegalStateException(
                 String.format(
                     "unknown command %s is invoked.",
-                    command::class.java.toString()
+                    request::class.java.toString()
                 )
             )
         }
         @Suppress("UNCHECKED_CAST")
         return response as TR
+    }
+
+    suspend fun u2fRegister(u2fRegistrationRequest: U2FRegistrationRequest): U2FRegistrationResponse {
+        return U2FRegisterExecution(this, u2fRegistrationRequest).execute()
+    }
+
+    suspend fun u2fSign(u2fAuthenticationRequest: U2FAuthenticationRequest): U2FAuthenticationResponse{
+        return U2FAuthenticationExecution(this, u2fAuthenticationRequest).execute()
     }
 
     suspend fun makeCredential(authenticatorMakeCredentialCommand: AuthenticatorMakeCredentialRequest): AuthenticatorMakeCredentialResponse {
@@ -190,3 +201,4 @@ class CtapAuthenticator @JvmOverloads constructor(
     }
 
 }
+

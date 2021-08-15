@@ -11,17 +11,18 @@ class RegistrationConsentDialogViewModel(application: Application) : AndroidView
     lateinit var callbacks: Callbacks
     lateinit var request: RegistrationConsentDialogActivityRequest
     val service: String?
-        get() = request.rp.id
-    val username: String
+        get() = request.rp?.id
+    val username: String?
         get() {
-            return request.user.displayName
+            return request.user?.displayName
         }
     val description: String
         get() {
-            val descRegistrationRequest =
-                getApplication<Application>().resources.getText(R.string.desc_registration_request)
-                    .toString()
-            return String.format(descRegistrationRequest, request.rp.id)
+            return if(service == null){
+                getApplication<Application>().resources.getText(R.string.desc_registration_request).toString()
+            } else{
+                getApplication<Application>().resources.getText(R.string.desc_registration_request_with_placeholder).toString().format(service)
+            }
         }
 
     @UiThread

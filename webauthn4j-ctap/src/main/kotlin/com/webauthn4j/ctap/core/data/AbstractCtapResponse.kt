@@ -1,15 +1,15 @@
 package com.webauthn4j.ctap.core.data
 
-abstract class AbstractCtapResponse<T : CtapResponseData> : CtapResponse<T> {
-    final override val statusCode: StatusCode
+abstract class AbstractCtapResponse<T : CtapResponseData> : CtapResponse {
+    final override val statusCode: CtapStatusCode
     final override val responseData: T?
 
-    constructor(statusCode: StatusCode, responseData: T?) {
+    constructor(statusCode: CtapStatusCode, responseData: T?) {
         this.statusCode = statusCode
         this.responseData = responseData
     }
 
-    constructor(statusCode: StatusCode) {
+    constructor(statusCode: CtapStatusCode) {
         this.statusCode = statusCode
         responseData = null
     }

@@ -3,7 +3,7 @@ package com.webauthn4j.ctap.authenticator
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponse
 import com.webauthn4j.ctap.core.data.PinSubCommand
-import com.webauthn4j.ctap.core.data.StatusCode
+import com.webauthn4j.ctap.core.data.CtapStatusCode
 import org.slf4j.LoggerFactory
 
 internal class ClientPINExecution(
@@ -46,7 +46,7 @@ internal class ClientPINExecution(
         }
     }
 
-    override fun createErrorResponse(statusCode: StatusCode): AuthenticatorClientPINResponse {
+    override fun createErrorResponse(statusCode: CtapStatusCode): AuthenticatorClientPINResponse {
         return AuthenticatorClientPINResponse(statusCode)
     }
 }

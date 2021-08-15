@@ -11,6 +11,7 @@ import com.unifidokey.driver.persistence.dao.EventDao
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.*
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementGenerator
+import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementGenerator
 import com.webauthn4j.ctap.authenticator.event.Event
 import com.webauthn4j.ctap.authenticator.extension.HMACSecretExtensionProcessor
 import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting
@@ -120,6 +121,7 @@ class AuthenticatorService(
         val extensionProcessors = listOf(HMACSecretExtensionProcessor())
         val ctapAuthenticator = CtapAuthenticator(
             attestationStatementGenerator,
+            attestationStatementGenerators[AttestationStatementFormatSetting.FIDO_U2F] as FIDOU2FAttestationStatementGenerator,
             extensionProcessors,
             authenticatorPropertyStore,
             objectConverter,

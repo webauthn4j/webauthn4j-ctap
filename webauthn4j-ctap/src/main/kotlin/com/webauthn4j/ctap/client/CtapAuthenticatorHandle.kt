@@ -45,11 +45,11 @@ class CtapAuthenticatorHandle(private val transportAdaptor: TransportAdaptor) {
     }
 
     @Throws(CtapErrorException::class)
-    private suspend fun <TC : CtapRequest, TR : CtapResponse<TRD>, TRD : CtapResponseData?> invokeCommand(
+    private suspend fun <TC : CtapRequest, TR : CtapResponse> invokeCommand(
         ctapCommand: TC
     ): TR {
         val ctapResponse: TR = transportAdaptor.send(ctapCommand)
-        if (ctapResponse.statusCode == StatusCode.CTAP2_OK) {
+        if (ctapResponse.statusCode == CtapStatusCode.CTAP2_OK) {
             return ctapResponse
         } else {
             throw CtapErrorException(ctapResponse.statusCode)

@@ -1,5 +1,6 @@
 package com.webauthn4j.ctap.core.data.nfc
 
+import com.webauthn4j.ctap.core.data.U2FStatusCode
 import com.webauthn4j.util.ArrayUtil
 import com.webauthn4j.util.AssertUtil
 import java.nio.ByteBuffer
@@ -38,12 +39,10 @@ class ResponseAPDU(data: ByteArray?, sw1: Byte, sw2: Byte) {
     val sw1: Byte = sw1
     val sw2: Byte = sw2
 
-    val bytes: ByteArray
-        get() = if (_data == null) {
-            ByteBuffer.allocate(SW_LENGTH).put(sw1).put(sw2).array()
-        } else {
-            ByteBuffer.allocate(_data.size + SW_LENGTH).put(_data).put(sw1).put(sw2).array()
-        }
+    fun toBytes(): ByteArray = when (_data) {
+        null -> ByteBuffer.allocate(SW_LENGTH).put(sw1).put(sw2).array()
+        else -> ByteBuffer.allocate(_data.size + SW_LENGTH).put(_data).put(sw1).put(sw2).array()
+    }
 
     constructor(sw1: Byte, sw2: Byte) : this(null, sw1, sw2)
 

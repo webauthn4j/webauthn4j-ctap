@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.core.data
 
-interface CtapRequest {
+interface CtapRequest : AuthenticatorRequest{
 
     val command: CtapCommand
 }

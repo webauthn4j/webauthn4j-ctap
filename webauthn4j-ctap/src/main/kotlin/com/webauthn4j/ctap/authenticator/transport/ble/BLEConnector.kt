@@ -8,7 +8,6 @@ import com.webauthn4j.ctap.core.converter.CtapRequestConverter
 import com.webauthn4j.ctap.core.converter.CtapResponseConverter
 import com.webauthn4j.ctap.core.data.CtapRequest
 import com.webauthn4j.ctap.core.data.CtapResponse
-import com.webauthn4j.ctap.core.data.CtapResponseData
 import com.webauthn4j.ctap.core.data.ble.*
 import com.webauthn4j.ctap.core.util.internal.ArrayUtil.toHexString
 import org.slf4j.LoggerFactory
@@ -74,7 +73,7 @@ class BLEConnector(
             else -> {
                 val ctapCommand = ctapRequestConverter.convert(bleFrame.data)
                 val ctapResponse =
-                    transactionManager.invokeCommand<CtapRequest, CtapResponse<CtapResponseData>, CtapResponseData>(
+                    transactionManager.invokeCommand<CtapRequest, CtapResponse>(
                         ctapCommand
                     )
                 val data = ctapResponseConverter.convertToBytes(ctapResponse)

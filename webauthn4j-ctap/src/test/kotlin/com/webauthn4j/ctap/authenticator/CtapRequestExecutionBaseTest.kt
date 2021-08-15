@@ -2,8 +2,7 @@ package com.webauthn4j.ctap.authenticator
 
 import com.webauthn4j.ctap.core.data.CtapRequest
 import com.webauthn4j.ctap.core.data.CtapResponse
-import com.webauthn4j.ctap.core.data.CtapResponseData
-import com.webauthn4j.ctap.core.data.StatusCode
+import com.webauthn4j.ctap.core.data.CtapStatusCode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThatCode
@@ -26,18 +25,18 @@ internal class CtapRequestExecutionBaseTest {
     }
 
     inner class TestCtapCommandExecution(ctapAuthenticator: CtapAuthenticator, ctapRequest: CtapRequest) :
-        CtapCommandExecutionBase<CtapRequest, CtapResponse<CtapResponseData>>(ctapAuthenticator, ctapRequest) {
+        CtapCommandExecutionBase<CtapRequest, CtapResponse>(ctapAuthenticator, ctapRequest) {
 
         override val commandName: String
             get() = "TestCtapCommand"
 
-        override suspend fun doExecute(): CtapResponse<CtapResponseData> {
+        override suspend fun doExecute(): CtapResponse {
             throw RuntimeException()
         }
 
         @Suppress("UNCHECKED_CAST")
-        override fun createErrorResponse(statusCode: StatusCode): CtapResponse<CtapResponseData> {
-            return mock(CtapResponse::class.java) as CtapResponse<CtapResponseData>
+        override fun createErrorResponse(statusCode: CtapStatusCode): CtapResponse {
+            return mock(CtapResponse::class.java) as CtapResponse
         }
 
     }

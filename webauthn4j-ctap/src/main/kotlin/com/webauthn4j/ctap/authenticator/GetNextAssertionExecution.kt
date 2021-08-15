@@ -4,7 +4,7 @@ import com.webauthn4j.ctap.authenticator.SignatureCalculator.calculate
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponseData
-import com.webauthn4j.ctap.core.data.StatusCode
+import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialType
 import com.webauthn4j.data.PublicKeyCredentialUserEntity
@@ -28,7 +28,7 @@ internal class GetNextAssertionExecution(
 
         //spec| Step1
         //spec| If authenticator does not remember any authenticatorGetAssertion parameters, return CTAP2_ERR_NOT_ALLOWED.
-        val getAssertionSession = ctapAuthenticator.onGoingGetAssertionSession?: return AuthenticatorGetNextAssertionResponse(StatusCode.CTAP2_ERR_NOT_ALLOWED)
+        val getAssertionSession = ctapAuthenticator.onGoingGetAssertionSession?: return AuthenticatorGetNextAssertionResponse(CtapStatusCode.CTAP2_ERR_NOT_ALLOWED)
 
         //spec| Step2
         //spec| If the credentialCounter is equal to or greater than numberOfCredentials, return CTAP2_ERR_NOT_ALLOWED.
@@ -36,7 +36,7 @@ internal class GetNextAssertionExecution(
         try {
             assertionObject = getAssertionSession.nextAssertionObject()
         } catch (e: NoSuchElementException) {
-            return AuthenticatorGetNextAssertionResponse(StatusCode.CTAP2_ERR_NOT_ALLOWED)
+            return AuthenticatorGetNextAssertionResponse(CtapStatusCode.CTAP2_ERR_NOT_ALLOWED)
         }
         val userCredential = assertionObject.userCredential
 
@@ -45,7 +45,7 @@ internal class GetNextAssertionExecution(
         //spec| discard the current authenticatorGetAssertion state and return CTAP2_ERR_NOT_ALLOWED.
         //spec| This step is optional if transport is done over NFC.
         if (getAssertionSession.isExpired()) {
-            return AuthenticatorGetNextAssertionResponse(StatusCode.CTAP2_ERR_NOT_ALLOWED)
+            return AuthenticatorGetNextAssertionResponse(CtapStatusCode.CTAP2_ERR_NOT_ALLOWED)
         }
 
         //spec| Step4
@@ -87,10 +87,10 @@ internal class GetNextAssertionExecution(
         // This is done in `getAssertionSession.nextUserCredential();`
         val responseData =
             AuthenticatorGetNextAssertionResponseData(credential, authData, signature, user)
-        return AuthenticatorGetNextAssertionResponse(StatusCode.CTAP2_OK, responseData)
+        return AuthenticatorGetNextAssertionResponse(CtapStatusCode.CTAP2_OK, responseData)
     }
 
-    override fun createErrorResponse(statusCode: StatusCode): AuthenticatorGetNextAssertionResponse {
+    override fun createErrorResponse(statusCode: CtapStatusCode): AuthenticatorGetNextAssertionResponse {
         return AuthenticatorGetNextAssertionResponse(statusCode)
     }
 }

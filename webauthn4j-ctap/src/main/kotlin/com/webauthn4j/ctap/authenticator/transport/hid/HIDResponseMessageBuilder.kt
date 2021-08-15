@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.authenticator.transport.hid
 
-import com.webauthn4j.ctap.core.data.StatusCode
+import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.ctap.core.data.hid.*
 
 class HIDResponseMessageBuilder : HIDMessageBuilderBase<HIDResponseMessage>() {
@@ -11,12 +11,12 @@ class HIDResponseMessageBuilder : HIDMessageBuilderBase<HIDResponseMessage>() {
     ): HIDResponseMessage {
         return when (command) {
             HIDCommand.CTAPHID_MSG -> {
-                val statusCode = StatusCode.create(data.first())
+                val statusCode = CtapStatusCode.create(data.first())
                 val message = data.copyOfRange(1, data.size)
                 HIDMSGResponseMessage(channelId, statusCode, message)
             }
             HIDCommand.CTAPHID_CBOR -> {
-                val statusCode = StatusCode.create(data.first())
+                val statusCode = CtapStatusCode.create(data.first())
                 val cbor = data.copyOfRange(1, data.size)
                 HIDCBORResponseMessage(channelId, statusCode, cbor)
             }

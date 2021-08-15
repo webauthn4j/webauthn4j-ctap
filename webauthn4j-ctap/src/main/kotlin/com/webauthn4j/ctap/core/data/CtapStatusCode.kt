@@ -3,58 +3,58 @@ package com.webauthn4j.ctap.core.data
 import com.webauthn4j.util.UnsignedNumberUtil
 
 @Suppress("MemberVisibilityCanBePrivate")
-class StatusCode(value: Int) {
+class CtapStatusCode(value: Int) {
     companion object {
 
         @JvmField
-        val CTAP1_ERR_SUCCESS = StatusCode(0x00)
-        val CTAP2_OK = StatusCode(0x00)
-        val CTAP1_ERR_INVALID_COMMAND = StatusCode(0x01)
-        val CTAP1_ERR_INVALID_PARAMETER = StatusCode(0x02)
-        val CTAP1_ERR_INVALID_LENGTH = StatusCode(0x03)
-        val CTAP1_ERR_INVALID_SEQ = StatusCode(0x04)
-        val CTAP1_ERR_TIMEOUT = StatusCode(0x05)
-        val CTAP1_ERR_CHANNEL_BUSY = StatusCode(0x06)
-        val CTAP1_ERR_LOCK_REQUIRED = StatusCode(0x0A)
-        val CTAP1_ERR_INVALID_CHANNEL = StatusCode(0x0B)
-        val CTAP2_ERR_CBOR_UNEXPECTED_TYPE = StatusCode(0x11)
-        val CTAP2_ERR_INVALID_CBOR = StatusCode(0x12)
-        val CTAP2_ERR_MISSING_PARAMETER = StatusCode(0x14)
-        val CTAP2_ERR_LIMIT_EXCEEDED = StatusCode(0x15)
-        val CTAP2_ERR_UNSUPPORTED_EXTENSION = StatusCode(0x16)
-        val CTAP2_ERR_CREDENTIAL_EXCLUDED = StatusCode(0x19)
-        val CTAP2_ERR_PROCESSING = StatusCode(0x21)
-        val CTAP2_ERR_INVALID_CREDENTIAL = StatusCode(0x22)
-        val CTAP2_ERR_USER_ACTION_PENDING = StatusCode(0x23)
-        val CTAP2_ERR_OPERATION_PENDING = StatusCode(0x24)
-        val CTAP2_ERR_NO_OPERATIONS = StatusCode(0x25)
-        val CTAP2_ERR_UNSUPPORTED_ALGORITHM = StatusCode(0x26)
-        val CTAP2_ERR_OPERATION_DENIED = StatusCode(0x27)
-        val CTAP2_ERR_KEY_STORE_FULL = StatusCode(0x28)
-        val CTAP2_ERR_NO_OPERATION_PENDING = StatusCode(0x2A)
-        val CTAP2_ERR_UNSUPPORTED_OPTION = StatusCode(0x2B)
-        val CTAP2_ERR_INVALID_OPTION = StatusCode(0x2C)
-        val CTAP2_ERR_KEEPALIVE_CANCEL = StatusCode(0x2D)
-        val CTAP2_ERR_NO_CREDENTIALS = StatusCode(0x2E)
-        val CTAP2_ERR_USER_ACTION_TIMEOUT = StatusCode(0x2F)
-        val CTAP2_ERR_NOT_ALLOWED = StatusCode(0x30)
-        val CTAP2_ERR_PIN_INVALID = StatusCode(0x31)
-        val CTAP2_ERR_PIN_BLOCKED = StatusCode(0x32)
-        val CTAP2_ERR_PIN_AUTH_INVALID = StatusCode(0x33)
-        val CTAP2_ERR_PIN_AUTH_BLOCKED = StatusCode(0x34)
-        val CTAP2_ERR_PIN_NOT_SET = StatusCode(0x35)
-        val CTAP2_ERR_PIN_REQUIRED = StatusCode(0x36)
-        val CTAP2_ERR_PIN_POLICY_VIOLATION = StatusCode(0x37)
-        val CTAP2_ERR_PIN_TOKEN_EXPIRED = StatusCode(0x38)
-        val CTAP2_ERR_REQUEST_TOO_LARGE = StatusCode(0x39)
-        val CTAP2_ERR_ACTION_TIMEOUT = StatusCode(0x3A)
-        val CTAP2_ERR_UP_REQUIRED = StatusCode(0x3B)
-        val CTAP1_ERR_OTHER = StatusCode(0x7F)
+        val CTAP1_ERR_SUCCESS = CtapStatusCode(0x00)
+        val CTAP2_OK = CtapStatusCode(0x00)
+        val CTAP1_ERR_INVALID_COMMAND = CtapStatusCode(0x01)
+        val CTAP1_ERR_INVALID_PARAMETER = CtapStatusCode(0x02)
+        val CTAP1_ERR_INVALID_LENGTH = CtapStatusCode(0x03)
+        val CTAP1_ERR_INVALID_SEQ = CtapStatusCode(0x04)
+        val CTAP1_ERR_TIMEOUT = CtapStatusCode(0x05)
+        val CTAP1_ERR_CHANNEL_BUSY = CtapStatusCode(0x06)
+        val CTAP1_ERR_LOCK_REQUIRED = CtapStatusCode(0x0A)
+        val CTAP1_ERR_INVALID_CHANNEL = CtapStatusCode(0x0B)
+        val CTAP2_ERR_CBOR_UNEXPECTED_TYPE = CtapStatusCode(0x11)
+        val CTAP2_ERR_INVALID_CBOR = CtapStatusCode(0x12)
+        val CTAP2_ERR_MISSING_PARAMETER = CtapStatusCode(0x14)
+        val CTAP2_ERR_LIMIT_EXCEEDED = CtapStatusCode(0x15)
+        val CTAP2_ERR_UNSUPPORTED_EXTENSION = CtapStatusCode(0x16)
+        val CTAP2_ERR_CREDENTIAL_EXCLUDED = CtapStatusCode(0x19)
+        val CTAP2_ERR_PROCESSING = CtapStatusCode(0x21)
+        val CTAP2_ERR_INVALID_CREDENTIAL = CtapStatusCode(0x22)
+        val CTAP2_ERR_USER_ACTION_PENDING = CtapStatusCode(0x23)
+        val CTAP2_ERR_OPERATION_PENDING = CtapStatusCode(0x24)
+        val CTAP2_ERR_NO_OPERATIONS = CtapStatusCode(0x25)
+        val CTAP2_ERR_UNSUPPORTED_ALGORITHM = CtapStatusCode(0x26)
+        val CTAP2_ERR_OPERATION_DENIED = CtapStatusCode(0x27)
+        val CTAP2_ERR_KEY_STORE_FULL = CtapStatusCode(0x28)
+        val CTAP2_ERR_NO_OPERATION_PENDING = CtapStatusCode(0x2A)
+        val CTAP2_ERR_UNSUPPORTED_OPTION = CtapStatusCode(0x2B)
+        val CTAP2_ERR_INVALID_OPTION = CtapStatusCode(0x2C)
+        val CTAP2_ERR_KEEPALIVE_CANCEL = CtapStatusCode(0x2D)
+        val CTAP2_ERR_NO_CREDENTIALS = CtapStatusCode(0x2E)
+        val CTAP2_ERR_USER_ACTION_TIMEOUT = CtapStatusCode(0x2F)
+        val CTAP2_ERR_NOT_ALLOWED = CtapStatusCode(0x30)
+        val CTAP2_ERR_PIN_INVALID = CtapStatusCode(0x31)
+        val CTAP2_ERR_PIN_BLOCKED = CtapStatusCode(0x32)
+        val CTAP2_ERR_PIN_AUTH_INVALID = CtapStatusCode(0x33)
+        val CTAP2_ERR_PIN_AUTH_BLOCKED = CtapStatusCode(0x34)
+        val CTAP2_ERR_PIN_NOT_SET = CtapStatusCode(0x35)
+        val CTAP2_ERR_PIN_REQUIRED = CtapStatusCode(0x36)
+        val CTAP2_ERR_PIN_POLICY_VIOLATION = CtapStatusCode(0x37)
+        val CTAP2_ERR_PIN_TOKEN_EXPIRED = CtapStatusCode(0x38)
+        val CTAP2_ERR_REQUEST_TOO_LARGE = CtapStatusCode(0x39)
+        val CTAP2_ERR_ACTION_TIMEOUT = CtapStatusCode(0x3A)
+        val CTAP2_ERR_UP_REQUIRED = CtapStatusCode(0x3B)
+        val CTAP1_ERR_OTHER = CtapStatusCode(0x7F)
 
-        private val map: Map<StatusCode, String>
+        private val map: Map<CtapStatusCode, String>
 
         init {
-            val tmp: MutableMap<StatusCode, String> = HashMap()
+            val tmp: MutableMap<CtapStatusCode, String> = HashMap()
             tmp[CTAP2_OK] = "CTAP2_OK"
             tmp[CTAP1_ERR_INVALID_COMMAND] = "CTAP1_ERR_INVALID_COMMAND"
             tmp[CTAP1_ERR_INVALID_PARAMETER] = "CTAP1_ERR_INVALID_PARAMETER"
@@ -101,7 +101,7 @@ class StatusCode(value: Int) {
         }
 
         @JvmStatic
-        fun create(value: String?): StatusCode {
+        fun create(value: String?): CtapStatusCode {
             return when (value) {
                 "CTAP2_OK" -> CTAP2_OK
                 "CTAP1_ERR_INVALID_COMMAND" -> CTAP1_ERR_INVALID_COMMAND
@@ -151,8 +151,8 @@ class StatusCode(value: Int) {
         }
 
         @JvmStatic
-        fun create(value: Byte): StatusCode {
-            return StatusCode(UnsignedNumberUtil.getUnsignedByte(value).toInt())
+        fun create(value: Byte): CtapStatusCode {
+            return CtapStatusCode(UnsignedNumberUtil.getUnsignedByte(value).toInt())
         }
 
     }
@@ -177,7 +177,7 @@ class StatusCode(value: Int) {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as StatusCode
+        other as CtapStatusCode
 
         if (value != other.value) return false
 

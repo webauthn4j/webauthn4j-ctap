@@ -137,7 +137,8 @@
 
     <!-- Consent Activity -->
     <string name="desc_logo">logo</string>
-    <string name="desc_registration_request">Service %s is requesting registration.</string>
+    <string name="desc_registration_request">Service is requesting registration.</string>
+    <string name="desc_registration_request_with_placeholder">Service %s is requesting registration.</string>
     <string name="desc_authentication_request">Service is requesting authentication.</string>
     <string name="desc_credential_selection_request">Select an account for %s.</string>
 

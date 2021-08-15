@@ -1,12 +1,11 @@
-package com.webauthn4j.ctap.authenticator.transport.nfc
+package com.webauthn4j.ctap.authenticator.transport.apdu
 
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.TransactionManager
+import com.webauthn4j.ctap.authenticator.exception.U2FCommandExecutionException
 import com.webauthn4j.ctap.core.converter.CtapRequestConverter
 import com.webauthn4j.ctap.core.converter.CtapResponseConverter
-import com.webauthn4j.ctap.core.data.CtapRequest
-import com.webauthn4j.ctap.core.data.CtapResponse
-import com.webauthn4j.ctap.core.data.CtapResponseData
+import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import org.slf4j.LoggerFactory
@@ -20,7 +19,7 @@ import java.util.*
  * NFC Transport Binding Connector
  */
 @Suppress("MemberVisibilityCanBePrivate")
-class NFCConnector(
+class APDUBasedProtocolConnector(
     private val transactionManager: TransactionManager,
     objectConverter: ObjectConverter
 ) {
@@ -45,27 +44,29 @@ class NFCConnector(
     private val ctapResponseConverter: CtapResponseConverter =
         CtapResponseConverter(objectConverter)
 
-    private val logger = LoggerFactory.getLogger(NFCConnector::class.java)
-    private val commandQueue: Queue<CommandAPDU> = LinkedList()
-    private val responseQueue = ResponseQueue()
+    private val logger = LoggerFactory.getLogger(APDUBasedProtocolConnector::class.java)
+    private val ctapCommandAPDUQueue: Queue<CommandAPDU> = LinkedList()
+    private val ctapResponseQueue = ResponseQueue()
+    private val u2fResponseQueue = ResponseQueue()
 
     internal val selectCommandAPDUProcessor = SelectCommandAPDUProcessor()
     internal val deselectCommandAPDUProcessor = DeselectCommandAPDUProcessor()
     internal val ctapCommandFragmentCommandAPDUProcessor = CtapCommandFragmentCommandAPDUProcessor()
-    internal val ctapCommandFinalFragmentCommandAPDUProcessor =
-        CtapRequestFinalFragmentCommandAPDUProcessor()
-    internal val responseAPDURequestCommandAPDUProcessor = ResponseAPDURequestCommandAPDUProcessor()
+    internal val ctapCommandFinalFragmentCommandAPDUProcessor = CtapRequestFinalFragmentCommandAPDUProcessor()
+    internal val ctapContinuationAPDURequestCommandAPDUProcessor = CtapContinuationAPDURequestCommandAPDUProcessor()
     internal val u2fRegisterCommandAPDUProcessor = U2FRegisterCommandAPDUProcessor()
     internal val u2fAuthenticateCommandAPDUProcessor = U2FAuthenticateCommandAPDUProcessor()
     internal val u2fVersionCommandAPDUProcessor = U2FVersionCommandAPDUProcessor()
+    internal val u2fContinuationAPDURequestCommandAPDUProcessor = U2FContinuationAPDURequestCommandAPDUProcessor()
 
     private val commandAPDUProcessors: List<CommandAPDUProcessor> = listOf(
         ctapCommandFragmentCommandAPDUProcessor,
         ctapCommandFinalFragmentCommandAPDUProcessor,
-        responseAPDURequestCommandAPDUProcessor,
+        ctapContinuationAPDURequestCommandAPDUProcessor,
         u2fRegisterCommandAPDUProcessor,
         u2fAuthenticateCommandAPDUProcessor,
-        u2fVersionCommandAPDUProcessor
+        u2fVersionCommandAPDUProcessor,
+        u2fContinuationAPDURequestCommandAPDUProcessor
     )
 
     private var aidSelected = false
@@ -99,7 +100,7 @@ class NFCConnector(
                 }
             }
             logger.debug("Processing Unknown APDU command")
-            return ResponseAPDU.createErrorResponseAPDU()
+            return U2FStatusCode.CLA_NOT_SUPPORTED.toResponseAPDU()
         } catch (e: RuntimeException) {
             logger.error(UNEXPECTED_EXCEPTION_MESSAGE, e)
             return ResponseAPDU.createErrorResponseAPDU()
@@ -119,8 +120,9 @@ class NFCConnector(
 
         override suspend fun process(command: CommandAPDU): ResponseAPDU {
             logger.debug("Processing Select APDU command")
-            commandQueue.clear()
-            responseQueue.clear()
+            ctapCommandAPDUQueue.clear()
+            ctapResponseQueue.clear()
+            u2fResponseQueue.clear()
             val response = if (Arrays.equals(command.dataIn, FIDO_AID)) {
                 val data = "FIDO_2_0".toByteArray(StandardCharsets.US_ASCII)
                 val sw1 = 0x90.toByte()
@@ -142,8 +144,9 @@ class NFCConnector(
 
         override suspend fun process(command: CommandAPDU): ResponseAPDU {
             logger.debug("Processing Deselect APDU command")
-            commandQueue.clear()
-            responseQueue.clear()
+            ctapCommandAPDUQueue.clear()
+            ctapResponseQueue.clear()
+            u2fResponseQueue.clear()
             val response = ResponseAPDU(null, 0x09.toByte(), 0x00.toByte())
             aidSelected = false
             return response
@@ -162,7 +165,7 @@ class NFCConnector(
 
         override suspend fun process(command: CommandAPDU): ResponseAPDU {
             logger.debug("Processing CTAP2 Non final APDU command")
-            commandQueue.add(command)
+            ctapCommandAPDUQueue.add(command)
             val sw1 = 0x90.toByte()
             val sw2 = 0x00.toByte()
             return ResponseAPDU(sw1, sw2)
@@ -182,10 +185,10 @@ class NFCConnector(
 
         override suspend fun process(command: CommandAPDU): ResponseAPDU {
             logger.debug("Processing CTAP2 Final APDU command")
-            commandQueue.add(command)
+            ctapCommandAPDUQueue.add(command)
             val ctapCommand: CtapRequest? = try {
-                val cloned: List<CommandAPDU> = ArrayList(commandQueue)
-                commandQueue.clear()
+                val cloned: List<CommandAPDU> = ArrayList(ctapCommandAPDUQueue)
+                ctapCommandAPDUQueue.clear()
                 buildCtapCommand(cloned)
             } catch (e: RuntimeException) {
                 logger.error("Failed to build a CTAP2 command from APDU commands", e)
@@ -193,12 +196,12 @@ class NFCConnector(
             }
             val ctapResponse = invokeCtapCommand(ctapCommand)
             val bytes = ctapResponseConverter.convertToBytes(ctapResponse)
-            responseQueue.initialize(bytes)
-            return responseQueue.poll(command)
+            ctapResponseQueue.initialize(bytes)
+            return ctapResponseQueue.poll(command)
         }
 
-        private suspend fun invokeCtapCommand(ctapRequest: CtapRequest?): CtapResponse<*> {
-            return transactionManager.invokeCommand<CtapRequest, CtapResponse<CtapResponseData>, CtapResponseData>(
+        private suspend fun invokeCtapCommand(ctapRequest: CtapRequest?): CtapResponse {
+            return transactionManager.invokeCommand(
                 ctapRequest as CtapRequest
             )
         }
@@ -221,17 +224,16 @@ class NFCConnector(
         }
     }
 
-    inner class ResponseAPDURequestCommandAPDUProcessor : CommandAPDUProcessor {
+    inner class CtapContinuationAPDURequestCommandAPDUProcessor : CommandAPDUProcessor {
 
-        private val logger =
-            LoggerFactory.getLogger(ResponseAPDURequestCommandAPDUProcessor::class.java)
+        private val logger = LoggerFactory.getLogger(CtapContinuationAPDURequestCommandAPDUProcessor::class.java)
 
         override fun isTarget(command: CommandAPDU): Boolean {
             return command.cla == 0x80.toByte() && command.ins == 0xc0.toByte()
         }
 
         override suspend fun process(command: CommandAPDU): ResponseAPDU {
-            return responseQueue.poll(command)
+            return ctapResponseQueue.poll(command)
         }
     }
 
@@ -243,8 +245,21 @@ class NFCConnector(
         }
 
         override suspend fun process(command: CommandAPDU): ResponseAPDU {
-            logger.debug("U2F command is not supported")
-            return ResponseAPDU.createErrorResponseAPDU()
+            val dataIn = command.dataIn
+            if(dataIn == null){
+                logger.debug("command data is missing")
+                return ResponseAPDU.createErrorResponseAPDU()
+            }
+            val u2fRegistrationRequest: U2FRegistrationRequest = U2FRegistrationRequest.createFromCommandAPDU(command)
+            try{
+                val u2fRegistrationResponse: U2FRegistrationResponse = transactionManager.invokeCommand(u2fRegistrationRequest)
+                u2fResponseQueue.initialize(u2fRegistrationResponse.toBytes())
+                return u2fResponseQueue.poll(command)
+            }
+            catch (e: U2FCommandExecutionException){
+                logger.error("U2F registration failed", e)
+                return ResponseAPDU(e.statusCode.sw1, e.statusCode.sw2)
+            }
         }
     }
 
@@ -254,13 +269,25 @@ class NFCConnector(
             LoggerFactory.getLogger(U2FAuthenticateCommandAPDUProcessor::class.java)
 
         override fun isTarget(command: CommandAPDU): Boolean {
-            return command.cla == 0x00.toByte() &&
-                    command.ins == 0x02.toByte()
+            return command.ins == 0x02.toByte()
         }
 
         override suspend fun process(command: CommandAPDU): ResponseAPDU {
-            logger.debug("U2F command is not supported")
-            return ResponseAPDU.createErrorResponseAPDU()
+            val dataIn = command.dataIn
+            if(dataIn == null){
+                logger.debug("command data is missing")
+                return ResponseAPDU.createErrorResponseAPDU()
+            }
+            val u2fAuthenticationRequest: U2FAuthenticationRequest = U2FAuthenticationRequest.createFromCommandAPDU(command)
+            try{
+                val u2fAuthenticationResponse: U2FAuthenticationResponse = transactionManager.invokeCommand(u2fAuthenticationRequest)
+                u2fResponseQueue.initialize(u2fAuthenticationResponse.toBytes())
+                return u2fResponseQueue.poll(command)
+            }
+            catch (e: U2FCommandExecutionException){
+                logger.error("U2F authentication failed", e)
+                return ResponseAPDU(e.statusCode.sw1, e.statusCode.sw2)
+            }
         }
     }
 
@@ -272,8 +299,23 @@ class NFCConnector(
         }
 
         override suspend fun process(command: CommandAPDU): ResponseAPDU {
-            logger.debug("U2F command is not supported")
-            return ResponseAPDU.createErrorResponseAPDU()
+            val data = "U2F_V2".encodeToByteArray()
+            val sw1 = 0x90.toByte()
+            val sw2 = 0x00.toByte()
+            return ResponseAPDU(data, sw1, sw2)
+        }
+    }
+
+    inner class U2FContinuationAPDURequestCommandAPDUProcessor : CommandAPDUProcessor {
+
+        private val logger = LoggerFactory.getLogger(CtapContinuationAPDURequestCommandAPDUProcessor::class.java)
+
+        override fun isTarget(command: CommandAPDU): Boolean {
+            return command.cla == 0x00.toByte() && command.ins == 0xc0.toByte()
+        }
+
+        override suspend fun process(command: CommandAPDU): ResponseAPDU {
+            return u2fResponseQueue.poll(command)
         }
     }
 

@@ -37,17 +37,16 @@ internal class CtapResponseConverterTest {
             ),
             2048L, listOf(PinProtocolVersion.VERSION_1)
         )
-        val original = AuthenticatorGetInfoResponse(StatusCode.CTAP2_OK, responseData)
+        val original = AuthenticatorGetInfoResponse(CtapStatusCode.CTAP2_OK, responseData)
         val encoded = converter.convertToBytes(original)
         val decoded = converter.convert(encoded, AuthenticatorGetInfoResponse::class.java)
-        Assertions.assertThat(encoded.first()).isEqualTo(StatusCode.CTAP2_OK.byte)
+        Assertions.assertThat(encoded.first()).isEqualTo(CtapStatusCode.CTAP2_OK.byte)
         Assertions.assertThat(decoded).isEqualTo(original)
     }
 
     @Test
     fun convertToBytes_test() {
-        val response: CtapResponse<AuthenticatorMakeCredentialResponseData> =
-            AuthenticatorMakeCredentialResponse(StatusCode.CTAP2_ERR_PIN_NOT_SET)
+        val response = AuthenticatorMakeCredentialResponse(CtapStatusCode.CTAP2_ERR_PIN_NOT_SET)
         val bytes = converter.convertToBytes(response)
         Assertions.assertThat(bytes).isEqualTo(HexUtil.decode("35"))
     }

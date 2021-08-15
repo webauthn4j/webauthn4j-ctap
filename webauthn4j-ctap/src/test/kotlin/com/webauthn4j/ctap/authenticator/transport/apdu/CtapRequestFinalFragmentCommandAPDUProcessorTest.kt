@@ -1,4 +1,4 @@
-package com.webauthn4j.ctap.authenticator.transport.nfc
+package com.webauthn4j.ctap.authenticator.transport.apdu
 
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.TransactionManager
@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 internal class CtapRequestFinalFragmentCommandAPDUProcessorTest {
     private val objectConverter = ObjectConverter()
     private val transactionManager: TransactionManager = object : TransactionManager() {}
-    private val target = NFCConnector(
+    private val target = APDUBasedProtocolConnector(
         transactionManager,
         objectConverter
     ).ctapCommandFinalFragmentCommandAPDUProcessor

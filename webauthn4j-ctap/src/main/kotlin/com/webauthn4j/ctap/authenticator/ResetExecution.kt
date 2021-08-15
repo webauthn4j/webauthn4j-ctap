@@ -5,7 +5,7 @@ import com.webauthn4j.ctap.authenticator.settings.ResetProtectionSetting
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.core.data.AuthenticatorResetRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorResetResponse
-import com.webauthn4j.ctap.core.data.StatusCode
+import com.webauthn4j.ctap.core.data.CtapStatusCode
 import org.slf4j.LoggerFactory
 import java.time.Instant
 
@@ -24,19 +24,19 @@ class ResetExecution internal constructor(
     override suspend fun doExecute(): AuthenticatorResetResponse {
         logger.debug("Processing reset request")
         return when (ctapAuthenticator.resetProtectionSetting) {
-            ResetProtectionSetting.ENABLED -> AuthenticatorResetResponse(StatusCode.CTAP2_ERR_OPERATION_DENIED)
+            ResetProtectionSetting.ENABLED -> AuthenticatorResetResponse(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
             else -> {
                 ctapAuthenticator.clientPINService.resetVolatilePinRetryCounter()
                 authenticatorPropertyStore.clear()
                 ctapAuthenticator.publishEvent(ResetEvent(Instant.now()))
-                AuthenticatorResetResponse(StatusCode.CTAP2_OK)
+                AuthenticatorResetResponse(CtapStatusCode.CTAP2_OK)
             }
         }
     }
 
     override val commandName: String = "Reset"
 
-    override fun createErrorResponse(statusCode: StatusCode): AuthenticatorResetResponse {
+    override fun createErrorResponse(statusCode: CtapStatusCode): AuthenticatorResetResponse {
         return AuthenticatorResetResponse(statusCode)
     }
 

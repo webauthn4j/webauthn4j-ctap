@@ -113,7 +113,7 @@ internal class MakeCredentialExecution :
 
     override suspend fun doExecute(): AuthenticatorMakeCredentialResponse {
         if (rpId == null) {
-            throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_MISSING_PARAMETER)
+            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_MISSING_PARAMETER)
         }
         execStep1ValidateExcludeList()
         execStep2ValidatePubKeyCredParams()
@@ -136,7 +136,7 @@ internal class MakeCredentialExecution :
         return response
     }
 
-    override fun createErrorResponse(statusCode: StatusCode): AuthenticatorMakeCredentialResponse {
+    override fun createErrorResponse(statusCode: CtapStatusCode): AuthenticatorMakeCredentialResponse {
         return AuthenticatorMakeCredentialResponse(statusCode)
     }
 
@@ -169,7 +169,7 @@ internal class MakeCredentialExecution :
                     ctapAuthenticator.userConsentHandler.consentMakeCredential(
                         makeCredentialConsentOptions
                     )
-                    throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_CREDENTIAL_EXCLUDED)
+                    throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_CREDENTIAL_EXCLUDED)
                 }
             }
         }
@@ -181,7 +181,7 @@ internal class MakeCredentialExecution :
     private fun execStep2ValidatePubKeyCredParams() {
         algorithmIdentifier =
             pubKeyCredParams.firstOrNull { authenticatorPropertyStore.supports(it.alg) }?.alg
-                ?: throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_UNSUPPORTED_ALGORITHM)
+                ?: throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_ALGORITHM)
     }
 
     //spec| Step3
@@ -199,7 +199,7 @@ internal class MakeCredentialExecution :
             else -> {
                 residentKeyPlan = when (requestOptions.rk) {
                     true -> when (ctapAuthenticator.residentKeySetting) {
-                        ResidentKeySetting.NEVER -> throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
+                        ResidentKeySetting.NEVER -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
                         else -> true
                     }
                     else -> ctapAuthenticator.residentKeySetting == ResidentKeySetting.ALWAYS
@@ -208,7 +208,7 @@ internal class MakeCredentialExecution :
                     true -> {
                         when (ctapAuthenticator.userVerificationSetting) {
                             UserVerificationSetting.READY -> true
-                            else -> throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
+                            else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
                         }
                     }
                     else -> false
@@ -217,7 +217,7 @@ internal class MakeCredentialExecution :
         }
         userPresencePlan = when (ctapAuthenticator.userPresenceSetting) {
             UserPresenceSetting.SUPPORTED -> true
-            else -> throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
+            else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
         }
     }
 
@@ -257,9 +257,9 @@ internal class MakeCredentialExecution :
                 //spec| but the user has to select which authenticator to send the pinToken to.
                 if (it.isEmpty()) {
                     if (ctapAuthenticator.clientPINService.isClientPINReady) {
-                        throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
+                        throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
                     } else {
-                        throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_PIN_NOT_SET)
+                        throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_NOT_SET)
                     }
                 } else {
                     ctapAuthenticator.clientPINService.validatePINAuth(it, clientDataHash)
@@ -283,7 +283,7 @@ internal class MakeCredentialExecution :
     //spec| If pinAuth parameter is present and the pinProtocol is not supported, return CTAP2_ERR_PIN_AUTH_INVALID.
     private fun execStep7ValidatePinProtocol() {
         if (authenticatorMakeCredentialRequest.pinAuth != null && authenticatorMakeCredentialRequest.pinProtocol != PinProtocolVersion.VERSION_1) {
-            throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
+            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
         }
     }
 
@@ -307,7 +307,7 @@ internal class MakeCredentialExecution :
                 userVerificationResult = true
             }
         } else {
-            throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_OPERATION_DENIED)
+            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
         }
     }
 
@@ -353,10 +353,10 @@ internal class MakeCredentialExecution :
                 try {
                     authenticatorPropertyStore.saveUserCredential(userCredential)
                 } catch (e: StoreFullException) {
-                    throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_KEY_STORE_FULL)
+                    throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_KEY_STORE_FULL)
                 }
             }
-            return AuthenticatorMakeCredentialResponse(StatusCode.CTAP2_OK, responseData)
+            return AuthenticatorMakeCredentialResponse(CtapStatusCode.CTAP2_OK, responseData)
         } catch (e: java.lang.RuntimeException) {
             if (userCredential is ResidentUserCredential) {
                 removeInCompleteUserCredential(userCredential)
@@ -368,7 +368,7 @@ internal class MakeCredentialExecution :
     private fun createUserCredential(): UserCredential {
 
         if (!authenticatorPropertyStore.supports(algorithmIdentifier)) {
-            throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_UNSUPPORTED_ALGORITHM)
+            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_ALGORITHM)
         }
 
         val userCredentialKey: UserCredentialKey
@@ -383,7 +383,7 @@ internal class MakeCredentialExecution :
                     clientDataHash
                 )
             } catch (e: StoreFullException) {
-                throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_KEY_STORE_FULL, e)
+                throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_KEY_STORE_FULL, e)
             }
         } else {
             userCredentialKey = NonResidentUserCredentialKey(

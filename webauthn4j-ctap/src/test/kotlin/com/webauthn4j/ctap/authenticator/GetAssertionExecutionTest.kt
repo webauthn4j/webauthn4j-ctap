@@ -27,9 +27,9 @@ internal class GetAssertionExecutionTest {
         val response = GetAssertionExecution(
             Mockito.mock(CtapAuthenticator::class.java),
             Mockito.mock(AuthenticatorGetAssertionRequest::class.java)
-        ).createErrorResponse(StatusCode.CTAP1_ERR_OTHER)
+        ).createErrorResponse(CtapStatusCode.CTAP1_ERR_OTHER)
         Assertions.assertThat(response).isInstanceOf(AuthenticatorGetAssertionResponse::class.java)
-        Assertions.assertThat(response.statusCode).isEqualTo(StatusCode.CTAP1_ERR_OTHER)
+        Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP1_ERR_OTHER)
     }
 
     @Test
@@ -54,7 +54,7 @@ internal class GetAssertionExecutionTest {
             pinProtocol
         )
         val response: AuthenticatorGetAssertionResponse = ctapAuthenticator.getAssertion(command)
-        Assertions.assertThat(response.statusCode).isEqualTo(StatusCode.CTAP2_OK)
+        Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
         Assertions.assertThat(response.responseData).isNotNull
     }
 
@@ -87,7 +87,7 @@ internal class GetAssertionExecutionTest {
             pinProtocol
         )
         val response: AuthenticatorGetAssertionResponse = ctapAuthenticator.getAssertion(command)
-        Assertions.assertThat(response.statusCode).isEqualTo(StatusCode.CTAP2_ERR_OPERATION_DENIED)
+        Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
     }
 
     @Test
@@ -111,7 +111,7 @@ internal class GetAssertionExecutionTest {
             pinProtocol
         )
         val response: AuthenticatorGetAssertionResponse = ctapAuthenticator.getAssertion(command)
-        Assertions.assertThat(response.statusCode).isEqualTo(StatusCode.CTAP2_ERR_NO_CREDENTIALS)
+        Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_ERR_NO_CREDENTIALS)
     }
 
     @Test
@@ -135,7 +135,7 @@ internal class GetAssertionExecutionTest {
             pinProtocol
         )
         val response: AuthenticatorGetAssertionResponse = ctapAuthenticator.getAssertion(command)
-        Assertions.assertThat(response.statusCode).isEqualTo(StatusCode.CTAP2_OK)
+        Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
         Assertions.assertThat(response.responseData).isNotNull
     }
 
@@ -174,7 +174,7 @@ internal class GetAssertionExecutionTest {
             pinProtocol
         )
         val response: AuthenticatorGetAssertionResponse = ctapAuthenticator.getAssertion(command)
-        Assertions.assertThat(response.statusCode).isEqualTo(StatusCode.CTAP2_ERR_KEY_STORE_FULL)
+        Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_ERR_KEY_STORE_FULL)
     }
 
     @ParameterizedTest
@@ -189,12 +189,13 @@ internal class GetAssertionExecutionTest {
     fun up_userVerification_matrix_test(
         up: Boolean,
         userPresenceSetting: UserPresenceSetting,
-        statusCode: StatusCode
+        statusCode: CtapStatusCode
     ) = runBlockingTest {
         var ctapAuthenticator = CtapAuthenticator()
         makeCredential(ctapAuthenticator)
         ctapAuthenticator = CtapAuthenticator(
             ctapAuthenticator.attestationStatementGenerator,
+            ctapAuthenticator.fidoU2FAttestationStatementGenerator,
             emptyList(),
             ctapAuthenticator.authenticatorPropertyStore,
             ctapAuthenticator.objectConverter,
@@ -236,7 +237,7 @@ internal class GetAssertionExecutionTest {
     fun uv_userVerification_matrix_test(
         uv: Boolean,
         userVerificationSetting: UserVerificationSetting,
-        statusCode: StatusCode
+        statusCode: CtapStatusCode
     ) = runBlockingTest {
         val ctapAuthenticator =
             CtapAuthenticator(settings = CtapAuthenticatorSettings(userVerification = userVerificationSetting))
@@ -296,7 +297,7 @@ internal class GetAssertionExecutionTest {
             pinProtocol
         )
         val response = ctapAuthenticator.makeCredential(command)
-        Assertions.assertThat(response.statusCode).isEqualTo(StatusCode.CTAP2_OK)
+        Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
         Assertions.assertThat(response.responseData).isNotNull
         Assertions.assertThat(response.responseData!!.attestationStatement).isNotNull
         Assertions.assertThat(response.responseData!!.authenticatorData).isNotNull
