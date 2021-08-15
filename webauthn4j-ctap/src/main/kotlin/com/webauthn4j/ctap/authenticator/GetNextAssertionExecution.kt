@@ -1,6 +1,7 @@
 package com.webauthn4j.ctap.authenticator
 
 import com.webauthn4j.ctap.authenticator.SignatureCalculator.calculate
+import com.webauthn4j.ctap.authenticator.store.UserCredential
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponseData
@@ -38,7 +39,7 @@ internal class GetNextAssertionExecution(
         } catch (e: NoSuchElementException) {
             return AuthenticatorGetNextAssertionResponse(CtapStatusCode.CTAP2_ERR_NOT_ALLOWED)
         }
-        val userCredential = assertionObject.userCredential
+        val credential = assertionObject.credential
 
         //spec| Step3
         //spec| If timer since the last call to authenticatorGetAssertion/authenticatorGetNextAssertion is greater than 30 seconds,
@@ -51,14 +52,14 @@ internal class GetNextAssertionExecution(
         //spec| Step4
         //spec| Sign the clientDataHash along with authData with the credential
         //spec| using credentialCounter as index (e.g., credentials[n] assuming 0-based array), using the structure specified in [WebAuthn].
-        val credential = PublicKeyCredentialDescriptor(
+        val descriptor = PublicKeyCredentialDescriptor(
             PublicKeyCredentialType.PUBLIC_KEY,
-            userCredential.credentialId,
+            credential.credentialId,
             CtapAuthenticator.TRANSPORTS
         )
-        val counter = userCredential.counter
+        val counter = credential.counter
         val authenticatorDataObject = AuthenticatorData(
-            getAssertionSession.rpIdHash,
+            assertionObject.credential.rpIdHash,
             assertionObject.flags,
             counter,
             assertionObject.extensions
@@ -68,15 +69,18 @@ internal class GetNextAssertionExecution(
         val signedData = ByteBuffer.allocate(authData.size + clientDataHash.size).put(authData)
             .put(clientDataHash).array()
         val signature = calculate(
-            userCredential.userCredentialKey.alg!!,
-            userCredential.userCredentialKey.keyPair!!.private,
+            credential.credentialKey.alg!!,
+            credential.credentialKey.keyPair!!.private,
             signedData
         )
-        val user = PublicKeyCredentialUserEntity(
-            userCredential.userHandle,
-            userCredential.username,
-            userCredential.displayName
-        )
+        val user = when (credential) {
+            is UserCredential -> PublicKeyCredentialUserEntity(
+                credential.userHandle,
+                credential.username,
+                credential.displayName
+            )
+            else -> null
+        }
 
         //spec| Step5
         //spec| Reset the timer. This step is optional if transport is done over NFC.
@@ -86,7 +90,7 @@ internal class GetNextAssertionExecution(
         //spec| Increment credentialCounter.
         // This is done in `getAssertionSession.nextUserCredential();`
         val responseData =
-            AuthenticatorGetNextAssertionResponseData(credential, authData, signature, user)
+            AuthenticatorGetNextAssertionResponseData(descriptor, authData, signature, user)
         return AuthenticatorGetNextAssertionResponse(CtapStatusCode.CTAP2_OK, responseData)
     }
 

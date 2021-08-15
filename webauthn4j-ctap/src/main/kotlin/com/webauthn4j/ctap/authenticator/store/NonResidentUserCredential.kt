@@ -2,12 +2,13 @@ package com.webauthn4j.ctap.authenticator.store
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.webauthn4j.util.MessageDigestUtil
 import java.io.Serializable
 import java.time.Instant
 
 data class NonResidentUserCredential @JsonCreator constructor(
     @JsonProperty("credentialId") override val credentialId: ByteArray,
-    @JsonProperty("userCredentialKey") override val userCredentialKey: NonResidentUserCredentialKey,
+    @JsonProperty("credentialKey") override val credentialKey: NonResidentCredentialKey,
     @JsonProperty("userHandle") override val userHandle: ByteArray?,
     @JsonProperty("username") override val username: String,
     @JsonProperty("displayName") override val displayName: String,
@@ -17,6 +18,9 @@ data class NonResidentUserCredential @JsonCreator constructor(
     @JsonProperty("otherUI") override val otherUI: Serializable?,
     @JsonProperty("details") override val details: Map<String, String>
 ) : UserCredential {
+
+    override val rpIdHash: ByteArray
+        get() = MessageDigestUtil.createSHA256().digest(rpId.toByteArray())
 
     override val counter: Long
         get() = 0
@@ -28,7 +32,7 @@ data class NonResidentUserCredential @JsonCreator constructor(
         if (other !is NonResidentUserCredential) return false
 
         if (!credentialId.contentEquals(other.credentialId)) return false
-        if (userCredentialKey != other.userCredentialKey) return false
+        if (credentialKey != other.credentialKey) return false
         if (userHandle != null) {
             if (other.userHandle == null) return false
             if (!userHandle.contentEquals(other.userHandle)) return false
@@ -46,7 +50,7 @@ data class NonResidentUserCredential @JsonCreator constructor(
 
     override fun hashCode(): Int {
         var result = credentialId.contentHashCode()
-        result = 31 * result + userCredentialKey.hashCode()
+        result = 31 * result + credentialKey.hashCode()
         result = 31 * result + (userHandle?.contentHashCode() ?: 0)
         result = 31 * result + username.hashCode()
         result = 31 * result + displayName.hashCode()

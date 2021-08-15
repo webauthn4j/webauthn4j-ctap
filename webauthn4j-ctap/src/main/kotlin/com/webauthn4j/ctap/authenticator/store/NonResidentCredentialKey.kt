@@ -9,7 +9,7 @@ import java.security.KeyPair
 import java.security.PrivateKey
 import java.security.PublicKey
 
-class NonResidentUserCredentialKey : UserCredentialKey, Serializable {
+class NonResidentCredentialKey : CredentialKey, Serializable {
     @JsonProperty("alg")
     override var alg: SignatureAlgorithm
         private set
@@ -47,7 +47,7 @@ class NonResidentUserCredentialKey : UserCredentialKey, Serializable {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as NonResidentUserCredentialKey
+        other as NonResidentCredentialKey
 
         if (alg != other.alg) return false
         if (publicKey != other.publicKey) return false

@@ -5,7 +5,7 @@ import com.unifidokey.core.adapter.UnifidoKeyAuthenticatorPropertyStore
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.core.setting.KeyStorageSetting
 import com.unifidokey.driver.persistence.dao.KeyStoreDao
-import com.unifidokey.driver.persistence.dao.KeyStoreResidentUserCredentialKey
+import com.unifidokey.driver.persistence.dao.KeyStoreResidentCredentialKey
 import com.unifidokey.driver.persistence.dao.RelyingPartyDao
 import com.unifidokey.driver.persistence.dao.UserCredentialDao
 import com.unifidokey.driver.persistence.entity.RelyingPartyEntity
@@ -14,8 +14,8 @@ import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.exception.StoreFullException
 import com.webauthn4j.ctap.authenticator.internal.KeyPairUtil.createCredentialKeyPair
 import com.webauthn4j.ctap.authenticator.store.ResidentUserCredential
-import com.webauthn4j.ctap.authenticator.store.ResidentUserCredentialKey
-import com.webauthn4j.ctap.authenticator.store.UserCredentialKey
+import com.webauthn4j.ctap.authenticator.store.ResidentCredentialKey
+import com.webauthn4j.ctap.authenticator.store.CredentialKey
 import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +38,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
     private val jsonConverter = ObjectConverter().jsonConverter
 
     /**
-     * Create a new [UserCredentialKey] in the credential storage.
+     * Create a new [CredentialKey] in the credential storage.
      *
      * @param algorithmIdentifier key algorithm
      * @param clientDataHash      SHA-256 hash of client data, which is used for attestation certificate generation
@@ -47,7 +47,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
     override fun createUserCredentialKey(
         algorithmIdentifier: COSEAlgorithmIdentifier,
         clientDataHash: ByteArray
-    ): ResidentUserCredentialKey {
+    ): ResidentCredentialKey {
         require(supports(algorithmIdentifier)) { "algorithmIdentifier is not supported." }
         val keyPair: KeyPair
         return when (keyStorageSetting) {
@@ -60,7 +60,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
                 )
                 val attestationCertificatePath =
                     keyStoreDao.findCredentialAttestationCertificatePath(alias)
-                KeyStoreResidentUserCredentialKey(
+                KeyStoreResidentCredentialKey(
                     algorithmIdentifier.toSignatureAlgorithm(),
                     alias,
                     keyPair,
@@ -69,7 +69,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
             }
             KeyStorageSetting.DATABASE -> {
                 keyPair = createCredentialKeyPair(algorithmIdentifier)
-                ResidentUserCredentialKey(algorithmIdentifier.toSignatureAlgorithm(), keyPair)
+                ResidentCredentialKey(algorithmIdentifier.toSignatureAlgorithm(), keyPair)
             }
         }
     }
@@ -90,19 +90,19 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
         val sid = fetched?.sid
         val keyPair: KeyPair?
         val keyAlias: String?
-        val userCredentialKey: UserCredentialKey = userCredential.userCredentialKey
-        if (userCredentialKey is KeyStoreResidentUserCredentialKey) {
+        val credentialKey: CredentialKey = userCredential.credentialKey
+        if (credentialKey is KeyStoreResidentCredentialKey) {
             keyPair = null
-            keyAlias = userCredentialKey.keyAlias
+            keyAlias = credentialKey.keyAlias
         } else {
-            keyPair = userCredentialKey.keyPair
+            keyPair = credentialKey.keyPair
             keyAlias = null
         }
         val detailsAsJson = jsonConverter.writeValueAsString(userCredential.details)
         val userCredentialEntity = UserCredentialEntity(
             sid,
             userCredential.credentialId,
-            userCredential.userCredentialKey.alg,
+            userCredential.credentialKey.alg,
             keyPair,
             keyAlias,
             userCredential.userHandle,
@@ -124,12 +124,12 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
         val (relyingPartyEntity, userCredentialEntities) = relyingPartyDao.findOne(rpId)
             ?: return emptyList()
         return userCredentialEntities.map { userCredentialEntity: UserCredentialEntity ->
-            val userCredentialKey: ResidentUserCredentialKey = when {
+            val userCredentialKey: ResidentCredentialKey = when {
                 userCredentialEntity.keyAlias != null -> { //if keystore
                     val keyPair = keyStoreDao.findCredentialKeyPair(userCredentialEntity.keyAlias)
                     val attestationCertificatePath =
                         keyStoreDao.findCredentialAttestationCertificatePath(userCredentialEntity.keyAlias)
-                    KeyStoreResidentUserCredentialKey(
+                    KeyStoreResidentCredentialKey(
                         userCredentialEntity.alg,
                         userCredentialEntity.keyAlias,
                         keyPair!!,
@@ -137,7 +137,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
                     )
                 }
                 userCredentialEntity.keyPair != null -> {
-                    ResidentUserCredentialKey(userCredentialEntity.alg, userCredentialEntity.keyPair)
+                    ResidentCredentialKey(userCredentialEntity.alg, userCredentialEntity.keyPair)
                 }
                 else -> {
                     TODO("throw proper exception")
@@ -176,16 +176,16 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
                 )
             }.findFirst().orElse(null)
             ?: return null
-        val userCredentialKey: ResidentUserCredentialKey = when {
+        val userCredentialKey: ResidentCredentialKey = when {
             userCredentialEntity.keyPair != null -> {
-                ResidentUserCredentialKey(userCredentialEntity.alg, userCredentialEntity.keyPair)
+                ResidentCredentialKey(userCredentialEntity.alg, userCredentialEntity.keyPair)
             }
             userCredentialEntity.keyAlias != null -> {
                 val alias = userCredentialEntity.keyAlias
                 val keyPair = keyStoreDao.findCredentialKeyPair(alias)
                 val attestationCertificatePath =
                     keyStoreDao.findCredentialAttestationCertificatePath(alias)
-                KeyStoreResidentUserCredentialKey(
+                KeyStoreResidentCredentialKey(
                     userCredentialEntity.alg,
                     alias,
                     keyPair!!,

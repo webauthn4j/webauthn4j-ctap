@@ -33,13 +33,13 @@ class FIDOU2FAttestationStatementGenerator(
 
     override suspend fun generate(attestationStatementRequest: AttestationStatementRequest): FIDOU2FAttestationStatement {
 
-        val publicKey = attestationStatementRequest.userCredentialKey.keyPair!!.public
+        val publicKey = attestationStatementRequest.credentialKey.keyPair!!.public
         if(publicKey !is ECPublicKey){
             throw IllegalArgumentException("attestationStatementRequest.userCredentialKey.keyPair must be Elliptic Curve key pair.")
         }
 
         val request = FIDOU2FAttestationStatementRequest(
-            userPublicKey = attestationStatementRequest.userCredentialKey.keyPair!!.public as ECPublicKey,
+            userPublicKey = attestationStatementRequest.credentialKey.keyPair!!.public as ECPublicKey,
             keyHandle = attestationStatementRequest.credentialId,
             applicationParameter = attestationStatementRequest.rpIdHash,
             challengeParameter = attestationStatementRequest.clientDataHash

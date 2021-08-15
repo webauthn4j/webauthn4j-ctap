@@ -61,7 +61,7 @@ class HMACSecretExtensionProcessor : RegistrationExtensionProcessor,
         }
         val hmacGetSecretAuthenticatorInput = context.getAssertionRequest.extensions?.hmacGetSecret!!
 
-        val json = context.userCredential.details[DETAILS_ID_HMAC_SECRET_EXTENSION] ?: throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
+        val json = context.credential.details[DETAILS_ID_HMAC_SECRET_EXTENSION] ?: throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
         val hmacSecretUserDetails = jsonConverter.readValue(json, HMACSecretUserDetails::class.java)!!
         val platformKeyAgreementKey = hmacGetSecretAuthenticatorInput.keyAgreement
         val saltEnc = hmacGetSecretAuthenticatorInput.saltEnc

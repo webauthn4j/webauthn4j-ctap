@@ -10,7 +10,7 @@ import javax.crypto.SecretKey
 class UserCredentialBuilder(private val objectConverter: ObjectConverter, private val encryptionKey: SecretKey, private val encryptionIV: ByteArray) {
 
     private lateinit var credentialId: ByteArray
-    private lateinit var userCredentialKey: UserCredentialKey
+    private lateinit var credentialKey: CredentialKey
     private lateinit var userHandle: ByteArray
     private lateinit var username: String
     private lateinit var displayName: String
@@ -23,8 +23,8 @@ class UserCredentialBuilder(private val objectConverter: ObjectConverter, privat
 
     fun build(): UserCredential{
         val details = detailsBuilder.build()
-        userCredentialKey.let {
-            return if(it is ResidentUserCredentialKey){
+        credentialKey.let {
+            return if(it is ResidentCredentialKey){
                 ResidentUserCredential(
                     credentialId,
                     it,
@@ -43,7 +43,7 @@ class UserCredentialBuilder(private val objectConverter: ObjectConverter, privat
                 // Let credentialId be the result of serializing and encrypting credentialSource
                 // so that only this authenticator can decrypt it.
                 val nonResidentUserCredentialEnvelope = NonResidentUserCredentialSource(
-                    userCredentialKey as NonResidentUserCredentialKey,
+                    credentialKey as NonResidentCredentialKey,
                     userHandle,
                     username,
                     displayName,
@@ -63,7 +63,7 @@ class UserCredentialBuilder(private val objectConverter: ObjectConverter, privat
 
                 NonResidentUserCredential(
                     credentialId,
-                    it as NonResidentUserCredentialKey,
+                    it as NonResidentCredentialKey,
                     userHandle,
                     username,
                     displayName,
@@ -82,8 +82,8 @@ class UserCredentialBuilder(private val objectConverter: ObjectConverter, privat
         return this
     }
 
-    fun userCredentialKey(value: UserCredentialKey): UserCredentialBuilder {
-        userCredentialKey = value
+    fun userCredentialKey(value: CredentialKey): UserCredentialBuilder {
+        credentialKey = value
         return this
     }
 

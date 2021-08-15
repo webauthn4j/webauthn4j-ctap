@@ -11,7 +11,7 @@ import java.time.Instant
  */
 @Suppress("CanBePrimaryConstructorProperty")
 class NonResidentUserCredentialSource @JsonCreator constructor(
-    @JsonProperty("userCredentialKey") userCredentialKey: NonResidentUserCredentialKey,
+    @JsonProperty("userCredentialKey") userCredentialKey: NonResidentCredentialKey,
     @JsonProperty("userHandle") userHandle: ByteArray?,
     @JsonProperty("username") username: String,
     @JsonProperty("displayName") displayName: String,

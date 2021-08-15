@@ -26,7 +26,7 @@ class U2FRegisterExecution(private val ctapAuthenticator: CtapAuthenticator, pri
         val encryptionIV = ctapAuthenticator.authenticatorPropertyStore.loadEncryptionIV()
 
         // As Android doesn't support extended APDU, keyHandle must be small enough to fit in one short APDU.
-        val envelope = U2FKeyEnvelope(EC2COSEKey.create(keyPair.private as ECPrivateKey), request.applicationParameter, Instant.now())
+        val envelope = U2FKeyEnvelope.create(EC2COSEKey.create(keyPair), request.applicationParameter, Instant.now())
         val data = ctapAuthenticator.objectConverter.cborConverter.writeValueAsBytes(envelope)
 
         val userPresenceResult = requestUserPresence(request.applicationParameter)

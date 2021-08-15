@@ -69,7 +69,7 @@ class U2FAuthenticationExecution(
         }
         val counter: UInt = 0u //TODO: increment
         val signedData = ByteBuffer.allocate(32 + 1 + 4 + 32).put(request.applicationParameter).put(userPresence).putInt(counter.toInt()).put(request.challengeParameter).array()
-        val privateKey = envelope.privateKey.privateKey!!
+        val privateKey = envelope.keyPair.privateKey!!
         val signature = SignatureCalculator.calculate(SignatureAlgorithm.ES256, privateKey, signedData)
 
         val response = U2FAuthenticationResponse(userPresence, counter, signature)

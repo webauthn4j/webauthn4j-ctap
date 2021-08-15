@@ -2,7 +2,6 @@ package com.webauthn4j.ctap.authenticator.store
 
 import com.webauthn4j.ctap.authenticator.exception.StoreFullException
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
-import java.io.Serializable
 import javax.crypto.SecretKey
 
 /**
@@ -12,7 +11,7 @@ import javax.crypto.SecretKey
 </T> */
 interface AuthenticatorPropertyStore{
     /**
-     * Create a new [ResidentUserCredentialKey]. This method doesn't require to persist a credential key.
+     * Create a new [ResidentCredentialKey]. This method doesn't require to persist a credential key.
      *
      * @param algorithmIdentifier key algorithm
      * @param clientDataHash      SHA-256 hash of client data, which is used for attestation certificate generation
@@ -21,7 +20,7 @@ interface AuthenticatorPropertyStore{
     fun createUserCredentialKey(
         algorithmIdentifier: COSEAlgorithmIdentifier,
         clientDataHash: ByteArray
-    ): ResidentUserCredentialKey
+    ): ResidentCredentialKey
 
     /**
      * Save [ResidentUserCredential]

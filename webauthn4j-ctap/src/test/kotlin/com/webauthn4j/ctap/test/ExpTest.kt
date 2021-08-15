@@ -5,6 +5,7 @@ import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData
 import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenticatorOutput
+import com.webauthn4j.util.MessageDigestUtil
 import org.junit.jupiter.api.Test
 
 class ExpTest {

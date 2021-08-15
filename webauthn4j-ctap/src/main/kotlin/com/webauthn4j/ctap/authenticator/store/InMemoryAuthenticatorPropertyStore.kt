@@ -39,10 +39,10 @@ open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
     override fun createUserCredentialKey(
         algorithmIdentifier: COSEAlgorithmIdentifier,
         clientDataHash: ByteArray
-    ): ResidentUserCredentialKey {
+    ): ResidentCredentialKey {
         require(supports(algorithmIdentifier)) { "algorithmIdentifier is not supported." }
         val keyPair = createCredentialKeyPair(algorithmIdentifier)
-        return ResidentUserCredentialKey(algorithmIdentifier.toSignatureAlgorithm(), keyPair)
+        return ResidentCredentialKey(algorithmIdentifier.toSignatureAlgorithm(), keyPair)
     }
 
     override fun saveUserCredential(userCredential: ResidentUserCredential) {

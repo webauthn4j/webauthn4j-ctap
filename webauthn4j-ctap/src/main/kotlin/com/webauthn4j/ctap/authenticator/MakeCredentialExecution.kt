@@ -337,7 +337,7 @@ internal class MakeCredentialExecution :
             userCredential.credentialId,
             authenticatorMakeCredentialRequest.clientDataHash,
             residentKeyPlan,
-            userCredential.userCredentialKey,
+            userCredential.credentialKey,
             authenticatorDataProvider
         )
 
@@ -371,14 +371,14 @@ internal class MakeCredentialExecution :
             throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_ALGORITHM)
         }
 
-        val userCredentialKey: UserCredentialKey
+        val credentialKey: CredentialKey
         if (residentKeyPlan) {
             val credentialId = ByteArray(32)
             secureRandom.nextBytes(credentialId)
             userCredentialBuilder.credentialId(credentialId)
 
             try {
-                userCredentialKey = authenticatorPropertyStore.createUserCredentialKey(
+                credentialKey = authenticatorPropertyStore.createUserCredentialKey(
                     algorithmIdentifier,
                     clientDataHash
                 )
@@ -386,12 +386,12 @@ internal class MakeCredentialExecution :
                 throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_KEY_STORE_FULL, e)
             }
         } else {
-            userCredentialKey = NonResidentUserCredentialKey(
+            credentialKey = NonResidentCredentialKey(
                 algorithmIdentifier.toSignatureAlgorithm(),
                 createCredentialKeyPair(algorithmIdentifier)
             )
         }
-        userCredentialBuilder.userCredentialKey(userCredentialKey)
+        userCredentialBuilder.userCredentialKey(credentialKey)
         userCredentialBuilder.createdAt(Instant.now())
         return userCredentialBuilder.build()
     }

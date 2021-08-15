@@ -11,7 +11,7 @@ import com.unifidokey.driver.persistence.dao.PreferenceDao
 import com.webauthn4j.ctap.authenticator.ClientPINService
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.ResidentUserCredential
-import com.webauthn4j.ctap.authenticator.store.ResidentUserCredentialKey
+import com.webauthn4j.ctap.authenticator.store.ResidentCredentialKey
 import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.util.ECUtil
 import org.junit.Before
@@ -58,7 +58,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImplRobolectricTest {
         val residentKey = true
         val userCredential: ResidentUserCredential = ResidentUserCredential(
             credentialId,
-            ResidentUserCredentialKey(SignatureAlgorithm.ES256, ECUtil.createKeyPair()),
+            ResidentCredentialKey(SignatureAlgorithm.ES256, ECUtil.createKeyPair()),
             userHandle,
             username,
             displayName,
@@ -72,7 +72,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImplRobolectricTest {
         target.saveUserCredential(userCredential)
         val retrieved = target.loadUserCredential(rpId, userHandle)!!
         assertThat(retrieved.id).isNotNull()
-        assertThat(retrieved.userCredentialKey).isNotNull()
+        assertThat(retrieved.credentialKey).isNotNull()
         assertThat(retrieved.userHandle).isEqualTo(userHandle)
         assertThat(retrieved.username).isEqualTo(username)
         assertThat(retrieved.displayName).isEqualTo(displayName)
@@ -229,7 +229,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImplRobolectricTest {
         val createdAt = Instant.now()
         val userCredential = ResidentUserCredential(
             credentialId,
-            ResidentUserCredentialKey(
+            ResidentCredentialKey(
                 SignatureAlgorithm.ES256,
                 ECUtil.createKeyPair()
             ),

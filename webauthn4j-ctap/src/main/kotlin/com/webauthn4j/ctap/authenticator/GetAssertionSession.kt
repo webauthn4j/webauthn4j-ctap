@@ -1,5 +1,6 @@
 package com.webauthn4j.ctap.authenticator
 
+import com.webauthn4j.ctap.authenticator.store.Credential
 import com.webauthn4j.ctap.authenticator.store.UserCredential
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthenticatorOutput
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorOutputs
@@ -9,18 +10,15 @@ import java.time.Instant
 
 class GetAssertionSession(
     val assertionObjects: List<AssertionObject>,
-    clientDataHash: ByteArray,
-    rpId: String
+    clientDataHash: ByteArray
 ) {
     private var index = 0
     private var instant: Instant
     val clientDataHash: ByteArray
-    val rpId: String
 
     init {
         instant = Instant.now()
         this.clientDataHash = clientDataHash
-        this.rpId = rpId
     }
 
     fun nextAssertionObject(): AssertionObject {
@@ -43,14 +41,11 @@ class GetAssertionSession(
         return Instant.now().epochSecond - instant.epochSecond >= 30
     }
 
-    val rpIdHash: ByteArray
-        get() = MessageDigestUtil.createSHA256().digest(rpId.toByteArray(StandardCharsets.UTF_8))
-
     fun withAssertionObjects(assertionObjects: List<AssertionObject>): GetAssertionSession {
-        return GetAssertionSession(assertionObjects, clientDataHash, rpId)
+        return GetAssertionSession(assertionObjects, clientDataHash)
     }
 
-    data class AssertionObject(var userCredential: UserCredential, var extensions: AuthenticationExtensionsAuthenticatorOutputs<AuthenticationExtensionAuthenticatorOutput>, var flags: Byte) {
+    data class AssertionObject(var credential: Credential, var extensions: AuthenticationExtensionsAuthenticatorOutputs<AuthenticationExtensionAuthenticatorOutput>, var flags: Byte) {
     }
 
 }

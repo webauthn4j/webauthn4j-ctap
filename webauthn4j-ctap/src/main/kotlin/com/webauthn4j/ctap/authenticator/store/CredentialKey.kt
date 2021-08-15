@@ -6,7 +6,7 @@ import java.security.KeyPair
 /**
  * Core interface representing user credential key (pair)
  */
-interface UserCredentialKey {
+interface CredentialKey {
     val alg: SignatureAlgorithm?
 
     /**

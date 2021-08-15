@@ -28,7 +28,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.nio.ByteBuffer
 import java.time.Instant
-import kotlin.collections.ArrayList
 import kotlin.experimental.or
 
 @Suppress("ConvertSecondaryConstructorToPrimary")
@@ -47,6 +46,7 @@ internal class GetAssertionExecution :
     //Command properties
     private val authenticatorGetAssertionRequest: AuthenticatorGetAssertionRequest
     private val rpId: String
+    private val rpIdHash: ByteArray
     private val clientDataHash: ByteArray
     private val allowList: List<PublicKeyCredentialDescriptor>?
     private val authenticationExtensionsAuthenticatorInputs: AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>?
@@ -55,7 +55,7 @@ internal class GetAssertionExecution :
     private val pinProtocol: PinProtocolVersion?
 
     // initialized in Step1
-    private lateinit var userCredentials: List<UserCredential>
+    private lateinit var credentials: List<Credential>
     // initialized in Step6
     private lateinit var assertionObjects: List<GetAssertionSession.AssertionObject>
     // initialized in Step10
@@ -78,6 +78,7 @@ internal class GetAssertionExecution :
 
         // command properties initialization and validation
         this.rpId = authenticatorGetAssertionRequest.rpId
+        this.rpIdHash = MessageDigestUtil.createSHA256().digest(rpId.toByteArray())
         this.clientDataHash = authenticatorGetAssertionRequest.clientDataHash
         this.allowList = authenticatorGetAssertionRequest.allowList
         this.authenticationExtensionsAuthenticatorInputs = authenticatorGetAssertionRequest.extensions
@@ -100,12 +101,23 @@ internal class GetAssertionExecution :
         execStep11SelectUserCredentialIfCredentialSelectorIsAuthenticator()
         val response = execStep12SignClientDataHashAndAuthData()
         val userCredentials = onGoingGetAssertionSession.assertionObjects.map {
-            GetAssertionEvent.UserCredential(
-                it.userCredential.username,
-                it.userCredential.displayName
-            )
+            when(val credential = it.credential){
+                is UserCredential -> {
+                    GetAssertionEvent.UserCredential(
+                        credential.credentialId,
+                        credential.username,
+                        credential.displayName
+                    )
+                }
+                else -> {
+                    GetAssertionEvent.UserCredential(
+                        credential.credentialId
+                    )
+                }
+            }
+
         }
-        val rpName = onGoingGetAssertionSession.assertionObjects.first().userCredential.rpName
+        val rpName = onGoingGetAssertionSession.assertionObjects.map { (it.credential as? UserCredential)?.rpName }.firstOrNull()?: "N/A (U2F service)"
         val event = GetAssertionEvent(Instant.now(), rpId, rpName, userCredentials, mapOf())
         ctapAuthenticator.publishEvent(event)
         return response
@@ -123,7 +135,7 @@ internal class GetAssertionExecution :
     //spec| - Let numberOfCredentials be the number of userCredentials found.
     private fun execStep1LoadEligibleUserCredentials() {
         val rpId = rpId
-        userCredentials = if (allowList != null && allowList.isNotEmpty()) {
+        credentials = if (allowList != null && allowList.isNotEmpty()) {
             val storedCredentials = authenticatorPropertyStore.loadUserCredentials(rpId)
                 .filter {
                     allowList.any { allowed: PublicKeyCredentialDescriptor ->
@@ -131,14 +143,14 @@ internal class GetAssertionExecution :
                             allowed.id
                         )
                     }
-                }
-            val derivedCredentials = allowList.mapNotNull(this::deriveUserCredential).filter { it.rpId == rpId }
-            val result: MutableList<UserCredential> = ArrayList()
+                }.filter { it.rpIdHash.contentEquals(rpIdHash) }
+            val derivedCredentials = allowList.mapNotNull(this::deriveCredential)
+            val result: MutableList<Credential> = ArrayList()
             result.addAll(storedCredentials)
             result.addAll(derivedCredentials)
             result
         } else {
-            ArrayList<UserCredential>(
+            ArrayList<Credential>(
                 authenticatorPropertyStore.loadUserCredentials(
                     rpId
                 )
@@ -146,7 +158,7 @@ internal class GetAssertionExecution :
         }
     }
 
-    private fun deriveUserCredential(descriptor: PublicKeyCredentialDescriptor): UserCredential? {
+    private fun deriveCredential(descriptor: PublicKeyCredentialDescriptor): Credential? {
         val credentialSourceEncryptionKey = authenticatorPropertyStore.loadEncryptionKey()
         val credentialSourceEncryptionIV = authenticatorPropertyStore.loadEncryptionIV()
         val decrypted : ByteArray
@@ -191,21 +203,13 @@ internal class GetAssertionExecution :
                     decrypted,
                     object : TypeReference<U2FKeyEnvelope>() {})!!
 
-            val expectedRpIdHash = MessageDigestUtil.createSHA256().digest(rpId.toByteArray())
-            if(!descriptor.id.contentEquals(expectedRpIdHash)){
-                return null
-            }
-            val key = NonResidentUserCredentialKey(SignatureAlgorithm.ES256, u2fKeyEnvelope.privateKey.publicKey!!, u2fKeyEnvelope.privateKey.privateKey!!)
-            return NonResidentUserCredential(
+            val key = NonResidentCredentialKey(SignatureAlgorithm.ES256, u2fKeyEnvelope.keyPair.publicKey!!, u2fKeyEnvelope.keyPair.privateKey!!)
+            return U2FCredential(
                 descriptor.id,
+                u2fKeyEnvelope.applicationParameter,
                 key,
-                null,
-                "unknown (U2F)",
-                "unknown (U2F)",
-                rpId,
-                "unknown (U2F)",
+                0,
                 u2fKeyEnvelope.createdAt,
-                null,
                 emptyMap()
             )
         }
@@ -274,17 +278,17 @@ internal class GetAssertionExecution :
     //spec| Authenticator extension outputs generated by the authenticator extension processing are returned in the authenticator data.
     private fun execStep6ProcessExtensions() {
         val inputs = this.authenticationExtensionsAuthenticatorInputs
-        assertionObjects = userCredentials.map{ userCredential ->
+        assertionObjects = credentials.map{ credential ->
             val outputsBuilder = AuthenticationExtensionsAuthenticatorOutputs.BuilderForAuthentication()
             if(inputs != null){
-                val context = AuthenticationExtensionContext(ctapAuthenticator, authenticatorGetAssertionRequest, userCredential, userVerificationPlan, userPresencePlan)
+                val context = AuthenticationExtensionContext(ctapAuthenticator, authenticatorGetAssertionRequest, credential, userVerificationPlan, userPresencePlan)
                 ctapAuthenticator.extensionProcessors.filterIsInstance<AuthenticationExtensionProcessor>().forEach{ processor ->
                     if(processor.supportsAuthenticationExtension(inputs)){
                         processor.processAuthenticationExtension(context, outputsBuilder)
                     }
                 }
             }
-            GetAssertionSession.AssertionObject(userCredential, outputsBuilder.build(), 0)
+            GetAssertionSession.AssertionObject(credential, outputsBuilder.build(), 0)
         }
     }
 
@@ -316,7 +320,7 @@ internal class GetAssertionExecution :
     //spec| Step8
     //spec| If no userCredentials were located in step 1, return CTAP2_ERR_NO_CREDENTIALS.
     private fun execStep8CheckUserCredentialCandidatesExistence() {
-        if (userCredentials.isEmpty()) {
+        if (credentials.isEmpty()) {
             throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_NO_CREDENTIALS)
         }
     }
@@ -327,7 +331,7 @@ internal class GetAssertionExecution :
     //spec| Otherwise, order the userCredentials by the time when they were created in reverse order.
     //spec| The first credential is the most recent credential that was created.
     private fun execStep9SortUserCredentials() {
-        userCredentials.sortedBy { userCredential -> userCredential.createdAt.epochSecond }
+        credentials.sortedBy { userCredential -> userCredential.createdAt.epochSecond }
     }
 
     //spec| Step10
@@ -361,7 +365,7 @@ internal class GetAssertionExecution :
                 assertionObject.flags = assertionObject.flags or AuthenticatorData.BIT_ED
             }
         }
-        onGoingGetAssertionSession = GetAssertionSession(assertionObjects, clientDataHash, rpId)
+        onGoingGetAssertionSession = GetAssertionSession(assertionObjects, clientDataHash)
         ctapAuthenticator.onGoingGetAssertionSession = onGoingGetAssertionSession
     }
 
@@ -373,8 +377,8 @@ internal class GetAssertionExecution :
     //spec|   terminate this procedure and return the CTAP2_ERR_OPERATION_DENIED error.
     private suspend fun execStep11SelectUserCredentialIfCredentialSelectorIsAuthenticator() {
         if (ctapAuthenticator.credentialSelectorSetting == CredentialSelectorSetting.AUTHENTICATOR) {
-            val selectedUserCredential: UserCredential = ctapAuthenticator.credentialSelectionHandler.select(userCredentials)
-            val selectedAssertionObject = assertionObjects.find { it.userCredential == selectedUserCredential }?: throw IllegalStateException("Selected UserCredential is not found in AssertionObject list")
+            val selectedCredential: Credential = ctapAuthenticator.credentialSelectionHandler.select(credentials)
+            val selectedAssertionObject = assertionObjects.find { it.credential == selectedCredential }?: throw IllegalStateException("Selected Credential is not found in AssertionObject list")
             onGoingGetAssertionSession = onGoingGetAssertionSession.withAssertionObjects(listOf(selectedAssertionObject))
             ctapAuthenticator.onGoingGetAssertionSession = onGoingGetAssertionSession
         }
@@ -384,15 +388,15 @@ internal class GetAssertionExecution :
     //spec| Sign the clientDataHash along with authData with the selected credential, using the structure specified in [WebAuthn].
     private fun execStep12SignClientDataHashAndAuthData(): AuthenticatorGetAssertionResponse {
         val assertionObject = onGoingGetAssertionSession.nextAssertionObject()
-        val userCredential = assertionObject.userCredential
+        val credential = assertionObject.credential
         val descriptor = PublicKeyCredentialDescriptor(
             PublicKeyCredentialType.PUBLIC_KEY,
-            userCredential.credentialId,
+            credential.credentialId,
             CtapAuthenticator.TRANSPORTS
         )
-        val counter = userCredential.counter
+        val counter = credential.counter
         val authenticatorDataObject = AuthenticatorData(
-            onGoingGetAssertionSession.rpIdHash,
+            assertionObject.credential.rpIdHash,
             assertionObject.flags,
             counter,
             assertionObject.extensions
@@ -407,15 +411,18 @@ internal class GetAssertionExecution :
         val signedData = ByteBuffer.allocate(authData.size + clientDataHash.size).put(authData)
             .put(clientDataHash).array()
         val signature = calculate(
-            userCredential.userCredentialKey.alg!!,
-            userCredential.userCredentialKey.keyPair!!.private,
+            credential.credentialKey.alg!!,
+            credential.credentialKey.keyPair!!.private,
             signedData
         )
-        val user = PublicKeyCredentialUserEntity(
-            userCredential.userHandle,
-            userCredential.username,
-            userCredential.displayName
-        )
+        val user = when (credential) {
+            is UserCredential -> PublicKeyCredentialUserEntity(
+                    credential.userHandle,
+                    credential.username,
+                    credential.displayName
+                )
+            else -> null
+        }
         val numberOfCredentials = onGoingGetAssertionSession.numberOfAssertionObjects
 
         //spec| On success, the authenticator returns an attestation object in its response as defined in [WebAuthn]:
@@ -428,10 +435,10 @@ internal class GetAssertionExecution :
         )
 
         // update counter
-        if (userCredential is ResidentUserCredential) {
-            userCredential.counter = counter + 1
+        if (credential is ResidentUserCredential) {
+            credential.counter = counter + 1
             try {
-                authenticatorPropertyStore.saveUserCredential(userCredential)
+                authenticatorPropertyStore.saveUserCredential(credential)
             } catch (e: StoreFullException) {
                 throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_KEY_STORE_FULL)
             }

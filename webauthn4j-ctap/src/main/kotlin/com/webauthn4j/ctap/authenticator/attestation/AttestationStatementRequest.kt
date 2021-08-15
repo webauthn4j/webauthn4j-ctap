@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.authenticator.attestation
 
-import com.webauthn4j.ctap.authenticator.store.UserCredentialKey
+import com.webauthn4j.ctap.authenticator.store.CredentialKey
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData
 import com.webauthn4j.data.attestation.authenticator.COSEKey
 import com.webauthn4j.data.attestation.authenticator.EC2COSEKey
@@ -17,7 +17,7 @@ class AttestationStatementRequest(
     credentialId: ByteArray?,
     clientDataHash: ByteArray?,
     residentKey: Boolean,
-    userCredentialKey: UserCredentialKey,
+    credentialKey: CredentialKey,
     authenticatorDataProvider: AuthenticatorDataProvider
 ) {
 
@@ -31,7 +31,7 @@ class AttestationStatementRequest(
         get() = ArrayUtil.clone(field)
     val residentKey: Boolean
     private val authenticatorDataProvider: AuthenticatorDataProvider
-    val userCredentialKey: UserCredentialKey
+    val credentialKey: CredentialKey
 
     init {
         this.rpIdHash = ArrayUtil.clone(rpIdHash)
@@ -39,7 +39,7 @@ class AttestationStatementRequest(
         this.credentialId = ArrayUtil.clone(credentialId)
         this.clientDataHash = ArrayUtil.clone(clientDataHash)
         this.residentKey = residentKey
-        this.userCredentialKey = userCredentialKey
+        this.credentialKey = credentialKey
         this.authenticatorDataProvider = authenticatorDataProvider
     }
 
@@ -47,7 +47,7 @@ class AttestationStatementRequest(
         get() {
             val credentialPublicKey: COSEKey
             val keyPair =
-                userCredentialKey.keyPair ?: throw IllegalStateException("keyPair must not be null")
+                credentialKey.keyPair ?: throw IllegalStateException("keyPair must not be null")
             keyPair.let {
                 val alg = it.public.algorithm
                 credentialPublicKey = when (alg) {

@@ -46,7 +46,7 @@ internal class NonResidentUserCredentialTest {
     private fun createNonResidentUserCredential(): NonResidentUserCredential {
         val credentialId = ByteArray(32)
         val userCredentialKey =
-            NonResidentUserCredentialKey(SignatureAlgorithm.ES256, ECUtil.createKeyPair())
+            NonResidentCredentialKey(SignatureAlgorithm.ES256, ECUtil.createKeyPair())
         val userHandle = ByteArray(32)
         return NonResidentUserCredential(
             credentialId,

@@ -75,16 +75,21 @@ class GetAssertionEvent : EventBase {
     class UserCredential : Serializable {
 
         @Suppress("JoinDeclarationAndAssignment")
-        val username: String
+        val id: ByteArray
 
         @Suppress("JoinDeclarationAndAssignment")
-        val displayName: String
+        val username: String?
+
+        @Suppress("JoinDeclarationAndAssignment")
+        val displayName: String?
 
         @JsonCreator
         constructor(
-            @JsonProperty("username") username: String,
-            @JsonProperty("displayName") displayName: String
+            @JsonProperty("id") id: ByteArray,
+            @JsonProperty("username") username: String? = null,
+            @JsonProperty("displayName") displayName: String? = null
         ) {
+            this.id = id
             this.username = username
             this.displayName = displayName
         }
@@ -93,6 +98,7 @@ class GetAssertionEvent : EventBase {
             if (this === other) return true
             if (other !is UserCredential) return false
 
+            if (!id.contentEquals(other.id)) return false
             if (username != other.username) return false
             if (displayName != other.displayName) return false
 
@@ -100,9 +106,12 @@ class GetAssertionEvent : EventBase {
         }
 
         override fun hashCode(): Int {
-            var result = username.hashCode()
+            var result = id.contentHashCode()
+            result = 31 * result + username.hashCode()
             result = 31 * result + displayName.hashCode()
             return result
         }
+
+
     }
 }
