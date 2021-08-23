@@ -78,6 +78,7 @@ internal class GetAssertionExecution :
 
         // command properties initialization and validation
         this.rpId = authenticatorGetAssertionRequest.rpId
+
         this.rpIdHash = MessageDigestUtil.createSHA256().digest(rpId.toByteArray())
         this.clientDataHash = authenticatorGetAssertionRequest.clientDataHash
         this.allowList = authenticatorGetAssertionRequest.allowList

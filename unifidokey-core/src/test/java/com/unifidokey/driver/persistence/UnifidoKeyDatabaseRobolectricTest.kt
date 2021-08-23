@@ -11,7 +11,7 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class UnifidoKeyDatabaseRobolectricTest {
-    private var target: UnifidoKeyDatabase? = null
+    private lateinit var target: UnifidoKeyDatabase
 
     @Before
     fun setup() {
@@ -22,7 +22,7 @@ class UnifidoKeyDatabaseRobolectricTest {
 
     @Test
     fun getRelyingPartyDao_test() {
-        val relyingPartyDao = target!!.relyingPartyDao
+        val relyingPartyDao = target.relyingPartyDao
         Truth.assertThat(relyingPartyDao).isNotNull()
     }
 }

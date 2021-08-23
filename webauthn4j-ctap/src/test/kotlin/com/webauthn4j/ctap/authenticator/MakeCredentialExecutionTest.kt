@@ -20,10 +20,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.doThrow
-import org.mockito.kotlin.mock
+import org.mockito.ArgumentMatchers.anyObject
+import org.mockito.kotlin.*
+import javax.crypto.SecretKey
 
 @ExperimentalCoroutinesApi
 internal class MakeCredentialExecutionTest {
@@ -66,14 +65,13 @@ internal class MakeCredentialExecutionTest {
 
     @Test
     fun store_full_test() = runBlockingTest {
-        val authenticatorPropertyStore = mock<InMemoryAuthenticatorPropertyStore> {
-            on {
+        val authenticatorPropertyStore = spy<InMemoryAuthenticatorPropertyStore> {
+            onGeneric {
                 createUserCredentialKey(
                     any(),
                     any()
                 )
             } doThrow StoreFullException("AuthenticatorPropertyStore is full")
-            on { supports(any()) } doReturn true
         }
         val ctapAuthenticator =
             CtapAuthenticator(authenticatorPropertyStore = authenticatorPropertyStore)

@@ -32,7 +32,7 @@ internal class AuthenticatorGetInfoResponseDataOptionsSerializerTest {
         )
         val encoded = converter.writeValueAsBytes(original)
         Assertions.assertThat(encoded)
-            .isEqualTo(HexUtil.decode("A464706C6174F462726BF569636C69656E7450696EF4627570F5"))
+            .isEqualTo(HexUtil.decode("A462726BF5627570F564706C6174F469636C69656E7450696EF4"))
         val decoded =
             converter.readValue(encoded, AuthenticatorGetInfoResponseData.Options::class.java)
         Assertions.assertThat(decoded).isEqualTo(original)
