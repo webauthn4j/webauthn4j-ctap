@@ -1,21 +1,21 @@
 package com.webauthn4j.ctap.authenticator
 
-import com.webauthn4j.data.PublicKeyCredentialRpEntity
-import com.webauthn4j.data.PublicKeyCredentialUserEntity
+import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
+import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
 import com.webauthn4j.util.MessageDigestUtil
 import java.io.Serializable
 
 class MakeCredentialConsentOptions : Serializable{
 
     val applicationParameter: ByteArray
-    val rp: PublicKeyCredentialRpEntity?
-    val user: PublicKeyCredentialUserEntity?
+    val rp: CtapPublicKeyCredentialRpEntity?
+    val user: CtapPublicKeyCredentialUserEntity?
     val isUserPresence: Boolean
     val isUserVerification: Boolean
 
     constructor(
         applicationParameter: ByteArray,
-        user: PublicKeyCredentialUserEntity?,
+        user: CtapPublicKeyCredentialUserEntity?,
         isUserPresence: Boolean,
         isUserVerification: Boolean
     ) {
@@ -27,12 +27,12 @@ class MakeCredentialConsentOptions : Serializable{
     }
 
     constructor(
-        rp: PublicKeyCredentialRpEntity,
-        user: PublicKeyCredentialUserEntity?,
+        rp: CtapPublicKeyCredentialRpEntity,
+        user: CtapPublicKeyCredentialUserEntity?,
         isUserPresence: Boolean,
         isUserVerification: Boolean
     ) {
-        val rpIdHash = MessageDigestUtil.createSHA256().digest(rp.id!!.toByteArray())
+        val rpIdHash = MessageDigestUtil.createSHA256().digest(rp.id.toByteArray())
         this.applicationParameter = rpIdHash
         this.rp = rp
         this.user = user

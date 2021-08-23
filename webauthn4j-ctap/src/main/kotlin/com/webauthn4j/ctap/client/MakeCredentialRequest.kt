@@ -1,5 +1,7 @@
 package com.webauthn4j.ctap.client
 
+import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
+import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
 import com.webauthn4j.data.*
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
 import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenticatorInput
@@ -8,8 +10,8 @@ import com.webauthn4j.util.ArrayUtil
 @Suppress("CanBePrimaryConstructorProperty")
 class MakeCredentialRequest(
     clientDataHash: ByteArray,
-    rp: PublicKeyCredentialRpEntity,
-    user: PublicKeyCredentialUserEntity,
+    rp: CtapPublicKeyCredentialRpEntity,
+    user: CtapPublicKeyCredentialUserEntity,
     pubKeyCredParams: List<PublicKeyCredentialParameters>,
     excludeList: List<PublicKeyCredentialDescriptor>?,
     extensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>?,
@@ -21,8 +23,8 @@ class MakeCredentialRequest(
 
     val clientDataHash: ByteArray = ArrayUtil.clone(clientDataHash)
         get() = ArrayUtil.clone(field)
-    val rp: PublicKeyCredentialRpEntity = rp
-    val user: PublicKeyCredentialUserEntity = user
+    val rp: CtapPublicKeyCredentialRpEntity = rp
+    val user: CtapPublicKeyCredentialUserEntity = user
     val pubKeyCredParams: List<PublicKeyCredentialParameters> = pubKeyCredParams.toList()
     val excludeList: List<PublicKeyCredentialDescriptor>? = excludeList?.toList()
     val extensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>? =

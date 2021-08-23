@@ -8,7 +8,7 @@ import kotlin.math.min
 /**
  * Queue to build [ResponseAPDU]
  */
-internal class ResponseQueue {
+internal class ResponseAPDUQueue {
     private var byteBuffer: ByteBuffer = ByteBuffer.allocate(0)
 
     /**

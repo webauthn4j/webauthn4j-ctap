@@ -9,11 +9,11 @@ import java.time.Instant
 data class NonResidentUserCredential @JsonCreator constructor(
     @JsonProperty("credentialId") override val credentialId: ByteArray,
     @JsonProperty("credentialKey") override val credentialKey: NonResidentCredentialKey,
-    @JsonProperty("userHandle") override val userHandle: ByteArray?,
-    @JsonProperty("username") override val username: String,
-    @JsonProperty("displayName") override val displayName: String,
+    @JsonProperty("userHandle") override val userHandle: ByteArray,
+    @JsonProperty("username") override val username: String?,
+    @JsonProperty("displayName") override val displayName: String?,
     @JsonProperty("rpId") override val rpId: String,
-    @JsonProperty("rpName") override val rpName: String,
+    @JsonProperty("rpName") override val rpName: String?,
     @JsonProperty("createdAt") override val createdAt: Instant,
     @JsonProperty("otherUI") override val otherUI: Serializable?,
     @JsonProperty("details") override val details: Map<String, String>
@@ -33,10 +33,7 @@ data class NonResidentUserCredential @JsonCreator constructor(
 
         if (!credentialId.contentEquals(other.credentialId)) return false
         if (credentialKey != other.credentialKey) return false
-        if (userHandle != null) {
-            if (other.userHandle == null) return false
-            if (!userHandle.contentEquals(other.userHandle)) return false
-        } else if (other.userHandle != null) return false
+        if (!userHandle.contentEquals(other.userHandle)) return false
         if (username != other.username) return false
         if (displayName != other.displayName) return false
         if (rpId != other.rpId) return false
@@ -51,11 +48,11 @@ data class NonResidentUserCredential @JsonCreator constructor(
     override fun hashCode(): Int {
         var result = credentialId.contentHashCode()
         result = 31 * result + credentialKey.hashCode()
-        result = 31 * result + (userHandle?.contentHashCode() ?: 0)
-        result = 31 * result + username.hashCode()
-        result = 31 * result + displayName.hashCode()
+        result = 31 * result + userHandle.contentHashCode()
+        result = 31 * result + (username?.hashCode() ?: 0)
+        result = 31 * result + (displayName?.hashCode() ?: 0)
         result = 31 * result + rpId.hashCode()
-        result = 31 * result + rpName.hashCode()
+        result = 31 * result + (rpName?.hashCode() ?: 0)
         result = 31 * result + createdAt.hashCode()
         result = 31 * result + (otherUI?.hashCode() ?: 0)
         result = 31 * result + details.hashCode()

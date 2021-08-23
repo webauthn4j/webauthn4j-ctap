@@ -2,6 +2,7 @@ package com.webauthn4j.ctap.authenticator.transport.hid
 
 import com.webauthn4j.ctap.core.data.CtapCommand
 import com.webauthn4j.ctap.core.data.hid.*
+import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 
 class HIDRequestMessageBuilder : HIDMessageBuilderBase<HIDRequestMessage>() {
 
@@ -12,9 +13,8 @@ class HIDRequestMessageBuilder : HIDMessageBuilderBase<HIDRequestMessage>() {
     ): HIDRequestMessage {
         return when (command) {
             HIDCommand.CTAPHID_MSG -> {
-                val commandByte = data.first()
-                val message = data.copyOfRange(1, data.size)
-                HIDMSGRequestMessage(channelId, commandByte, message)
+                val commandAPDU = CommandAPDU.parse(data)
+                HIDMSGRequestMessage(channelId, commandAPDU)
             }
             HIDCommand.CTAPHID_CBOR -> {
                 val ctapCommand = CtapCommand(data.first())

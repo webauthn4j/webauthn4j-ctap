@@ -2,6 +2,7 @@ package integration.setting.relyingparty
 
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
 import com.webauthn4j.ctap.authenticator.settings.CredentialSelectorSetting
+import com.webauthn4j.ctap.authenticator.store.Credential
 import com.webauthn4j.ctap.authenticator.store.UserCredential
 import com.webauthn4j.ctap.client.exception.CtapErrorException
 import com.webauthn4j.data.*
@@ -26,7 +27,7 @@ class ExcludeCredentialsTest {
                     CredentialSelectorSetting.AUTHENTICATOR
                 passwordlessTestCase.authenticator.credentialSelectionHandler =
                     object : CredentialSelectionHandler {
-                        override suspend fun select(list: List<UserCredential>): UserCredential {
+                        override suspend fun select(list: List<Credential>): Credential {
                             return list.first { item -> item.credentialId.contentEquals(result?.rawId) }
                         }
                     }
@@ -52,7 +53,7 @@ class ExcludeCredentialsTest {
             CredentialSelectorSetting.AUTHENTICATOR
         passwordlessTestCase.authenticator.credentialSelectionHandler =
             object : CredentialSelectionHandler {
-                override suspend fun select(list: List<UserCredential>): UserCredential {
+                override suspend fun select(list: List<Credential>): Credential {
                     return list.first { item -> item.credentialId.contentEquals(result?.rawId) }
                 }
             }

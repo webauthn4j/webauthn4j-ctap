@@ -5,14 +5,12 @@ import com.webauthn4j.ctap.authenticator.settings.ResidentKeySetting
 import com.webauthn4j.ctap.authenticator.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.settings.UserVerificationSetting
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
-import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialRequest
-import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialResponse
-import com.webauthn4j.ctap.core.data.PinProtocolVersion
-import com.webauthn4j.ctap.core.data.CtapStatusCode
-import com.webauthn4j.ctap.core.data.CtapStatusCode.Companion.CTAP2_ERR_MISSING_PARAMETER
+import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.ctap.core.data.CtapStatusCode.Companion.CTAP2_ERR_OPERATION_DENIED
 import com.webauthn4j.ctap.core.data.CtapStatusCode.Companion.CTAP2_ERR_UNSUPPORTED_ALGORITHM
-import com.webauthn4j.data.*
+import com.webauthn4j.data.PublicKeyCredentialDescriptor
+import com.webauthn4j.data.PublicKeyCredentialParameters
+import com.webauthn4j.data.PublicKeyCredentialType
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
 import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenticatorInput
@@ -34,8 +32,8 @@ internal class MakeCredentialExecutionTest {
     @Test
     fun test() = runBlockingTest {
         val clientDataHash = ByteArray(0)
-        val rp = PublicKeyCredentialRpEntity("example.com", "example")
-        val user = PublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,
@@ -67,39 +65,6 @@ internal class MakeCredentialExecutionTest {
     }
 
     @Test
-    fun rpId_null_test() = runBlockingTest {
-        val clientDataHash = ByteArray(0)
-        val rp = PublicKeyCredentialRpEntity(null, "example")
-        val user = PublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
-        val pubKeyCredParams = listOf(
-            PublicKeyCredentialParameters(
-                PublicKeyCredentialType.PUBLIC_KEY,
-                COSEAlgorithmIdentifier.ES256
-            )
-        )
-        val excludeList: List<PublicKeyCredentialDescriptor> = emptyList()
-        val extensions =
-            AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>()
-        val options = AuthenticatorMakeCredentialRequest.Options(rk = true, uv = true)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
-        val command = AuthenticatorMakeCredentialRequest(
-            clientDataHash,
-            rp,
-            user,
-            pubKeyCredParams,
-            excludeList,
-            extensions,
-            options,
-            pinAuth,
-            pinProtocol
-        )
-        val response = ctapAuthenticator.makeCredential(command)
-        assertThat(response).isInstanceOf(AuthenticatorMakeCredentialResponse::class.java)
-        assertThat(response.statusCode).isEqualTo(CTAP2_ERR_MISSING_PARAMETER)
-    }
-
-    @Test
     fun store_full_test() = runBlockingTest {
         val authenticatorPropertyStore = mock<InMemoryAuthenticatorPropertyStore> {
             on {
@@ -114,8 +79,8 @@ internal class MakeCredentialExecutionTest {
             CtapAuthenticator(authenticatorPropertyStore = authenticatorPropertyStore)
 
         val clientDataHash = ByteArray(0)
-        val rp = PublicKeyCredentialRpEntity("example.com", "example")
-        val user = PublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,
@@ -157,8 +122,8 @@ internal class MakeCredentialExecutionTest {
         createdResidentKeyCount: Int
     ) = runBlockingTest {
         val clientDataHash = ByteArray(0)
-        val rp = PublicKeyCredentialRpEntity("example.com", "example")
-        val user = PublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,
@@ -210,8 +175,8 @@ internal class MakeCredentialExecutionTest {
         createdResidentKeyCount: Int
     ) = runBlockingTest {
         val clientDataHash = ByteArray(0)
-        val rp = PublicKeyCredentialRpEntity("example.com", "example")
-        val user = PublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,
@@ -264,8 +229,8 @@ internal class MakeCredentialExecutionTest {
         statusCode: CtapStatusCode
     ) = runBlockingTest {
         val clientDataHash = ByteArray(0)
-        val rp = PublicKeyCredentialRpEntity("example.com", "example")
-        val user = PublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,
@@ -308,9 +273,8 @@ internal class MakeCredentialExecutionTest {
     fun userPresence_test(userPresenceSetting: UserPresenceSetting, statusCode: CtapStatusCode) =
         runBlockingTest {
             val clientDataHash = ByteArray(0)
-            val rp = PublicKeyCredentialRpEntity("example.com", "example")
-            val user =
-                PublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+            val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
+            val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
             val pubKeyCredParams = listOf(
                 PublicKeyCredentialParameters(
                     PublicKeyCredentialType.PUBLIC_KEY,
@@ -346,8 +310,8 @@ internal class MakeCredentialExecutionTest {
     @Test
     fun userConsent_false_test() = runBlockingTest {
         val clientDataHash = ByteArray(0)
-        val rp = PublicKeyCredentialRpEntity("example.com", "example")
-        val user = PublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,
@@ -389,8 +353,8 @@ internal class MakeCredentialExecutionTest {
     @Test
     fun unsupported_alg_test() = runBlockingTest {
         val clientDataHash = ByteArray(0)
-        val rp = PublicKeyCredentialRpEntity("example.com", "example")
-        val user = PublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,

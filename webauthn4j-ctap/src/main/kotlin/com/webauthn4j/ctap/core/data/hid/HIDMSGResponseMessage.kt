@@ -1,6 +1,7 @@
 package com.webauthn4j.ctap.core.data.hid
 
 import com.webauthn4j.ctap.core.data.CtapStatusCode
+import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.util.ArrayUtil
 import java.nio.ByteBuffer
@@ -8,29 +9,21 @@ import java.nio.ByteBuffer
 class HIDMSGResponseMessage : HIDResponseMessage, HIDMessageBase {
 
     @Suppress("JoinDeclarationAndAssignment")
-    val statusCode: CtapStatusCode
+    val responseAPDU: ResponseAPDU
 
     @Suppress("ConvertSecondaryConstructorToPrimary")
-    constructor(channelId: HIDChannelId, statusCode: CtapStatusCode, message: ByteArray) : super(
+    constructor(channelId: HIDChannelId, responseAPDU: ResponseAPDU) : super(
         channelId,
         HIDCommand.CTAPHID_MSG
     ) {
-        this.statusCode = statusCode
-        this.message = ArrayUtil.clone(message)
+        this.responseAPDU = responseAPDU
     }
 
-    val message: ByteArray
-        get() = ArrayUtil.clone(field)
-
     override val data: ByteArray
-        get() = ByteBuffer.allocate(1 + message.size).put(statusCode.byte).put(message).array()
+        get() = responseAPDU.toBytes()
 
     override fun toString(): String {
-        return "HIDMSGResponseMessage(channelId=${channelId}, command=$command, statusCode=$statusCode, message=${
-            HexUtil.encodeToString(
-                message
-            )
-        })"
+        return "HIDMSGResponseMessage(channelId=${channelId}, responseAPDU=${responseAPDU})"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -38,17 +31,16 @@ class HIDMSGResponseMessage : HIDResponseMessage, HIDMessageBase {
         if (other !is HIDMSGResponseMessage) return false
         if (!super.equals(other)) return false
 
-        if (statusCode != other.statusCode) return false
-        if (!message.contentEquals(other.message)) return false
+        if (responseAPDU != other.responseAPDU) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = super.hashCode()
-        result = 31 * result + statusCode.hashCode()
-        result = 31 * result + message.contentHashCode()
+        result = 31 * result + responseAPDU.hashCode()
         return result
     }
+
 
 }

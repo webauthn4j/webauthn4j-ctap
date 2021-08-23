@@ -1,5 +1,6 @@
 package com.webauthn4j.ctap.core.data.nfc
 
+import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.util.ArrayUtil
 import com.webauthn4j.util.AssertUtil
 import com.webauthn4j.util.UnsignedNumberUtil
@@ -67,6 +68,7 @@ class CommandAPDU {
     }
 
 
+
     val maxResponseDataSize: Int
         get() {
             val length = le
@@ -79,25 +81,34 @@ class CommandAPDU {
         }
 
     companion object {
-        private const val CLA_POS = 0
-        private const val INS_POS = 1
-        private const val P1_POS = 2
-        private const val P2_POS = 3
-        private const val BYTE_AFTER_P2_POS = 4
+        private const val POS_CLA = 0
+        private const val POS_INS = 1
+        private const val POS_P1 = 2
+        private const val POS_P2 = 3
+        private const val POS_P2_NEXT = 4
         private const val HEADER_LENGTH = 4
-        private const val SHORT_LENGTH_LENGTH = 1
-        private const val EXTENDED_LENGTH_LENGTH = 3
+
+        private const val SHORT_LENGTH_LC_LENGTH = 1
+        private const val EXTENDED_LENGTH_LC_LENGTH = 3
+
+        private const val SHORT_LENGTH_LE_LENGTH = 1
+        private const val CASE2_EXTENDED_LENGTH_LE_LENGTH = 2
+        private const val EXTENDED_LENGTH_LE_LENGTH = 3
+
         private const val CASE1_APDU_LENGTH = 4
         private const val CASE2_SHORT_APDU_LENGTH = 5
         private const val CASE2_EXTENDED_APDU_LENGTH = 7
 
         @JvmStatic
         fun parse(apdu: ByteArray): CommandAPDU {
+
+            // APDU format ref. https://smartcardguy.hatenablog.jp/entry/2018/08/11/153334
+
             AssertUtil.isTrue(apdu.size >= HEADER_LENGTH, "apdu must have sufficient length")
-            val cla = apdu[CLA_POS]
-            val ins = apdu[INS_POS]
-            val p1 = apdu[P1_POS]
-            val p2 = apdu[P2_POS]
+            val cla = apdu[POS_CLA]
+            val ins = apdu[POS_INS]
+            val p1 = apdu[POS_P1]
+            val p2 = apdu[POS_P2]
             val lc: ByteArray?
             val dataIn: ByteArray?
             val le: ByteArray?
@@ -107,24 +118,25 @@ class CommandAPDU {
                 lc = null
                 dataIn = null
                 le = null
-            } else if (apdu[BYTE_AFTER_P2_POS] == 0.toByte() && apdu.size != CASE2_SHORT_APDU_LENGTH) {
-                val length =
-                    apdu.copyOfRange(BYTE_AFTER_P2_POS, BYTE_AFTER_P2_POS + EXTENDED_LENGTH_LENGTH)
+            }
+            else if (apdu[POS_P2_NEXT] == 0.toByte() && apdu.size != CASE2_SHORT_APDU_LENGTH) {
                 // case2 extended APDU
                 if (apdu.size == CASE2_EXTENDED_APDU_LENGTH) {
+                    val length = apdu.copyOfRange(POS_P2_NEXT, POS_P2_NEXT + CASE2_EXTENDED_LENGTH_LE_LENGTH)
                     lc = null
                     dataIn = null
                     le = length
                 } else {
+                    val length = apdu.copyOfRange(POS_P2_NEXT, POS_P2_NEXT + EXTENDED_LENGTH_LC_LENGTH)
                     lc = length
                     val dataLength = getLengthFromLengthField(lc)
-                    val dataPos = BYTE_AFTER_P2_POS + EXTENDED_LENGTH_LENGTH
+                    val dataPos = POS_P2_NEXT + EXTENDED_LENGTH_LC_LENGTH
                     dataIn = apdu.copyOfRange(dataPos, dataPos + dataLength)
-                    // case3 extended APDU
-                    le = if (apdu.size == dataPos + dataLength) {
-                        null
-                    } else {
-                        apdu.copyOfRange(dataPos + dataLength, apdu.size)
+                    le = when (apdu.size) {
+                        // case3 extended APDU
+                        dataPos + dataLength -> null
+                        // case4
+                        else -> apdu.copyOfRange(dataPos + dataLength, apdu.size)
                     }
                 }
             } else {
@@ -132,33 +144,80 @@ class CommandAPDU {
                 if (apdu.size == CASE2_SHORT_APDU_LENGTH) {
                     lc = null
                     dataIn = null
-                    le = byteArrayOf(apdu[BYTE_AFTER_P2_POS])
+                    le = byteArrayOf(apdu[POS_P2_NEXT])
                 } else {
-                    lc = byteArrayOf(apdu[BYTE_AFTER_P2_POS])
+                    lc = byteArrayOf(apdu[POS_P2_NEXT])
                     val dataLength = getLengthFromLengthField(lc)
-                    val dataPos = BYTE_AFTER_P2_POS + SHORT_LENGTH_LENGTH
+                    val dataPos = POS_P2_NEXT + SHORT_LENGTH_LC_LENGTH
                     dataIn = apdu.copyOfRange(dataPos, dataPos + dataLength)
-                    // case3 short APDU
-                    le = if (apdu.size == dataPos + dataLength) {
-                        null
-                    } else {
-                        apdu.copyOfRange(dataPos + dataLength, apdu.size)
+                    le = when (apdu.size) {
+                        // case3 short APDU
+                        dataPos + dataLength -> null
+                        // case4
+                        else -> apdu.copyOfRange(dataPos + dataLength, apdu.size)
                     }
                 }
             }
             return CommandAPDU(cla, ins, p1, p2, lc, dataIn, le)
         }
 
-        private fun getLengthFromLengthField(length: ByteArray): Int {
-            return if (length.size == SHORT_LENGTH_LENGTH) {
-                if (length.first() == 0.toByte()) {
-                    256
-                } else {
-                    UnsignedNumberUtil.getUnsignedByte(length[0]).toInt()
+        private fun getLengthFromLengthField(bytes: ByteArray): Int {
+            return when (bytes.size) {
+                1 -> {
+                    when {
+                        bytes.first() == 0.toByte() -> UByte.MAX_VALUE.toInt()
+                        else -> UnsignedNumberUtil.getUnsignedByte(bytes.first()).toInt()
+                    }
                 }
-            } else {
-                UnsignedNumberUtil.getUnsignedShort(length.copyOfRange(1, 3))
+                2, 3 -> {
+                    when (val length = UnsignedNumberUtil.getUnsignedShort(bytes.copyOfRange(bytes.size - 2, bytes.size))) {
+                        0 -> UShort.MAX_VALUE.toInt()
+                        else -> length
+                    }
+                }
+                else -> throw IllegalArgumentException("length field must be 1-3 bytes")
             }
         }
     }
+
+    override fun toString(): String {
+        return "CommandAPDU(cla=$cla, ins=$ins, p1=$p1, p2=$p2, lc=${HexUtil.encodeToString(lc)}, dataIn=${HexUtil.encodeToString(dataIn)}, le=${HexUtil.encodeToString(le)})"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is CommandAPDU) return false
+
+        if (cla != other.cla) return false
+        if (ins != other.ins) return false
+        if (p1 != other.p1) return false
+        if (p2 != other.p2) return false
+        if (lc != null) {
+            if (other.lc == null) return false
+            if (!lc.contentEquals(other.lc)) return false
+        } else if (other.lc != null) return false
+        if (dataIn != null) {
+            if (other.dataIn == null) return false
+            if (!dataIn.contentEquals(other.dataIn)) return false
+        } else if (other.dataIn != null) return false
+        if (le != null) {
+            if (other.le == null) return false
+            if (!le.contentEquals(other.le)) return false
+        } else if (other.le != null) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = cla.toInt()
+        result = 31 * result + ins
+        result = 31 * result + p1
+        result = 31 * result + p2
+        result = 31 * result + (lc?.contentHashCode() ?: 0)
+        result = 31 * result + (dataIn?.contentHashCode() ?: 0)
+        result = 31 * result + (le?.contentHashCode() ?: 0)
+        return result
+    }
+
+
 }

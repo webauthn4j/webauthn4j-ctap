@@ -3,6 +3,7 @@ package com.webauthn4j.ctap.authenticator.transport.apdu
 import ch.qos.logback.core.encoder.ByteArrayUtil
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.TransactionManager
+import com.webauthn4j.ctap.authenticator.transport.nfc.NFCConnector
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 
 internal class SelectCommandAPDUProcessorTest {
-    private val target = APDUBasedProtocolConnector(
+    private val target = NFCConnector(
         Mockito.mock(TransactionManager::class.java),
         ObjectConverter()
     ).selectCommandAPDUProcessor

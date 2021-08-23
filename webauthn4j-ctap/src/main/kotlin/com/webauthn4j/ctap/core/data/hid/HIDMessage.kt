@@ -25,7 +25,7 @@ interface HIDMessage {
         val initPacketActualDataSize = min(data.size, MAX_INIT_PACKET_DATA_SIZE)
         data.copyInto(initPacketData, 0, 0, initPacketActualDataSize)
         val initializationPacket =
-            HIDInitializationPacket(channelId, command, data.size, initPacketData)
+            HIDInitializationPacket(channelId, command, data.size.toUShort(), initPacketData)
         pos += initPacketActualDataSize
         val list = mutableListOf<HIDPacket>(initializationPacket)
 

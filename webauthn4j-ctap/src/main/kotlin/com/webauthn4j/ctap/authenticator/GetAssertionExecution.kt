@@ -264,7 +264,7 @@ internal class GetAssertionExecution :
                     else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
                 }
             }
-            if (BooleanUtil.isTrue(options.up)) {
+            if (options.up != false) {
                 userPresencePlan = when (ctapAuthenticator.userPresenceSetting) {
                     UserPresenceSetting.SUPPORTED -> true
                     else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
@@ -416,7 +416,7 @@ internal class GetAssertionExecution :
             signedData
         )
         val user = when (credential) {
-            is UserCredential -> PublicKeyCredentialUserEntity(
+            is UserCredential -> CtapPublicKeyCredentialUserEntity(
                     credential.userHandle,
                     credential.username,
                     credential.displayName

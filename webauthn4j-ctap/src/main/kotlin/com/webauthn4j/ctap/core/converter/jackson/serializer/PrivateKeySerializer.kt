@@ -12,9 +12,9 @@ class PrivateKeySerializer : StdSerializer<PrivateKey>(PrivateKey::class.java) {
     override fun serialize(value: PrivateKey, gen: JsonGenerator, provider: SerializerProvider) {
         requireNotNull(value.encoded) { "This private key cannot be serialized. It may be backed by external key store like Android KeyStore." }
         gen.writeStartObject()
-        gen.writeStringField("algorithm", value.algorithm)
         gen.writeStringField("format", value.format)
         gen.writeBinaryField("encoded", value.encoded)
+        gen.writeStringField("algorithm", value.algorithm)
         gen.writeEndObject()
     }
 

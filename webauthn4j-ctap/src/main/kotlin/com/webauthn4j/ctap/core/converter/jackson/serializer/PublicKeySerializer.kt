@@ -12,9 +12,9 @@ class PublicKeySerializer : StdSerializer<PublicKey>(PublicKey::class.java) {
     @Throws(IOException::class)
     override fun serialize(value: PublicKey, gen: JsonGenerator, provider: SerializerProvider) {
         gen.writeStartObject()
-        gen.writeStringField("algorithm", value.algorithm)
         gen.writeStringField("format", value.format)
         gen.writeBinaryField("encoded", value.encoded)
+        gen.writeStringField("algorithm", value.algorithm)
         gen.writeEndObject()
     }
 

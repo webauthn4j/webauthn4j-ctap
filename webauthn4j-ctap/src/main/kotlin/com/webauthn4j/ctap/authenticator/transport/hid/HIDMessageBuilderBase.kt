@@ -14,12 +14,12 @@ abstract class HIDMessageBuilderBase<T : HIDMessage> {
     private var command: HIDCommand? = null
 
     fun initialize(initializationPacket: HIDInitializationPacket) {
-        buffer = ByteBuffer.allocate(initializationPacket.length)
+        buffer = ByteBuffer.allocate(initializationPacket.length.toInt())
         buffer.put(
             initializationPacket.data,
             0,
             min(
-                min(initializationPacket.length, MAX_INIT_PACKET_DATA_SIZE),
+                min(initializationPacket.length.toInt(), MAX_INIT_PACKET_DATA_SIZE),
                 initializationPacket.data.size
             )
         )

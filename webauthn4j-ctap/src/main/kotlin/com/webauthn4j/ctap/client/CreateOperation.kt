@@ -1,6 +1,8 @@
 package com.webauthn4j.ctap.client
 
 import com.webauthn4j.ctap.client.exception.WebAuthnClientException
+import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
+import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
 import com.webauthn4j.data.*
 import com.webauthn4j.data.attestation.AttestationObject
 import com.webauthn4j.data.attestation.statement.NoneAttestationStatement
@@ -61,13 +63,14 @@ class CreateOperation(
         val clientDataHash = MessageDigestUtil.createSHA256().digest(clientDataJSON)
         val rpId = publicKeyCredentialCreationOptions.rp.id ?: clientProperty.origin.host
         ?: throw WebAuthnClientException("WebAuthn client must have origin.")
-        val rp = PublicKeyCredentialRpEntity(rpId, publicKeyCredentialCreationOptions.rp.name)
+        val rp = CtapPublicKeyCredentialRpEntity(rpId, publicKeyCredentialCreationOptions.rp.name)
+        val user = CtapPublicKeyCredentialUserEntity(publicKeyCredentialCreationOptions.user.id, publicKeyCredentialCreationOptions.user.name, publicKeyCredentialCreationOptions.user.displayName)
         val authenticatorExtensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>? =
             null //TODO
         val makeCredentialRequest = MakeCredentialRequest(
             clientDataHash,
             rp,
-            publicKeyCredentialCreationOptions.user,
+            user,
             publicKeyCredentialCreationOptions.pubKeyCredParams,
             publicKeyCredentialCreationOptions.excludeCredentials,
             authenticatorExtensions,

@@ -2,7 +2,7 @@ package integration.setting.authenticator
 
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
 import com.webauthn4j.ctap.authenticator.settings.CredentialSelectorSetting
-import com.webauthn4j.ctap.authenticator.store.UserCredential
+import com.webauthn4j.ctap.authenticator.store.Credential
 import com.webauthn4j.ctap.client.PublicKeyCredentialSelectionHandler
 import com.webauthn4j.data.AuthenticatorAssertionResponse
 import com.webauthn4j.data.AuthenticatorAttestationResponse
@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.io.Serializable
 
 @Suppress("EXPERIMENTAL_API_USAGE", "ClassName")
 class CredentialSelectorSettingTest {
@@ -30,9 +29,8 @@ class CredentialSelectorSettingTest {
 
             passwordlessTestCase.authenticator.credentialSelectorSetting =
                 CredentialSelectorSetting.AUTHENTICATOR
-            passwordlessTestCase.authenticator.credentialSelectionHandler = object :
-                CredentialSelectionHandler { // This credentialSelectionHandler selects 2nd (correct) credential
-                override suspend fun select(list: List<UserCredential>): UserCredential {
+            passwordlessTestCase.authenticator.credentialSelectionHandler = object : CredentialSelectionHandler { // This credentialSelectionHandler selects 2nd (correct) credential
+                override suspend fun select(list: List<Credential>): Credential {
                     return list.first { it.credentialId.contentEquals(publicKeyCredential!!.rawId) }
                 }
             }
@@ -53,7 +51,7 @@ class CredentialSelectorSettingTest {
                 CredentialSelectorSetting.AUTHENTICATOR
             passwordlessTestCase.authenticator.credentialSelectionHandler = object :
                 CredentialSelectionHandler { // This credentialSelectionHandler selects 1st (incorrect) credential
-                override suspend fun select(list: List<UserCredential>): UserCredential {
+                override suspend fun select(list: List<Credential>): Credential {
                     return list.first { it.credentialId.contentEquals(publicKeyCredential!!.rawId) }
                 }
             }

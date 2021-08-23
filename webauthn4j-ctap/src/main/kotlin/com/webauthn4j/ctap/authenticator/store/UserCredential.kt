@@ -1,7 +1,6 @@
 package com.webauthn4j.ctap.authenticator.store
 
 import java.io.Serializable
-import java.time.Instant
 
 /**
  * Core interface for representing user credential of authenticator
@@ -15,21 +14,21 @@ interface UserCredential : Credential {
      *
      * @return userHandle
      */
-    val userHandle: ByteArray?
+    val userHandle: ByteArray
 
     /**
      * Return username
      *
      * @return username
      */
-    val username: String
+    val username: String?
 
     /**
      * Return displayName
      *
      * @return displayName
      */
-    val displayName: String
+    val displayName: String?
 
     /**
      * Return rpId
@@ -43,7 +42,7 @@ interface UserCredential : Credential {
      *
      * @return rpName
      */
-    val rpName: String
+    val rpName: String?
 
 
     /**

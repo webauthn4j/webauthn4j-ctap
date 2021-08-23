@@ -7,5 +7,5 @@ interface AssertionResponseData : CtapResponseData {
     val credential: PublicKeyCredentialDescriptor?
     val authData: ByteArray?
     val signature: ByteArray?
-    val user: PublicKeyCredentialUserEntity?
+    val user: CtapPublicKeyCredentialUserEntity?
 }

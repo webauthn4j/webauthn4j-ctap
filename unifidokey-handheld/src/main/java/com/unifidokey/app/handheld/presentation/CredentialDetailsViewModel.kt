@@ -20,9 +20,9 @@ class CredentialDetailsViewModel(application: Application) : AndroidViewModel(ap
         userCredentialDao = unifidoKeyComponent.userCredentialDao
     }
 
-    val username: String
+    val username: String?
         get() = userCredentialEntity.username
-    val displayName: String
+    val displayName: String?
         get() = userCredentialEntity.displayName
     val createdAt: String
         get() = userCredentialEntity.createdAt.toString()

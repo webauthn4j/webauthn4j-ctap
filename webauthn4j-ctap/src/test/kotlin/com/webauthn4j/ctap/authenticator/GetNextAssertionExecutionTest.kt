@@ -148,8 +148,8 @@ class GetNextAssertionExecutionTest {
         uv: Boolean = true
     ) {
         val clientDataHash = ByteArray(0)
-        val rp = PublicKeyCredentialRpEntity("example.com", "example")
-        val user = PublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,

@@ -1,5 +1,6 @@
 package com.webauthn4j.ctap.core.data.hid
 
+import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.util.ArrayUtil
 import java.nio.ByteBuffer
@@ -7,28 +8,20 @@ import java.nio.ByteBuffer
 class HIDMSGRequestMessage : HIDRequestMessage, HIDMessageBase {
 
     @Suppress("JoinDeclarationAndAssignment")
-    val u2fCommand: Byte
+    val commandAPDU: CommandAPDU
 
-    constructor(channelId: HIDChannelId, u2fCommand: Byte, message: ByteArray) : super(
+    constructor(channelId: HIDChannelId, commandAPDU: CommandAPDU) : super(
         channelId,
         HIDCommand.CTAPHID_MSG
     ) {
-        this.u2fCommand = u2fCommand
-        this.message = ArrayUtil.clone(message)
+        this.commandAPDU = commandAPDU
     }
 
-    val message: ByteArray
-        get() = ArrayUtil.clone(field)
-
     override val data: ByteArray
-        get() = ByteBuffer.allocate(1 + message.size).put(u2fCommand).put(message).array()
+        get() = TODO()
 
     override fun toString(): String {
-        return "HIDMSGRequestMessage(channelId=${channelId}, command=$command, statusCode=$u2fCommand, message=${
-            HexUtil.encodeToString(
-                message
-            )
-        })"
+        return "HIDMSGRequestMessage(channelId=${channelId}, commandAPDU=$commandAPDU)"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -36,16 +29,14 @@ class HIDMSGRequestMessage : HIDRequestMessage, HIDMessageBase {
         if (other !is HIDMSGRequestMessage) return false
         if (!super.equals(other)) return false
 
-        if (u2fCommand != other.u2fCommand) return false
-        if (!message.contentEquals(other.message)) return false
+        if (commandAPDU != other.commandAPDU) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = super.hashCode()
-        result = 31 * result + u2fCommand.hashCode()
-        result = 31 * result + message.contentHashCode()
+        result = 31 * result + commandAPDU.hashCode()
         return result
     }
 

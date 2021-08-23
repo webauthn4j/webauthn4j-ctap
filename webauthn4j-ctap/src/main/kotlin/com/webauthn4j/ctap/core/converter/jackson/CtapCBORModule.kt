@@ -69,6 +69,14 @@ class CtapCBORModule : SimpleModule("WebAuthnCBORModule") {
             AuthenticatorResetResponseData::class.java,
             AuthenticatorResetResponseDataSerializer()
         )
+        this.addSerializer(
+            CtapPublicKeyCredentialRpEntity::class.java,
+            CtapPublicKeyCredentialRpEntitySerializer()
+        )
+        this.addSerializer(
+            CtapPublicKeyCredentialUserEntity::class.java,
+            CtapPublicKeyCredentialUserEntitySerializer()
+        )
         this.addSerializer(U2FKeyEnvelope::class.java, U2FKeyEnvelopeSerializer())
         addDeserializer(ClientPINOption::class.java, ClientPINOptionDeserializer())
         addDeserializer(PlatformOption::class.java, PlatformOptionDeserializer())

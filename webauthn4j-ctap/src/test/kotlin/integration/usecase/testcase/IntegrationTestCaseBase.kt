@@ -13,8 +13,8 @@ import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatement
 import com.webauthn4j.ctap.authenticator.attestation.PackedAttestationStatementGenerator
 import com.webauthn4j.ctap.authenticator.settings.*
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
+import com.webauthn4j.ctap.authenticator.store.Credential
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
-import com.webauthn4j.ctap.authenticator.store.UserCredential
 import com.webauthn4j.ctap.client.ClientProperty
 import com.webauthn4j.ctap.client.CtapAuthenticatorHandle
 import com.webauthn4j.ctap.client.CtapClient
@@ -92,7 +92,7 @@ abstract class IntegrationTestCaseBase {
         private val credentialSelectionHandlerParameter =
             TestParameter<CredentialSelectionHandler> {
                 object : CredentialSelectionHandler {
-                    override suspend fun select(list: List<UserCredential>): UserCredential =
+                    override suspend fun select(list: List<Credential>): Credential =
                         list.first()
                 }
             }

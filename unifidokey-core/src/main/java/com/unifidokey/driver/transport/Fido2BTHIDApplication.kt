@@ -9,10 +9,10 @@ import com.webauthn4j.ctap.authenticator.TransactionManager
 import com.webauthn4j.ctap.authenticator.transport.hid.HIDConnector
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import org.slf4j.LoggerFactory
+import java.nio.ByteBuffer
 
 class Fido2BTHIDApplication(
     transactionManager: TransactionManager,

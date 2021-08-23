@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialParameters
-import com.webauthn4j.data.PublicKeyCredentialRpEntity
-import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
 import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenticatorInput
 import com.webauthn4j.util.ArrayUtil
@@ -14,8 +12,8 @@ import com.webauthn4j.util.ArrayUtil
 @Suppress("CanBePrimaryConstructorProperty")
 class AuthenticatorMakeCredentialRequest @JsonCreator constructor(
     @JsonProperty("1") clientDataHash: ByteArray,
-    @JsonProperty("2") rp: PublicKeyCredentialRpEntity,
-    @JsonProperty("3") user: PublicKeyCredentialUserEntity,
+    @JsonProperty("2") rp: CtapPublicKeyCredentialRpEntity,
+    @JsonProperty("3") user: CtapPublicKeyCredentialUserEntity,
     @JsonProperty("4") pubKeyCredParams: List<PublicKeyCredentialParameters>,
     @JsonProperty("5") excludeList: List<PublicKeyCredentialDescriptor>?,
     @JsonProperty("6") extensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>?,

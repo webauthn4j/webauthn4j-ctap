@@ -12,10 +12,10 @@ class UserCredentialBuilder(private val objectConverter: ObjectConverter, privat
     private lateinit var credentialId: ByteArray
     private lateinit var credentialKey: CredentialKey
     private lateinit var userHandle: ByteArray
-    private lateinit var username: String
-    private lateinit var displayName: String
+    private var username: String? = null
+    private var displayName: String? = null
     private lateinit var rpId: String
-    private lateinit var rpName: String
+    private var rpName: String? = null
     private var counter: Long = 0
     private lateinit var createdAt: Instant
     private var otherUI: Serializable? = null
@@ -92,12 +92,12 @@ class UserCredentialBuilder(private val objectConverter: ObjectConverter, privat
         return this
     }
 
-    fun username(value: String): UserCredentialBuilder {
+    fun username(value: String?): UserCredentialBuilder {
         username = value
         return this
     }
 
-    fun displayName(value: String): UserCredentialBuilder {
+    fun displayName(value: String?): UserCredentialBuilder {
         displayName = value
         return this
     }
@@ -107,7 +107,7 @@ class UserCredentialBuilder(private val objectConverter: ObjectConverter, privat
         return this
     }
 
-    fun rpName(value: String): UserCredentialBuilder {
+    fun rpName(value: String?): UserCredentialBuilder {
         rpName = value
         return this
     }

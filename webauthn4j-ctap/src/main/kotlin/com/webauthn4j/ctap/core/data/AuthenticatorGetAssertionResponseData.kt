@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
-import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import com.webauthn4j.util.ArrayUtil
 
 @Suppress("CanBePrimaryConstructorProperty")
@@ -12,7 +11,7 @@ class AuthenticatorGetAssertionResponseData @JsonCreator constructor(
     @JsonProperty("1") credential: PublicKeyCredentialDescriptor?,
     @JsonProperty("2") authData: ByteArray,
     @JsonProperty("3") signature: ByteArray,
-    @JsonProperty("4") user: PublicKeyCredentialUserEntity?,
+    @JsonProperty("4") user: CtapPublicKeyCredentialUserEntity?,
     @JsonProperty("5") numberOfCredentials: Int?
 ) : CtapResponseData {
 
@@ -21,7 +20,7 @@ class AuthenticatorGetAssertionResponseData @JsonCreator constructor(
         get() = ArrayUtil.clone(field)
     val signature: ByteArray = ArrayUtil.clone(signature)
         get() = ArrayUtil.clone(field)
-    val user: PublicKeyCredentialUserEntity? = user
+    val user: CtapPublicKeyCredentialUserEntity? = user
     val numberOfCredentials: Int? = numberOfCredentials
 
     override fun equals(other: Any?): Boolean {

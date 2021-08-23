@@ -2,13 +2,15 @@ package com.webauthn4j.ctap.authenticator.transport.hid
 
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.TransactionManager
+import com.webauthn4j.ctap.authenticator.transport.apdu.U2FAPDUProcessor
 import com.webauthn4j.ctap.core.converter.CtapRequestConverter
 import com.webauthn4j.ctap.core.converter.CtapResponseConverter
 import com.webauthn4j.ctap.core.converter.HIDPacketConverter
 import com.webauthn4j.ctap.core.data.CtapResponse
-import com.webauthn4j.ctap.core.data.CtapResponseData
+import com.webauthn4j.ctap.core.data.U2FStatusCode
 import com.webauthn4j.ctap.core.data.hid.*
 import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.MAX_PACKET_SIZE
+import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import com.webauthn4j.util.HexUtil
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
@@ -20,7 +22,7 @@ class HIDConnector(
 ) {
 
     companion object {
-        private const val KEEPALIVE_INTERVAL = 30L
+        private const val KEEPALIVE_INTERVAL = 100L
         private const val HID_PROTOCOL_VERSION_NUMBER: Byte = 2
         private const val MAJOR_DEVICE_VERSION_NUMBER: Byte = 0
         private const val MINOR_DEVICE_VERSION_NUMBER: Byte = 1
@@ -34,10 +36,13 @@ class HIDConnector(
     private val ctapRequestConverter = CtapRequestConverter(objectConverter)
     private val ctapResponseConverter = CtapResponseConverter(objectConverter)
 
+    private val u2fAPDUProcessor = U2FAPDUProcessor(transactionManager)
+
     private val hidPacketConverter = HIDPacketConverter()
     private val hidChannels: MutableMap<HIDChannelId, HIDChannel> = HashMap()
     private var lastAllocatedChannelId: HIDChannelId = HIDChannelId(0)
 
+    private val u2fConfirmationWorker = newSingleThreadContext("u2f-confirmation-worker")
 
     suspend fun handle(bytes: ByteArray, hidPacketHandler: HIDPacketHandler) {
         try {
@@ -46,11 +51,11 @@ class HIDConnector(
                 MAX_PACKET_SIZE + 1 -> 1
                 else -> throw IllegalStateException("Unexpected bytes size")
             }
-            val packetBytes = bytes.copyOfRange(packetOffset, MAX_PACKET_SIZE) //TODO:
+            val packetBytes = bytes.copyOfRange(packetOffset, bytes.size)
 
-            // Linux対応に必要なはずだが、現在はそれ以外のプラットフォームでも返却される長さがあってないのでエラーを発生させてしまう
+
             val hidPacket = hidPacketConverter.convert(packetBytes)
-            logger.debug("CTAP2 Request HID Packet: {}", hidPacket.toString())
+            logger.debug("CTAP Request HID Packet: {}", hidPacket.toString())
 
             var hidChannel = hidChannels[hidPacket.channelId]
             if (hidChannel == null) {
@@ -58,7 +63,7 @@ class HIDConnector(
                 hidChannels[hidPacket.channelId] = hidChannel
             }
             hidChannel.handlePacket(hidPacket) {
-                logger.debug("CTAP2 Response HID Packet: {}", it.toString())
+                logger.debug("CTAP Response HID Packet: {}", it.toString())
                 val responseBytes = hidPacketConverter.convert(it)
                 hidPacketHandler.onResponse(responseBytes)
             }
@@ -111,43 +116,85 @@ class HIDConnector(
             hidMessage: HIDMessage,
             responseCallback: ResponseCallback<HIDResponseMessage>
         ) {
-            logger.debug("CTAP2 Request HID Message: {}", hidMessage.toString())
+            logger.debug("CTAP Request HID Message: {}", hidMessage.toString())
             when (hidMessage.command) {
                 HIDCommand.CTAPHID_MSG -> handleMsg(hidMessage as HIDMSGRequestMessage) {
-                    logger.debug("CTAP2 Response HID Message: {}", it.toString())
+                    logger.debug("CTAP Response HID Message: {}", it.toString())
                     responseCallback.onResponse(it)
                 }
                 HIDCommand.CTAPHID_CBOR -> handleCbor(hidMessage as HIDCBORRequestMessage) {
-                    logger.debug("CTAP2 Response HID Message: {}", it.toString())
+                    logger.debug("CTAP Response HID Message: {}", it.toString())
                     responseCallback.onResponse(it)
                 }
                 HIDCommand.CTAPHID_INIT -> handleInit(hidMessage as HIDINITRequestMessage) {
-                    logger.debug("CTAP2 Response HID Message: {}", it.toString())
+                    logger.debug("CTAP Response HID Message: {}", it.toString())
                     responseCallback.onResponse(it)
                 }
                 HIDCommand.CTAPHID_PING -> handlePing(hidMessage as HIDPINGRequestMessage) {
-                    logger.debug("CTAP2 Response HID Message: {}", it.toString())
+                    logger.debug("CTAP Response HID Message: {}", it.toString())
                     responseCallback.onResponse(it)
                 }
                 HIDCommand.CTAPHID_CANCEL -> handleCancel(hidMessage as HIDCANCELRequestMessage)
                 HIDCommand.CTAPHID_WINK -> handleWink(hidMessage as HIDWINKRequestMessage) {
-                    logger.debug("CTAP2 Response HID Message: {}", it.toString())
+                    logger.debug("CTAP Response HID Message: {}", it.toString())
                     responseCallback.onResponse(it)
                 }
                 HIDCommand.CTAPHID_LOCK -> handleLock(hidMessage as HIDLOCKRequestMessage) {
-                    logger.debug("CTAP2 Response HID Message: {}", it.toString())
+                    logger.debug("CTAP Response HID Message: {}", it.toString())
                     responseCallback.onResponse(it)
                 }
                 else -> throw IllegalArgumentException("%s is not supported".format(hidMessage.command))
             }
         }
 
-        @Suppress("UNUSED_PARAMETER")
+        private var u2fConfirmationStatus: Deferred<HIDMSGResponseMessage>? = null
+        private var activeRequest: HIDMSGRequestMessage? = null
+
         private suspend fun handleMsg(
             hidMessage: HIDMSGRequestMessage,
             responseCallback: ResponseCallback<HIDResponseMessage>
         ) {
-            throw TODO("CTAP1/U2F handling is not implemented")
+            coroutineScope {
+
+                val conditionNotSatisfiedMessage = HIDMSGResponseMessage(hidMessage.channelId, ResponseAPDU(U2FStatusCode.CONDITION_NOT_SATISFIED.sw1, U2FStatusCode.CONDITION_NOT_SATISFIED.sw2))
+
+                u2fConfirmationStatus.let {
+                    when {
+                        it == null -> {
+                            resetU2FConfirmationStatus(hidMessage)
+                            responseCallback.onResponse(conditionNotSatisfiedMessage)
+                        }
+                        it.isCompleted -> {
+                            if(hidMessage == activeRequest){
+                                u2fConfirmationStatus = null
+                                activeRequest = null
+                                responseCallback.onResponse(it.await())
+                            }
+                            else{
+                                resetU2FConfirmationStatus(hidMessage)
+                                responseCallback.onResponse(conditionNotSatisfiedMessage)
+                            }
+                        }
+                        it.isCancelled -> {
+                            resetU2FConfirmationStatus(hidMessage)
+                            responseCallback.onResponse(conditionNotSatisfiedMessage)
+                        }
+                        it.isActive -> {
+                            delay(KEEPALIVE_INTERVAL)
+                            responseCallback.onResponse(conditionNotSatisfiedMessage)
+                        }
+                        else -> throw IllegalStateException()
+                    }
+                }
+            }
+        }
+
+        private suspend fun resetU2FConfirmationStatus(hidMessage: HIDMSGRequestMessage){
+            u2fConfirmationStatus= CoroutineScope(u2fConfirmationWorker).async {
+                val responseAPDU = u2fAPDUProcessor.process(hidMessage.commandAPDU)
+                HIDMSGResponseMessage(hidMessage.channelId, responseAPDU)
+            }
+            activeRequest = hidMessage
         }
 
         private suspend fun handleInit(
@@ -254,4 +301,5 @@ class HIDConnector(
     private fun interface ResponseCallback<T> {
         fun onResponse(response: T)
     }
+
 }

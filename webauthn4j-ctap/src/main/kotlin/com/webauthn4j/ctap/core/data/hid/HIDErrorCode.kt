@@ -17,13 +17,13 @@ data class HIDErrorCode(val value: Byte) {
     override fun toString(): String {
         return when (value) {
             INVALID_CMD.value -> "INVALID_CMD(0x01)"
-            INVALID_PAR.value -> "INVALID_CMD(0x02)"
-            INVALID_LEN.value -> "INVALID_CMD(0x03)"
-            INVALID_SEQ.value -> "INVALID_CMD(0x04)"
-            MSG_TIMEOUT.value -> "INVALID_CMD(0x05)"
-            CHANNEL_BUSY.value -> "INVALID_CMD(0x06)"
-            LOCK_REQUIRED.value -> "INVALID_CMD(0x0A)"
-            INVALID_CHANNEL.value -> "INVALID_CMD(0x0B)"
+            INVALID_PAR.value -> "INVALID_PAR(0x02)"
+            INVALID_LEN.value -> "INVALID_LEN(0x03)"
+            INVALID_SEQ.value -> "INVALID_SEQ(0x04)"
+            MSG_TIMEOUT.value -> "MSG_TIMEOUT(0x05)"
+            CHANNEL_BUSY.value -> "CHANNEL_BUSY(0x06)"
+            LOCK_REQUIRED.value -> "LOCK_REQUIRED(0x0A)"
+            INVALID_CHANNEL.value -> "INVALID_CHANNEL(0x0B)"
             OTHER.value -> "OTHER(0x7F)"
             else -> "UNKNOWN(0x%02X)".format(value)
         }

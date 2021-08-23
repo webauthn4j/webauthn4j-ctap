@@ -14,7 +14,7 @@ class HIDPacketConverter {
         val cid = HIDChannelId(source.copyOfRange(0, 4))
         val cmdOrSec = source[4]
         return if ((cmdOrSec and CMD_BIT) == CMD_BIT) {
-            val length = ByteBuffer.wrap(byteArrayOf(0, 0, source[5], source[6])).int
+            val length = ByteBuffer.wrap(byteArrayOf(source[5], source[6])).short.toUShort()
             val data = source.copyOfRange(7, source.size)
             val cmd = cmdOrSec and (CMD_BIT.inv())
             HIDInitializationPacket(cid, HIDCommand(cmd), length, data)

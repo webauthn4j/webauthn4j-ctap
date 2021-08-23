@@ -7,7 +7,7 @@ import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.core.service.NFCService
 import com.unifidokey.core.service.NFCStatus
-import com.webauthn4j.ctap.authenticator.transport.apdu.APDUBasedProtocolConnector
+import com.webauthn4j.ctap.authenticator.transport.nfc.NFCConnector
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import com.webauthn4j.ctap.core.util.internal.ArrayUtil
@@ -21,7 +21,7 @@ class CtapNFCAndroidService : HostApduService(), CoroutineScope {
     private lateinit var job: Job
     override val coroutineContext: CoroutineContext
         get() = job
-    private lateinit var APDUBasedProtocolConnector: APDUBasedProtocolConnector
+    private lateinit var nfcConnector: NFCConnector
     private lateinit var nfcService: NFCService
 
     //single thread worker to synchronize authenticator access
@@ -46,7 +46,7 @@ class CtapNFCAndroidService : HostApduService(), CoroutineScope {
         val unifidoKeyComponent: UnifidoKeyComponent = unifidoKeyApplication.unifidoKeyComponent
         val authenticatorService = unifidoKeyComponent.authenticatorService
         val objectConverter = unifidoKeyComponent.objectConverter
-        APDUBasedProtocolConnector = APDUBasedProtocolConnector(authenticatorService, objectConverter)
+        nfcConnector = NFCConnector(authenticatorService, objectConverter)
         nfcService = unifidoKeyComponent.nfcService
         logger.debug("CtapNFCAndroidService is initialized")
     }
@@ -57,7 +57,7 @@ class CtapNFCAndroidService : HostApduService(), CoroutineScope {
             logger.debug("Received command APDU: {}", ArrayUtil.toHexString(apdu))
             if (nfcService.nfcStatus.value == NFCStatus.ON) {
                 val commandAPDU = CommandAPDU.parse(apdu)
-                val responseAPDU = APDUBasedProtocolConnector.handleCommandAPDU(commandAPDU)
+                val responseAPDU = nfcConnector.handleCommandAPDU(commandAPDU)
                 sendResponseApdu(responseAPDU.toBytes())
                 logger.debug("Sent response APDU: {}", ArrayUtil.toHexString(responseAPDU.toBytes()))
             } else {

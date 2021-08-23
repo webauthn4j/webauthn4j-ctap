@@ -19,8 +19,8 @@ import java.time.Instant
 
 @RunWith(RobolectricTestRunner::class)
 class UserCredentialDaoRobolectricTest {
-    private var relyingPartyDao: RelyingPartyDao? = null
-    private var target: UserCredentialDao? = null
+    private lateinit var relyingPartyDao: RelyingPartyDao
+    private lateinit var target: UserCredentialDao
 
     @Before
     fun setup() {
@@ -53,9 +53,9 @@ class UserCredentialDaoRobolectricTest {
             null,
             "{}"
         )
-        relyingPartyDao!!.create(relyingParty)
-        val id = target!!.create(userCredential)
-        val fetched = target!!.findOne(credentialId)
+        relyingPartyDao.create(relyingParty)
+        val id = target.create(userCredential)
+        val fetched = target.findOne(credentialId)
         val expected = UserCredentialEntity(
             id,
             credentialId,
@@ -110,10 +110,10 @@ class UserCredentialDaoRobolectricTest {
             null,
             "{}"
         )
-        relyingPartyDao!!.create(relyingParty)
-        target!!.create(userCredential0)
-        target!!.create(userCredential1)
-        val fetched = target!!.findAll()
+        relyingPartyDao.create(relyingParty)
+        target.create(userCredential0)
+        target.create(userCredential1)
+        val fetched = target.findAll()
         Truth.assertThat(fetched).hasSize(2)
     }
 
@@ -137,7 +137,7 @@ class UserCredentialDaoRobolectricTest {
             null,
             "{}"
         )
-        target!!.create(userCredential)
+        target.create(userCredential)
     }
 
     @Test
@@ -161,8 +161,8 @@ class UserCredentialDaoRobolectricTest {
             null,
             "{}"
         )
-        val id = relyingPartyDao!!.create(relyingParty)
-        target!!.create(userCredential)
+        val id = relyingPartyDao.create(relyingParty)
+        target.create(userCredential)
         val update = UserCredentialEntity(
             id,
             credentialId,
@@ -178,8 +178,8 @@ class UserCredentialDaoRobolectricTest {
             null,
             "{}"
         )
-        target!!.update(update)
-        val fetched = target!!.findOne(credentialId)
+        target.update(update)
+        val fetched = target.findOne(credentialId)
         Truth.assertThat(fetched).isEqualTo(update)
     }
 
@@ -204,8 +204,8 @@ class UserCredentialDaoRobolectricTest {
             null,
             "{}"
         )
-        relyingPartyDao!!.create(relyingParty)
-        val id = target!!.create(userCredential)
+        relyingPartyDao.create(relyingParty)
+        val id = target.create(userCredential)
         val delete = UserCredentialEntity(
             id,
             credentialId,
@@ -221,8 +221,8 @@ class UserCredentialDaoRobolectricTest {
             null,
             "{}"
         )
-        target!!.delete(delete)
-        val fetched = target!!.findOne(credentialId)
+        target.delete(delete)
+        val fetched = target.findOne(credentialId)
         Truth.assertThat(fetched).isNull()
     }
 }

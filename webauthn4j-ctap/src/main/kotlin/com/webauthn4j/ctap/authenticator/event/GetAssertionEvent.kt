@@ -12,7 +12,7 @@ class GetAssertionEvent : EventBase {
         id: Long?,
         time: Instant,
         rpId: String,
-        rpName: String,
+        rpName: String?,
         userCredentials: List<UserCredential>,
         details: Map<String, Serializable>
     ) : super(
@@ -31,7 +31,7 @@ class GetAssertionEvent : EventBase {
     constructor(
         time: Instant,
         rpId: String,
-        rpName: String,
+        rpName: String?,
         userCredentials: List<UserCredential>,
         details: Map<String, Serializable>
     ) : this(null, time, rpId, rpName, userCredentials, details)
@@ -41,7 +41,7 @@ class GetAssertionEvent : EventBase {
         @JsonProperty("id") id: Long?,
         @JsonProperty("time") time: Instant,
         @JsonProperty("rpId") rpId: String,
-        @JsonProperty("rpName") rpName: String,
+        @JsonProperty("rpName") rpName: String?,
         @JsonProperty("userCredentials") userCredentials: List<UserCredential>
     ) : super(
         id,
@@ -54,9 +54,9 @@ class GetAssertionEvent : EventBase {
         @JsonIgnore
         get() = get("rpId") as String
 
-    val rpName: String
+    val rpName: String?
         @JsonIgnore
-        get() = get("rpName") as String
+        get() = get("rpName") as String?
 
     val userCredentials: List<UserCredential>
         @Suppress("UNCHECKED_CAST")

@@ -12,7 +12,7 @@ class AuthenticatorGetNextAssertionResponseData @JsonCreator constructor(
     @JsonProperty("1") credential: PublicKeyCredentialDescriptor?,
     @JsonProperty("2") authData: ByteArray,
     @JsonProperty("3") signature: ByteArray,
-    @JsonProperty("4") user: PublicKeyCredentialUserEntity?
+    @JsonProperty("4") user: CtapPublicKeyCredentialUserEntity?
 ) : AssertionResponseData {
 
     override val credential: PublicKeyCredentialDescriptor? = credential
@@ -20,7 +20,7 @@ class AuthenticatorGetNextAssertionResponseData @JsonCreator constructor(
         get() = ArrayUtil.clone(field)
     override val signature: ByteArray = ArrayUtil.clone(signature)
         get() = ArrayUtil.clone(field)
-    override val user: PublicKeyCredentialUserEntity? = user
+    override val user: CtapPublicKeyCredentialUserEntity? = user
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

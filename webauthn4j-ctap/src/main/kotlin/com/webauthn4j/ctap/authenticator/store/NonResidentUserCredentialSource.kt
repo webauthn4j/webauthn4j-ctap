@@ -13,10 +13,10 @@ import java.time.Instant
 class NonResidentUserCredentialSource @JsonCreator constructor(
     @JsonProperty("userCredentialKey") userCredentialKey: NonResidentCredentialKey,
     @JsonProperty("userHandle") userHandle: ByteArray?,
-    @JsonProperty("username") username: String,
-    @JsonProperty("displayName") displayName: String,
+    @JsonProperty("username") username: String?,
+    @JsonProperty("displayName") displayName: String?,
     @JsonProperty("rpId") rpId: String,
-    @JsonProperty("rpName") rpName: String,
+    @JsonProperty("rpName") rpName: String?,
     @JsonProperty("createdAt") createdAt: Instant,
     @JsonProperty("otherUI") otherUI: Serializable?,
     @JsonProperty("details") details: Map<String, String>
@@ -25,10 +25,10 @@ class NonResidentUserCredentialSource @JsonCreator constructor(
     val userCredentialKey = userCredentialKey
     val userHandle: ByteArray = ArrayUtil.clone(userHandle)
         get() = ArrayUtil.clone(field)
-    val username: String = username
-    val displayName: String = displayName
+    val username: String? = username
+    val displayName: String? = displayName
     val rpId: String = rpId
-    val rpName: String = rpName
+    val rpName: String? = rpName
     val createdAt: Instant = createdAt
     val otherUI: Serializable? = otherUI
     val details: Map<String, String> = details

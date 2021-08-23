@@ -54,9 +54,9 @@ internal class MakeCredentialExecution :
 
     // command properties
     private val clientDataHash: ByteArray
-    private val rp: PublicKeyCredentialRpEntity
+    private val rp: CtapPublicKeyCredentialRpEntity
     private val rpId: String?
-    private val user: PublicKeyCredentialUserEntity
+    private val user: CtapPublicKeyCredentialUserEntity
     private val pubKeyCredParams: List<PublicKeyCredentialParameters>
     private val excludeList: List<PublicKeyCredentialDescriptor>?
     private val registrationExtensionAuthenticatorInputs: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>?
@@ -105,7 +105,7 @@ internal class MakeCredentialExecution :
         userCredentialBuilder.userHandle(user.id)
         userCredentialBuilder.username(user.name)
         userCredentialBuilder.displayName(user.displayName)
-        userCredentialBuilder.rpId(rpId!!)
+        userCredentialBuilder.rpId(rpId)
         userCredentialBuilder.rpName(rp.name)
         userCredentialBuilder.counter(counter)
         userCredentialBuilder.otherUI(null)
