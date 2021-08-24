@@ -65,25 +65,6 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-
-    fun startBluetoothPairing(ctapBLEAdapter: CtapBLEAdapter): Boolean {
-        return try {
-            unifidoKeyComponent.bleService.startPairing()
-            true
-        } catch (e: RuntimeException) {
-            logger.error("Unexpected exception is thrown", e)
-            false
-        }
-    }
-
-    fun stopBluetoothPairing(ctapBLEAdapter: CtapBLEAdapter) {
-        try {
-            unifidoKeyComponent.bleService.stopPairing()
-        } catch (e: RuntimeException) {
-            logger.error("Unexpected exception is thrown", e)
-        }
-    }
-
     fun setUserVerificationSetting(userVerificationSetting: UserVerificationSetting): Boolean {
         return try {
             configManager.userVerification.value = userVerificationSetting

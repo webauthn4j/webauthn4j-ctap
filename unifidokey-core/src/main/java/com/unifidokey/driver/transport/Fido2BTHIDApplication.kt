@@ -4,15 +4,19 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothHidDevice
 import android.bluetooth.BluetoothProfile
 import androidx.annotation.WorkerThread
+import com.google.android.gms.common.util.concurrent.NamedThreadFactory
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.TransactionManager
 import com.webauthn4j.ctap.authenticator.transport.hid.HIDConnector
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import org.slf4j.LoggerFactory
 import java.nio.ByteBuffer
+import java.util.concurrent.Executors
+import java.util.concurrent.ThreadFactory
 
 class Fido2BTHIDApplication(
     transactionManager: TransactionManager,

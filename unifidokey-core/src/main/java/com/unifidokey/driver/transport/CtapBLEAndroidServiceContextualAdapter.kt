@@ -161,10 +161,6 @@ class CtapBLEAndroidServiceContextualAdapter(private val context: Context) : Cta
                             BluetoothDevice.EXTRA_PAIRING_VARIANT,
                             BluetoothAdapter.ERROR
                         )
-                        val pairingKey = intent.getIntExtra(
-                            BluetoothDevice.EXTRA_PAIRING_KEY,
-                            BluetoothAdapter.ERROR
-                        )
                         logger.info(resolvePairingVariant(pairingVariant))
                     }
                     BluetoothAdapter.ACTION_STATE_CHANGED -> {

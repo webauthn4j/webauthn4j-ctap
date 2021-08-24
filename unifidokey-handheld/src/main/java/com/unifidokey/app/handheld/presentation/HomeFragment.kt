@@ -71,6 +71,7 @@ class HomeFragment : Fragment() {
     // Methods
 
 
+    @Suppress("UNUSED_PARAMETER")
     @UiThread
     fun onBTHIDPairingButtonClick(view: View) {
         BluetoothPairingUtil.startPairing(this.requireContext())

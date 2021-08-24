@@ -2,6 +2,7 @@ package com.webauthn4j.ctap.authenticator
 
 import com.webauthn4j.ctap.core.data.*
 import kotlinx.coroutines.*
+import kotlin.time.Duration
 
 open class TransactionManager(ctapAuthenticator: CtapAuthenticator = CtapAuthenticator()) {
 
@@ -36,6 +37,12 @@ open class TransactionManager(ctapAuthenticator: CtapAuthenticator = CtapAuthent
 
     fun cancelOnGoingTransaction() {
         transaction?.cancel()
+    }
+
+    suspend fun lock(timeMillis: Long) {
+        withContext(authenticatorWorker){
+            delay(timeMillis)
+        }
     }
 
 }

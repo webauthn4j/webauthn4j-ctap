@@ -52,7 +52,6 @@ class BLEService constructor(
                 _bleStatus.setValue(BLEStatus.OFF)
             }
         }
-        _bleStatus.observeForever(this::onBLEStatusChanged)
     }
 
 
@@ -65,13 +64,5 @@ class BLEService constructor(
     }
 
 
-    private fun onBLEStatusChanged(bleStatus: BLEStatus) {
-//TODO:revisit
-
-//        when (bleStatus) {
-//            BLEStatus.ON -> activate()
-//            else -> deactivate()
-//        }
-    }
 
 }

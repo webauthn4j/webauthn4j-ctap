@@ -14,6 +14,7 @@ import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import com.webauthn4j.util.HexUtil
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
+import java.util.concurrent.Executors
 import kotlin.experimental.or
 
 class HIDConnector(
@@ -275,6 +276,7 @@ class HIDConnector(
             )
         }
 
+        @Suppress("UNUSED_PARAMETER")
         private suspend fun handleCancel(hidMessage: HIDCANCELRequestMessage) {
             transactionManager.cancelOnGoingTransaction()
         }
@@ -287,12 +289,12 @@ class HIDConnector(
             responseCallback.onResponse(HIDWINKResponseMessage(hidMessage.channelId))
         }
 
-        private fun handleLock(
+        private suspend fun handleLock(
             hidMessage: HIDLOCKRequestMessage,
             responseCallback: ResponseCallback<HIDLOCKResponseMessage>
         ) {
-            val seconds = hidMessage.seconds
-            //transactionManager.lock(seconds) //TODO
+            val timeMillis = hidMessage.seconds.toLong() * 1000L
+            transactionManager.lock(timeMillis)
             responseCallback.onResponse(HIDLOCKResponseMessage(hidMessage.channelId))
         }
 
