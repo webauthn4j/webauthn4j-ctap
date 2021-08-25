@@ -160,56 +160,6 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
         }
     }
 
-    override fun loadUserCredential(
-        rpId: String?,
-        userHandle: ByteArray
-    ): ResidentUserCredential? {
-        if (rpId == null) {
-            return null
-        }
-        val (relyingPartyEntity, userCredentialEntities) = relyingPartyDao.findOne(rpId)
-            ?: return null
-        val userCredentialEntity = userCredentialEntities.stream()
-            .filter { userCredential: UserCredentialEntity ->
-                userCredential.userHandle.contentEquals(
-                    userHandle
-                )
-            }.findFirst().orElse(null)
-            ?: return null
-        val userCredentialKey: ResidentCredentialKey = when {
-            userCredentialEntity.keyPair != null -> {
-                ResidentCredentialKey(userCredentialEntity.alg, userCredentialEntity.keyPair)
-            }
-            userCredentialEntity.keyAlias != null -> {
-                val alias = userCredentialEntity.keyAlias
-                val keyPair = keyStoreDao.findCredentialKeyPair(alias)
-                val attestationCertificatePath =
-                    keyStoreDao.findCredentialAttestationCertificatePath(alias)
-                KeyStoreResidentCredentialKey(
-                    userCredentialEntity.alg,
-                    alias,
-                    keyPair!!,
-                    attestationCertificatePath!!
-                )
-            }
-            else -> TODO("throw proper exception")
-        }
-        val details = jsonConverter.readValue(userCredentialEntity.details, object : TypeReference<Map<String, String>>(){})!!
-        return ResidentUserCredential(
-            userCredentialEntity.credentialId,
-            userCredentialKey,
-            userCredentialEntity.userHandle,
-            userCredentialEntity.username,
-            userCredentialEntity.displayName,
-            relyingPartyEntity.id,
-            relyingPartyEntity.name,
-            userCredentialEntity.counter,
-            userCredentialEntity.createdAt,
-            userCredentialEntity.otherUI,
-            details
-        )
-    }
-
     override fun removeUserCredential(credentialId: ByteArray) {
         val userCredentialEntity = userCredentialDao.findOne(credentialId)
         if (userCredentialEntity != null) {

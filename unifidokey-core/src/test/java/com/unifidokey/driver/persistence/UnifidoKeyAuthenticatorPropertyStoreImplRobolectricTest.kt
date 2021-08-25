@@ -45,46 +45,6 @@ class UnifidoKeyAuthenticatorPropertyStoreImplRobolectricTest {
     }
 
 
-    @Test
-    fun saveUserCredential() {
-        val credentialId = ByteArray(16)
-        val userHandle = ByteArray(16)
-        val username = "username"
-        val displayName = "displayName"
-        val rpId = "rpId"
-        val rpName = "rpName"
-        val counter: Long = 123
-        val createdAt = Instant.now()
-        val residentKey = true
-        val userCredential: ResidentUserCredential = ResidentUserCredential(
-            credentialId,
-            ResidentCredentialKey(SignatureAlgorithm.ES256, ECUtil.createKeyPair()),
-            userHandle,
-            username,
-            displayName,
-            rpId,
-            rpName,
-            counter,
-            createdAt,
-            null,
-            emptyMap()
-        )
-        target.saveUserCredential(userCredential)
-        val retrieved = target.loadUserCredential(rpId, userHandle)!!
-        assertThat(retrieved.id).isNotNull()
-        assertThat(retrieved.credentialKey).isNotNull()
-        assertThat(retrieved.userHandle).isEqualTo(userHandle)
-        assertThat(retrieved.username).isEqualTo(username)
-        assertThat(retrieved.displayName).isEqualTo(displayName)
-        assertThat(retrieved.rpId).isEqualTo(rpId)
-        assertThat(retrieved.rpName).isEqualTo(rpName)
-        assertThat(retrieved.counter).isEqualTo(counter)
-        assertThat(retrieved.createdAt.epochSecond).isEqualTo(createdAt.epochSecond)
-        assertThat(retrieved.isResidentKey).isEqualTo(residentKey)
-        assertThat(retrieved.details).isEqualTo(emptyMap<String, String>())
-    }
-
-
 //    @Ignore
 //    @Test
 //    fun createUserCredential_as_nonResidentKey() {

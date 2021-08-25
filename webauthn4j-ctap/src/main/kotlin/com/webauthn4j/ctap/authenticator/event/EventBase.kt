@@ -36,11 +36,13 @@ abstract class EventBase(
         @JsonIgnore
         get() = get("time") as Instant
 
+    @Suppress("unused")
     @JsonAnyGetter
     private fun jsonAnyGetter(): Map<String, Any?> {
         return _map
     }
 
+    @Suppress("unused")
     @JsonAnySetter
     private fun jsonAnySetter(key: String, value: Any?) {
         if (key != "type") {

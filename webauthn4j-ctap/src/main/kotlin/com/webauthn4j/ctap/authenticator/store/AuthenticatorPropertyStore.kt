@@ -38,15 +38,6 @@ interface AuthenticatorPropertyStore{
      */
     fun loadUserCredentials(rpId: String?): List<ResidentUserCredential>
 
-    /**
-     * Load single user credential by rpId and userHandle
-     *
-     * @param rpId       rpId for look up key
-     * @param userHandle userHandle for look up key
-     * @return user credential
-     */
-    //TODO: revisit
-    fun loadUserCredential(rpId: String?, userHandle: ByteArray): ResidentUserCredential?
     fun removeUserCredential(credentialId: ByteArray)
     fun supports(alg: COSEAlgorithmIdentifier): Boolean
 

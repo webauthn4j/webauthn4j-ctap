@@ -62,20 +62,6 @@ open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
         return map[rpId]?.values?.toList() ?: emptyList()
     }
 
-    override fun loadUserCredential(
-        rpId: String?,
-        userHandle: ByteArray
-    ): ResidentUserCredential? {
-        if (rpId == null) {
-            return null //TODO: revisit: should throw RelyingPartyNotFoundException?
-        }
-        return loadUserCredentials(rpId).firstOrNull { userCredential: ResidentUserCredential ->
-            userCredential.userHandle.contentEquals(
-                userHandle
-            )
-        } //TODO: revisit: should throw CredentialNotFoundException?
-    }
-
     override fun removeUserCredential(credentialId: ByteArray) {
         map.keys.forEach(Consumer { rpId: String ->
             val userCredentials =
