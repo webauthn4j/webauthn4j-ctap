@@ -65,8 +65,7 @@ class CreateOperation(
         ?: throw WebAuthnClientException("WebAuthn client must have origin.")
         val rp = CtapPublicKeyCredentialRpEntity(rpId, publicKeyCredentialCreationOptions.rp.name)
         val user = CtapPublicKeyCredentialUserEntity(publicKeyCredentialCreationOptions.user.id, publicKeyCredentialCreationOptions.user.name, publicKeyCredentialCreationOptions.user.displayName)
-        val authenticatorExtensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>? =
-            null //TODO
+        val authenticatorExtensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>? = null //TODO: implement extension handling
         val makeCredentialRequest = MakeCredentialRequest(
             clientDataHash,
             rp,
@@ -83,9 +82,11 @@ class CreateOperation(
             },
             object : AuthenticatorUserVerificationHandler {
                 override suspend fun onAuthenticatorUserVerificationStarted() {
+                    //nop
                 }
 
                 override suspend fun onAuthenticatorUserVerificationFinished() {
+                    //nop
                 }
             }
         )
@@ -99,9 +100,9 @@ class CreateOperation(
                 makeCredentialResponse.attestationObject.authenticatorData,
                 NoneAttestationStatement()
             )
-            AttestationConveyancePreference.INDIRECT -> TODO("not implemented")
+            AttestationConveyancePreference.INDIRECT -> makeCredentialResponse.attestationObject //TODO: implement replacing the attestation with anonymous but verifiable one
             AttestationConveyancePreference.DIRECT -> makeCredentialResponse.attestationObject
-            AttestationConveyancePreference.ENTERPRISE -> makeCredentialResponse.attestationObject //TODO: revisit
+            AttestationConveyancePreference.ENTERPRISE -> makeCredentialResponse.attestationObject //TODO: implement enterprise attestation
             else -> throw IllegalStateException(
                 String.format(
                     "AttestationConveyancePreference {} ist not supported",

@@ -99,6 +99,7 @@ class CommandAPDU {
         private const val CASE2_SHORT_APDU_LENGTH = 5
         private const val CASE2_EXTENDED_APDU_LENGTH = 7
 
+        @SuppressWarnings("kotlin:S3776")
         @JvmStatic
         fun parse(apdu: ByteArray): CommandAPDU {
 
@@ -184,6 +185,7 @@ class CommandAPDU {
         return "CommandAPDU(cla=$cla, ins=$ins, p1=$p1, p2=$p2, lc=${HexUtil.encodeToString(lc)}, dataIn=${HexUtil.encodeToString(dataIn)}, le=${HexUtil.encodeToString(le)})"
     }
 
+    @SuppressWarnings("kotlin:S3776")
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is CommandAPDU) return false

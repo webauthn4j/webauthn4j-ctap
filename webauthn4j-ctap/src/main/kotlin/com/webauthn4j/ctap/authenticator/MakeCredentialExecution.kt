@@ -244,16 +244,16 @@ internal class MakeCredentialExecution :
     //spec|
     //spec| - If the verification succeeds, set the "uv" bit to 1 in the response.
     //spec| - If the verification fails, return CTAP2_ERR_PIN_AUTH_INVALID error.
-    private fun execStep5ProcessPinAuth() {
+    private suspend fun execStep5ProcessPinAuth() {
         pinAuth.let {
             if (it != null && pinProtocol == PinProtocolVersion.VERSION_1) {
-                //TODO: to be moved after getting user consent (step8)
                 //spec| If platform sends zero length pinAuth, authenticator needs to wait for user touch
                 //spec| and then returns either CTAP2_ERR_PIN_NOT_SET if pin is not set or CTAP2_ERR_PIN_INVALID if pin has been set.
                 //spec| This is done for the case where multiple authenticators are attached to the platform and
                 //spec| the platform wants to enforce clientPin semantics,
                 //spec| but the user has to select which authenticator to send the pinToken to.
                 if (it.isEmpty()) {
+                    requestUserConsent()
                     if (ctapAuthenticator.clientPINService.isClientPINReady) {
                         throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
                     } else {
@@ -272,8 +272,8 @@ internal class MakeCredentialExecution :
     //spec| Step6
     //spec| If pinAuth parameter is not present and clientPin been set on the authenticator, return CTAP2_ERR_PIN_REQUIRED error.
     private fun execStep6ValidateClientPin() {
-//        if (authenticatorMakeCredentialCommand.pinAuth == null && ctapAuthenticator.clientPINService.clientPIN != null) {
-//            throw CtapCommandExecutionException(StatusCode.CTAP2_ERR_PIN_REQUIRED)
+//        if (authenticatorMakeCredentialRequest.pinAuth == null && ctapAuthenticator.clientPINService.clientPIN != null) {
+//            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_REQUIRED)
 //        }
     }
 
@@ -290,13 +290,7 @@ internal class MakeCredentialExecution :
     //spec| Alternatively, request user interaction in an authenticator-specific way (e.g., flash the LED light).
     //spec| Request permission to create a credential. If the user declines permission, return the CTAP2_ERR_OPERATION_DENIED error.
     private suspend fun execStep8RequestUserConsent() {
-        val options = MakeCredentialConsentOptions(
-            rp,
-            user,
-            userPresencePlan,
-            userVerificationPlan
-        )
-        val consent: Boolean = ctapAuthenticator.userConsentHandler.consentMakeCredential(options)
+        val consent: Boolean = requestUserConsent()
         if (consent) {
             if (userPresencePlan) {
                 userPresenceResult = true
@@ -307,6 +301,16 @@ internal class MakeCredentialExecution :
         } else {
             throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
         }
+    }
+
+    private suspend fun requestUserConsent(): Boolean{
+        val options = MakeCredentialConsentOptions(
+            rp,
+            user,
+            userPresencePlan,
+            userVerificationPlan
+        )
+        return ctapAuthenticator.userConsentHandler.consentMakeCredential(options)
     }
 
     //spec| Step9-11

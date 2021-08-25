@@ -71,6 +71,9 @@ interface AuthenticatorPropertyStore{
     fun savePINRetries(pinRetries: Int)
     fun loadPINRetries(): Int
 
+    fun loadDeviceWideCounter(): UInt
+    fun saveDeviceWideCounter(deviceWideCounter: UInt)
+
     /**
      * Clear all user credentials and client PIN
      */

@@ -50,7 +50,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
 
     private var volatilePinRetryCounter = MAX_VOLATILE_PIN_RETRIES
     var authenticatorKeyAgreementKey = ECUtil.createKeyPair() //TODO: セッションを跨いで再利用されているが大丈夫か？
-    val pinToken: ByteArray = ByteArray(16)
+    val pinToken = ByteArray(16)
 
     init {
         SecureRandom().nextBytes(pinToken)
@@ -177,13 +177,9 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
         //spec| -- Authenticator decrypts pinHashEnc and verifies against its internal stored LEFT(SHA-256(curPin), 16).
         val secretKey: SecretKey = SecretKeySpec(sharedSecret, "AES")
         val pinHash = CipherUtil.decryptWithAESCBCNoPadding(pinHashEnc, secretKey, ZERO_IV)
-        val clientPIN = authenticatorPropertyStore.loadClientPIN()
-            ?: return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_NOT_SET)
-        //
-        //
-        //
-        // !!!NOT in spec!!! //TODO: ask spec author
+        val clientPIN = authenticatorPropertyStore.loadClientPIN() ?: return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_NOT_SET)
         val currentPINHash = Arrays.copyOf(MessageDigestUtil.createSHA256().digest(clientPIN), 16)
+
         if (!Arrays.equals(pinHash, currentPINHash)) {
             //spec| --- If a mismatch is detected, the authenticator performs the following operations:
             //spec| ---- Authenticator generates a new "authenticatorKeyAgreementKey".
@@ -290,6 +286,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
         )
     }
 
+    //spec| verify it by matching it against first 16 bytes of HMAC-SHA-256 of clientDataHash parameter using pinToken: HMAC- SHA-256(pinToken, clientDataHash).
     fun validatePINAuth(pinAuth: ByteArray?, clientDataHash: ByteArray?) {
         val calculatedPinAuth = MACUtil.calculateHmacSHA256(clientDataHash, pinToken, 16)
         if (!Arrays.equals(calculatedPinAuth, pinAuth)) {

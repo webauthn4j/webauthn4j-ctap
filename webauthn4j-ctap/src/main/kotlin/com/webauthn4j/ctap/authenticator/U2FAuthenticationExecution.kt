@@ -67,7 +67,8 @@ class U2FAuthenticationExecution(
             true-> 0x01.toByte()
             false -> 0x00.toByte()
         }
-        val counter: UInt = 0u //TODO: increment
+        val counter = ctapAuthenticator.authenticatorPropertyStore.loadDeviceWideCounter() + 1u
+        ctapAuthenticator.authenticatorPropertyStore.saveDeviceWideCounter(counter)
         val signedData = ByteBuffer.allocate(32 + 1 + 4 + 32).put(request.applicationParameter).put(userPresence).putInt(counter.toInt()).put(request.challengeParameter).array()
         val privateKey = envelope.keyPair.privateKey!!
         val signature = SignatureCalculator.calculate(SignatureAlgorithm.ES256, privateKey, signedData)

@@ -32,7 +32,7 @@ abstract class HIDMessageBuilderBase<T : HIDMessage> {
             throw IllegalStateException("Builder is not initialized. It seems initialization packet haven't arrived.")
         }
         if (counter != continuationPacket.sec) {
-            throw IllegalStateException("ContinuationPacket with an unexpected sequence number arrived.")//TODO: revisit exception type
+            throw IllegalStateException("ContinuationPacket with an unexpected sequence number arrived.")
         }
         buffer.put(
             continuationPacket.data,

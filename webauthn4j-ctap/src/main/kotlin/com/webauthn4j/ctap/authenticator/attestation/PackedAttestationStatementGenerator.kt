@@ -64,10 +64,10 @@ class PackedAttestationStatementGenerator : AttestationStatementGenerator {
             .put(authenticatorDataBytes).put(clientDataHash).array()
         val alg: COSEAlgorithmIdentifier = attestationStatementRequest.algorithmIdentifier
         val sig = calculate(
-            SignatureAlgorithm.ES256,
+            alg.toSignatureAlgorithm(),
             attestationPrivateKey,
             signedData
-        ) //TODO revisit alg
+        )
         val aaguid = authenticatorData.attestedCredentialData!!.aaguid
         return PackedAttestationStatement(
             alg,

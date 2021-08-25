@@ -85,7 +85,7 @@ class HMACSecretExtensionProcessor : RegistrationExtensionProcessor,
         //spec| The authenticator verifies saltEnc by generating LEFT(HMAC-SHA-256(sharedSecret, saltEnc), 16) and matching against the input saltAuth parameter.
         val mac = MACUtil.calculateHmacSHA256(saltEnc, sharedSecret, 16)
         if(!mac.contentEquals(saltAuth)){
-            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION) //TODO: revisit error code
+            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_INVALID_OPTION)
         }
 
         //spec| The authenticator chooses which CredRandom to use for next step based on whether user verification was done or not in above steps.

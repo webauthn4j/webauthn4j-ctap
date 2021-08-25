@@ -100,6 +100,7 @@ class CtapStatusCode(value: Int) {
             map = HashMap(tmp)
         }
 
+        @SuppressWarnings("kotlin:S1479")
         @JvmStatic
         fun create(value: String?): CtapStatusCode {
             return when (value) {

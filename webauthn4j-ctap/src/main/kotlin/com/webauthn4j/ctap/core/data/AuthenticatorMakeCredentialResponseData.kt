@@ -30,7 +30,7 @@ class AuthenticatorMakeCredentialResponseData : CtapResponseData {
     }
 
     constructor(attestationObject: AttestationObject) {
-        authenticatorData = attestationObject.authenticatorData //TODO: revisit
+        authenticatorData = attestationObject.authenticatorData
         attestationStatement = attestationObject.attestationStatement
     }
 

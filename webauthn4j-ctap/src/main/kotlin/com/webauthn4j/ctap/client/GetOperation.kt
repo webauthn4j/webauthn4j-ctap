@@ -48,8 +48,7 @@ class GetOperation(
         val clientDataJSON =
             webAuthnClient.collectedClientDataConverter.convertToBytes(collectedClientData)
         val clientDataHash = MessageDigestUtil.createSHA256().digest(clientDataJSON)
-        val authenticatorExtensions: AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>? =
-            null //TODO
+        val authenticatorExtensions: AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>? = null //TODO: implement extension handling
         val rpId = publicKeyCredentialRequestOptions.rpId ?: clientProperty.origin.host
         ?: throw WebAuthnClientException("WebAuthn client must have origin.")
         val getAssertionsRequest = GetAssertionsRequest(
@@ -63,11 +62,12 @@ class GetOperation(
                 override suspend fun onClientPINRequested(): String = clientProperty.clientPIN
             },
             object : AuthenticatorUserVerificationHandler {
-                //TODO
                 override suspend fun onAuthenticatorUserVerificationStarted() {
+                    //nop
                 }
 
                 override suspend fun onAuthenticatorUserVerificationFinished() {
+                    //nop
                 }
             }
         )
@@ -79,8 +79,7 @@ class GetOperation(
             val authenticatorData = it.authData
             val signature = it.signature
             val userHandle = it.user?.id
-            val clientExtensionResults: AuthenticationExtensionsClientOutputs<AuthenticationExtensionClientOutput>? =
-                null //TODO
+            val clientExtensionResults: AuthenticationExtensionsClientOutputs<AuthenticationExtensionClientOutput>? = null //TODO: implement extension handling
             PublicKeyCredential(
                 credentialId,
                 AuthenticatorAssertionResponse(
