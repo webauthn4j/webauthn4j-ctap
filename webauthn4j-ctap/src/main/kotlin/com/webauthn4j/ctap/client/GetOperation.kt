@@ -63,11 +63,12 @@ class GetOperation(
                 override suspend fun onClientPINRequested(): String = clientProperty.clientPIN
             },
             object : AuthenticatorUserVerificationHandler {
-                //TODO
                 override suspend fun onAuthenticatorUserVerificationStarted() {
+                    //nop
                 }
 
                 override suspend fun onAuthenticatorUserVerificationFinished() {
+                    //nop
                 }
             }
         )

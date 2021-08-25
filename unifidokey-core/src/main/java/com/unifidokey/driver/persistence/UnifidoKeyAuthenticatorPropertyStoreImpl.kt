@@ -215,6 +215,18 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
         }
     }
 
+    override fun loadDeviceWideCounter(): UInt {
+        return configManager.deviceWideCounter.value
+    }
+
+    override fun saveDeviceWideCounter(deviceWideCounter: UInt) {
+        runBlocking {
+            launch(Dispatchers.Main.immediate){
+                configManager.deviceWideCounter.value = deviceWideCounter
+            }
+        }
+    }
+
     override fun clear() {
         relyingPartyDao.deleteAll()
         keyStoreDao.deleteAll()
@@ -222,6 +234,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
             launch(Dispatchers.Main.immediate){
                 configManager.pinRetries.reset()
                 configManager.clientPINEnc.reset()
+                configManager.deviceWideCounter.reset()
             }
         }
     }

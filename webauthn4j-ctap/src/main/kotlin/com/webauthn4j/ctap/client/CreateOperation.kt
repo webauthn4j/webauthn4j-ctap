@@ -83,9 +83,11 @@ class CreateOperation(
             },
             object : AuthenticatorUserVerificationHandler {
                 override suspend fun onAuthenticatorUserVerificationStarted() {
+                    //nop
                 }
 
                 override suspend fun onAuthenticatorUserVerificationFinished() {
+                    //nop
                 }
             }
         )

@@ -25,6 +25,9 @@ class ConfigManager(
     val clientPINEnc = ClientPINEncConfigProperty(this)
     val pinRetries = PINRetriesConfigProperty(this)
 
+    // counter
+    val deviceWideCounter = DeviceWideCounterConfigProperty(this)
+
     // transports
     val isNFCTransportEnabled = NFCTransportEnabledConfigProperty(this)
     val isBLETransportEnabled = BLETransportEnabledConfigProperty(this)

@@ -30,6 +30,11 @@ class HIDConnector(
         private const val BUILD_DEVICE_VERSION_NUMBER: Byte = 0
         private val CAPABILITIES =
             HIDCapability((HIDCapability.CBOR.value or HIDCapability.NMSG.value))
+
+        private const val CTAP_REQUEST_HID_PACKET_LOGGING_TEMPLATE = "CTAP Request HID Packet: {}"
+        private const val CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE = "CTAP Response HID Packet: {}"
+        private const val CTAP_REQUEST_HID_MESSAGE_LOGGING_TEMPLATE = "CTAP Request HID Message: {}"
+        private const val CTAP_RESPONSE_HID_MESSAGE_LOGGING_TEMPLATE = "CTAP Request HID Message: {}"
     }
 
     private val logger = LoggerFactory.getLogger(HIDConnector::class.java)
@@ -47,7 +52,7 @@ class HIDConnector(
 
     suspend fun handle(bytes: ByteArray, hidPacketHandler: HIDPacketHandler) {
         try {
-            val packetOffset = when (bytes.size) { //TODO: respect reportIdIncluded
+            val packetOffset = when (bytes.size) {
                 MAX_PACKET_SIZE -> 0
                 MAX_PACKET_SIZE + 1 -> 1
                 else -> throw IllegalStateException("Unexpected bytes size")
@@ -56,21 +61,29 @@ class HIDConnector(
 
 
             val hidPacket = hidPacketConverter.convert(packetBytes)
-            logger.debug("CTAP Request HID Packet: {}", hidPacket.toString())
+            try{
+                logger.debug(CTAP_REQUEST_HID_PACKET_LOGGING_TEMPLATE, hidPacket.toString())
 
-            var hidChannel = hidChannels[hidPacket.channelId]
-            if (hidChannel == null) {
-                hidChannel = HIDChannel(hidPacket.channelId)
-                hidChannels[hidPacket.channelId] = hidChannel
+                var hidChannel = hidChannels[hidPacket.channelId]
+                if (hidChannel == null) {
+                    hidChannel = HIDChannel(hidPacket.channelId)
+                    hidChannels[hidPacket.channelId] = hidChannel
+                }
+                hidChannel.handlePacket(hidPacket) {
+                    logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, it.toString())
+                    val responseBytes = hidPacketConverter.convert(it)
+                    hidPacketHandler.onResponse(responseBytes)
+                }
             }
-            hidChannel.handlePacket(hidPacket) {
-                logger.debug("CTAP Response HID Packet: {}", it.toString())
-                val responseBytes = hidPacketConverter.convert(it)
-                hidPacketHandler.onResponse(responseBytes)
+            catch (e: RuntimeException){
+                logger.error("Unexpected exception is thrown while processing HID packet", e)
+                HIDERRORResponseMessage(hidPacket.channelId, HIDErrorCode.OTHER).toHIDPackets().forEach{
+                    logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, it.toString())
+                    hidPacketHandler.onResponse(it.toBytes())
+                }
             }
         } catch (e: RuntimeException) {
             logger.error("Unexpected exception is thrown while processing HID packet", e)
-//            TODO()
         }
     }
 
@@ -106,8 +119,8 @@ class HIDConnector(
                 } catch (e: RuntimeException) {
                     logger.error("Unexpected exception is thrown while processing HID message", e)
                     HIDERRORResponseMessage(hidMessage.channelId, HIDErrorCode.OTHER).toHIDPackets()
-                        .forEach { parameter ->
-                            responseCallback.onResponse(parameter)
+                        .forEach { packet ->
+                            responseCallback.onResponse(packet)
                         }
                 }
             }
@@ -117,31 +130,31 @@ class HIDConnector(
             hidMessage: HIDMessage,
             responseCallback: ResponseCallback<HIDResponseMessage>
         ) {
-            logger.debug("CTAP Request HID Message: {}", hidMessage.toString())
+            logger.debug(CTAP_REQUEST_HID_MESSAGE_LOGGING_TEMPLATE, hidMessage.toString())
             when (hidMessage.command) {
                 HIDCommand.CTAPHID_MSG -> handleMsg(hidMessage as HIDMSGRequestMessage) {
-                    logger.debug("CTAP Response HID Message: {}", it.toString())
+                    logger.debug(CTAP_RESPONSE_HID_MESSAGE_LOGGING_TEMPLATE, it.toString())
                     responseCallback.onResponse(it)
                 }
                 HIDCommand.CTAPHID_CBOR -> handleCbor(hidMessage as HIDCBORRequestMessage) {
-                    logger.debug("CTAP Response HID Message: {}", it.toString())
+                    logger.debug(CTAP_RESPONSE_HID_MESSAGE_LOGGING_TEMPLATE, it.toString())
                     responseCallback.onResponse(it)
                 }
                 HIDCommand.CTAPHID_INIT -> handleInit(hidMessage as HIDINITRequestMessage) {
-                    logger.debug("CTAP Response HID Message: {}", it.toString())
+                    logger.debug(CTAP_RESPONSE_HID_MESSAGE_LOGGING_TEMPLATE, it.toString())
                     responseCallback.onResponse(it)
                 }
                 HIDCommand.CTAPHID_PING -> handlePing(hidMessage as HIDPINGRequestMessage) {
-                    logger.debug("CTAP Response HID Message: {}", it.toString())
+                    logger.debug(CTAP_RESPONSE_HID_MESSAGE_LOGGING_TEMPLATE, it.toString())
                     responseCallback.onResponse(it)
                 }
                 HIDCommand.CTAPHID_CANCEL -> handleCancel(hidMessage as HIDCANCELRequestMessage)
                 HIDCommand.CTAPHID_WINK -> handleWink(hidMessage as HIDWINKRequestMessage) {
-                    logger.debug("CTAP Response HID Message: {}", it.toString())
+                    logger.debug(CTAP_RESPONSE_HID_MESSAGE_LOGGING_TEMPLATE, it.toString())
                     responseCallback.onResponse(it)
                 }
                 HIDCommand.CTAPHID_LOCK -> handleLock(hidMessage as HIDLOCKRequestMessage) {
-                    logger.debug("CTAP Response HID Message: {}", it.toString())
+                    logger.debug(CTAP_RESPONSE_HID_MESSAGE_LOGGING_TEMPLATE, it.toString())
                     responseCallback.onResponse(it)
                 }
                 else -> throw IllegalArgumentException("%s is not supported".format(hidMessage.command))
@@ -161,7 +174,7 @@ class HIDConnector(
 
                 u2fConfirmationStatus.let {
                     when {
-                        it == null -> {
+                        it == null || it.isCancelled -> {
                             resetU2FConfirmationStatus(hidMessage)
                             responseCallback.onResponse(conditionNotSatisfiedMessage)
                         }
@@ -175,10 +188,6 @@ class HIDConnector(
                                 resetU2FConfirmationStatus(hidMessage)
                                 responseCallback.onResponse(conditionNotSatisfiedMessage)
                             }
-                        }
-                        it.isCancelled -> {
-                            resetU2FConfirmationStatus(hidMessage)
-                            responseCallback.onResponse(conditionNotSatisfiedMessage)
                         }
                         it.isActive -> {
                             delay(KEEPALIVE_INTERVAL)

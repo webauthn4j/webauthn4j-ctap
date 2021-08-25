@@ -50,7 +50,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
 
     private var volatilePinRetryCounter = MAX_VOLATILE_PIN_RETRIES
     var authenticatorKeyAgreementKey = ECUtil.createKeyPair() //TODO: セッションを跨いで再利用されているが大丈夫か？
-    val pinToken: ByteArray = ByteArray(16)
+    val pinToken = ByteArray(16)
 
     init {
         SecureRandom().nextBytes(pinToken)

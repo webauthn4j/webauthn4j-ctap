@@ -31,6 +31,29 @@ import javax.crypto.spec.SecretKeySpec
  */
 class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
 
+    companion object {
+        private const val RESPONSE_DATA_NULL_MESSAGE = "authenticatorClientPIN responseData is null"
+        private const val KEY_AGREEMENT_NULL_MESSAGE = "authenticatorClientPIN responseData.keyAgreement is null"
+        private val ZERO_IV = byteArrayOf(
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00
+        )
+    }
+
     suspend fun makeCredential(makeCredentialRequest: MakeCredentialRequest): MakeCredentialResponse {
         val getInfoResponse: AuthenticatorGetInfoResponse = ctapAuthenticatorHandle.getInfo()
         if (getInfoResponse.responseData == null) {
@@ -220,10 +243,10 @@ class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
             ctapAuthenticatorHandle.clientPIN(getKeyAgreementSubCommand)
         val platformKeyAgreementKeyPair = ECUtil.createKeyPair()
         if (clientPINResponse.responseData == null) {
-            throw ResponseDataValidationException("authenticatorClientPIN responseData is null")
+            throw ResponseDataValidationException(RESPONSE_DATA_NULL_MESSAGE)
         }
         if (clientPINResponse.responseData.keyAgreement == null) {
-            throw ResponseDataValidationException("authenticatorClientPIN responseData.keyAgreement is null")
+            throw ResponseDataValidationException(KEY_AGREEMENT_NULL_MESSAGE)
         }
         val platformKeyAgreementKey = clientPINResponse.responseData.keyAgreement
         val sharedSecret = MessageDigestUtil.createSHA256().digest(
@@ -250,10 +273,10 @@ class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
             ctapAuthenticatorHandle.clientPIN(getKeyAgreementSubCommand)
         val platformKeyAgreementKeyPair = ECUtil.createKeyPair()
         if (clientPINResponse.responseData == null) {
-            throw ResponseDataValidationException("authenticatorClientPIN responseData is null")
+            throw ResponseDataValidationException(RESPONSE_DATA_NULL_MESSAGE)
         }
         if (clientPINResponse.responseData.keyAgreement == null) {
-            throw ResponseDataValidationException("authenticatorClientPIN responseData.keyAgreement is null")
+            throw ResponseDataValidationException(KEY_AGREEMENT_NULL_MESSAGE)
         }
         val platformKeyAgreementKey = clientPINResponse.responseData.keyAgreement
         val sharedSecret = MessageDigestUtil.createSHA256().digest(
@@ -288,7 +311,7 @@ class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
         val getRetriesSubCommand = AuthenticatorClientPINRequest.createV1GetRetries()
         val clientPINResponse = ctapAuthenticatorHandle.clientPIN(getRetriesSubCommand)
         if (clientPINResponse.responseData == null) {
-            throw ResponseDataValidationException("authenticatorClientPIN responseData is null")
+            throw ResponseDataValidationException(RESPONSE_DATA_NULL_MESSAGE)
         }
         if (clientPINResponse.responseData.retries == null) {
             throw ResponseDataValidationException("authenticatorClientPIN responseData.retries is null")
@@ -339,10 +362,10 @@ class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
         val getKeyAgreementResponse: AuthenticatorClientPINResponse =
             ctapAuthenticatorHandle.clientPIN(AuthenticatorClientPINRequest.createV1GetKeyAgreement())
         if (getKeyAgreementResponse.responseData == null) {
-            throw ResponseDataValidationException("authenticatorClientPIN responseData is null")
+            throw ResponseDataValidationException(RESPONSE_DATA_NULL_MESSAGE)
         }
         if (getKeyAgreementResponse.responseData.keyAgreement == null) {
-            throw ResponseDataValidationException("authenticatorClientPIN responseData.keyAgreement is null")
+            throw ResponseDataValidationException(KEY_AGREEMENT_NULL_MESSAGE)
         }
         val authenticatorKeyAgreementKey = getKeyAgreementResponse.responseData.keyAgreement
         val sharedSecret = MessageDigestUtil.createSHA256().digest(
@@ -361,7 +384,7 @@ class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
             )
         )
         if (getPINTokenResponse.responseData == null) {
-            throw ResponseDataValidationException("authenticatorClientPIN responseData is null")
+            throw ResponseDataValidationException(RESPONSE_DATA_NULL_MESSAGE)
         }
         if (getPINTokenResponse.responseData.pinToken == null) {
             throw ResponseDataValidationException("authenticatorClientPIN responseData.pinToken is null")
@@ -398,24 +421,4 @@ class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
         }
     }
 
-    companion object {
-        private val ZERO_IV = byteArrayOf(
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00,
-            0x00
-        )
-    }
 }
