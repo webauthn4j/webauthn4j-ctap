@@ -15,8 +15,6 @@ import com.webauthn4j.ctap.authenticator.store.*
 import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialParameters
-import com.webauthn4j.data.PublicKeyCredentialRpEntity
-import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import com.webauthn4j.data.attestation.authenticator.AttestedCredentialData
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData
 import com.webauthn4j.data.attestation.authenticator.COSEKey
@@ -123,7 +121,7 @@ internal class MakeCredentialExecution :
         execStep6ValidateClientPin()
         execStep7ValidatePinProtocol()
         execStep8RequestUserConsent()
-        val response = execStep9_11GenerateAttestedCredential()
+        val response = execStep9to11GenerateAttestedCredential()
         val event = MakeCredentialEvent(
             Instant.now(),
             rpId,
@@ -318,7 +316,7 @@ internal class MakeCredentialExecution :
     //spec| - Store the user parameter along the newly-created key pair.
     //spec| - If authenticator does not have enough internal storage to persist the new credential, return CTAP2_ERR_KEY_STORE_FULL.
     //spec| Generate an attestation statement for the newly-created key using clientDataHash.
-    private suspend fun execStep9_11GenerateAttestedCredential(): AuthenticatorMakeCredentialResponse {
+    private suspend fun execStep9to11GenerateAttestedCredential(): AuthenticatorMakeCredentialResponse {
         val userCredential = createUserCredential()
         val rpIdHash = MessageDigestUtil.createSHA256().digest(rpId!!.toByteArray())
         val alg = algorithmIdentifier

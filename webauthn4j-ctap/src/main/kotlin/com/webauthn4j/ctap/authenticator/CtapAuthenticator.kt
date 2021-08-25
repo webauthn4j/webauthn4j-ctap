@@ -158,10 +158,6 @@ class CtapAuthenticator @JvmOverloads constructor(
         return ResetExecution(this, authenticatorResetCommand).execute()
     }
 
-    suspend fun cancel() {
-        TODO("Not yet implemented")
-    }
-
     fun registerEventListener(eventListener: EventListener) {
         eventListeners.add(eventListener)
     }
