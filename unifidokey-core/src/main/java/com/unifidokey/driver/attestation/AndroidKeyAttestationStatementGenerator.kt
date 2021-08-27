@@ -22,7 +22,7 @@ class AndroidKeyAttestationStatementGenerator(objectConverter: ObjectConverter) 
         val authenticatorDataBytes = authenticatorDataConverter.convert(authenticatorData)
         val signedData = ByteBuffer.allocate(authenticatorDataBytes.size + clientDataHash.size)
             .put(authenticatorDataBytes).put(clientDataHash).array()
-        val alg = attestationStatementRequest.algorithmIdentifier
+        val alg = attestationStatementRequest.alg
         require(supports(attestationStatementRequest.credentialKey)) { "provided userCredentialKey is not supported." }
         val keyStoreResidentUserCredentialKey =
             attestationStatementRequest.credentialKey as KeyStoreResidentCredentialKey

@@ -132,8 +132,7 @@ class PasswordlessTestCase : IntegrationTestCaseBase() {
         )
 
         // Relying Party Server validate the credential for registration
-        step4Result =
-            relyingParty.webAuthnManager.validate(authenticationRequest, authenticationParameters)
+        step4Result = relyingParty.webAuthnManager.validate(authenticationRequest, authenticationParameters)
         return step4Result
     }
 }

@@ -13,7 +13,7 @@ import java.security.interfaces.RSAPublicKey
 
 class AttestationStatementRequest(
     rpIdHash: ByteArray?,
-    algorithmIdentifier: COSEAlgorithmIdentifier,
+    alg: COSEAlgorithmIdentifier,
     credentialId: ByteArray?,
     clientDataHash: ByteArray?,
     residentKey: Boolean,
@@ -24,18 +24,18 @@ class AttestationStatementRequest(
 
     val rpIdHash: ByteArray
         get() = ArrayUtil.clone(field)
-    val algorithmIdentifier: COSEAlgorithmIdentifier
+    val alg: COSEAlgorithmIdentifier
     val credentialId: ByteArray
         get() = ArrayUtil.clone(field)
     val clientDataHash: ByteArray
         get() = ArrayUtil.clone(field)
     val residentKey: Boolean
-    private val authenticatorDataProvider: AuthenticatorDataProvider
     val credentialKey: CredentialKey
+    private val authenticatorDataProvider: AuthenticatorDataProvider
 
     init {
         this.rpIdHash = ArrayUtil.clone(rpIdHash)
-        this.algorithmIdentifier = algorithmIdentifier
+        this.alg = alg
         this.credentialId = ArrayUtil.clone(credentialId)
         this.clientDataHash = ArrayUtil.clone(clientDataHash)
         this.residentKey = residentKey
@@ -49,14 +49,18 @@ class AttestationStatementRequest(
             val keyPair =
                 credentialKey.keyPair ?: throw IllegalStateException("keyPair must not be null")
             keyPair.let {
-                val alg = it.public.algorithm
-                credentialPublicKey = when (alg) {
-                    "EC" -> EC2COSEKey.create((it.public as ECPublicKey), algorithmIdentifier)
-                    "RSA" -> RSACOSEKey.create((it.public as RSAPublicKey), algorithmIdentifier)
+                val keyAlgorithm = it.public.algorithm
+                credentialPublicKey = when (keyAlgorithm) {
+                    "EC" -> EC2COSEKey.create((it.public as ECPublicKey),
+                        COSEAlgorithmIdentifier.create(this.credentialKey.alg!!)
+                    )
+                    "RSA" -> RSACOSEKey.create((it.public as RSAPublicKey),
+                        COSEAlgorithmIdentifier.create(this.credentialKey.alg!!)
+                    )
                     else -> throw IllegalArgumentException(
                         String.format(
                             "algorithm %s of userCredentialKey is not supported.",
-                            alg
+                            keyAlgorithm
                         )
                     )
                 }

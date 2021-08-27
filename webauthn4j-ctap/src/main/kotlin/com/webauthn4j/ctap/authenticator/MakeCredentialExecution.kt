@@ -323,7 +323,7 @@ internal class MakeCredentialExecution :
     private suspend fun execStep9to11GenerateAttestedCredential(): AuthenticatorMakeCredentialResponse {
         val userCredential = createUserCredential()
         val rpIdHash = MessageDigestUtil.createSHA256().digest(rpId!!.toByteArray())
-        val alg = algorithmIdentifier
+        val alg = COSEAlgorithmIdentifier.ES256 // Attestation statement is fixed to ES256 for now
         val authenticatorDataProvider: AttestationStatementRequest.AuthenticatorDataProvider =
             object : AttestationStatementRequest.AuthenticatorDataProvider {
                 override fun provide(

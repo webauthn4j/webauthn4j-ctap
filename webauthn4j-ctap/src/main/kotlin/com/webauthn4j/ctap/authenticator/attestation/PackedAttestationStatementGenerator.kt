@@ -3,7 +3,6 @@ package com.webauthn4j.ctap.authenticator.attestation
 import com.webauthn4j.converter.AuthenticatorDataConverter
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.SignatureCalculator.calculate
-import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData
 import com.webauthn4j.data.attestation.statement.AttestationCertificatePath
@@ -62,7 +61,7 @@ class PackedAttestationStatementGenerator : AttestationStatementGenerator {
         val clientDataHash = attestationStatementRequest.clientDataHash
         val signedData = ByteBuffer.allocate(authenticatorDataBytes.size + clientDataHash.size)
             .put(authenticatorDataBytes).put(clientDataHash).array()
-        val alg: COSEAlgorithmIdentifier = attestationStatementRequest.algorithmIdentifier
+        val alg: COSEAlgorithmIdentifier = attestationStatementRequest.alg
         val sig = calculate(
             alg.toSignatureAlgorithm(),
             attestationPrivateKey,
