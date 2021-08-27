@@ -87,6 +87,7 @@ class CtapAuthenticator @JvmOverloads constructor(
     var onGoingGetAssertionSession: GetAssertionSession? = null
     var userConsentHandler: UserConsentHandler = DefaultUserConsentHandler()
     var credentialSelectionHandler: CredentialSelectionHandler = DefaultCredentialSelectionHandler()
+    var winkHandler: WinkHandler = DefaultWinkHandler()
     var eventListeners: MutableList<EventListener> = mutableListOf()
     var exceptionReporters: MutableList<ExceptionReporter> = mutableListOf()
 
@@ -158,6 +159,11 @@ class CtapAuthenticator @JvmOverloads constructor(
         return ResetExecution(this, authenticatorResetCommand).execute()
     }
 
+    suspend fun wink() {
+        winkHandler.wink()
+    }
+
+
     fun registerEventListener(eventListener: EventListener) {
         eventListeners.add(eventListener)
     }
@@ -182,6 +188,7 @@ class CtapAuthenticator @JvmOverloads constructor(
         exceptionReporters.forEach{ it.report(exception) }
     }
 
+
     private class DefaultUserConsentHandler : UserConsentHandler {
         override suspend fun consentMakeCredential(options: MakeCredentialConsentOptions): Boolean {
             return true
@@ -196,6 +203,16 @@ class CtapAuthenticator @JvmOverloads constructor(
         override suspend fun select(list: List<Credential>): Credential {
             return list.first()
         }
+    }
+
+    private class DefaultWinkHandler : WinkHandler {
+
+        private val logger = LoggerFactory.getLogger(DefaultWinkHandler::class.java)
+
+        override suspend fun wink() {
+            logger.debug("wink requested")
+        }
+
     }
 
 }

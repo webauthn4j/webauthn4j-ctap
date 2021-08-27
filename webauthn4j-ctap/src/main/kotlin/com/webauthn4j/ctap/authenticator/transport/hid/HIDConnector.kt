@@ -14,7 +14,6 @@ import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import com.webauthn4j.util.HexUtil
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
-import java.util.concurrent.Executors
 import kotlin.experimental.or
 
 class HIDConnector(
@@ -287,15 +286,15 @@ class HIDConnector(
             transactionManager.cancelOnGoingTransaction()
         }
 
-        private fun handleWink(
+        private suspend fun handleWink(
             hidMessage: HIDWINKRequestMessage,
             responseCallback: ResponseCallback<HIDWINKResponseMessage>
         ) {
-            //TODO: wink
+            transactionManager.ctapAuthenticator.wink()
             responseCallback.onResponse(HIDWINKResponseMessage(hidMessage.channelId))
         }
 
-        private suspend fun handleLock(
+        private fun handleLock(
             hidMessage: HIDLOCKRequestMessage,
             responseCallback: ResponseCallback<HIDLOCKResponseMessage>
         ) {

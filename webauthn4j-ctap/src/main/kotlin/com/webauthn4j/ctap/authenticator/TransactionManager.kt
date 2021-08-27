@@ -39,9 +39,11 @@ open class TransactionManager(ctapAuthenticator: CtapAuthenticator = CtapAuthent
         transaction?.cancel()
     }
 
-    suspend fun lock(timeMillis: Long) {
-        withContext(authenticatorWorker){
-            delay(timeMillis)
+    fun lock(timeMillis: Long) {
+        runBlocking {
+            CoroutineScope(authenticatorWorker).launch {
+                delay(timeMillis)
+            }.join()
         }
     }
 
