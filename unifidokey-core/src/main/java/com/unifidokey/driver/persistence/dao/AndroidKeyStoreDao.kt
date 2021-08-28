@@ -2,6 +2,7 @@ package com.unifidokey.driver.persistence.dao
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.util.exception.UnexpectedCheckedException
 import java.io.IOException
 import java.security.*
@@ -42,7 +43,7 @@ class AndroidKeyStoreDao : KeyStoreDaoBase(createKeyStore(), "") {
         alias: String,
         algorithm: String,
         algorithmParameterSpec: AlgorithmParameterSpec?,
-        digest: String,
+        signatureAlgorithm: SignatureAlgorithm,
         attestationChallenge: ByteArray?
     ) {
         try {
@@ -51,8 +52,8 @@ class AndroidKeyStoreDao : KeyStoreDaoBase(createKeyStore(), "") {
                 alias,
                 KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
             )
-                .setDigests(digest)
-                .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1) //TODO: PSS対応
+                .setDigests(signatureAlgorithm.messageDigestAlgorithm.jcaName)
+                .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1) //TODO: support PSS alg
                 .setAttestationChallenge(attestationChallenge)
             if (algorithmParameterSpec != null) {
                 builder.setAlgorithmParameterSpec(algorithmParameterSpec)

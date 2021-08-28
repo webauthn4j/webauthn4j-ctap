@@ -2,6 +2,7 @@ package com.unifidokey.driver.persistence.dao
 
 import android.security.keystore.KeyProperties
 import com.webauthn4j.data.SignatureAlgorithm
+import com.webauthn4j.data.SignatureAlgorithm.*
 import com.webauthn4j.data.attestation.statement.AttestationCertificatePath
 import com.webauthn4j.util.exception.UnexpectedCheckedException
 import java.security.*
@@ -162,54 +163,33 @@ abstract class KeyStoreDaoBase protected constructor(
         alg: SignatureAlgorithm,
         attestationChallenge: ByteArray?
     ) {
-        when (alg) {
-            SignatureAlgorithm.ES256 -> createKeyPair(
+        when {
+            alg == ES256 -> createKeyPair(
                 alias,
                 KeyProperties.KEY_ALGORITHM_EC,
                 ECGenParameterSpec("secp256r1"),
-                KeyProperties.DIGEST_SHA256,
+                alg,
                 attestationChallenge
             )
-            SignatureAlgorithm.ES384 -> createKeyPair(
+            alg == ES384 -> createKeyPair(
                 alias,
                 KeyProperties.KEY_ALGORITHM_EC,
                 ECGenParameterSpec("secp384r1"),
-                KeyProperties.DIGEST_SHA384,
+                alg,
                 attestationChallenge
             )
-            SignatureAlgorithm.ES512 -> createKeyPair(
+            alg == ES512 -> createKeyPair(
                 alias,
                 KeyProperties.KEY_ALGORITHM_EC,
                 ECGenParameterSpec("secp521r1"),
-                KeyProperties.DIGEST_SHA512,
+                alg,
                 attestationChallenge
             )
-            SignatureAlgorithm.RS1 -> createKeyPair(
+            setOf(RS1, RS256, RS384, RS512).contains(alg) -> createKeyPair(
                 alias,
                 KeyProperties.KEY_ALGORITHM_RSA,
                 null,
-                KeyProperties.DIGEST_SHA1,
-                attestationChallenge
-            )
-            SignatureAlgorithm.RS256 -> createKeyPair(
-                alias,
-                KeyProperties.KEY_ALGORITHM_RSA,
-                null,
-                KeyProperties.DIGEST_SHA256,
-                attestationChallenge
-            )
-            SignatureAlgorithm.RS384 -> createKeyPair(
-                alias,
-                KeyProperties.KEY_ALGORITHM_RSA,
-                null,
-                KeyProperties.DIGEST_SHA384,
-                attestationChallenge
-            )
-            SignatureAlgorithm.RS512 -> createKeyPair(
-                alias,
-                KeyProperties.KEY_ALGORITHM_RSA,
-                null,
-                KeyProperties.DIGEST_SHA512,
+                alg,
                 attestationChallenge
             )
             else -> throw IllegalArgumentException(
@@ -227,7 +207,7 @@ abstract class KeyStoreDaoBase protected constructor(
         alias: String,
         algorithm: String,
         algorithmParameterSpec: AlgorithmParameterSpec?,
-        digest: String,
+        signatureAlgorithm: SignatureAlgorithm,
         attestationChallenge: ByteArray?
     )
 

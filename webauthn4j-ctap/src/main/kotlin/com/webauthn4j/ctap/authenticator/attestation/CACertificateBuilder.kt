@@ -1,5 +1,6 @@
 package com.webauthn4j.ctap.authenticator.attestation
 
+import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.util.exception.UnexpectedCheckedException
 import org.bouncycastle.asn1.x509.BasicConstraints
 import org.bouncycastle.asn1.x509.Extension
@@ -22,7 +23,8 @@ open class CACertificateBuilder internal constructor(
     private val subjectDN: String,
     private val publicKey: PublicKey,
     private val issuerDN: String,
-    private val issuerPrivateKey: PrivateKey
+    private val issuerPrivateKey: PrivateKey,
+    private val signatureAlgorithm: SignatureAlgorithm
 ) {
 
     private var notBefore = Instant.parse("2000-01-01T00:00:00Z")
@@ -52,7 +54,7 @@ open class CACertificateBuilder internal constructor(
                 BasicConstraints(true)
             )
             val contentSigner =
-                JcaContentSignerBuilder("SHA256withECDSA").build(issuerPrivateKey) //TODO: revisit algorithm
+                JcaContentSignerBuilder(signatureAlgorithm.jcaName).build(issuerPrivateKey)
             val certificateHolder = certificateBuilder.build(contentSigner)
             JcaX509CertificateConverter().getCertificate(certificateHolder)
         } catch (e: CertificateException) {

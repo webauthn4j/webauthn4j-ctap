@@ -254,13 +254,13 @@ class HIDConnector(
                         val keepAliveMessage = HIDKEEPALIVEResponseMessage(
                             hidMessage.channelId,
                             HIDStatusCode.PROCESSING
-                        ) //TODO:StatusCodeを正しく返却できるように
+                        ) //TODO: provide HIDStatusCode on context
                         responseCallback.onResponse(keepAliveMessage)
                         delay(KEEPALIVE_INTERVAL)
                     }
                 }
                 val ctapCommand = ctapRequestConverter.convert(hidMessage.data)
-                var ctapResponse: CtapResponse = transactionManager.invokeCommand(ctapCommand)
+                val ctapResponse: CtapResponse = transactionManager.invokeCommand(ctapCommand)
                 val cbor = ctapResponseConverter.convertToResponseDataBytes(ctapResponse)
                 val responseMessage =
                     HIDCBORResponseMessage(hidMessage.channelId, ctapResponse.statusCode, cbor)

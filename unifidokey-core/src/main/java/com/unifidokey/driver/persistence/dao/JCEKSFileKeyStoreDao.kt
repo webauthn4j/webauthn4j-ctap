@@ -3,6 +3,7 @@ package com.unifidokey.driver.persistence.dao
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import com.webauthn4j.ctap.authenticator.attestation.RootCACertificateBuilder
+import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.util.exception.UnexpectedCheckedException
 import java.io.FileInputStream
 import java.io.IOException
@@ -44,7 +45,7 @@ class JCEKSFileKeyStoreDao : KeyStoreDaoBase {
         alias: String,
         algorithm: String,
         algorithmParameterSpec: AlgorithmParameterSpec?,
-        digest: String,
+        signatureAlgorithm: SignatureAlgorithm,
         attestationChallenge: ByteArray?
     ) {
         try {
@@ -53,7 +54,7 @@ class JCEKSFileKeyStoreDao : KeyStoreDaoBase {
                 alias,
                 KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
             )
-                .setDigests(digest)
+                .setDigests(signatureAlgorithm.messageDigestAlgorithm.jcaName)
                 .setAttestationChallenge(attestationChallenge)
             if (algorithmParameterSpec != null) {
                 builder.setAlgorithmParameterSpec(algorithmParameterSpec)
@@ -61,7 +62,7 @@ class JCEKSFileKeyStoreDao : KeyStoreDaoBase {
             keyPairGenerator.initialize(builder.build())
             val keyPair = keyPairGenerator.generateKeyPair()
             val certificates = arrayOfNulls<Certificate>(1)
-            certificates[0] = generateSelfSignedCertificate(keyPair)
+            certificates[0] = generateSelfSignedCertificate(keyPair, signatureAlgorithm)
             keyStore.setKeyEntry(alias, keyPair.private, password!!.toCharArray(), certificates)
         } catch (e: NoSuchAlgorithmException) {
             throw UnexpectedCheckedException(e)
@@ -72,11 +73,12 @@ class JCEKSFileKeyStoreDao : KeyStoreDaoBase {
         }
     }
 
-    private fun generateSelfSignedCertificate(keyPair: KeyPair): X509Certificate {
+    private fun generateSelfSignedCertificate(keyPair: KeyPair, signatureAlgorithm: SignatureAlgorithm): X509Certificate {
         val rootCACertificateBuilder = RootCACertificateBuilder(
             "CN=UnifidoKeyKeystoreKey,O=WebAuthn4J Project,C=US",
             keyPair.public,
-            keyPair.private
+            keyPair.private,
+            signatureAlgorithm
         )
         //TODO: add attestationChallenge extension
         return rootCACertificateBuilder.build()

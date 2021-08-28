@@ -3,6 +3,7 @@ package com.webauthn4j.ctap.authenticator.attestation
 import com.webauthn4j.converter.AuthenticatorDataConverter
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.SignatureCalculator.calculate
+import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData
 import com.webauthn4j.data.attestation.statement.AttestationCertificatePath
@@ -15,6 +16,7 @@ import java.security.PrivateKey
 import java.security.PublicKey
 import java.security.cert.X509Certificate
 import java.util.function.Function
+import kotlin.math.sign
 
 class PackedAttestationStatementGenerator : AttestationStatementGenerator {
 
@@ -36,6 +38,7 @@ class PackedAttestationStatementGenerator : AttestationStatementGenerator {
         subjectDN: String,
         attestationKeyPair: KeyPair,
         issuerPrivateKey: PrivateKey,
+        signatureAlgorithm: SignatureAlgorithm,
         caCertificates: List<X509Certificate>,
         objectConverter: ObjectConverter
     ) {
@@ -47,6 +50,7 @@ class PackedAttestationStatementGenerator : AttestationStatementGenerator {
                 attestationPublicKey,
                 caCertificates.first().subjectDN.name,
                 issuerPrivateKey,
+                signatureAlgorithm,
                 aaguid
             )
             AttestationCertificatePath(attestationCertificate, caCertificates)
@@ -80,6 +84,7 @@ class PackedAttestationStatementGenerator : AttestationStatementGenerator {
         attestationPublicKey: PublicKey,
         issuerDN: String,
         issuerPrivateKey: PrivateKey,
+        signatureAlgorithm: SignatureAlgorithm,
         aaguid: AAGUID?
     ): X509Certificate {
         val builder = AttestationCertificateBuilder(
@@ -87,6 +92,7 @@ class PackedAttestationStatementGenerator : AttestationStatementGenerator {
             attestationPublicKey,
             issuerDN,
             issuerPrivateKey,
+            signatureAlgorithm,
             aaguid!!
         )
         return builder.build()
@@ -105,6 +111,7 @@ class PackedAttestationStatementGenerator : AttestationStatementGenerator {
                     DemoAttestationConstants.DEMO_ATTESTATION_PRIVATE_KEY
                 ),
                 DemoAttestationConstants.DEMO_INTERMEDIATE_CA_PRIVATE_KEY,
+                SignatureAlgorithm.ES256,
                 listOf(DemoAttestationConstants.DEMO_INTERMEDIATE_CA_CERTIFICATE),
                 ObjectConverter()
             )

@@ -15,6 +15,7 @@
  */
 package com.webauthn4j.ctap.authenticator.attestation
 
+import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import com.webauthn4j.util.exception.UnexpectedCheckedException
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
@@ -41,6 +42,7 @@ class AttestationCertificateBuilder internal constructor(
     private val publicKey: PublicKey,
     private val issuerDN: String,
     private val issuerPrivateKey: PrivateKey,
+    private val signatureAlgorithm: SignatureAlgorithm,
     private val aaguid: AAGUID
 ) {
 
@@ -76,7 +78,7 @@ class AttestationCertificateBuilder internal constructor(
                 BasicConstraints(false)
             )
             val contentSigner =
-                JcaContentSignerBuilder("SHA256withECDSA").build(issuerPrivateKey) //TODO: revisit algorithm
+                JcaContentSignerBuilder(signatureAlgorithm.jcaName).build(issuerPrivateKey)
             val certificateHolder = certificateBuilder.build(contentSigner)
             JcaX509CertificateConverter().getCertificate(certificateHolder)
         } catch (e: CertificateException) {

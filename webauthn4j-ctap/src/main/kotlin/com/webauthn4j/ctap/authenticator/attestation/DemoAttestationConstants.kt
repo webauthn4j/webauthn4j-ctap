@@ -1,5 +1,6 @@
 package com.webauthn4j.ctap.authenticator.attestation
 
+import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.util.exception.UnexpectedCheckedException
 import java.security.KeyFactory
 import java.security.NoSuchAlgorithmException
@@ -46,13 +47,15 @@ object DemoAttestationConstants {
         DEMO_ROOT_CA_CERTIFICATE = RootCACertificateBuilder(
             DEMO_ROOT_CA_NAME,
             DEMO_ROOT_CA_PUBLIC_KEY,
-            DEMO_ROOT_CA_PRIVATE_KEY
+            DEMO_ROOT_CA_PRIVATE_KEY,
+            SignatureAlgorithm.ES256
         ).build()
         DEMO_INTERMEDIATE_CA_CERTIFICATE = CACertificateBuilder(
             DEMO_INTERMEDIATE_CA_NAME,
             DEMO_INTERMEDIATE_CA_PUBLIC_KEY,
             DEMO_ROOT_CA_NAME,
-            DEMO_ROOT_CA_PRIVATE_KEY
+            DEMO_ROOT_CA_PRIVATE_KEY,
+            SignatureAlgorithm.ES256
         ).build()
     }
 
