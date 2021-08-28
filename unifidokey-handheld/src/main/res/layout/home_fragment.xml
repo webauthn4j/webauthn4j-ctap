@@ -234,7 +234,7 @@
                             android:id="@+id/bthid_pairing_button"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Pairing" />
+                            android:text="@string/button_text_pairing" />
 
                         <com.google.android.material.button.MaterialButton
                             style="?attr/borderlessButtonStyle"

@@ -91,7 +91,7 @@ class HIDConnector(
         return lastAllocatedChannelId
     }
 
-    private inner class HIDChannel(private val channelId: HIDChannelId) {
+    private inner class HIDChannel(channelId: HIDChannelId) {
 
         private val hidRequestMessageBuilder = HIDRequestMessageBuilder()
 
@@ -206,7 +206,7 @@ class HIDConnector(
             activeRequest = hidMessage
         }
 
-        private suspend fun handleInit(
+        private fun handleInit(
             hidMessage: HIDINITRequestMessage,
             responseCallback: ResponseCallback<HIDResponseMessage>
         ) {
@@ -269,7 +269,7 @@ class HIDConnector(
             }
         }
 
-        private suspend fun handlePing(
+        private fun handlePing(
             hidMessage: HIDPINGRequestMessage,
             responseCallback: ResponseCallback<HIDResponseMessage>
         ) {
@@ -282,7 +282,7 @@ class HIDConnector(
         }
 
         @Suppress("UNUSED_PARAMETER")
-        private suspend fun handleCancel(hidMessage: HIDCANCELRequestMessage) {
+        private fun handleCancel(hidMessage: HIDCANCELRequestMessage) {
             transactionManager.cancelOnGoingTransaction()
         }
 

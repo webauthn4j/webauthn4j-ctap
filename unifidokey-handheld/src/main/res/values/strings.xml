@@ -3,9 +3,6 @@
     <!-- common -->
 
     <string name="app_name">UnifidoKey</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
     <string name="aid_description">FIDO CTAP2 NFC</string>
 
     <string name="hint_service">Service</string>
@@ -53,20 +50,18 @@
 
     <string name="title_nfc">NFC</string>
     <string name="title_bluetooth_hid">Bluetooth HID</string>
+    <string name="button_text_pairing">Pairing</string>
     <string name="title_recent_history">Recent History</string>
     <string name="button_text_more">More</string>
     <string name="checkbox_text_background">Stay Background</string>
-    <string name="snackbar_text_connect_from_your_device">Connect from your device</string>
 
     <!-- credential list fragment -->
     <string name="menu_search">Search</string>
-    <string name="menu_pairing">Pairing</string>
 
     <string name="desc_registration_instruction">To register a new credential, connect your smartphone to your PC with Bluetooth or tap your smartphone to the NFC reader when a service request it.</string>
 
     <!-- credential details fragment -->
 
-    <string name="action_delete">Delete</string>
     <string name="menu_delete">Delete</string>
 
 
@@ -82,7 +77,6 @@
     <string name="title_ble_support">BLE</string>
     <string name="title_bthid_support">Bluetooth HID</string>
     <string name="title_bthid_pairing">Bluetooth HID Pairing</string>
-    <string name="title_bthid_connected_device">Bluetooth HID connected device</string>
 
     <string name="summary_nfc_support_disabled">NFC transport is not available</string>
     <string name="summary_nfc_support_on">NFC transport is ON</string>
@@ -96,7 +90,6 @@
 
     <string name="summary_bthid_pairing">Start Bluetooth HID Pairing</string>
 
-    <string name="message_ble_pairing">BLE Pairing is in progress.</string>
 
     <string name="header_consent">Consent</string>
     <string name="title_client_pin">ClientPIN</string>
@@ -131,9 +124,6 @@
 
 
     <string name="relying_party_icon">Relying Party Icon</string>
-
-
-    <string name="cancel">Cancel</string>
 
     <!-- Consent Activity -->
     <string name="desc_logo">logo</string>

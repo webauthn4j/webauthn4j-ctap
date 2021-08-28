@@ -64,14 +64,13 @@ class U2FAPDUProcessor(
                 return ResponseAPDU.createErrorResponseAPDU()
             }
             val u2fRegistrationRequest: U2FRegistrationRequest = U2FRegistrationRequest.createFromCommandAPDU(command)
-            try{
+            return try{
                 val u2fRegistrationResponse: U2FRegistrationResponse = transactionManager.invokeCommand(u2fRegistrationRequest)
                 u2fResponseQueue.initialize(u2fRegistrationResponse.toBytes())
-                return u2fResponseQueue.poll(command)
-            }
-            catch (e: U2FCommandExecutionException){
+                u2fResponseQueue.poll(command)
+            } catch (e: U2FCommandExecutionException){
                 logger.error("U2F registration failed", e)
-                return ResponseAPDU(e.statusCode.sw1, e.statusCode.sw2)
+                ResponseAPDU(e.statusCode.sw1, e.statusCode.sw2)
             }
         }
     }
@@ -92,14 +91,13 @@ class U2FAPDUProcessor(
                 return ResponseAPDU.createErrorResponseAPDU()
             }
             val u2fAuthenticationRequest: U2FAuthenticationRequest = U2FAuthenticationRequest.createFromCommandAPDU(command)
-            try{
+            return try{
                 val u2fAuthenticationResponse: U2FAuthenticationResponse = transactionManager.invokeCommand(u2fAuthenticationRequest)
                 u2fResponseQueue.initialize(u2fAuthenticationResponse.toBytes())
-                return u2fResponseQueue.poll(command)
-            }
-            catch (e: U2FCommandExecutionException){
+                u2fResponseQueue.poll(command)
+            } catch (e: U2FCommandExecutionException){
                 logger.error("U2F authentication failed", e)
-                return ResponseAPDU(e.statusCode.sw1, e.statusCode.sw2)
+                ResponseAPDU(e.statusCode.sw1, e.statusCode.sw2)
             }
         }
     }

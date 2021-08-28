@@ -50,7 +50,6 @@ class CtapRequestConverter(objectConverter: ObjectConverter) {
      * @param source the source object to convert
      * @return concatenation of a command byte and a request data
      */
-    @ExperimentalUnsignedTypes
     fun convertToBytes(source: CtapRequest): ByteArray {
         val command = source.command.value
         val requestDataBytes = convertToRequestDataBytes(source)

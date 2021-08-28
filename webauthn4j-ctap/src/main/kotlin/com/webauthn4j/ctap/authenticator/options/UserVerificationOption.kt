@@ -3,8 +3,7 @@ package com.webauthn4j.ctap.authenticator.options
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue
 
-data class UserVerificationOption private constructor(@get:JsonValue val value: Boolean) {
-
+data class UserVerificationOption constructor(@get:JsonValue val value: Boolean) {
 
     companion object {
         @JvmField

@@ -1,5 +1,3 @@
-import org.asciidoctor.gradle.jvm.AsciidoctorTask
-
 /*
  * Copyright 2018 the original author or authors.
  *
@@ -208,6 +206,8 @@ subprojects {
 //task clean(type: Delete) {
 //    delete rootProject.buildDir
 //}
+
+import org.asciidoctor.gradle.jvm.AsciidoctorTask
 
 task generateUserGuideJA(type: AsciidoctorTask) {
     group = "documentation"

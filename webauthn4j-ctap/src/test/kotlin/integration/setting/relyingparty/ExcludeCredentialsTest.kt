@@ -3,7 +3,6 @@ package integration.setting.relyingparty
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
 import com.webauthn4j.ctap.authenticator.settings.CredentialSelectorSetting
 import com.webauthn4j.ctap.authenticator.store.Credential
-import com.webauthn4j.ctap.authenticator.store.UserCredential
 import com.webauthn4j.ctap.client.exception.CtapErrorException
 import com.webauthn4j.data.*
 import com.webauthn4j.data.extension.client.RegistrationExtensionClientOutput
@@ -11,7 +10,6 @@ import integration.usecase.testcase.PasswordlessTestCase
 import kotlinx.coroutines.test.runBlockingTest
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
-import java.io.Serializable
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class ExcludeCredentialsTest {

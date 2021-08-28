@@ -47,6 +47,7 @@ class FIDOU2FAttestationStatementGenerator(
         return generate(request)
     }
 
+    @Suppress("RedundantSuspendModifier")
     suspend fun generate(attestationStatementRequest: FIDOU2FAttestationStatementRequest): FIDOU2FAttestationStatement {
         val rfu: Byte = 0x00
         val signedData = ByteBuffer.allocate(1 + 32 + 32 + attestationStatementRequest.keyHandle.size + 65)

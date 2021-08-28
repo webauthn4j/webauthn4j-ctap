@@ -91,9 +91,7 @@ class CommandAPDU {
         private const val SHORT_LENGTH_LC_LENGTH = 1
         private const val EXTENDED_LENGTH_LC_LENGTH = 3
 
-        private const val SHORT_LENGTH_LE_LENGTH = 1
         private const val CASE2_EXTENDED_LENGTH_LE_LENGTH = 2
-        private const val EXTENDED_LENGTH_LE_LENGTH = 3
 
         private const val CASE1_APDU_LENGTH = 4
         private const val CASE2_SHORT_APDU_LENGTH = 5

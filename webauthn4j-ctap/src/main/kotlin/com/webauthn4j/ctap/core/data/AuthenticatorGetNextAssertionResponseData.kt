@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
-import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import com.webauthn4j.util.ArrayUtil
 
 @Suppress("CanBePrimaryConstructorProperty")

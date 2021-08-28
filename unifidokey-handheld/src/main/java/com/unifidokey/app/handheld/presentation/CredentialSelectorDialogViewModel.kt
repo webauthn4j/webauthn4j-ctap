@@ -18,8 +18,10 @@ class CredentialSelectorDialogViewModel(application: Application) : AndroidViewM
 
     val service: String?
         get() = rpId
+    @Suppress("MemberVisibilityCanBePrivate")
     val rpId: String?
         get() = credentials.firstOrNull()?.rpId
+    @Suppress("MemberVisibilityCanBePrivate")
     val rpName: String?
         get() = credentials.firstOrNull()?.rpName
 

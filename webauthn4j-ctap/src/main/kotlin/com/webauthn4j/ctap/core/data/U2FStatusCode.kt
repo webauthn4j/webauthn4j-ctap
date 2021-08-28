@@ -4,6 +4,7 @@ import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 
 class U2FStatusCode(val sw1: Byte, val sw2: Byte) {
 
+    @Suppress("MemberVisibilityCanBePrivate")
     companion object {
 
         @JvmField

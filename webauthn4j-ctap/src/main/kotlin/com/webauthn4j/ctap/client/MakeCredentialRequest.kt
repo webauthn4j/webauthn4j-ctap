@@ -2,7 +2,9 @@ package com.webauthn4j.ctap.client
 
 import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
 import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
-import com.webauthn4j.data.*
+import com.webauthn4j.data.AuthenticatorSelectionCriteria
+import com.webauthn4j.data.PublicKeyCredentialDescriptor
+import com.webauthn4j.data.PublicKeyCredentialParameters
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
 import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenticatorInput
 import com.webauthn4j.util.ArrayUtil

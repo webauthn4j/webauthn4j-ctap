@@ -226,12 +226,10 @@ internal class MakeCredentialExecution :
         val inputs = this.registrationExtensionAuthenticatorInputs
         val outputsBuilder = AuthenticationExtensionsAuthenticatorOutputs.BuilderForRegistration()
         if(inputs != null){
-            inputs.extensions.forEach{
-                ctapAuthenticator.extensionProcessors.filterIsInstance<RegistrationExtensionProcessor>().forEach{ processor ->
-                    if(processor.supportsRegistrationExtension(inputs)){
-                        val context = RegistrationExtensionContext(ctapAuthenticator, authenticatorMakeCredentialRequest)
-                        processor.processRegistrationExtension(context, userCredentialBuilder, outputsBuilder)
-                    }
+            ctapAuthenticator.extensionProcessors.filterIsInstance<RegistrationExtensionProcessor>().forEach{ processor ->
+                if(processor.supportsRegistrationExtension(inputs)){
+                    val context = RegistrationExtensionContext(ctapAuthenticator, authenticatorMakeCredentialRequest)
+                    processor.processRegistrationExtension(context, userCredentialBuilder, outputsBuilder)
                 }
             }
             registrationExtensionAuthenticatorOutputs = outputsBuilder.build()

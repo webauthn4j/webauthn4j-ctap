@@ -3,7 +3,6 @@ package com.unifidokey.driver.transport
 import android.nfc.cardemulation.HostApduService
 import android.os.Bundle
 import androidx.annotation.WorkerThread
-import com.google.android.gms.common.util.concurrent.NamedThreadFactory
 import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.core.service.NFCService
@@ -14,7 +13,6 @@ import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import com.webauthn4j.ctap.core.util.internal.ArrayUtil
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
-import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
 class CtapNFCAndroidService : HostApduService(), CoroutineScope {

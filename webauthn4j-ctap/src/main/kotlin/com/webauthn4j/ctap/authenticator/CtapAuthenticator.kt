@@ -14,14 +14,12 @@ import com.webauthn4j.ctap.authenticator.settings.*
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.Credential
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
-import com.webauthn4j.ctap.authenticator.store.UserCredential
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
 import com.webauthn4j.ctap.core.converter.jackson.PublicKeyCredentialSourceCBORModule
 import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import org.slf4j.LoggerFactory
-import java.lang.Exception
 
 class CtapAuthenticator @JvmOverloads constructor(
     // Core logic delegates
@@ -36,6 +34,7 @@ class CtapAuthenticator @JvmOverloads constructor(
 ) {
 
 
+    @Suppress("MemberVisibilityCanBePrivate")
     companion object {
         @JvmField
         val AAGUID = AAGUID("33c1642b-b5e9-423d-9add-5a0119c2a8b8")
@@ -124,10 +123,12 @@ class CtapAuthenticator @JvmOverloads constructor(
         return response as TR
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     suspend fun u2fRegister(u2fRegistrationRequest: U2FRegistrationRequest): U2FRegistrationResponse {
         return U2FRegisterExecution(this, u2fRegistrationRequest).execute()
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     suspend fun u2fSign(u2fAuthenticationRequest: U2FAuthenticationRequest): U2FAuthenticationResponse{
         return U2FAuthenticationExecution(this, u2fAuthenticationRequest).execute()
     }

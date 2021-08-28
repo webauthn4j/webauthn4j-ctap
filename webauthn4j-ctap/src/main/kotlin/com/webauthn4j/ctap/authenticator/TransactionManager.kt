@@ -2,7 +2,6 @@ package com.webauthn4j.ctap.authenticator
 
 import com.webauthn4j.ctap.core.data.*
 import kotlinx.coroutines.*
-import kotlin.time.Duration
 
 open class TransactionManager(ctapAuthenticator: CtapAuthenticator = CtapAuthenticator()) {
 

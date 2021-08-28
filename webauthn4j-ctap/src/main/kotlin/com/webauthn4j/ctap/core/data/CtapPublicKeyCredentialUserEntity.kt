@@ -13,11 +13,23 @@ import java.io.Serializable
  * @see [
  * §5.4.3. User Account Parameters for Credential Generation
 ](https://www.w3.org/TR/webauthn-1/.dictdef-publickeycredentialuserentity) */
-class CtapPublicKeyCredentialUserEntity @JsonCreator constructor(
-    @JsonProperty("id") id: ByteArray,
-    @JsonProperty("name") name: String?,
-    @JsonProperty("displayName") displayName: String?
-) : Serializable {
+class CtapPublicKeyCredentialUserEntity : Serializable {
+
+    /**
+     * @param id          id
+     * @param name        name
+     * @param displayName displayName
+     */
+    @JsonCreator
+    constructor(
+        @JsonProperty("id") id: ByteArray,
+        @JsonProperty("name") name: String?,
+        @JsonProperty("displayName") displayName: String?
+    ) {
+        this.id = ArrayUtil.clone(id)
+        this.name = name
+        this.displayName = displayName
+    }
 
     // ~ Instance fields
     // ================================================================================================
@@ -26,16 +38,6 @@ class CtapPublicKeyCredentialUserEntity @JsonCreator constructor(
     val name: String?
     val displayName: String?
 
-    /**
-     * @param id          id
-     * @param name        name
-     * @param displayName displayName
-     */
-    init {
-        this.id = ArrayUtil.clone(id)
-        this.name = name
-        this.displayName = displayName
-    }
 
     override fun toString(): String {
         return "PublicKeyCredentialUserEntity(id=${HexUtil.encodeToString(id)}, displayName=$displayName)"

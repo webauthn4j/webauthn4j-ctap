@@ -3,7 +3,7 @@ package com.webauthn4j.ctap.authenticator.options
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonValue
 
-data class UserPresenceOption private constructor(@get:JsonValue val value: Boolean) {
+data class UserPresenceOption constructor(@get:JsonValue val value: Boolean) {
 
     companion object {
         @JvmField

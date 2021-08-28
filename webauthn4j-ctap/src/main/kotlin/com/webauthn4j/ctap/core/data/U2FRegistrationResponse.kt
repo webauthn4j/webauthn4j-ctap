@@ -9,6 +9,7 @@ import java.security.interfaces.ECPublicKey
 
 class U2FRegistrationResponse : AuthenticatorResponse{
 
+    @Suppress("JoinDeclarationAndAssignment")
     val reservedByte: Byte
     val userPublicKey: ECPublicKey
     val keyHandle: ByteArray

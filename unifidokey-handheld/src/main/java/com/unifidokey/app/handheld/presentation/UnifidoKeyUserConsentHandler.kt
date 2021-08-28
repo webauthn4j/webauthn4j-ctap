@@ -1,10 +1,6 @@
 package com.unifidokey.app.handheld.presentation
 
 import android.content.Context
-import com.unifidokey.app.handheld.presentation.AuthenticationConsentDialogActivityRequest
-import com.unifidokey.app.handheld.presentation.AuthenticationConsentDialogActivityStarter
-import com.unifidokey.app.handheld.presentation.RegistrationConsentDialogActivityRequest
-import com.unifidokey.app.handheld.presentation.RegistrationConsentDialogActivityStarter
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.core.setting.UserConsentSetting
 import com.webauthn4j.ctap.authenticator.GetAssertionConsentOptions

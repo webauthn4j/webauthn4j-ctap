@@ -21,6 +21,7 @@ class U2FAuthenticationRequest : AuthenticatorRequest {
         }
     }
 
+    @Suppress("JoinDeclarationAndAssignment")
     val controlByte: Byte
     val challengeParameter: ByteArray
         get() = ArrayUtil.clone(field)

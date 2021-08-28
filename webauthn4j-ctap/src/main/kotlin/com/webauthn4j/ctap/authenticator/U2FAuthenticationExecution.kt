@@ -61,6 +61,7 @@ class U2FAuthenticationExecution(
             }
         }
 
+        @Suppress("MoveVariableDeclarationIntoWhen")
         val userPresenceResult = requestUserPresence(request.applicationParameter, userPresencePlan)
 
         val userPresence = when(userPresenceResult) {

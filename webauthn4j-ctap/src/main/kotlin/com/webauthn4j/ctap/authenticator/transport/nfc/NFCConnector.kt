@@ -5,7 +5,7 @@ import com.webauthn4j.ctap.authenticator.TransactionManager
 import com.webauthn4j.ctap.authenticator.transport.apdu.CTAPAPDUProcessor
 import com.webauthn4j.ctap.authenticator.transport.apdu.CommandAPDUProcessor
 import com.webauthn4j.ctap.authenticator.transport.apdu.U2FAPDUProcessor
-import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.ctap.core.data.U2FStatusCode
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import org.slf4j.LoggerFactory

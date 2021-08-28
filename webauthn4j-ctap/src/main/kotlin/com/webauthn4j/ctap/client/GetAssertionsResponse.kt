@@ -2,7 +2,6 @@ package com.webauthn4j.ctap.client
 
 import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
-import com.webauthn4j.data.PublicKeyCredentialUserEntity
 
 data class GetAssertionsResponse(val assertions: List<Assertion>) {
 

@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.unifidokey.app.UnifidoKeyApplicationBase
-import com.unifidokey.driver.transport.CtapBTHIDAndroidServiceContextualAdapter
 import org.slf4j.LoggerFactory
 
 class DeviceBootBroadcastReceiver : BroadcastReceiver() {

@@ -3,11 +3,11 @@ package com.webauthn4j.ctap.core.data.hid
 import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.MAX_PACKET_SIZE
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.util.ArrayUtil
-import com.webauthn4j.util.UnsignedNumberUtil
 import java.nio.ByteBuffer
 import kotlin.experimental.or
 
 class HIDInitializationPacket : HIDPacket {
+    @Suppress("JoinDeclarationAndAssignment")
     val command: HIDCommand
     val length: UShort
 

@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication
-import com.unifidokey.core.adapter.CtapBLEAdapter
 import com.unifidokey.core.config.BTHIDDeviceHistoryEntry
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.core.setting.KeepScreenOnSetting

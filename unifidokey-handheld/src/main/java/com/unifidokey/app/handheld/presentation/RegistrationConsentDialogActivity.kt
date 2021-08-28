@@ -77,8 +77,7 @@ class RegistrationConsentDialogActivity : AppCompatActivity(),
         onSuccessHandler: RegistrationConsentDialogViewModel.Callbacks.OnSuccessHandler?,
         onFailureHandler: RegistrationConsentDialogViewModel.Callbacks.OnFailureHandler?
     ) {
-        val rp = viewModel.request.rp
-        val subtitle = when (rp){
+        val subtitle = when (val rp = viewModel.request.rp){
             null -> "Legacy Service(U2F) requires user verification."
             else -> String.format("Service %s (%s) requires user verification.", rp.name, rp.id)
         }

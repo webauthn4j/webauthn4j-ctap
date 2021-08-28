@@ -1,10 +1,6 @@
 package com.webauthn4j.ctap.core.data.hid
 
-import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
-import com.webauthn4j.ctap.core.util.internal.HexUtil
-import com.webauthn4j.util.ArrayUtil
-import java.nio.ByteBuffer
 
 class HIDMSGResponseMessage : HIDResponseMessage, HIDMessageBase {
 

@@ -1,11 +1,8 @@
 package com.webauthn4j.ctap.authenticator
 
 import com.webauthn4j.ctap.authenticator.store.Credential
-import com.webauthn4j.ctap.authenticator.store.UserCredential
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthenticatorOutput
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorOutputs
-import com.webauthn4j.util.MessageDigestUtil
-import java.nio.charset.StandardCharsets
 import java.time.Instant
 
 class GetAssertionSession(
@@ -45,7 +42,6 @@ class GetAssertionSession(
         return GetAssertionSession(assertionObjects, clientDataHash)
     }
 
-    data class AssertionObject(var credential: Credential, var extensions: AuthenticationExtensionsAuthenticatorOutputs<AuthenticationExtensionAuthenticatorOutput>, var flags: Byte) {
-    }
+    data class AssertionObject(var credential: Credential, var extensions: AuthenticationExtensionsAuthenticatorOutputs<AuthenticationExtensionAuthenticatorOutput>, var flags: Byte)
 
 }

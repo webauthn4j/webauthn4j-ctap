@@ -104,12 +104,10 @@ class HMACSecretExtensionProcessor : RegistrationExtensionProcessor,
         //spec| - Two salt case: "hmac-secret": AES256-CBC(sharedSecret, IV=0, output1 (32 bytes) || output2 (32 bytes))
         val secretKey: SecretKey = SecretKeySpec(sharedSecret, "AES")
         val salt = CipherUtil.decryptWithAESCBCNoPadding(saltEnc, secretKey, IV_ZERO)
-        val hmacGetSecret: ByteArray
-        when (salt.size) {
+        val hmacGetSecret = when (salt.size) {
             32 -> {
-                val salt1 = salt
-                val output1 = MACUtil.calculateHmacSHA256(salt1, credRandom)
-                hmacGetSecret = CipherUtil.encryptWithAESCBCNoPadding(output1, secretKey, IV_ZERO)
+                val output1 = MACUtil.calculateHmacSHA256(salt, credRandom)
+                CipherUtil.encryptWithAESCBCNoPadding(output1, secretKey, IV_ZERO)
             }
             64 -> {
                 val salt1 = salt.copyOfRange(0, 32)
@@ -117,7 +115,7 @@ class HMACSecretExtensionProcessor : RegistrationExtensionProcessor,
                 val output1 = MACUtil.calculateHmacSHA256(salt1, credRandom)
                 val output2 = MACUtil.calculateHmacSHA256(salt2, credRandom)
                 val output = output1.plus(output2)
-                hmacGetSecret = CipherUtil.encryptWithAESCBCNoPadding(output, secretKey, IV_ZERO)
+                CipherUtil.encryptWithAESCBCNoPadding(output, secretKey, IV_ZERO)
             }
             else -> TODO("validation should be done at appropriate place")
         }

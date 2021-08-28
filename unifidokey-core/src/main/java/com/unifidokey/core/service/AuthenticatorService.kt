@@ -17,7 +17,6 @@ import com.webauthn4j.ctap.authenticator.extension.HMACSecretExtensionProcessor
 import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import kotlinx.coroutines.runBlocking
-import java.lang.Exception
 
 /**
  * Domain service for authenticator

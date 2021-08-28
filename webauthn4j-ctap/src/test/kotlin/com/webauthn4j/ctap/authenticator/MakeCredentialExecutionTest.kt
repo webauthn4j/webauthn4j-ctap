@@ -20,9 +20,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.mockito.ArgumentMatchers.anyObject
-import org.mockito.kotlin.*
-import javax.crypto.SecretKey
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doThrow
+import org.mockito.kotlin.spy
 
 @ExperimentalCoroutinesApi
 internal class MakeCredentialExecutionTest {

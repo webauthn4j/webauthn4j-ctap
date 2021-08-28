@@ -5,6 +5,4 @@ import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialRequest
 
 class RegistrationExtensionContext(
     val ctapAuthenticator: CtapAuthenticator,
-    val makeCredentialRequest: AuthenticatorMakeCredentialRequest) {
-
-}
+    val makeCredentialRequest: AuthenticatorMakeCredentialRequest)

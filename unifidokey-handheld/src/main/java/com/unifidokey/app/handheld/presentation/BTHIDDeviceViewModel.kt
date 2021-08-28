@@ -1,6 +1,5 @@
 package com.unifidokey.app.handheld.presentation
 
-import android.content.Context
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.LiveData

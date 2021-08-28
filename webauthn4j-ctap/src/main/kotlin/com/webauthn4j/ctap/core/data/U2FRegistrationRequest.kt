@@ -3,7 +3,6 @@ package com.webauthn4j.ctap.core.data
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.util.ArrayUtil
-import java.lang.IllegalArgumentException
 import java.nio.ByteBuffer
 
 class U2FRegistrationRequest : AuthenticatorRequest{

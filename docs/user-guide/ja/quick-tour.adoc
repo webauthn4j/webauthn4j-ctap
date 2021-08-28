@@ -11,7 +11,7 @@ UnifidoKeyをインストールしたスマートフォンにNFC機能が搭載�
 ##### NFC 接続の有効化
 
 UnifidoKeyのNFC transportを有効化した上で、PCのNFCリーダーにUnifidoKeyを置くことで利用可能です。
-リーダーはNFCに対応している必要があります。Felica、MIFAREの読み取りのみに対応したリーダーでは利用することが出来ません。
+リーダーはNFCに対応している必要があります。FeliCa、MIFAREの読み取りのみに対応したリーダーでは利用することが出来ません。
 
 #### Bluetooth HID 接続
 

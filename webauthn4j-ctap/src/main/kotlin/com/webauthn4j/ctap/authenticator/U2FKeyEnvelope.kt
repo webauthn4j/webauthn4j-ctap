@@ -26,6 +26,7 @@ class U2FKeyEnvelope {
         }
     }
 
+    @Suppress("JoinDeclarationAndAssignment")
     val version: UByte
     val keyPair: EC2COSEKey
     val applicationParameter: ByteArray

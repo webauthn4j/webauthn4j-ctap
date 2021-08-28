@@ -17,7 +17,6 @@ import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialType
-import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthenticatorInput
@@ -44,6 +43,7 @@ internal class GetAssertionExecution :
     private val authenticatorPropertyStore: AuthenticatorPropertyStore
 
     //Command properties
+    @Suppress("JoinDeclarationAndAssignment")
     private val authenticatorGetAssertionRequest: AuthenticatorGetAssertionRequest
     private val rpId: String
     private val rpIdHash: ByteArray

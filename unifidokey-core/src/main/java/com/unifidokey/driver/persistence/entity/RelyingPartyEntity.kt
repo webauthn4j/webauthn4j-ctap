@@ -7,7 +7,7 @@ import java.io.Serializable
 data class RelyingPartyEntity(
     @field:PrimaryKey(autoGenerate = true) val sid: Long?, // surrogate id
     val id: String, // rpId
-    @field:ColumnInfo() val name: String?
+    @field:ColumnInfo val name: String?
 ) : Serializable {
 
     @Ignore

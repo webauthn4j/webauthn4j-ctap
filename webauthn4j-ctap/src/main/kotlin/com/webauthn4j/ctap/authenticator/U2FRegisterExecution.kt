@@ -7,10 +7,8 @@ import com.webauthn4j.ctap.core.data.U2FRegistrationResponse
 import com.webauthn4j.ctap.core.data.U2FStatusCode
 import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import com.webauthn4j.data.attestation.authenticator.EC2COSEKey
-import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import com.webauthn4j.util.ECUtil
 import org.slf4j.LoggerFactory
-import java.security.interfaces.ECPrivateKey
 import java.security.interfaces.ECPublicKey
 import java.time.Instant
 

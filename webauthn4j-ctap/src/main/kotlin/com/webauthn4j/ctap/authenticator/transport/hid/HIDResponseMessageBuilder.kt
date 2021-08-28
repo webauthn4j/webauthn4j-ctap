@@ -2,7 +2,6 @@ package com.webauthn4j.ctap.authenticator.transport.hid
 
 import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.ctap.core.data.hid.*
-import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 
 class HIDResponseMessageBuilder : HIDMessageBuilderBase<HIDResponseMessage>() {
     override fun createMessage(

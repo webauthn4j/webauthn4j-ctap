@@ -3,7 +3,10 @@ package com.webauthn4j.ctap.client
 import com.webauthn4j.ctap.client.exception.WebAuthnClientException
 import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
 import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
-import com.webauthn4j.data.*
+import com.webauthn4j.data.AttestationConveyancePreference
+import com.webauthn4j.data.AuthenticatorAttestationResponse
+import com.webauthn4j.data.PublicKeyCredential
+import com.webauthn4j.data.PublicKeyCredentialCreationOptions
 import com.webauthn4j.data.attestation.AttestationObject
 import com.webauthn4j.data.attestation.statement.NoneAttestationStatement
 import com.webauthn4j.data.client.ClientDataType

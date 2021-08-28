@@ -6,7 +6,9 @@ import com.webauthn4j.ctap.authenticator.settings.UserVerificationSetting
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.ResidentUserCredential
 import com.webauthn4j.ctap.core.data.*
-import com.webauthn4j.data.*
+import com.webauthn4j.data.PublicKeyCredentialDescriptor
+import com.webauthn4j.data.PublicKeyCredentialParameters
+import com.webauthn4j.data.PublicKeyCredentialType
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthenticatorInput
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
@@ -18,10 +20,7 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.mockito.Mockito
 import org.mockito.Mockito.mock
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 internal class GetAssertionExecutionTest {

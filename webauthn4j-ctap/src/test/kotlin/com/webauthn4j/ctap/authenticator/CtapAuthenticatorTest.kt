@@ -2,7 +2,9 @@ package com.webauthn4j.ctap.authenticator
 
 import com.webauthn4j.ctap.authenticator.options.*
 import com.webauthn4j.ctap.core.data.*
-import com.webauthn4j.data.*
+import com.webauthn4j.data.PublicKeyCredentialDescriptor
+import com.webauthn4j.data.PublicKeyCredentialParameters
+import com.webauthn4j.data.PublicKeyCredentialType
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthenticatorInput
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs

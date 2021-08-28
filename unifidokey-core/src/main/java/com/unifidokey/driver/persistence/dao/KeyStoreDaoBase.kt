@@ -57,17 +57,17 @@ abstract class KeyStoreDaoBase protected constructor(
     }
 
     override fun findOrCreateDeviceAttestationPrivateKey(): PrivateKey {
-        return findOrCreateKeyPair(ATTESTATION_KEY_ENTRY, SignatureAlgorithm.ES256, null).private
+        return findOrCreateKeyPair(ATTESTATION_KEY_ENTRY, ES256, null).private
     }
 
     override fun findOrCreateIssuerPrivateKey(): PrivateKey {
-        return findOrCreateKeyPair(ISSUER_KEY_ENTRY, SignatureAlgorithm.ES256, null).private
+        return findOrCreateKeyPair(ISSUER_KEY_ENTRY, ES256, null).private
     }
 
     override fun findOrCreateDeviceAttestationCertificatePath(): AttestationCertificatePath {
         return findOrCreateAttestationCertificatePath(
             ATTESTATION_KEY_ENTRY,
-            SignatureAlgorithm.ES256,
+            ES256,
             null
         )
     }

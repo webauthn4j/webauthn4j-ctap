@@ -5,7 +5,6 @@ import com.webauthn4j.ctap.authenticator.store.UserCredential
 import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialType
-import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

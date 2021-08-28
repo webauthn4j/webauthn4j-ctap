@@ -7,7 +7,6 @@ import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementGenerator
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementRequest
 import com.webauthn4j.data.attestation.statement.AndroidSafetyNetAttestationStatement
-import com.webauthn4j.data.attestation.statement.AttestationStatement
 import com.webauthn4j.data.attestation.statement.Response
 import com.webauthn4j.data.jws.JWSFactory
 import com.webauthn4j.util.MessageDigestUtil

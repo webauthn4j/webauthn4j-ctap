@@ -1,9 +1,6 @@
 package com.webauthn4j.ctap.core.data.hid
 
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
-import com.webauthn4j.ctap.core.util.internal.HexUtil
-import com.webauthn4j.util.ArrayUtil
-import java.nio.ByteBuffer
 
 class HIDMSGRequestMessage : HIDRequestMessage, HIDMessageBase {
 

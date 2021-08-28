@@ -2,8 +2,8 @@ package com.webauthn4j.ctap.authenticator
 
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponse
-import com.webauthn4j.ctap.core.data.PinSubCommand
 import com.webauthn4j.ctap.core.data.CtapStatusCode
+import com.webauthn4j.ctap.core.data.PinSubCommand
 import org.slf4j.LoggerFactory
 
 internal class ClientPINExecution(
