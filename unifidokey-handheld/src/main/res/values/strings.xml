@@ -77,6 +77,7 @@
     <string name="title_ble_support">BLE</string>
     <string name="title_bthid_support">Bluetooth HID</string>
     <string name="title_bthid_pairing">Bluetooth HID Pairing</string>
+    <string name="title_bthid_connected_device">Bluetooth HID connected device</string>
 
     <string name="summary_nfc_support_disabled">NFC transport is not available</string>
     <string name="summary_nfc_support_on">NFC transport is ON</string>
