@@ -52,7 +52,7 @@ internal class GetInfoExecution(
                 extensions,
                 ctapAuthenticator.aaguid,
                 AuthenticatorGetInfoResponseData.Options(plat, rk, clientPin, up, uv),
-                2048L,
+                2048u,
                 CtapAuthenticator.PIN_PROTOCOLS
             )
         )

@@ -10,13 +10,13 @@ import com.webauthn4j.util.ArrayUtil
 class AuthenticatorClientPINResponseData @JsonCreator constructor(
     @JsonProperty("1") keyAgreement: COSEKey?,
     @JsonProperty("2") pinToken: ByteArray?,
-    @JsonProperty("3") retries: Long?
+    @JsonProperty("3") retries: UInt?
 ) : CtapResponseData {
 
     val keyAgreement: COSEKey? = keyAgreement
     val pinToken: ByteArray? = pinToken
         get() = ArrayUtil.clone(field)
-    val retries: Long? = retries
+    val retries: UInt? = retries
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

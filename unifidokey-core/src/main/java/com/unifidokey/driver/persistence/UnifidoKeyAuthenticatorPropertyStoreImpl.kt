@@ -203,11 +203,11 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
         }
     }
 
-    override fun loadPINRetries(): Int {
+    override fun loadPINRetries(): UInt {
         return configManager.pinRetries.value
     }
 
-    override fun savePINRetries(pinRetries: Int) {
+    override fun savePINRetries(pinRetries: UInt) {
         runBlocking {
             launch(Dispatchers.Main.immediate){
                 configManager.pinRetries.value = pinRetries

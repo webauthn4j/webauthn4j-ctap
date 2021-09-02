@@ -25,7 +25,7 @@ import javax.crypto.spec.SecretKeySpec
 class ClientPINService(private val authenticatorPropertyStore: AuthenticatorPropertyStore) {
 
     companion object {
-        const val MAX_PIN_RETRIES = 8
+        const val MAX_PIN_RETRIES : UInt = 8u
         const val MAX_VOLATILE_PIN_RETRIES = 3
         private val ZERO_IV = byteArrayOf(
             0x00,
@@ -70,7 +70,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
         //spec| -- subCommand: getRetries(0x01)
         //spec| - Authenticator responds back with retries.
         val pinRetries = authenticatorPropertyStore.loadPINRetries()
-        val responseData = AuthenticatorClientPINResponseData(null, null, pinRetries.toLong())
+        val responseData = AuthenticatorClientPINResponseData(null, null, pinRetries)
         return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_OK, responseData)
     }
 
@@ -133,7 +133,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
         authenticatorPropertyStore.saveClientPIN(trimmedNewPIN)
         val pinRetries = MAX_PIN_RETRIES
         authenticatorPropertyStore.savePINRetries(pinRetries)
-        val responseData = AuthenticatorClientPINResponseData(null, null, pinRetries.toLong())
+        val responseData = AuthenticatorClientPINResponseData(null, null, pinRetries)
         return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_OK, responseData)
     }
 
@@ -149,7 +149,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
             return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_MISSING_PARAMETER)
         }
         //spec| -- If the retries counter is 0, return CTAP2_ERR_PIN_BLOCKED error.
-        if (authenticatorPropertyStore.loadPINRetries() == 0) {
+        if (authenticatorPropertyStore.loadPINRetries() == 0u) {
             return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_BLOCKED)
         } else if (volatilePinRetryCounter == 0) {
             return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_AUTH_BLOCKED)
@@ -168,7 +168,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
             return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
         }
         //spec| -- Authenticator decrements the retries counter by 1.
-        authenticatorPropertyStore.savePINRetries(authenticatorPropertyStore.loadPINRetries() - 1)
+        authenticatorPropertyStore.savePINRetries(authenticatorPropertyStore.loadPINRetries() - 1u)
         if (volatilePinRetryCounter > 0) {
             volatilePinRetryCounter--
         }
@@ -217,7 +217,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
         //spec| --- Authenticator stores LEFT(SHA-256(newPin), 16) on the device and returns CTAP2_OK.
         authenticatorPropertyStore.saveClientPIN(trimmedNewPIN) // clientPIN is not trimmedPIN. This is intended.
         val pinRetires = authenticatorPropertyStore.loadPINRetries()
-        val responseData = AuthenticatorClientPINResponseData(null, null, pinRetires.toLong())
+        val responseData = AuthenticatorClientPINResponseData(null, null, pinRetires)
         return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_OK, responseData)
     }
 
@@ -231,7 +231,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
             return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_MISSING_PARAMETER)
         }
         //spec| -- If the retries counter is 0, return CTAP2_ERR_PIN_BLOCKED error.
-        if (authenticatorPropertyStore.loadPINRetries() == 0) {
+        if (authenticatorPropertyStore.loadPINRetries() == 0u) {
             return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_BLOCKED)
         }
         //spec| -- Authenticator generates "sharedSecret": SHA-256((abG).x) using private key of authenticatorKeyAgreementKey, "a" and public key of platformKeyAgreementKey, "bG".
@@ -239,7 +239,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
         //spec| --- See [RFC6090] Section 4.1 and appendix (C.2) of [SP800-56A] for more ECDH key agreement protocol details and key representation.
         val sharedSecret = generateSharedSecret(platformKeyAgreementKey)
         //spec| -- Authenticator decrements the retries counter by 1.
-        authenticatorPropertyStore.savePINRetries(authenticatorPropertyStore.loadPINRetries() - 1)
+        authenticatorPropertyStore.savePINRetries(authenticatorPropertyStore.loadPINRetries() - 1u)
         volatilePinRetryCounter--
 
         //spec| -- Authenticator decrypts pinHashEnc and verifies against its internal stored LEFT(SHA-256(curPin), 16).
@@ -259,7 +259,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
             //spec| ---- Authenticator returns errors according to following conditions:
             //spec| ----- If the retries counter is 0, return CTAP2_ERR_PIN_BLOCKED error.
             return when {
-                authenticatorPropertyStore.loadPINRetries() == 0 -> AuthenticatorClientPINResponse(
+                authenticatorPropertyStore.loadPINRetries() == 0u -> AuthenticatorClientPINResponse(
                     CtapStatusCode.CTAP2_ERR_PIN_BLOCKED
                 )
                 volatilePinRetryCounter == 0 -> AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_AUTH_BLOCKED)
@@ -273,7 +273,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
         val pinTokenEnc = CipherUtil.encryptWithAESCBCNoPadding(pinToken, secretKey, ZERO_IV)
         val pinRetries = authenticatorPropertyStore.loadPINRetries()
         val responseData =
-            AuthenticatorClientPINResponseData(null, pinTokenEnc, pinRetries.toLong())
+            AuthenticatorClientPINResponseData(null, pinTokenEnc, pinRetries)
         return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_OK, responseData)
     }
 

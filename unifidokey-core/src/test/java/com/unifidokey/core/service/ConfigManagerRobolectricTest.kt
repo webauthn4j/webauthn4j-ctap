@@ -36,9 +36,9 @@ internal class ConfigManagerRobolectricTest {
 
     @Test
     fun pinRetries_test() {
-        val value = 1
+        val value = 1u
         target.pinRetries.value = value
-        val retrieved: Int = target.pinRetries.value
+        val retrieved: UInt = target.pinRetries.value
         assertThat(retrieved).isEqualTo(value)
     }
 

@@ -3,7 +3,7 @@ package com.webauthn4j.ctap.core.data
 import com.webauthn4j.util.UnsignedNumberUtil
 
 @Suppress("MemberVisibilityCanBePrivate")
-class CtapStatusCode(value: Int) {
+class CtapStatusCode(private val value: Byte) {
     companion object {
 
         @JvmField
@@ -153,20 +153,13 @@ class CtapStatusCode(value: Int) {
 
         @JvmStatic
         fun create(value: Byte): CtapStatusCode {
-            return CtapStatusCode(UnsignedNumberUtil.getUnsignedByte(value).toInt())
+            return CtapStatusCode(UnsignedNumberUtil.getUnsignedByte(value).toByte())
         }
 
     }
 
-    private val value: Int
-
-    val byte: Byte
-        get() = value.toByte()
-
-    init {
-        require(!(value > UnsignedNumberUtil.UNSIGNED_BYTE_MAX || value < 0)) { "value must be within unsigned byte" }
-        this.value = value
-    }
+    val byte
+        get() = value
 
 
     override fun toString(): String {
@@ -186,7 +179,7 @@ class CtapStatusCode(value: Int) {
     }
 
     override fun hashCode(): Int {
-        return value
+        return value.toInt()
     }
 
 

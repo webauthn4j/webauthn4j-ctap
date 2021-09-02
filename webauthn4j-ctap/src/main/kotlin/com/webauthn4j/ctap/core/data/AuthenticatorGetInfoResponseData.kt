@@ -6,21 +6,46 @@ import com.webauthn4j.ctap.authenticator.options.*
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 
 @Suppress("CanBePrimaryConstructorProperty")
-class AuthenticatorGetInfoResponseData @JsonCreator constructor(
-    @JsonProperty("1") versions: List<String>,
-    @JsonProperty("2") extensions: List<String>?,
-    @JsonProperty("3") aaguid: AAGUID,
-    @JsonProperty("4") options: Options?,
-    @JsonProperty("5") maxMsgSize: Long?,
-    @JsonProperty("6") pinProtocols: List<PinProtocolVersion>?
-) : CtapResponseData {
+class AuthenticatorGetInfoResponseData : CtapResponseData {
 
-    val versions = versions.toList()
-    val extensions = extensions?.toList()
-    val aaguid = aaguid
-    val options = options
-    val maxMsgSize = maxMsgSize
-    val pinProtocols = pinProtocols?.toList()
+    companion object{
+
+        @JvmStatic
+        @JsonCreator
+        fun createFromCbor(
+            @JsonProperty("1") versions: List<String>,
+            @JsonProperty("2") extensions: List<String>?,
+            @JsonProperty("3") aaguid: AAGUID,
+            @JsonProperty("4") options: Options?,
+            @JsonProperty("5") maxMsgSize: Long?,
+            @JsonProperty("6") pinProtocols: List<PinProtocolVersion>?
+        ) : AuthenticatorGetInfoResponseData{
+            return AuthenticatorGetInfoResponseData(versions, extensions, aaguid, options, maxMsgSize?.toUInt(), pinProtocols)
+        }
+    }
+
+    constructor(
+        versions: List<String>,
+        extensions: List<String>?,
+        aaguid: AAGUID,
+        options: Options?,
+        maxMsgSize: UInt?,
+        pinProtocols: List<PinProtocolVersion>?
+    ) {
+        this.versions = versions.toList()
+        this.extensions = extensions?.toList()
+        this.aaguid = aaguid
+        this.options = options
+        this.maxMsgSize = maxMsgSize
+        this.pinProtocols = pinProtocols?.toList()
+    }
+
+    val versions: List<String>
+    val extensions: List<String>?
+    val aaguid: AAGUID
+    val options: Options?
+    val maxMsgSize: UInt?
+    val pinProtocols: List<PinProtocolVersion>?
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

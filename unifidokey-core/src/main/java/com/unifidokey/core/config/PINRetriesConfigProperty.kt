@@ -3,15 +3,15 @@ package com.unifidokey.core.config
 import com.webauthn4j.ctap.authenticator.ClientPINService
 
 class PINRetriesConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<Int>(configManager, KEY, ClientPINService.MAX_PIN_RETRIES) {
+    ConfigPropertyBase<UInt>(configManager, KEY, ClientPINService.MAX_PIN_RETRIES) {
 
-    override fun save(value: Int) {
-        configManager.persistenceAdaptor.savePrimitiveInt(KEY, value)
+    override fun save(value: UInt) {
+        configManager.persistenceAdaptor.savePrimitiveInt(KEY, value.toInt())
     }
 
     @Throws(ConfigNotFoundException::class)
-    override fun load(): Int {
-        return configManager.persistenceAdaptor.loadPrimitiveInt(KEY)
+    override fun load(): UInt {
+        return configManager.persistenceAdaptor.loadPrimitiveInt(KEY).toUInt()
     }
 
     fun reset() {

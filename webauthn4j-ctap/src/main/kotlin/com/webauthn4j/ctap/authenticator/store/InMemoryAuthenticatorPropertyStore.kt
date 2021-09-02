@@ -22,7 +22,7 @@ open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
     private lateinit var credentialSourceEncryptionKey: SecretKey
     private lateinit var credentialSourceEncryptionIV: ByteArray
     private var clientPIN: ByteArray? = null
-    private var pinRetries = 0
+    private var pinRetries : UInt = 0u
     private var deviceWideCounter = 0u
 
     init {
@@ -93,7 +93,7 @@ open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
         return ArrayUtil.clone(clientPIN)
     }
 
-    override fun loadPINRetries(): Int {
+    override fun loadPINRetries(): UInt {
         return pinRetries
     }
 
@@ -105,7 +105,7 @@ open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
         this.deviceWideCounter = deviceWideCounter
     }
 
-    override fun savePINRetries(pinRetries: Int) {
+    override fun savePINRetries(pinRetries: UInt) {
         this.pinRetries = pinRetries
     }
 

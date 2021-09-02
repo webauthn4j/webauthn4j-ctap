@@ -68,8 +68,8 @@ interface AuthenticatorPropertyStore{
      * @return clientPIN
      */
     fun loadClientPIN(): ByteArray?
-    fun savePINRetries(pinRetries: Int)
-    fun loadPINRetries(): Int
+    fun savePINRetries(pinRetries: UInt)
+    fun loadPINRetries(): UInt
 
     fun loadDeviceWideCounter(): UInt
     fun saveDeviceWideCounter(deviceWideCounter: UInt)

@@ -307,7 +307,7 @@ class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
         ctapAuthenticatorHandle.clientPIN(setPINSubCommand)
     }
 
-    suspend fun getRetries(): Long {
+    suspend fun getRetries(): UInt {
         val getRetriesSubCommand = AuthenticatorClientPINRequest.createV1GetRetries()
         val clientPINResponse = ctapAuthenticatorHandle.clientPIN(getRetriesSubCommand)
         if (clientPINResponse.responseData == null) {

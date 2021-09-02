@@ -88,15 +88,15 @@ class ClientPINTest {
 
     @Test
     fun getRetries_test() = runBlockingTest {
-        assertThat(clientPINTestCase.clientPlatform.ctapService.getRetries().toInt()).isEqualTo(
+        assertThat(clientPINTestCase.clientPlatform.ctapService.getRetries()).isEqualTo(
             ClientPINService.MAX_PIN_RETRIES
         )
         try {
             clientPINTestCase.clientPlatform.ctapService.changePIN("invalid-PIN", "invalid-PIN")
         } catch (e: CtapErrorException) { /* nop */
         }
-        assertThat(clientPINTestCase.clientPlatform.ctapService.getRetries().toInt()).isEqualTo(
-            ClientPINService.MAX_PIN_RETRIES - 1
+        assertThat(clientPINTestCase.clientPlatform.ctapService.getRetries()).isEqualTo(
+            ClientPINService.MAX_PIN_RETRIES - 1u
         )
     }
 

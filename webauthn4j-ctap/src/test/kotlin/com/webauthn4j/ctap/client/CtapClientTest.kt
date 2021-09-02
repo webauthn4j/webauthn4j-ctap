@@ -52,14 +52,14 @@ internal class CtapClientTest {
     @Test
     @Throws(ExecutionException::class, InterruptedException::class)
     fun getRetries_test() = runBlockingTest {
-        assertThat(target.getRetries()).isEqualTo(ClientPINService.MAX_PIN_RETRIES.toLong())
+        assertThat(target.getRetries()).isEqualTo(ClientPINService.MAX_PIN_RETRIES)
         try {
             target.changePIN("wrongPIN", "newPIN")
         } catch (e: RuntimeException) {
         }
-        assertThat(target.getRetries()).isEqualTo((ClientPINService.MAX_PIN_RETRIES - 1).toLong())
+        assertThat(target.getRetries()).isEqualTo(ClientPINService.MAX_PIN_RETRIES - 1u)
         target.reset()
-        assertThat(target.getRetries()).isEqualTo(ClientPINService.MAX_PIN_RETRIES.toLong())
+        assertThat(target.getRetries()).isEqualTo(ClientPINService.MAX_PIN_RETRIES)
     }
 
     @ExperimentalCoroutinesApi

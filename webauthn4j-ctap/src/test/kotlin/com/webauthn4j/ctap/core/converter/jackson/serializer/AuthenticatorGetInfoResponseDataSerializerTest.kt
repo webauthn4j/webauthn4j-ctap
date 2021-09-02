@@ -2,6 +2,7 @@ package com.webauthn4j.ctap.core.converter.jackson.serializer
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.webauthn4j.converter.util.CborConverter
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
@@ -19,6 +20,7 @@ internal class AuthenticatorGetInfoResponseDataSerializerTest {
         val jsonMapper = ObjectMapper()
         val cborMapper = ObjectMapper(CBORFactory())
         cborMapper.registerModule(CtapCBORModule())
+        cborMapper.registerModule(KotlinModule())
         converter = ObjectConverter(jsonMapper, cborMapper).cborConverter
     }
 
@@ -34,7 +36,7 @@ internal class AuthenticatorGetInfoResponseDataSerializerTest {
                 UserPresenceOption.SUPPORTED,
                 UserVerificationOption.READY
             ),
-            2048L, listOf(PinProtocolVersion.VERSION_1)
+            2048u, listOf(PinProtocolVersion.VERSION_1)
         )
         val encoded = converter.writeValueAsBytes(original)
         val decoded = converter.readValue(encoded, AuthenticatorGetInfoResponseData::class.java)

@@ -29,7 +29,7 @@ internal class HIDMessageTest {
                         UserPresenceOption.SUPPORTED,
                         UserVerificationOption.READY
                     ),
-                    1024,
+                    1024u,
                     listOf()
                 )
             )

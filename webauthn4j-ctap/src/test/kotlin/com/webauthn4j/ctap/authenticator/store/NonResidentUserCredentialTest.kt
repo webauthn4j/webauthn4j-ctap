@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.webauthn4j.converter.util.CborConverter
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.core.converter.jackson.PublicKeyCredentialSourceCBORModule
@@ -24,6 +25,7 @@ internal class NonResidentUserCredentialTest {
         val cborMapper = ObjectMapper(CBORFactory())
         cborMapper.registerModule(JavaTimeModule())
         cborMapper.registerModule(PublicKeyCredentialSourceCBORModule())
+        cborMapper.registerModule(KotlinModule())
         cborConverter = ObjectConverter(jsonMapper, cborMapper).cborConverter
     }
 

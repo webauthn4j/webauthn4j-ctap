@@ -3,6 +3,7 @@ package integration.usecase.testcase
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.webauthn4j.WebAuthnManager
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
@@ -43,6 +44,7 @@ abstract class IntegrationTestCaseBase {
         cborMapper.registerModule(JavaTimeModule())
         cborMapper.registerModule(CtapCBORModule())
         cborMapper.registerModule(PublicKeyCredentialSourceCBORModule())
+        cborMapper.registerModule(KotlinModule())
         ObjectConverter(jsonMapper, cborMapper)
     }
     var objectConverter by objectConverterParameter

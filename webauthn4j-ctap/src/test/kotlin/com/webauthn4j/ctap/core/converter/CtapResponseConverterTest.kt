@@ -2,6 +2,7 @@ package com.webauthn4j.ctap.core.converter
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.options.*
@@ -19,6 +20,7 @@ internal class CtapResponseConverterTest {
         val jsonMapper = ObjectMapper()
         val cborMapper = ObjectMapper(CBORFactory())
         cborMapper.registerModule(CtapCBORModule())
+        cborMapper.registerModule(KotlinModule())
         val objectConverter = ObjectConverter(jsonMapper, cborMapper)
         converter = CtapResponseConverter(objectConverter)
     }
@@ -35,7 +37,7 @@ internal class CtapResponseConverterTest {
                 UserPresenceOption.SUPPORTED,
                 UserVerificationOption.READY
             ),
-            2048L, listOf(PinProtocolVersion.VERSION_1)
+            2048u, listOf(PinProtocolVersion.VERSION_1)
         )
         val original = AuthenticatorGetInfoResponse(CtapStatusCode.CTAP2_OK, responseData)
         val encoded = converter.convertToBytes(original)

@@ -169,7 +169,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImplRobolectricTest {
 
     @Test
     fun savePINRetries_loadPINRetries_test() {
-        val pinRetries = 1
+        val pinRetries = 1u
         target.savePINRetries(pinRetries)
         val loadedData = target.loadPINRetries()
         assertThat(loadedData).isEqualTo(pinRetries)
@@ -177,7 +177,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImplRobolectricTest {
 
     @Test
     fun clear_test() {
-        target.savePINRetries(3)
+        target.savePINRetries(3u)
         target.saveClientPIN(ByteArray(32))
         val credentialId = ByteArray(48)
         val userId = ByteArray(16)

@@ -4,6 +4,7 @@ import androidx.room.Room
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.unifidokey.core.adapter.UnifidoKeyAuthenticatorPropertyStore
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.core.service.AuthenticatorService
@@ -119,6 +120,7 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
         cborMapper.registerModule(CtapCBORModule())
         cborMapper.registerModule(PublicKeyCredentialSourceCBORModule())
         cborMapper.registerModule(JavaTimeModule())
+        cborMapper.registerModule(KotlinModule())
         return ObjectConverter(jsonMapper, cborMapper)
     }
 

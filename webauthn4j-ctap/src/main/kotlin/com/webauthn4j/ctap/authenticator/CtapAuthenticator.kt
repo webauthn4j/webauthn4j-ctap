@@ -3,6 +3,7 @@ package com.webauthn4j.ctap.authenticator
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.webauthn4j.converter.AuthenticatorDataConverter
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementGenerator
@@ -59,6 +60,7 @@ class CtapAuthenticator @JvmOverloads constructor(
             cborMapper.registerModule(CtapCBORModule())
             cborMapper.registerModule(PublicKeyCredentialSourceCBORModule())
             cborMapper.registerModule(JavaTimeModule())
+            cborMapper.registerModule(KotlinModule())
             return ObjectConverter(jsonMapper, cborMapper)
         }
     }
