@@ -27,9 +27,9 @@ class U2FRegistrationResponse : AuthenticatorResponse{
     ) {
         this.reservedByte = reserved
         this.userPublicKey = userPublicKey
-        this.keyHandle = keyHandle
+        this.keyHandle = ArrayUtil.clone(keyHandle)
         this.attestationCertificate = attestationCertificate
-        this.signature = signature
+        this.signature = ArrayUtil.clone(signature)
     }
 
     fun toBytes(): ByteArray{

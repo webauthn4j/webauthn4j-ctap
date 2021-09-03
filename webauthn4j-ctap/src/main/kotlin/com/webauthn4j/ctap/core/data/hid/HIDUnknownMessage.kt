@@ -9,7 +9,7 @@ class HIDUnknownMessage(
     data: ByteArray
 ) : HIDRequestMessage, HIDResponseMessage, HIDMessageBase(channelId, command) {
 
-    override val data = data
+    override val data : ByteArray = ArrayUtil.clone(data)
         get() = ArrayUtil.clone(field)
 
     override fun toString(): String {

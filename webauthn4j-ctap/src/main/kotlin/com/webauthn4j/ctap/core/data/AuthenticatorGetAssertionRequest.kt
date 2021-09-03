@@ -22,12 +22,12 @@ class AuthenticatorGetAssertionRequest(
     override val command: CtapCommand = CtapCommand.GET_ASSERTION
 
     val rpId = rpId
-    val clientDataHash = clientDataHash
+    val clientDataHash : ByteArray = ArrayUtil.clone(clientDataHash)
         get() = ArrayUtil.clone(field)
     val allowList = allowList?.toList()
     val extensions = extensions
     val options = options
-    val pinAuth = pinAuth
+    val pinAuth : ByteArray = ArrayUtil.clone(pinAuth)
         get() = ArrayUtil.clone(field)
     val pinProtocol = pinProtocol
 

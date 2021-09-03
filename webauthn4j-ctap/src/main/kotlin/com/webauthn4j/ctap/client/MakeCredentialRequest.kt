@@ -18,7 +18,7 @@ class MakeCredentialRequest(
     excludeList: List<PublicKeyCredentialDescriptor>?,
     extensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>?,
     authenticatorSelection: AuthenticatorSelectionCriteria?,
-    timeout: Long?,
+    timeout: ULong?,
     clientPINUserVerificationHandler: ClientPINUserVerificationHandler,
     authenticatorUserVerificationHandler: AuthenticatorUserVerificationHandler
 ) {
@@ -32,7 +32,7 @@ class MakeCredentialRequest(
     val extensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>? =
         extensions
     val authenticatorSelection: AuthenticatorSelectionCriteria? = authenticatorSelection
-    val timeout: Long? = timeout
+    val timeout: ULong? = timeout
     val clientPINUserVerificationHandler: ClientPINUserVerificationHandler =
         clientPINUserVerificationHandler
     val authenticatorUserVerificationHandler: AuthenticatorUserVerificationHandler =

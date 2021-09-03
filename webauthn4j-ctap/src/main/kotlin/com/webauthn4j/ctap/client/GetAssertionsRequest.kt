@@ -14,7 +14,7 @@ class GetAssertionsRequest(
     allowList: List<PublicKeyCredentialDescriptor>?,
     extensions: AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>?,
     userVerification: UserVerificationRequirement?,
-    timeout: Long?,
+    timeout: ULong?,
     clientPINUserVerificationHandler: ClientPINUserVerificationHandler,
     authenticatorUserVerificationHandler: AuthenticatorUserVerificationHandler
 ) {
@@ -26,7 +26,7 @@ class GetAssertionsRequest(
     val extensions: AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>? =
         extensions
     val userVerification: UserVerificationRequirement? = userVerification
-    val timeout: Long? = timeout
+    val timeout: ULong? = timeout
     val clientPINUserVerificationHandler: ClientPINUserVerificationHandler =
         clientPINUserVerificationHandler
     val authenticatorUserVerificationHandler: AuthenticatorUserVerificationHandler =

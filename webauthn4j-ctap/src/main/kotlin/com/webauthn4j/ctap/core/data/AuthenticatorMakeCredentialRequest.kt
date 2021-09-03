@@ -35,7 +35,7 @@ class AuthenticatorMakeCredentialRequest @JsonCreator constructor(
     val extensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>? =
         extensions
     val options: Options? = options
-    val pinAuth: ByteArray? = pinAuth
+    val pinAuth: ByteArray? = ArrayUtil.clone(pinAuth)
         get() = ArrayUtil.clone(field)
     val pinProtocol: PinProtocolVersion? = pinProtocol
 

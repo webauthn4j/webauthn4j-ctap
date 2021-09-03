@@ -13,9 +13,7 @@ class HIDChannelId {
     private val _value: Int
 
     val value: ByteArray
-        get() {
-            return ByteBuffer.allocate(4).putInt(_value).array()
-        }
+        get() = ByteBuffer.allocate(4).putInt(_value).array()
 
     constructor(value: ByteArray) {
         require(value.size == 4) { "value must be 4 bytes" }

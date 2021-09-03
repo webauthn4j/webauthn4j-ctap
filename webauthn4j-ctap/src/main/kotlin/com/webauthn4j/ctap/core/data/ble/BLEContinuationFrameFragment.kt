@@ -1,5 +1,6 @@
 package com.webauthn4j.ctap.core.data.ble
 
+import com.webauthn4j.util.ArrayUtil
 import java.nio.ByteBuffer
 
 class BLEContinuationFrameFragment(seq: Byte, data: ByteArray) : BLEFrameFragment {
@@ -8,7 +9,8 @@ class BLEContinuationFrameFragment(seq: Byte, data: ByteArray) : BLEFrameFragmen
     val seq = seq
 
     @Suppress("CanBePrimaryConstructorProperty")
-    override val data = data
+    override val data: ByteArray = ArrayUtil.clone(data)
+        get() = ArrayUtil.clone(field)
 
     override val bytes: ByteArray
         get() {

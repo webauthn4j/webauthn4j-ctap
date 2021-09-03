@@ -1,11 +1,15 @@
 package com.webauthn4j.ctap.core.data.ble
 
+import com.webauthn4j.util.ArrayUtil
 import java.util.*
 import kotlin.math.min
 
-class BLEFrame @JvmOverloads constructor(val cmd: BLEFrameCommand, val data: ByteArray? = null) {
+class BLEFrame @JvmOverloads constructor(val cmd: BLEFrameCommand, data: ByteArray? = null) {
 
     constructor(error: BLEFrameError) : this(BLEFrameCommand.ERROR, byteArrayOf(error.value))
+
+    val data: ByteArray? = ArrayUtil.clone(data)
+        get() = ArrayUtil.clone(field)
 
     fun sliceToFragments(maxFragmentSize: Int): List<BLEFrameFragment> {
         var position = 0
@@ -18,7 +22,7 @@ class BLEFrame @JvmOverloads constructor(val cmd: BLEFrameCommand, val data: Byt
                 i == 0 -> {
                     val maxDataSize = maxFragmentSize - 3
                     val slicedData = sliceData(data, position, maxDataSize)
-                    bleFrameFragment = BLEInitializationFrameFragment(cmd, data.size, slicedData)
+                    bleFrameFragment = BLEInitializationFrameFragment(cmd, data.size.toUShort(), slicedData)
                     position += slicedData.size
                 }
                 i <= 0x7f -> {

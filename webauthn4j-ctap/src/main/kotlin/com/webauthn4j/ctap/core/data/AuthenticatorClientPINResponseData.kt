@@ -14,7 +14,7 @@ class AuthenticatorClientPINResponseData @JsonCreator constructor(
 ) : CtapResponseData {
 
     val keyAgreement: COSEKey? = keyAgreement
-    val pinToken: ByteArray? = pinToken
+    val pinToken: ByteArray? = ArrayUtil.clone(pinToken)
         get() = ArrayUtil.clone(field)
     val retries: UInt? = retries
 
