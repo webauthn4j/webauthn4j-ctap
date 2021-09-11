@@ -25,6 +25,7 @@ class UserCredentialEntity(
     @field:ColumnInfo(name = "user_handle") val userHandle: ByteArray,
     val username: String?,
     @field:ColumnInfo(name = "display_name") val displayName: String?,
+    @field:ColumnInfo(name = "icon") val icon: String?,
     @field:ColumnInfo(name = "rp_id") val rpId: String,
     val counter: Long,
     @field:ColumnInfo(name = "created_at") val createdAt: Instant,
@@ -41,6 +42,7 @@ class UserCredentialEntity(
         userHandle: ByteArray,
         username: String?,
         displayName: String?,
+        icon: String?,
         rpId: String,
         counter: Long,
         createdAt: Instant,
@@ -55,6 +57,7 @@ class UserCredentialEntity(
         userHandle,
         username,
         displayName,
+        icon,
         rpId,
         counter,
         createdAt,
@@ -82,6 +85,7 @@ class UserCredentialEntity(
         if (!userHandle.contentEquals(other.userHandle)) return false
         if (username != other.username) return false
         if (displayName != other.displayName) return false
+        if (icon != other.icon) return false
         if (rpId != other.rpId) return false
         if (counter != other.counter) return false
         if (createdAt != other.createdAt) return false
@@ -100,6 +104,7 @@ class UserCredentialEntity(
         result = 31 * result + userHandle.contentHashCode()
         result = 31 * result + username.hashCode()
         result = 31 * result + displayName.hashCode()
+        result = 31 * result + icon.hashCode()
         result = 31 * result + rpId.hashCode()
         result = 31 * result + counter.hashCode()
         result = 31 * result + createdAt.hashCode()

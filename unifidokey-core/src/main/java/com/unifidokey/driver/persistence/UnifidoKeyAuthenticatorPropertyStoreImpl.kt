@@ -80,7 +80,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
         // existing relying party will not be updated
         val dto = relyingPartyDao.findOne(userCredential.rpId)
         if (dto == null) {
-            val relyingPartyEntity = RelyingPartyEntity(userCredential.rpId, userCredential.rpName)
+            val relyingPartyEntity = RelyingPartyEntity(userCredential.rpId, userCredential.rpName, userCredential.rpIcon)
             relyingPartyDao.create(relyingPartyEntity)
         }
 
@@ -108,6 +108,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
             userCredential.userHandle,
             userCredential.username,
             userCredential.displayName,
+            userCredential.icon,
             userCredential.rpId,
             userCredential.counter,
             userCredential.createdAt,
@@ -150,8 +151,10 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
                 userCredentialEntity.userHandle,
                 userCredentialEntity.username,
                 userCredentialEntity.displayName,
+                userCredentialEntity.icon,
                 relyingPartyEntity.id,
                 relyingPartyEntity.name,
+                relyingPartyEntity.icon,
                 userCredentialEntity.counter,
                 userCredentialEntity.createdAt,
                 userCredentialEntity.otherUI,

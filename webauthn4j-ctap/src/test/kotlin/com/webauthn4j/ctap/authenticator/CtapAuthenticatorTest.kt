@@ -79,8 +79,8 @@ internal class CtapAuthenticatorTest {
 
     private suspend fun makeCredential(): AuthenticatorMakeCredentialResponse {
         val clientDataHash = ByteArray(0)
-        val rp = CtapPublicKeyCredentialRpEntity(RP_ID, "example")
-        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+        val rp = CtapPublicKeyCredentialRpEntity(RP_ID, "example", "rpIcon")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,

@@ -1,7 +1,10 @@
+:toc: left
+
 = WebAuthn4J UnifidoKey ユーザーガイド
 
 include::introduction.adoc[]
 include::quick-tour.adoc[]
 include::credential-management.adoc[]
 include::history.adoc[]
+include::advanced-usage.adoc[]
 include::configuration.adoc[]

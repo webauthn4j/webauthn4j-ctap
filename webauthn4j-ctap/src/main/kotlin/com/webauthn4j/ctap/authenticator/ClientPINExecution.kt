@@ -4,25 +4,31 @@ import com.webauthn4j.ctap.core.data.AuthenticatorClientPINRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponse
 import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.ctap.core.data.PinSubCommand
+import com.webauthn4j.ctap.core.validator.AuthenticatorClientPINRequestValidator
 import org.slf4j.LoggerFactory
 
 internal class ClientPINExecution(
     private val ctapAuthenticator: CtapAuthenticator,
-    private val authenticatorClientPINCommand: AuthenticatorClientPINRequest
+    private val authenticatorClientPINRequest: AuthenticatorClientPINRequest
 ) : CtapCommandExecutionBase<AuthenticatorClientPINRequest, AuthenticatorClientPINResponse>(
     ctapAuthenticator,
-    authenticatorClientPINCommand
+    authenticatorClientPINRequest
 ) {
     private val logger = LoggerFactory.getLogger(ClientPINExecution::class.java)
+    private val authenticatorClientPINRequestValidator = AuthenticatorClientPINRequestValidator()
     override val commandName: String = "ClientPIN"
+
+    override suspend fun validate() {
+        authenticatorClientPINRequestValidator.validate(authenticatorClientPINRequest)
+    }
 
     override suspend fun doExecute(): AuthenticatorClientPINResponse {
         val clientPINService = ctapAuthenticator.clientPINService
-        val platformKeyAgreementKey = authenticatorClientPINCommand.keyAgreement
-        val pinAuth = authenticatorClientPINCommand.pinAuth
-        val newPinEnc = authenticatorClientPINCommand.newPinEnc
-        val pinHashEnc = authenticatorClientPINCommand.pinHashEnc
-        return when (authenticatorClientPINCommand.subCommand) {
+        val platformKeyAgreementKey = authenticatorClientPINRequest.keyAgreement
+        val pinAuth = authenticatorClientPINRequest.pinAuth
+        val newPinEnc = authenticatorClientPINRequest.newPinEnc
+        val pinHashEnc = authenticatorClientPINRequest.pinHashEnc
+        return when (authenticatorClientPINRequest.subCommand) {
             PinSubCommand.GET_PIN_RETRIES -> {
                 logger.debug("Processing clientPIN getRetries sub-command")
                 clientPINService.getPinRetries()

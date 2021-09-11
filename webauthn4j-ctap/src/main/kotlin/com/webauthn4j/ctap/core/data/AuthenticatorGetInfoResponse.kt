@@ -8,7 +8,7 @@ class AuthenticatorGetInfoResponse : AbstractCtapResponse<AuthenticatorGetInfoRe
 
     constructor(statusCode: CtapStatusCode) : super(statusCode, null)
 
-    override val command: CtapCommand = CtapCommand.GET_INFO
+    //override val command: CtapCommand = CtapCommand.GET_INFO
 
     override fun toString(): String {
         return "AuthenticatorGetInfoResponse(statusCode=$statusCode, responseData=$responseData)"

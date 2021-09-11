@@ -12,7 +12,7 @@ internal class BLEInitializationFrameFragmentTest {
         val data: ByteArray = Base64UrlUtil.decode("gwFtAaUBWCA8cFwsrhxkHiTchwx8Tw-OJvBFJ9ke0SaZwNGK3bSaTwKiYmlka3dlYmF1dGhuLmlvZG5hbWVrd2ViYXV0aG4uaW8Do2JpZErK1QQAAAAAAAAAZG5hbWVwbWFpbEB5bm9qaW1hLm5ldGtkaXNwbGF5TmFtZWRtYWlsBIqiY2FsZyZkdHlwZWpwdWJsaWMta2V5omNhbGc4ImR0eXBlanB1YmxpYy1rZXmiY2FsZzgjZHR5cGVqcHVibGljLWtleaJjYWxnOQEAZHR5cGVqcHVibGljLWtleaJjYWxnOQEBZHR5cGVqcHVibGljLWtleaJjYWxnOQECZA")
         val bleFrameFragment = parse(data)
         Assertions.assertThat(bleFrameFragment.cmd).isEqualTo(BLEFrameCommand.MSG)
-        Assertions.assertThat(bleFrameFragment.length).isEqualTo(365)
+        Assertions.assertThat(bleFrameFragment.length).isEqualTo(365.toUShort())
         Assertions.assertThat(bleFrameFragment.data.size).isEqualTo(253)
     }
 }

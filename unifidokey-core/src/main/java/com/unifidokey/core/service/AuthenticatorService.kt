@@ -147,6 +147,6 @@ class AuthenticatorService(
     }
 
     private fun onException(exception: Exception){
-        FirebaseCrashlytics.getInstance().recordException(exception)
+//        FirebaseCrashlytics.getInstance().recordException(exception) //TODO: enable again
     }
 }

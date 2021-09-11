@@ -7,6 +7,7 @@ import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.core.service.NFCService
 import com.unifidokey.core.service.NFCStatus
+import com.webauthn4j.ctap.authenticator.exception.APDUProcessingException
 import com.webauthn4j.ctap.authenticator.transport.nfc.NFCConnector
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
@@ -56,10 +57,17 @@ class CtapNFCAndroidService : HostApduService(), CoroutineScope {
         launch(nfcWorker) {
             logger.debug("Received command APDU: {}", ArrayUtil.toHexString(apdu))
             if (nfcService.nfcStatus.value == NFCStatus.ON) {
-                val commandAPDU = CommandAPDU.parse(apdu)
-                val responseAPDU = nfcConnector.handleCommandAPDU(commandAPDU)
-                sendResponseApdu(responseAPDU.toBytes())
-                logger.debug("Sent response APDU: {}", ArrayUtil.toHexString(responseAPDU.toBytes()))
+                try{
+                    val commandAPDU = CommandAPDU.parse(apdu)
+                    val responseAPDU = nfcConnector.handleCommandAPDU(commandAPDU)
+                    sendResponseApdu(responseAPDU.toBytes())
+                    logger.debug("Sent response APDU: {}", ArrayUtil.toHexString(responseAPDU.toBytes()))
+                }
+                catch (e: APDUProcessingException){
+                    val responseAPDU = ResponseAPDU(e.statusCode.sw1, e.statusCode.sw2)
+                    sendResponseApdu(responseAPDU.toBytes())
+                    logger.debug("Sent response APDU: {}", ArrayUtil.toHexString(responseAPDU.toBytes()))
+                }
             } else {
                 val errorResponseAPDU = ResponseAPDU.createErrorResponseAPDU()
                 sendResponseApdu(errorResponseAPDU.toBytes())

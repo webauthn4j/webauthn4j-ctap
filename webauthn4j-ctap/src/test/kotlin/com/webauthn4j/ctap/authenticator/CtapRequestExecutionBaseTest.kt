@@ -30,6 +30,10 @@ internal class CtapRequestExecutionBaseTest {
         override val commandName: String
             get() = "TestCtapCommand"
 
+        override suspend fun validate() {
+            // nop
+        }
+
         override suspend fun doExecute(): CtapResponse {
             throw RuntimeException()
         }

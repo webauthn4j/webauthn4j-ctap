@@ -12,8 +12,10 @@ data class NonResidentUserCredential @JsonCreator constructor(
     @JsonProperty("userHandle") override val userHandle: ByteArray,
     @JsonProperty("username") override val username: String?,
     @JsonProperty("displayName") override val displayName: String?,
+    @JsonProperty("icon") override val icon: String?,
     @JsonProperty("rpId") override val rpId: String,
     @JsonProperty("rpName") override val rpName: String?,
+    @JsonProperty("rpIcon") override val rpIcon: String?,
     @JsonProperty("createdAt") override val createdAt: Instant,
     @JsonProperty("otherUI") override val otherUI: Serializable?,
     @JsonProperty("details") override val details: Map<String, String>
@@ -36,8 +38,10 @@ data class NonResidentUserCredential @JsonCreator constructor(
         if (!userHandle.contentEquals(other.userHandle)) return false
         if (username != other.username) return false
         if (displayName != other.displayName) return false
+        if (icon != other.icon) return false
         if (rpId != other.rpId) return false
         if (rpName != other.rpName) return false
+        if (rpIcon != other.rpIcon) return false
         if (createdAt != other.createdAt) return false
         if (otherUI != other.otherUI) return false
         if (details != other.details) return false
@@ -51,8 +55,10 @@ data class NonResidentUserCredential @JsonCreator constructor(
         result = 31 * result + userHandle.contentHashCode()
         result = 31 * result + (username?.hashCode() ?: 0)
         result = 31 * result + (displayName?.hashCode() ?: 0)
+        result = 31 * result + (icon?.hashCode() ?: 0)
         result = 31 * result + rpId.hashCode()
         result = 31 * result + (rpName?.hashCode() ?: 0)
+        result = 31 * result + (rpIcon?.hashCode() ?: 0)
         result = 31 * result + createdAt.hashCode()
         result = 31 * result + (otherUI?.hashCode() ?: 0)
         result = 31 * result + details.hashCode()

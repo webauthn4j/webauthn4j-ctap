@@ -2,7 +2,7 @@ package com.webauthn4j.ctap.core.converter.jackson.serializer
 
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINRequest
 
-class AuthenticatorClientPINCommandSerializer :
+class AuthenticatorClientPINRequestSerializer :
     AbstractCtapCanonicalCborSerializer<AuthenticatorClientPINRequest>(
         AuthenticatorClientPINRequest::class.java, listOf(
             FieldSerializationRule(1, AuthenticatorClientPINRequest::pinProtocol),

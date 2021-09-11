@@ -19,16 +19,19 @@ class CtapPublicKeyCredentialUserEntity : Serializable {
      * @param id          id
      * @param name        name
      * @param displayName displayName
+     * @param icon        icon
      */
     @JsonCreator
     constructor(
         @JsonProperty("id") id: ByteArray,
         @JsonProperty("name") name: String?,
-        @JsonProperty("displayName") displayName: String?
+        @JsonProperty("displayName") displayName: String?,
+        @JsonProperty("icon") icon: String?
     ) {
         this.id = ArrayUtil.clone(id)
         this.name = name
         this.displayName = displayName
+        this.icon = icon
     }
 
     // ~ Instance fields
@@ -37,10 +40,11 @@ class CtapPublicKeyCredentialUserEntity : Serializable {
         get() = ArrayUtil.clone(field)
     val name: String?
     val displayName: String?
+    val icon: String?
 
 
     override fun toString(): String {
-        return "PublicKeyCredentialUserEntity(id=${HexUtil.encodeToString(id)}, displayName=$displayName)"
+        return "PublicKeyCredentialUserEntity(id=${HexUtil.encodeToString(id)}, name=$name, displayName=$displayName, icon=$icon)"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -50,6 +54,7 @@ class CtapPublicKeyCredentialUserEntity : Serializable {
         if (!id.contentEquals(other.id)) return false
         if (name != other.name) return false
         if (displayName != other.displayName) return false
+        if (icon != other.icon) return false
 
         return true
     }
@@ -58,6 +63,7 @@ class CtapPublicKeyCredentialUserEntity : Serializable {
         var result = id.contentHashCode()
         result = 31 * result + (name?.hashCode() ?: 0)
         result = 31 * result + (displayName?.hashCode() ?: 0)
+        result = 31 * result + (icon?.hashCode() ?: 0)
         return result
     }
 

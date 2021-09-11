@@ -65,12 +65,18 @@ class HIDConnector(
 
                 var hidChannel = hidChannels[hidPacket.channelId]
                 if (hidChannel == null) {
-                    hidChannel = HIDChannel(hidPacket.channelId)
-                    hidChannels[hidPacket.channelId] = hidChannel
+                    if(hidPacket is HIDContinuationPacket){
+                        logger.debug("Unexpected continuation packet is received. Skipped.")
+                        return
+                    }
+                    else{
+                        hidChannel = HIDChannel(hidPacket.channelId)
+                        hidChannels[hidPacket.channelId] = hidChannel
+                    }
                 }
-                hidChannel.handlePacket(hidPacket) {
-                    logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, it.toString())
-                    val responseBytes = hidPacketConverter.convert(it)
+                hidChannel.handlePacket(hidPacket) { responsePacket ->
+                    logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, responsePacket.toString())
+                    val responseBytes = hidPacketConverter.convert(responsePacket)
                     hidPacketHandler.onResponse(responseBytes)
                 }
             }

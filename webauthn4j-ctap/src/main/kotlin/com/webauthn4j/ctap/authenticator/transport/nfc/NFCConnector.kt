@@ -82,7 +82,7 @@ class NFCConnector(
                 }
             }
             logger.debug("Processing Unknown APDU command")
-            return U2FStatusCode.CLA_NOT_SUPPORTED.toResponseAPDU()
+            return U2FStatusCode.INS_NOT_SUPPORTED.toResponseAPDU()
         } catch (e: RuntimeException) {
             logger.error(UNEXPECTED_EXCEPTION_MESSAGE, e)
             return ResponseAPDU.createErrorResponseAPDU()
@@ -100,7 +100,7 @@ class NFCConnector(
             ctapAPDUProcessor.clear()
             u2fAPDUProcessor.clear()
             val response = if (Arrays.equals(command.dataIn, FIDO_AID)) {
-                val data = "FIDO_2_0".toByteArray(StandardCharsets.US_ASCII)
+                val data = "U2F_V2".toByteArray(StandardCharsets.US_ASCII)
                 val sw1 = 0x90.toByte()
                 val sw2 = 0x00.toByte()
                 ResponseAPDU(data, sw1, sw2)

@@ -15,6 +15,7 @@ import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.ctap.core.util.internal.BooleanUtil
 import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import com.webauthn4j.ctap.core.util.internal.HexUtil
+import com.webauthn4j.ctap.core.validator.AuthenticatorGetAssertionRequestValidator
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialType
 import com.webauthn4j.data.SignatureAlgorithm
@@ -37,9 +38,9 @@ internal class GetAssertionExecution :
 
     @Suppress("JoinDeclarationAndAssignment")
     private val ctapAuthenticator: CtapAuthenticator
-    private val authenticatorGetAssertionCommand: AuthenticatorGetAssertionRequest
 
     private val logger: Logger = LoggerFactory.getLogger(GetAssertionExecution::class.java)
+    private val getAssertionRequestValidator = AuthenticatorGetAssertionRequestValidator()
     private val authenticatorPropertyStore: AuthenticatorPropertyStore
 
     //Command properties
@@ -73,7 +74,6 @@ internal class GetAssertionExecution :
     ) : super(ctapAuthenticator, authenticatorGetAssertionRequest) {
         this.authenticatorGetAssertionRequest = authenticatorGetAssertionRequest
         this.ctapAuthenticator = ctapAuthenticator
-        this.authenticatorGetAssertionCommand = authenticatorGetAssertionRequest
         this.authenticatorPropertyStore = ctapAuthenticator.authenticatorPropertyStore
 
         // command properties initialization and validation
@@ -86,6 +86,10 @@ internal class GetAssertionExecution :
         this.options = authenticatorGetAssertionRequest.options
         this.pinAuth = authenticatorGetAssertionRequest.pinAuth
         this.pinProtocol = authenticatorGetAssertionRequest.pinProtocol
+    }
+
+    override suspend fun validate() {
+        getAssertionRequestValidator.validate(authenticatorGetAssertionRequest)
     }
 
     override suspend fun doExecute(): AuthenticatorGetAssertionResponse {
@@ -189,8 +193,10 @@ internal class GetAssertionExecution :
                 nonResidentUserCredentialEnvelope.userHandle,
                 nonResidentUserCredentialEnvelope.username,
                 nonResidentUserCredentialEnvelope.displayName,
+                nonResidentUserCredentialEnvelope.icon,
                 nonResidentUserCredentialEnvelope.rpId,
                 nonResidentUserCredentialEnvelope.rpName,
+                nonResidentUserCredentialEnvelope.rpIcon,
                 nonResidentUserCredentialEnvelope.createdAt,
                 nonResidentUserCredentialEnvelope.otherUI,
                 nonResidentUserCredentialEnvelope.details
@@ -304,8 +310,8 @@ internal class GetAssertionExecution :
         //spec| - If the "up" option was specified and set to true, collect the user’s consentMakeCredential.
         //spec|   - If no consentMakeCredential is obtained and a timeout occurs, return the CTAP2_ERR_OPERATION_DENIED error.
         val options = GetAssertionConsentOptions(rpId, userPresencePlan, userVerificationPlan)
-        val permission = ctapAuthenticator.userConsentHandler.consentGetAssertion(options)
-        if (permission) {
+        val consent = ctapAuthenticator.userConsentHandler.consentGetAssertion(options)
+        if (consent) {
             if (userVerificationPlan) {
                 userVerificationResult = true
             }
@@ -346,6 +352,20 @@ internal class GetAssertionExecution :
     //spec|   User identifiable information (name, DisplayName, icon) inside publicKeyCredentialUserEntity MUST not be returned
     //spec|   if user verification is not done by the authenticator.
     private fun execStep10PrepareGetAssertionSession() {
+        if(!(userVerificationPlan || authenticatorGetAssertionRequest.pinAuth != null )){
+            assertionObjects.map {
+                when (val credential = it.credential) {
+                    is ResidentUserCredential -> {
+                        it.credential = ResidentUserCredential(credential.credentialId, credential.credentialKey, credential.userHandle, null, null, null, credential.rpId, credential.rpName, credential.rpIcon, credential.counter, credential.createdAt, credential.otherUI, credential.details)
+                    }
+                    is NonResidentUserCredential -> {
+                        it.credential = NonResidentUserCredential(credential.credentialId, credential.credentialKey, credential.userHandle, null, null, null, credential.rpId, credential.rpName, credential.rpIcon, credential.createdAt, credential.otherUI, credential.details)
+                    }
+                }
+
+            }
+        }
+
         // Let authenticatorData be the byte array specified in §6.1 Authenticator data including processedExtensions,
         // if any, as the extensions and excluding attestedCredentialData.
         var flags: Byte = 0
@@ -379,7 +399,7 @@ internal class GetAssertionExecution :
     private suspend fun execStep11SelectUserCredentialIfCredentialSelectorIsAuthenticator() {
         if (ctapAuthenticator.credentialSelectorSetting == CredentialSelectorSetting.AUTHENTICATOR) {
             val selectedCredential: Credential = ctapAuthenticator.credentialSelectionHandler.select(credentials)
-            val selectedAssertionObject = assertionObjects.find { it.credential == selectedCredential }?: throw IllegalStateException("Selected Credential is not found in AssertionObject list")
+            val selectedAssertionObject = assertionObjects.find { it.credential.credentialId.contentEquals(selectedCredential.credentialId) }?: throw IllegalStateException("Selected Credential is not found in AssertionObject list")
             onGoingGetAssertionSession = onGoingGetAssertionSession.withAssertionObjects(listOf(selectedAssertionObject))
             ctapAuthenticator.onGoingGetAssertionSession = onGoingGetAssertionSession
         }
@@ -420,7 +440,8 @@ internal class GetAssertionExecution :
             is UserCredential -> CtapPublicKeyCredentialUserEntity(
                     credential.userHandle,
                     credential.username,
-                    credential.displayName
+                    credential.displayName,
+                    credential.icon
                 )
             else -> null
         }

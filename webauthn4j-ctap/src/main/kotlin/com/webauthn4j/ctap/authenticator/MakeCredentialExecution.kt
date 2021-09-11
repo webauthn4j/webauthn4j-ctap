@@ -13,8 +13,10 @@ import com.webauthn4j.ctap.authenticator.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.settings.UserVerificationSetting
 import com.webauthn4j.ctap.authenticator.store.*
 import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.ctap.core.validator.AuthenticatorMakeCredentialRequestValidator
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialParameters
+import com.webauthn4j.data.PublicKeyCredentialType
 import com.webauthn4j.data.attestation.authenticator.AttestedCredentialData
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData
 import com.webauthn4j.data.attestation.authenticator.COSEKey
@@ -41,6 +43,7 @@ internal class MakeCredentialExecution :
     override val commandName: String = "MakeCredential"
 
     private val logger: Logger = LoggerFactory.getLogger(MakeCredentialExecution::class.java)
+    private val makeCredentialRequestValidator = AuthenticatorMakeCredentialRequestValidator()
 
     @Suppress("JoinDeclarationAndAssignment")
     private val ctapAuthenticator: CtapAuthenticator
@@ -103,10 +106,16 @@ internal class MakeCredentialExecution :
         userCredentialBuilder.userHandle(user.id)
         userCredentialBuilder.username(user.name)
         userCredentialBuilder.displayName(user.displayName)
+        userCredentialBuilder.icon(user.icon)
         userCredentialBuilder.rpId(rpId)
         userCredentialBuilder.rpName(rp.name)
+        userCredentialBuilder.rpIcon(rp.icon)
         userCredentialBuilder.counter(counter)
         userCredentialBuilder.otherUI(null)
+    }
+
+    override suspend fun validate() {
+        makeCredentialRequestValidator.validate(authenticatorMakeCredentialRequest)
     }
 
     override suspend fun doExecute(): AuthenticatorMakeCredentialResponse {
@@ -178,7 +187,7 @@ internal class MakeCredentialExecution :
     //spec| terminate this procedure and return error code CTAP2_ERR_UNSUPPORTED_ALGORITHM.
     private fun execStep2ValidatePubKeyCredParams() {
         algorithmIdentifier =
-            pubKeyCredParams.firstOrNull { authenticatorPropertyStore.supports(it.alg) }?.alg
+            pubKeyCredParams.firstOrNull { it.type == PublicKeyCredentialType.PUBLIC_KEY && authenticatorPropertyStore.supports(it.alg) }?.alg
                 ?: throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_ALGORITHM)
     }
 
@@ -195,6 +204,9 @@ internal class MakeCredentialExecution :
                 residentKeyPlan = ctapAuthenticator.residentKeySetting == ResidentKeySetting.ALWAYS
             }
             else -> {
+                if(requestOptions.up == true){
+                    throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_INVALID_OPTION)
+                }
                 residentKeyPlan = when (requestOptions.rk) {
                     true -> when (ctapAuthenticator.residentKeySetting) {
                         ResidentKeySetting.NEVER -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)

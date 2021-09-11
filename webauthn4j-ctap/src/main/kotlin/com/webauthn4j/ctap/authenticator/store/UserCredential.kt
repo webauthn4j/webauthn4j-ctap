@@ -31,6 +31,13 @@ interface UserCredential : Credential {
     val displayName: String?
 
     /**
+     * Return icon
+     *
+     * @return icon
+     */
+    val icon: String?
+
+    /**
      * Return rpId
      *
      * @return rpId
@@ -44,6 +51,12 @@ interface UserCredential : Credential {
      */
     val rpName: String?
 
+    /**
+     * Return rpIcon
+     *
+     * @return rpIcon
+     */
+    val rpIcon: String?
 
     /**
      * Return other information used by the authenticator to inform its UI

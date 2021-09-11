@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.core.adapter.BluetoothDeviceHandle
@@ -17,6 +18,7 @@ import com.unifidokey.core.adapter.CtapBTHIDAdapter
 import com.unifidokey.core.config.BTHIDDeviceHistoryEntry
 import org.slf4j.LoggerFactory
 import java.time.Instant
+
 
 class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: Context) :
     CtapBTHIDAdapter, AutoCloseable {
@@ -33,8 +35,53 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
 
     private val bthidBroadcastReceiver = BTHIDBroadcastReceiver()
 
-    override val bluetoothDevices: LiveData<List<BluetoothDeviceHandle>>
-        get() = mutableBluetoothDevices
+    override val bluetoothDevices: LiveData<List<BluetoothDeviceHandle>> by lazy {
+        MediatorLiveData<List<BluetoothDeviceHandle>>().also{ mediatorLiveData ->
+            mediatorLiveData.value = listBluetoothDevices()
+            mediatorLiveData.addSource(isBTHIDAdapterEnabled){ enabled ->
+                if(enabled){
+                    mediatorLiveData.value = listBluetoothDevices()
+                }
+                else{
+                    mediatorLiveData.value = emptyList()
+                }
+            }
+            mediatorLiveData.addSource(deviceHistoryConfigProperty.liveData){ deviceHistory ->
+                val deviceList = mediatorLiveData.value
+                deviceHistory?.forEach { entry ->
+                    deviceList?.firstOrNull{ deviceHandle -> deviceHandle.address == entry.address}?.lastConnectedAt = entry.lastConnectedAt
+                }
+                mediatorLiveData.value = deviceList?.sortedWith(compareBy<BluetoothDeviceHandle>{ it.lastConnectedAt }.thenBy{ it.name })?.reversed()
+            }
+        }
+    }
+
+    private fun listBluetoothDevices(): List<BluetoothDeviceHandle>{
+        return if(isBTHIDAdapterEnabled.value!!){
+            (bluetoothAdapter?.bondedDevices ?: emptyList()).filter {
+                it.name != null &&
+                        it.address != null &&
+                        it.type != DEVICE_TYPE_LE &&
+                        when (it.bluetoothClass.majorDeviceClass) {
+                            Device.Major.COMPUTER -> true
+                            Device.Major.AUDIO_VIDEO -> false
+                            Device.Major.HEALTH -> false
+                            Device.Major.IMAGING -> false
+                            Device.Major.MISC -> false
+                            Device.Major.NETWORKING -> false
+                            Device.Major.PHONE -> true
+                            Device.Major.TOY -> false
+                            Device.Major.UNCATEGORIZED -> true
+                            Device.Major.WEARABLE -> false
+                            else -> true
+                        }
+            }.map {
+                val deviceHistoryEntry = deviceHistoryConfigProperty.value?.firstOrNull { deviceHistoryEntry -> deviceHistoryEntry.address == it.address }
+                BluetoothDeviceHandle(it.name, it.address, deviceHistoryEntry?.lastConnectedAt)
+            }.sortedWith(compareBy<BluetoothDeviceHandle>{ it.lastConnectedAt }.thenBy{ it.name }).reversed()
+        }
+        else emptyList()
+    }
 
     private var isBound = false
 
@@ -46,32 +93,7 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
         unifidoKeyApplication.unifidoKeyComponent.configManager.bthidDeviceHistory
     private val mutableBTHIDAdapterEnabled: MutableLiveData<Boolean> =
         MutableLiveData(_isBTHIDAdapterEnabled)
-    private val mutableBluetoothDevices: MutableLiveData<List<BluetoothDeviceHandle>> by lazy {
-        val devices = (bluetoothAdapter?.bondedDevices ?: emptyList()).filter {
-            it.name != null &&
-                    it.address != null &&
-                    it.type != DEVICE_TYPE_LE &&
-                    when (it.bluetoothClass.majorDeviceClass) {
-                        Device.Major.COMPUTER -> true
-                        Device.Major.AUDIO_VIDEO -> false
-                        Device.Major.HEALTH -> false
-                        Device.Major.IMAGING -> false
-                        Device.Major.MISC -> false
-                        Device.Major.NETWORKING -> false
-                        Device.Major.PHONE -> true
-                        Device.Major.TOY -> false
-                        Device.Major.UNCATEGORIZED -> true
-                        Device.Major.WEARABLE -> false
-                        else -> true
-                    }
-        }.map {
-            val deviceHistoryEntry =
-                deviceHistoryConfigProperty.value?.firstOrNull { deviceHistoryEntry -> deviceHistoryEntry.address == it.address }
-            BluetoothDeviceHandle(it.name, it.address, deviceHistoryEntry?.lastConnectedAt)
-        }.sortedBy { it.lastConnectedAt?.epochSecond ?: 0 }
-        MutableLiveData(devices)
 
-    }
 
     override val isBTHIDAdapterAvailable: Boolean
         get() {
@@ -268,33 +290,33 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
             }
         }
 
-        private fun resolveState(state: Int): String {
-            return when (state) {
-                BluetoothAdapter.STATE_OFF -> "OFF"
-                BluetoothAdapter.STATE_TURNING_ON -> "TURNING_ON"
-                BluetoothAdapter.STATE_ON -> "ON"
-                BluetoothAdapter.STATE_TURNING_OFF -> "TURNING_OFF"
-                14 -> "BLE_TURNING_ON"
-                15 -> "BLE_ON"
-                16 -> "BLE_TURNING_OFF"
-                BluetoothAdapter.ERROR -> "error"
-                else -> throw IllegalStateException()
-            }
-        }
-
-        private fun resolveConnectionState(state: Int): String {
-            return when (state) {
-                BluetoothProfile.STATE_DISCONNECTED -> "disconnected"
-                BluetoothProfile.STATE_CONNECTING -> "connecting"
-                BluetoothProfile.STATE_CONNECTED -> "connected"
-                BluetoothProfile.STATE_DISCONNECTING -> "disconnecting"
-                BluetoothAdapter.ERROR -> "error"
-                else -> throw IllegalStateException()
-            }
-        }
 
 
     }
 
 
+    private fun resolveState(state: Int): String {
+        return when (state) {
+            BluetoothAdapter.STATE_OFF -> "OFF"
+            BluetoothAdapter.STATE_TURNING_ON -> "TURNING_ON"
+            BluetoothAdapter.STATE_ON -> "ON"
+            BluetoothAdapter.STATE_TURNING_OFF -> "TURNING_OFF"
+            14 -> "BLE_TURNING_ON"
+            15 -> "BLE_ON"
+            16 -> "BLE_TURNING_OFF"
+            BluetoothAdapter.ERROR -> "error"
+            else -> throw IllegalStateException()
+        }
+    }
+
+    private fun resolveConnectionState(state: Int): String {
+        return when (state) {
+            BluetoothProfile.STATE_DISCONNECTED -> "disconnected"
+            BluetoothProfile.STATE_CONNECTING -> "connecting"
+            BluetoothProfile.STATE_CONNECTED -> "connected"
+            BluetoothProfile.STATE_DISCONNECTING -> "disconnecting"
+            BluetoothAdapter.ERROR -> "error"
+            else -> throw IllegalStateException()
+        }
+    }
 }

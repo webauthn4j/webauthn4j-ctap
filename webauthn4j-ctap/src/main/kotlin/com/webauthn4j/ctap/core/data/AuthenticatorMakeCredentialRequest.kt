@@ -77,16 +77,18 @@ class AuthenticatorMakeCredentialRequest @JsonCreator constructor(
 
     class Options @JsonCreator constructor(
         @param:JsonProperty("rk") val rk: Boolean?,
+        @param:JsonProperty("up") val up: Boolean?, //This is a known but invalid option, and should return CTAP2_ERR_INVALID_OPTION if present
         @param:JsonProperty("uv") val uv: Boolean?
     ) {
 
+        constructor(rk: Boolean?, uv: Boolean?) : this(rk, null, uv)
+
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as Options
+            if (other !is Options) return false
 
             if (rk != other.rk) return false
+            if (up != other.up) return false
             if (uv != other.uv) return false
 
             return true
@@ -94,6 +96,7 @@ class AuthenticatorMakeCredentialRequest @JsonCreator constructor(
 
         override fun hashCode(): Int {
             var result = rk?.hashCode() ?: 0
+            result = 31 * result + (up?.hashCode() ?: 0)
             result = 31 * result + (uv?.hashCode() ?: 0)
             return result
         }

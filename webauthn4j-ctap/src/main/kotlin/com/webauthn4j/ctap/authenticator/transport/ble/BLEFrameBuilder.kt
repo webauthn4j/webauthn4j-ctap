@@ -10,12 +10,12 @@ import java.util.function.Consumer
 internal class BLEFrameBuilder {
     private val continuationFragments: Queue<BLEContinuationFrameFragment> = LinkedList()
     private var initializationFragment: BLEInitializationFrameFragment? = null
-    private var remaining = 0
+    private var remaining = 0L
 
     fun initialize(initializationFragment: BLEInitializationFrameFragment) {
         this.initializationFragment = initializationFragment
         continuationFragments.clear()
-        remaining = initializationFragment.length - initializationFragment.data.size
+        remaining = initializationFragment.length.toLong() - initializationFragment.data.size.toLong()
     }
 
     fun append(continuationFragment: BLEContinuationFrameFragment) {
@@ -27,14 +27,14 @@ internal class BLEFrameBuilder {
         get() = initializationFragment != null
 
     val isCompleted: Boolean
-        get() = remaining == 0
+        get() = remaining == 0L
 
     fun build(): BLEFrame {
         initializationFragment.let {
             if (it == null) {
                 throw IllegalStateException("BLEFrameBuilder is not initialized")
             }
-            val byteBuffer = ByteBuffer.allocate(it.length)
+            val byteBuffer = ByteBuffer.allocate(it.length.toInt())
             byteBuffer.put(it.data)
             continuationFragments.forEach(Consumer { continuationFragment: BLEContinuationFrameFragment ->
                 byteBuffer.put(

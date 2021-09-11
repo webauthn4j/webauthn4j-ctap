@@ -117,11 +117,11 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
         //spec| --- If minimum PIN length check fails, authenticator returns CTAP2_ERR_PIN_POLICY_VIOLATION error.
         val secretKey: SecretKey = SecretKeySpec(sharedSecret, "AES")
         val newPIN = CipherUtil.decryptWithAESCBCNoPadding(newPinEnc, secretKey, ZERO_IV)
-        val sentinelPos = ArrayUtil.indexOf(newPIN, 0x00.toByte())
-        if (sentinelPos < 0) {
-            return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_POLICY_VIOLATION)
+        val sentinelPos = newPIN.indexOf(0x00)
+        val trimmedNewPIN: ByteArray = when {
+            (sentinelPos < 0) -> newPIN
+            else -> newPIN.copyOf(sentinelPos)
         }
-        val trimmedNewPIN = newPIN.copyOf(sentinelPos)
         if (trimmedNewPIN.size < 4) {
             return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_POLICY_VIOLATION)
         }

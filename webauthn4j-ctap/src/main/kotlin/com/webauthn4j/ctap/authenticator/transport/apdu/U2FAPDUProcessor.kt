@@ -39,7 +39,7 @@ class U2FAPDUProcessor(
                 }
             }
             logger.debug("Processing Unknown APDU command")
-            U2FStatusCode.CLA_NOT_SUPPORTED.toResponseAPDU()
+            U2FStatusCode.INS_NOT_SUPPORTED.toResponseAPDU()
         } catch (e: RuntimeException) {
             logger.error(NFCConnector.UNEXPECTED_EXCEPTION_MESSAGE, e)
             ResponseAPDU.createErrorResponseAPDU()

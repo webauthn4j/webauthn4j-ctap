@@ -56,7 +56,7 @@ class CreateOperation(
     private suspend fun makeCredential(ctapAuthenticatorHandle: CtapAuthenticatorHandle): PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput> {
         // makeCredential
         val collectedClientData = CollectedClientData(
-            ClientDataType.CREATE,
+            ClientDataType.WEBAUTHN_CREATE,
             publicKeyCredentialCreationOptions.challenge,
             clientProperty.origin,
             TokenBinding(TokenBindingStatus.NOT_SUPPORTED, null as ByteArray?)
@@ -66,8 +66,8 @@ class CreateOperation(
         val clientDataHash = MessageDigestUtil.createSHA256().digest(clientDataJSON)
         val rpId = publicKeyCredentialCreationOptions.rp.id ?: clientProperty.origin.host
         ?: throw WebAuthnClientException("WebAuthn client must have origin.")
-        val rp = CtapPublicKeyCredentialRpEntity(rpId, publicKeyCredentialCreationOptions.rp.name)
-        val user = CtapPublicKeyCredentialUserEntity(publicKeyCredentialCreationOptions.user.id, publicKeyCredentialCreationOptions.user.name, publicKeyCredentialCreationOptions.user.displayName)
+        val rp = CtapPublicKeyCredentialRpEntity(rpId, publicKeyCredentialCreationOptions.rp.name, null)
+        val user = CtapPublicKeyCredentialUserEntity(publicKeyCredentialCreationOptions.user.id, publicKeyCredentialCreationOptions.user.name, publicKeyCredentialCreationOptions.user.displayName, null)
         val authenticatorExtensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>? = null //TODO: implement extension handling
         val makeCredentialRequest = MakeCredentialRequest(
             clientDataHash,
@@ -77,7 +77,7 @@ class CreateOperation(
             publicKeyCredentialCreationOptions.excludeCredentials,
             authenticatorExtensions,
             publicKeyCredentialCreationOptions.authenticatorSelection,
-            publicKeyCredentialCreationOptions.timeout,
+            publicKeyCredentialCreationOptions.timeout?.toULong(),
             object : ClientPINUserVerificationHandler {
                 override suspend fun onClientPINRequested(): String {
                     return clientProperty.clientPIN

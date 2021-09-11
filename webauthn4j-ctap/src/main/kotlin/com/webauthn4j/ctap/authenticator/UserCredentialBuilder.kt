@@ -14,8 +14,10 @@ class UserCredentialBuilder(private val objectConverter: ObjectConverter, privat
     private lateinit var userHandle: ByteArray
     private var username: String? = null
     private var displayName: String? = null
+    private var icon: String? = null
     private lateinit var rpId: String
     private var rpName: String? = null
+    private var rpIcon: String? = null
     private var counter: Long = 0
     private lateinit var createdAt: Instant
     private var otherUI: Serializable? = null
@@ -31,8 +33,10 @@ class UserCredentialBuilder(private val objectConverter: ObjectConverter, privat
                     userHandle,
                     username,
                     displayName,
+                    icon,
                     rpId,
                     rpName,
+                    rpIcon,
                     counter,
                     createdAt,
                     otherUI,
@@ -47,8 +51,10 @@ class UserCredentialBuilder(private val objectConverter: ObjectConverter, privat
                     userHandle,
                     username,
                     displayName,
+                    icon,
                     rpId,
                     rpName,
+                    rpIcon,
                     createdAt,
                     otherUI,
                     details
@@ -67,8 +73,10 @@ class UserCredentialBuilder(private val objectConverter: ObjectConverter, privat
                     userHandle,
                     username,
                     displayName,
+                    icon,
                     rpId,
                     rpName,
+                    rpIcon,
                     createdAt,
                     otherUI,
                     details
@@ -102,6 +110,11 @@ class UserCredentialBuilder(private val objectConverter: ObjectConverter, privat
         return this
     }
 
+    fun icon(value: String?): UserCredentialBuilder {
+        icon = value
+        return this
+    }
+
     fun rpId(value: String): UserCredentialBuilder {
         rpId = value
         return this
@@ -109,6 +122,11 @@ class UserCredentialBuilder(private val objectConverter: ObjectConverter, privat
 
     fun rpName(value: String?): UserCredentialBuilder {
         rpName = value
+        return this
+    }
+
+    fun rpIcon(value: String?): UserCredentialBuilder {
+        rpIcon = value
         return this
     }
 

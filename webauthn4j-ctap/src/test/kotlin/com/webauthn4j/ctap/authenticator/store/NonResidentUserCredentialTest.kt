@@ -56,8 +56,10 @@ internal class NonResidentUserCredentialTest {
             userHandle,
             "username",
             "displayName",
+            "icon",
             "rpId",
             "rpName",
+            "rpIcon",
             Instant.now(),
             null,
             emptyMap()

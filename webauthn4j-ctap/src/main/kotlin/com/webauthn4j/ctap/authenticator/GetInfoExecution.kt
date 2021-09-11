@@ -10,14 +10,18 @@ import org.slf4j.LoggerFactory
 
 internal class GetInfoExecution(
     private val ctapAuthenticator: CtapAuthenticator,
-    authenticatorGetInfoCommand: AuthenticatorGetInfoRequest
+    authenticatorGetInfoRequest: AuthenticatorGetInfoRequest
 ) : CtapCommandExecutionBase<AuthenticatorGetInfoRequest, AuthenticatorGetInfoResponse>(
     ctapAuthenticator,
-    authenticatorGetInfoCommand
+    authenticatorGetInfoRequest
 ) {
 
     private val logger = LoggerFactory.getLogger(GetInfoExecution::class.java)
     override val commandName: String = "GetInfo"
+
+    override suspend fun validate() {
+        //nop
+    }
 
     override suspend fun doExecute(): AuthenticatorGetInfoResponse {
         val plat: PlatformOption = when (ctapAuthenticator.platformSetting) {

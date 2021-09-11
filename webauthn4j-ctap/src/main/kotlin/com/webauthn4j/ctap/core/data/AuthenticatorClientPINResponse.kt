@@ -8,7 +8,7 @@ class AuthenticatorClientPINResponse : AbstractCtapResponse<AuthenticatorClientP
 
     constructor(statusCode: CtapStatusCode) : super(statusCode, null)
 
-    override val command: CtapCommand = CtapCommand.CLIENT_PIN
+    //override val command: CtapCommand = CtapCommand.CLIENT_PIN
 
     override fun toString(): String {
         return "AuthenticatorClientPINResponse(statusCode=$statusCode, responseData=$responseData)"

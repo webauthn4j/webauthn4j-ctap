@@ -58,7 +58,7 @@
     <!-- credential list fragment -->
     <string name="menu_search">Search</string>
 
-    <string name="desc_registration_instruction">To register a new credential, connect your smartphone to your PC with Bluetooth or tap your smartphone to the NFC reader when a service request it.</string>
+    <string name="desc_registration_instruction">To register a new credential, connect your smartphone to your PC with Bluetooth or tap your smartphone to your NFC reader when a service requests it.</string>
 
     <!-- credential details fragment -->
 

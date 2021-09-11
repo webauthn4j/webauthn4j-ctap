@@ -117,7 +117,7 @@ class HMACSecretExtensionProcessor : RegistrationExtensionProcessor,
                 val output = output1.plus(output2)
                 CipherUtil.encryptWithAESCBCNoPadding(output, secretKey, IV_ZERO)
             }
-            else -> TODO("validation should be done at appropriate place")
+            else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_INVALID_CBOR) //TODO: validation should be done at appropriate place
         }
 
         outputsBuilder.setHMACGetSecret(hmacGetSecret)

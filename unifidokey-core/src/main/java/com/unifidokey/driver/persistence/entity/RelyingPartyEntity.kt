@@ -7,10 +7,11 @@ import java.io.Serializable
 data class RelyingPartyEntity(
     @field:PrimaryKey(autoGenerate = true) val sid: Long?, // surrogate id
     val id: String, // rpId
-    @field:ColumnInfo val name: String?
+    @field:ColumnInfo val name: String?,
+    @field:ColumnInfo val icon: String?
 ) : Serializable {
 
     @Ignore
-    constructor(id: String, name: String?) : this(null, id, name)
+    constructor(id: String, name: String?, icon: String?) : this(null, id, name, icon)
 
 }

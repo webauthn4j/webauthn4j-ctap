@@ -2,7 +2,7 @@ package com.webauthn4j.ctap.core.converter.jackson.serializer
 
 import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialRequest
 
-class AuthenticatorMakeCredentialCommandSerializer :
+class AuthenticatorMakeCredentialRequestSerializer :
     AbstractCtapCanonicalCborSerializer<AuthenticatorMakeCredentialRequest>(
         AuthenticatorMakeCredentialRequest::class.java, listOf(
             FieldSerializationRule(1, AuthenticatorMakeCredentialRequest::clientDataHash),

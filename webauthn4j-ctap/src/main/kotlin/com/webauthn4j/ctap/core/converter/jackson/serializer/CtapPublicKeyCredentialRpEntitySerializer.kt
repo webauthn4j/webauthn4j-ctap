@@ -6,6 +6,7 @@ class CtapPublicKeyCredentialRpEntitySerializer :
     AbstractCtapCanonicalCborSerializer<CtapPublicKeyCredentialRpEntity>(
         CtapPublicKeyCredentialRpEntity::class.java, listOf(
             FieldSerializationRule("id", CtapPublicKeyCredentialRpEntity::id),
+            FieldSerializationRule("icon", CtapPublicKeyCredentialRpEntity::icon),
             FieldSerializationRule("name", CtapPublicKeyCredentialRpEntity::name)
         )
     )

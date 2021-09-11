@@ -2,6 +2,9 @@ package com.unifidokey.app
 
 import androidx.room.Room
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.cfg.CoercionAction
+import com.fasterxml.jackson.databind.cfg.CoercionInputShape
+import com.fasterxml.jackson.databind.type.LogicalType
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -117,6 +120,16 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
         val jsonMapper = ObjectMapper()
         jsonMapper.registerModule(JavaTimeModule())
         val cborMapper = ObjectMapper(CBORFactory())
+        cborMapper.coercionConfigFor(LogicalType.Textual).setCoercion(CoercionInputShape.Boolean, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.Boolean, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.String, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.Array, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.EmptyArray, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.EmptyObject, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.EmptyString, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.Float, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.Integer, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.Object, CoercionAction.Fail)
         cborMapper.registerModule(CtapCBORModule())
         cborMapper.registerModule(PublicKeyCredentialSourceCBORModule())
         cborMapper.registerModule(JavaTimeModule())

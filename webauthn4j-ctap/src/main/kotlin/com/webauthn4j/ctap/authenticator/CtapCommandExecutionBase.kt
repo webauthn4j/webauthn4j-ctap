@@ -12,6 +12,9 @@ abstract class CtapCommandExecutionBase<TC : CtapRequest, TR : CtapResponse>(pri
 
     suspend fun execute(): TR {
         logger.info("CTAP Command {}", ctapCommand.toString())
+
+        validate()
+
         val ctapResponse = try {
             doExecute()
         } catch (e: CtapCommandExecutionException) {
@@ -36,6 +39,7 @@ abstract class CtapCommandExecutionBase<TC : CtapRequest, TR : CtapResponse>(pri
     }
 
     protected abstract val commandName: String
+    abstract suspend fun validate()
     protected abstract suspend fun doExecute(): TR
     internal abstract fun createErrorResponse(statusCode: CtapStatusCode): TR
 }

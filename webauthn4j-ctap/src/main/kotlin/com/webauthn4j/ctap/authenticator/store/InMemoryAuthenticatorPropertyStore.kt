@@ -53,7 +53,7 @@ open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
             userCredentials = HashMap()
             map[rpId] = userCredentials
         }
-        userCredentials[userCredential.id] = userCredential
+        userCredentials[userCredential.credentialId] = userCredential
     }
 
     override fun loadUserCredentials(rpId: String?): List<ResidentUserCredential> {

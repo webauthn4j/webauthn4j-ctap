@@ -11,15 +11,19 @@ import java.time.Instant
 
 class ResetExecution internal constructor(
     private val ctapAuthenticator: CtapAuthenticator,
-    authenticatorResetCommand: AuthenticatorResetRequest
+    authenticatorResetRequest: AuthenticatorResetRequest
 ) : CtapCommandExecutionBase<AuthenticatorResetRequest, AuthenticatorResetResponse>(
     ctapAuthenticator,
-    authenticatorResetCommand
+    authenticatorResetRequest
 ) {
 
     private val authenticatorPropertyStore: AuthenticatorPropertyStore =
         ctapAuthenticator.authenticatorPropertyStore
     private val logger = LoggerFactory.getLogger(MakeCredentialExecution::class.java)
+
+    override suspend fun validate() {
+        // nop
+    }
 
     override suspend fun doExecute(): AuthenticatorResetResponse {
         logger.debug("Processing reset request")

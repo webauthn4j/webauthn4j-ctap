@@ -18,6 +18,7 @@ class CtapPublicKeyCredentialRpEntity :Serializable {
     // ================================================================================================
     val id: String
     val name: String?
+    val icon: String?
 
     // ~ Constructor
     // ========================================================================================================
@@ -28,19 +29,22 @@ class CtapPublicKeyCredentialRpEntity :Serializable {
     @JsonCreator
     constructor(
         @JsonProperty("id") id: String,
-        @JsonProperty("name") name: String?
+        @JsonProperty("name") name: String?,
+        @JsonProperty("icon") icon: String?
     ) {
         this.id = id
         this.name = name
+        this.icon = icon
     }
 
     constructor(id: String) {
         this.id = id
         this.name = null
+        this.icon = null
     }
 
     override fun toString(): String {
-        return "PublicKeyCredentialRpEntity(id=${id}name=$name)"
+        return "PublicKeyCredentialRpEntity(id=${id}, name=$name, icon=$icon)"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -49,6 +53,7 @@ class CtapPublicKeyCredentialRpEntity :Serializable {
 
         if (id != other.id) return false
         if (name != other.name) return false
+        if (icon != other.icon) return false
 
         return true
     }
@@ -56,7 +61,9 @@ class CtapPublicKeyCredentialRpEntity :Serializable {
     override fun hashCode(): Int {
         var result = id.hashCode()
         result = 31 * result + (name?.hashCode() ?: 0)
+        result = 31 * result + (icon?.hashCode() ?: 0)
         return result
     }
+
 
 }

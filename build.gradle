@@ -52,7 +52,7 @@ buildscript {
     ext.springBootVersion = "2.5.4"
     ext.bouncyCastleVersion = "1.69"
     ext.logbackAndroidVersion = "2.0.0"
-    ext.webauthn4jVersion = "master-SNAPSHOT"
+    ext.webauthn4jVersion = "unifidokey-dev-SNAPSHOT"
     ext.mockitoVersion = "3.12.4"
     ext.mockitoKotlinVersion = "3.2.0"
     ext.asciidoctorGradleVersion = "3.3.2"

@@ -29,7 +29,7 @@ internal class CredentialSelectorDialogAdapter(
         return position.toLong()
     }
 
-    override fun getView(position: Int, convertView: View, parent: ViewGroup): View {
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         @SuppressLint("ViewHolder") val view =
             layoutInflater.inflate(R.layout.credential_list_credential_layout, parent, false)
         val displayNameView = view.findViewById<TextView>(R.id.displayName_view)

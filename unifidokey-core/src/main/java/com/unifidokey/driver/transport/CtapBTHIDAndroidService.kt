@@ -11,6 +11,8 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.*
 import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.core.adapter.BluetoothDeviceHandle
+import com.unifidokey.core.config.BTHIDDeviceHistoryConfigProperty
+import com.unifidokey.core.config.BTHIDDeviceHistoryEntry
 import com.unifidokey.core.service.BTHIDService
 import com.unifidokey.core.service.BTHIDStatus
 import com.unifidokey.driver.notification.UnifidoKeyNotificationController
@@ -21,6 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
+import java.time.Instant
 
 class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObserver {
 
@@ -57,7 +60,7 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
     private lateinit var bthidService: BTHIDService
     private lateinit var objectConverter: ObjectConverter
     private lateinit var unifidoKeyNotificationController: UnifidoKeyNotificationController
-
+    private lateinit var bthidDeviceHistory: BTHIDDeviceHistoryConfigProperty
 
     private var bluetoothAdapter: BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
     private var bluetoothHidDevice: BluetoothHidDevice? = null
@@ -125,8 +128,10 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
     fun connect(deviceHandle: BluetoothDeviceHandle) {
         val remoteDevice = bluetoothAdapter.getRemoteDevice(deviceHandle.address)
         val result = bluetoothHidDevice?.connect(remoteDevice)!!
-        if(!result){
-            //TODO
+        if(result){
+            val history: List<BTHIDDeviceHistoryEntry>? = bthidDeviceHistory.value
+            history?.firstOrNull { it.address == deviceHandle.address }?.lastConnectedAt = Instant.now()
+            bthidDeviceHistory.value = history
         }
     }
 
@@ -143,6 +148,7 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
         objectConverter = unifidoKeyApplication.unifidoKeyComponent.objectConverter
         unifidoKeyNotificationController =
             unifidoKeyApplication.unifidoKeyComponent.unifidoKeyNotificationController
+        bthidDeviceHistory = unifidoKeyApplication.unifidoKeyComponent.configManager.bthidDeviceHistory
         bthidService.isBTHIDBackgroundServiceModeEnabled.observeForever {
             when {
                 it -> startForeground()

@@ -183,8 +183,10 @@ class UnifidoKeyAuthenticatorPropertyStoreImplRobolectricTest {
         val userId = ByteArray(16)
         val username = "username"
         val displayName = "displayName"
+        val icon = "icon"
         val rpId = "rpId"
         val rpName = "rpName"
+        val rpIcon = "rpIcon"
         val counter: Long = 123
         val createdAt = Instant.now()
         val userCredential = ResidentUserCredential(
@@ -196,8 +198,10 @@ class UnifidoKeyAuthenticatorPropertyStoreImplRobolectricTest {
             userId,
             username,
             displayName,
+            icon,
             rpId,
             rpName,
+            rpIcon,
             counter,
             createdAt,
             null,

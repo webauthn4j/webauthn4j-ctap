@@ -55,6 +55,7 @@ class ConfigManager(
         caCertificates,
         clientPINEnc,
         pinRetries,
+        deviceWideCounter,
         isNFCTransportEnabled,
         isBLETransportEnabled,
         isBTHIDTransportEnabled,

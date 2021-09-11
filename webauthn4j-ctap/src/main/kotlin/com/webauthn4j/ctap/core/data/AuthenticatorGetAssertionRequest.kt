@@ -27,7 +27,7 @@ class AuthenticatorGetAssertionRequest(
     val allowList = allowList?.toList()
     val extensions = extensions
     val options = options
-    val pinAuth : ByteArray = ArrayUtil.clone(pinAuth)
+    val pinAuth : ByteArray? = ArrayUtil.clone(pinAuth)
         get() = ArrayUtil.clone(field)
     val pinProtocol = pinProtocol
 

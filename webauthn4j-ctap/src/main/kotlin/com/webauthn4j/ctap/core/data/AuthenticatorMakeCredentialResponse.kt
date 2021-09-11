@@ -9,7 +9,7 @@ class AuthenticatorMakeCredentialResponse :
 
     constructor(statusCode: CtapStatusCode) : super(statusCode, null)
 
-    override val command: CtapCommand = CtapCommand.MAKE_CREDENTIAL
+    //override val command: CtapCommand = CtapCommand.MAKE_CREDENTIAL
 
     override fun toString(): String {
         return "AuthenticatorMakeCredentialResponse(statusCode=$statusCode, responseData=$responseData)"

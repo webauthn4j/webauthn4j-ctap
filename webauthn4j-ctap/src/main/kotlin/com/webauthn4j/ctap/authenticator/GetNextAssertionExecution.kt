@@ -12,14 +12,18 @@ import java.nio.ByteBuffer
 
 internal class GetNextAssertionExecution(
     private val ctapAuthenticator: CtapAuthenticator,
-    authenticatorGetNextAssertionCommand: AuthenticatorGetNextAssertionRequest
+    authenticatorGetNextAssertionRequest: AuthenticatorGetNextAssertionRequest
 ) : CtapCommandExecutionBase<AuthenticatorGetNextAssertionRequest, AuthenticatorGetNextAssertionResponse>(
     ctapAuthenticator,
-    authenticatorGetNextAssertionCommand
+    authenticatorGetNextAssertionRequest
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(GetNextAssertionExecution::class.java)
     override val commandName: String = "GetNextAssertion"
+
+    override suspend fun validate() {
+        // nop
+    }
 
     override suspend fun doExecute(): AuthenticatorGetNextAssertionResponse {
 
@@ -73,7 +77,8 @@ internal class GetNextAssertionExecution(
             is UserCredential -> CtapPublicKeyCredentialUserEntity(
                 credential.userHandle,
                 credential.username,
-                credential.displayName
+                credential.displayName,
+                credential.icon
             )
             else -> null
         }

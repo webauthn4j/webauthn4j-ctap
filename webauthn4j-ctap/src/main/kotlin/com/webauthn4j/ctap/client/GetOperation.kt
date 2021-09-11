@@ -40,7 +40,7 @@ class GetOperation(
 
     private suspend fun getAssertions(ctapAuthenticatorHandle: CtapAuthenticatorHandle): PublicKeyCredential<AuthenticatorAssertionResponse, AuthenticationExtensionClientOutput> {
         val collectedClientData = CollectedClientData(
-            ClientDataType.GET,
+            ClientDataType.WEBAUTHN_GET,
             publicKeyCredentialRequestOptions.challenge,
             clientProperty.origin,
             TokenBinding(TokenBindingStatus.NOT_SUPPORTED, null as ByteArray?)
@@ -57,7 +57,7 @@ class GetOperation(
             publicKeyCredentialRequestOptions.allowCredentials,
             authenticatorExtensions,
             publicKeyCredentialRequestOptions.userVerification,
-            publicKeyCredentialRequestOptions.timeout,
+            publicKeyCredentialRequestOptions.timeout?.toULong(),
             object : ClientPINUserVerificationHandler {
                 override suspend fun onClientPINRequested(): String = clientProperty.clientPIN
             },

@@ -31,8 +31,8 @@ internal class MakeCredentialExecutionTest {
     @Test
     fun test() = runBlockingTest {
         val clientDataHash = ByteArray(0)
-        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
-        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,
@@ -77,8 +77,8 @@ internal class MakeCredentialExecutionTest {
             CtapAuthenticator(authenticatorPropertyStore = authenticatorPropertyStore)
 
         val clientDataHash = ByteArray(0)
-        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
-        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,
@@ -120,8 +120,8 @@ internal class MakeCredentialExecutionTest {
         createdResidentKeyCount: Int
     ) = runBlockingTest {
         val clientDataHash = ByteArray(0)
-        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
-        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,
@@ -173,8 +173,8 @@ internal class MakeCredentialExecutionTest {
         createdResidentKeyCount: Int
     ) = runBlockingTest {
         val clientDataHash = ByteArray(0)
-        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
-        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,
@@ -227,8 +227,8 @@ internal class MakeCredentialExecutionTest {
         statusCode: CtapStatusCode
     ) = runBlockingTest {
         val clientDataHash = ByteArray(0)
-        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
-        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,
@@ -271,8 +271,8 @@ internal class MakeCredentialExecutionTest {
     fun userPresence_test(userPresenceSetting: UserPresenceSetting, statusCode: CtapStatusCode) =
         runBlockingTest {
             val clientDataHash = ByteArray(0)
-            val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
-            val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+            val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
+            val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
             val pubKeyCredParams = listOf(
                 PublicKeyCredentialParameters(
                     PublicKeyCredentialType.PUBLIC_KEY,
@@ -308,8 +308,8 @@ internal class MakeCredentialExecutionTest {
     @Test
     fun userConsent_false_test() = runBlockingTest {
         val clientDataHash = ByteArray(0)
-        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
-        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,
@@ -351,8 +351,8 @@ internal class MakeCredentialExecutionTest {
     @Test
     fun unsupported_alg_test() = runBlockingTest {
         val clientDataHash = ByteArray(0)
-        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example")
-        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
+        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,

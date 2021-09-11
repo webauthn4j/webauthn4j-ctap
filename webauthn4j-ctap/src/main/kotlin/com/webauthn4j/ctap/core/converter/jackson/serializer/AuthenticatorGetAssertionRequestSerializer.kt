@@ -2,7 +2,7 @@ package com.webauthn4j.ctap.core.converter.jackson.serializer
 
 import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionRequest
 
-class AuthenticatorGetAssertionCommandSerializer :
+class AuthenticatorGetAssertionRequestSerializer :
     AbstractCtapCanonicalCborSerializer<AuthenticatorGetAssertionRequest>(
         AuthenticatorGetAssertionRequest::class.java, listOf(
             FieldSerializationRule(1, AuthenticatorGetAssertionRequest::rpId),

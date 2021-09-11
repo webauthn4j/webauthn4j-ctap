@@ -11,7 +11,7 @@ class CtapCBORModule : SimpleModule("WebAuthnCBORModule") {
     init {
         this.addSerializer(
             AuthenticatorClientPINRequest::class.java,
-            AuthenticatorClientPINCommandSerializer()
+            AuthenticatorClientPINRequestSerializer()
         )
         this.addSerializer(
             AuthenticatorClientPINResponseData::class.java,
@@ -19,11 +19,11 @@ class CtapCBORModule : SimpleModule("WebAuthnCBORModule") {
         )
         this.addSerializer(
             AuthenticatorGetAssertionRequest::class.java,
-            AuthenticatorGetAssertionCommandSerializer()
+            AuthenticatorGetAssertionRequestSerializer()
         )
         this.addSerializer(
             AuthenticatorGetAssertionRequest.Options::class.java,
-            AuthenticatorGetAssertionCommandOptionsSerializer()
+            AuthenticatorGetAssertionRequestOptionsSerializer()
         )
         this.addSerializer(
             AuthenticatorGetAssertionResponseData::class.java,
@@ -31,7 +31,7 @@ class CtapCBORModule : SimpleModule("WebAuthnCBORModule") {
         )
         this.addSerializer(
             AuthenticatorGetInfoRequest::class.java,
-            AuthenticatorGetInfoCommandSerializer()
+            AuthenticatorGetInfoRequestSerializer()
         )
         this.addSerializer(
             AuthenticatorGetInfoResponseData::class.java,
@@ -43,7 +43,7 @@ class CtapCBORModule : SimpleModule("WebAuthnCBORModule") {
         )
         this.addSerializer(
             AuthenticatorGetNextAssertionRequest::class.java,
-            AuthenticatorGetNextAssertionCommandSerializer()
+            AuthenticatorGetNextAssertionRequestSerializer()
         )
         this.addSerializer(
             AuthenticatorGetNextAssertionResponseData::class.java,
@@ -51,11 +51,11 @@ class CtapCBORModule : SimpleModule("WebAuthnCBORModule") {
         )
         this.addSerializer(
             AuthenticatorMakeCredentialRequest::class.java,
-            AuthenticatorMakeCredentialCommandSerializer()
+            AuthenticatorMakeCredentialRequestSerializer()
         )
         this.addSerializer(
             AuthenticatorMakeCredentialRequest.Options::class.java,
-            AuthenticatorMakeCredentialCommandOptionsSerializer()
+            AuthenticatorMakeCredentialRequestOptionsSerializer()
         )
         this.addSerializer(
             AuthenticatorMakeCredentialResponseData::class.java,
@@ -63,7 +63,7 @@ class CtapCBORModule : SimpleModule("WebAuthnCBORModule") {
         )
         this.addSerializer(
             AuthenticatorResetRequest::class.java,
-            AuthenticatorResetCommandSerializer()
+            AuthenticatorResetRequestSerializer()
         )
         this.addSerializer(
             AuthenticatorResetResponseData::class.java,
@@ -78,10 +78,14 @@ class CtapCBORModule : SimpleModule("WebAuthnCBORModule") {
             CtapPublicKeyCredentialUserEntitySerializer()
         )
         this.addSerializer(U2FKeyEnvelope::class.java, U2FKeyEnvelopeSerializer())
-        addDeserializer(ClientPINOption::class.java, ClientPINOptionDeserializer())
-        addDeserializer(PlatformOption::class.java, PlatformOptionDeserializer())
-        addDeserializer(ResidentKeyOption::class.java, ResidentKeyOptionDeserializer())
-        addDeserializer(UserPresenceOption::class.java, UserPresenceOptionDeserializer())
-        addDeserializer(UserVerificationOption::class.java, UserVerificationOptionDeserializer())
+
+        this.addDeserializer(String::class.java, CoercionLessStringDeserializer())
+        this.addDeserializer(ByteArray::class.java, CoercionLessByteArrayDeserializer())
+
+        this.addDeserializer(ClientPINOption::class.java, ClientPINOptionDeserializer())
+        this.addDeserializer(PlatformOption::class.java, PlatformOptionDeserializer())
+        this.addDeserializer(ResidentKeyOption::class.java, ResidentKeyOptionDeserializer())
+        this.addDeserializer(UserPresenceOption::class.java, UserPresenceOptionDeserializer())
+        this.addDeserializer(UserVerificationOption::class.java, UserVerificationOptionDeserializer())
     }
 }

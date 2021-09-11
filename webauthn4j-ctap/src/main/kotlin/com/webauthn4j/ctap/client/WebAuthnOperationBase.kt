@@ -57,6 +57,7 @@ open class WebAuthnOperationBase(protected val webAuthnClient: WebAuthnClient) {
             ResidentKeyRequirement.DISCOURAGED -> {
                 true
             }
+            else -> throw NotImplementedError("unknown option")
         }
     }
 

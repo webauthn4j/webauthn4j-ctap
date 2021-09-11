@@ -9,7 +9,7 @@ class AuthenticatorGetNextAssertionResponse :
 
     constructor(statusCode: CtapStatusCode) : super(statusCode, null)
 
-    override val command: CtapCommand = CtapCommand.GET_NEXT_ASSERTION
+    //override val command: CtapCommand = CtapCommand.GET_NEXT_ASSERTION
 
     override fun toString(): String {
         return "AuthenticatorGetNextAssertionResponse(statusCode=$statusCode, responseData=$responseData)"

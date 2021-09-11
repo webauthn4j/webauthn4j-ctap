@@ -68,16 +68,16 @@ class BLEConnector(
     }
 
     private suspend fun invokeCtapCommand(bleFrame: BLEFrame) {
-        when (bleFrame.data) {
+        when (val commandData = bleFrame.data) {
             null -> logger.warn("BLE frame data is null")
             else -> {
-                val ctapCommand = ctapRequestConverter.convert(bleFrame.data)
+                val ctapCommand = ctapRequestConverter.convert(commandData)
                 val ctapResponse =
                     transactionManager.invokeCommand<CtapRequest, CtapResponse>(
                         ctapCommand
                     )
-                val data = ctapResponseConverter.convertToBytes(ctapResponse)
-                sendResponse(BLEFrame(BLEFrameCommand.MSG, data))
+                val responseData = ctapResponseConverter.convertToBytes(ctapResponse)
+                sendResponse(BLEFrame(BLEFrameCommand.MSG, responseData))
             }
         }
     }

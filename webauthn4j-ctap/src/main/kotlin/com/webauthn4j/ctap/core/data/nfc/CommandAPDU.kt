@@ -1,5 +1,7 @@
 package com.webauthn4j.ctap.core.data.nfc
 
+import com.webauthn4j.ctap.authenticator.exception.APDUProcessingException
+import com.webauthn4j.ctap.core.data.U2FStatusCode
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.util.ArrayUtil
 import com.webauthn4j.util.AssertUtil
@@ -103,7 +105,9 @@ class CommandAPDU {
 
             // APDU format ref. https://smartcardguy.hatenablog.jp/entry/2018/08/11/153334
 
-            AssertUtil.isTrue(apdu.size >= HEADER_LENGTH, "apdu must have sufficient length")
+            if(apdu.size < HEADER_LENGTH){
+                throw APDUProcessingException(U2FStatusCode.WRONG_LENGTH)
+            }
             val cla = apdu[POS_CLA]
             val ins = apdu[POS_INS]
             val p1 = apdu[POS_P1]
@@ -130,13 +134,17 @@ class CommandAPDU {
                     lc = length
                     val dataLength = getLengthFromLengthField(lc)
                     val dataPos = POS_P2_NEXT + EXTENDED_LENGTH_LC_LENGTH
-                    dataIn = apdu.copyOfRange(dataPos, dataPos + dataLength)
-                    le = when (apdu.size) {
+                    val remainingLeSize = apdu.size - (dataPos+dataLength)
+                    le = when (remainingLeSize) {
                         // case3 extended APDU
-                        dataPos + dataLength -> null
+                        0 -> null
                         // case4
-                        else -> apdu.copyOfRange(dataPos + dataLength, apdu.size)
+                        1 -> apdu.copyOfRange(dataPos + dataLength, apdu.size)
+                        2 -> apdu.copyOfRange(dataPos + dataLength, apdu.size)
+                        3 -> apdu.copyOfRange(dataPos + dataLength, apdu.size)
+                        else-> throw APDUProcessingException(U2FStatusCode.WRONG_LENGTH)
                     }
+                    dataIn = apdu.copyOfRange(dataPos, dataPos + dataLength)
                 }
             } else {
                 // case2 short APDU
@@ -148,13 +156,18 @@ class CommandAPDU {
                     lc = byteArrayOf(apdu[POS_P2_NEXT])
                     val dataLength = getLengthFromLengthField(lc)
                     val dataPos = POS_P2_NEXT + SHORT_LENGTH_LC_LENGTH
-                    dataIn = apdu.copyOfRange(dataPos, dataPos + dataLength)
-                    le = when (apdu.size) {
+                    val remainingLeSize = apdu.size - (dataPos+dataLength)
+
+                    le = when (remainingLeSize) {
                         // case3 short APDU
-                        dataPos + dataLength -> null
+                        0 -> null
                         // case4
-                        else -> apdu.copyOfRange(dataPos + dataLength, apdu.size)
+                        1 -> apdu.copyOfRange(dataPos + dataLength, apdu.size)
+                        2 -> apdu.copyOfRange(dataPos + dataLength, apdu.size)
+                        3 -> apdu.copyOfRange(dataPos + dataLength, apdu.size)
+                        else -> throw APDUProcessingException(U2FStatusCode.WRONG_LENGTH)
                     }
+                    dataIn = apdu.copyOfRange(dataPos, dataPos + dataLength)
                 }
             }
             return CommandAPDU(cla, ins, p1, p2, lc, dataIn, le)
@@ -174,7 +187,7 @@ class CommandAPDU {
                         else -> length
                     }
                 }
-                else -> throw IllegalArgumentException("length field must be 1-3 bytes")
+                else -> throw APDUProcessingException(U2FStatusCode.WRONG_LENGTH)
             }
         }
     }

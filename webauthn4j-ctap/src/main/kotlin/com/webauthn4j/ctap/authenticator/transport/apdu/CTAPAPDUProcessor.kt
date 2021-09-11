@@ -5,9 +5,7 @@ import com.webauthn4j.ctap.authenticator.TransactionManager
 import com.webauthn4j.ctap.authenticator.transport.nfc.NFCConnector
 import com.webauthn4j.ctap.core.converter.CtapRequestConverter
 import com.webauthn4j.ctap.core.converter.CtapResponseConverter
-import com.webauthn4j.ctap.core.data.CtapRequest
-import com.webauthn4j.ctap.core.data.CtapResponse
-import com.webauthn4j.ctap.core.data.U2FStatusCode
+import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import org.slf4j.LoggerFactory
@@ -47,11 +45,11 @@ class CTAPAPDUProcessor(
         return try {
             for (commandAPDUProcessor in commandAPDUProcessors) {
                 if (commandAPDUProcessor.isTarget(command)) {
-                    commandAPDUProcessor.process(command)
+                    return commandAPDUProcessor.process(command)
                 }
             }
             logger.debug("Processing Unknown APDU command")
-            U2FStatusCode.CLA_NOT_SUPPORTED.toResponseAPDU()
+            U2FStatusCode.INS_NOT_SUPPORTED.toResponseAPDU()
         } catch (e: RuntimeException) {
             logger.error(NFCConnector.UNEXPECTED_EXCEPTION_MESSAGE, e)
             ResponseAPDU.createErrorResponseAPDU()
@@ -102,7 +100,10 @@ class CTAPAPDUProcessor(
                 buildCtapCommand(cloned)
             } catch (e: RuntimeException) {
                 logger.error("Failed to build a CTAP2 command from APDU commands", e)
-                return ResponseAPDU.createErrorResponseAPDU()
+                val ctapResponse = AuthenticatorGenericErrorResponse(CtapStatusCode.CTAP1_ERR_OTHER)
+                val bytes = ctapResponseConverter.convertToBytes(ctapResponse)
+                ctapResponseQueue.initialize(bytes)
+                return ctapResponseQueue.poll(command)
             }
             val ctapResponse = invokeCtapCommand(ctapCommand)
             val bytes = ctapResponseConverter.convertToBytes(ctapResponse)
