@@ -97,6 +97,9 @@
 
     <string name="title_user_consent">User Consent</string>
 
+    <string name="title_consent_caching">Consent Caching</string>
+    <string name="summary_consent_caching">Cache user consent result</string>
+
     <string name="reset_protection">Reset Protection</string>
     <string name="summary_reset_protection">Refuse reset when enabled</string>
 

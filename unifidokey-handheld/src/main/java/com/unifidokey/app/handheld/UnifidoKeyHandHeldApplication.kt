@@ -2,8 +2,8 @@ package com.unifidokey.app.handheld
 
 import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.app.UnifidoKeyComponent
-import com.unifidokey.app.handheld.presentation.CachingCredentialSelectionHandler
-import com.unifidokey.app.handheld.presentation.CachingUserConsentHandler
+import com.webauthn4j.ctap.authenticator.CachingCredentialSelectionHandler
+import com.webauthn4j.ctap.authenticator.CachingUserConsentHandler
 import com.unifidokey.app.handheld.presentation.UnifidoKeyCredentialSelectionHandler
 import com.unifidokey.app.handheld.presentation.UnifidoKeyUserConsentHandler
 import com.unifidokey.core.config.ConfigManager
@@ -32,10 +32,8 @@ class UnifidoKeyHandHeldApplication : UnifidoKeyApplicationBase<UnifidoKeyHandHe
         val unifidoKeyComponent: UnifidoKeyComponent = this.unifidoKeyComponent
         val authenticatorService: AuthenticatorService = unifidoKeyComponent.authenticatorService
         val configManager: ConfigManager = unifidoKeyComponent.configManager
-        authenticatorService.userConsentHandler =
-            CachingUserConsentHandler(UnifidoKeyUserConsentHandler(this, configManager))
-        authenticatorService.credentialSelectionHandler =
-            CachingCredentialSelectionHandler(UnifidoKeyCredentialSelectionHandler(this))
+        authenticatorService.userConsentHandler = UnifidoKeyUserConsentHandler(this, configManager)
+        authenticatorService.credentialSelectionHandler = UnifidoKeyCredentialSelectionHandler(this)
     }
 
 

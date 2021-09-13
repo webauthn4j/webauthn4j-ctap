@@ -15,6 +15,7 @@ import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatement
 import com.webauthn4j.ctap.authenticator.event.Event
 import com.webauthn4j.ctap.authenticator.extension.HMACSecretExtensionProcessor
 import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting
+import com.webauthn4j.ctap.authenticator.settings.ConsentCachingSetting
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import kotlinx.coroutines.runBlocking
 
@@ -72,10 +73,11 @@ class AuthenticatorService(
         configManager.isBTHIDTransportEnabled.liveData.observeForever { renewCtapAuthenticator() }
         configManager.isBLETransportEnabled.liveData.observeForever { renewCtapAuthenticator() }
         configManager.userConsent.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.clientPIN.liveData.observeForever { renewCtapAuthenticator() }
+        configManager.consentCaching.liveData.observeForever{ renewCtapAuthenticator() }
         configManager.resetProtection.liveData.observeForever { renewCtapAuthenticator() }
         configManager.credentialSelector.liveData.observeForever { renewCtapAuthenticator() }
         configManager.platform.liveData.observeForever { renewCtapAuthenticator() }
+        configManager.clientPIN.liveData.observeForever { renewCtapAuthenticator() }
         configManager.userVerification.liveData.observeForever { renewCtapAuthenticator() }
         configManager.userPresence.liveData.observeForever { renewCtapAuthenticator() }
         configManager.algorithms.liveData.observeForever { renewCtapAuthenticator() }
@@ -89,8 +91,8 @@ class AuthenticatorService(
         val aaguid = configManager.aaguid.value
         val platformSetting = configManager.platform.value
         val residentKeySetting = configManager.residentKey.value
-        val clientPINSetting = configManager.clientPIN.value
         val resetProtectionSetting = configManager.resetProtection.value
+        val clientPINSetting = configManager.clientPIN.value
         val userPresenceSetting = configManager.userPresence.value
         val userVerificationSetting = configManager.userVerification.value
         val algorithms = configManager.algorithms.value
@@ -128,12 +130,18 @@ class AuthenticatorService(
         )
         userConsentHandler.let {
             if (it != null) {
-                ctapAuthenticator.userConsentHandler = it
+                ctapAuthenticator.userConsentHandler = when (configManager.consentCaching.value) {
+                    ConsentCachingSetting.ENABLED -> CachingUserConsentHandler(it)
+                    else -> CachingUserConsentHandler(it)
+                }
             }
         }
         credentialSelectionHandler.let {
             if (it != null) {
-                ctapAuthenticator.credentialSelectionHandler = it
+                ctapAuthenticator.credentialSelectionHandler = when(configManager.consentCaching.value){
+                    ConsentCachingSetting.ENABLED -> CachingCredentialSelectionHandler(it)
+                    else -> it
+                }
             }
         }
         ctapAuthenticator.registerEventListener(this::onEvent)

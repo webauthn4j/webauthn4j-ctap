@@ -189,6 +189,21 @@ class SettingsFragment internal constructor(
                     return@OnPreferenceChangeListener false
                 }
             }
+        findPreference<Preference>(ConsentCachingConfigProperty.KEY)!!.onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any? ->
+                try {
+                    val consentCachingSetting = ConsentCachingSetting.create((newValue as Boolean))
+                    return@OnPreferenceChangeListener viewModel.setConsentCachingSetting(consentCachingSetting)
+                } catch (e: RuntimeException) {
+                    logger.error("Unexpected exception is thrown", e)
+                    Toast.makeText(
+                        settingsActivity,
+                        "Unexpected error has occurred.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@OnPreferenceChangeListener false
+                }
+            }
         findPreference<Preference>(ResetProtectionConfigProperty.KEY)!!.onPreferenceChangeListener =
             Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any ->
                 try {

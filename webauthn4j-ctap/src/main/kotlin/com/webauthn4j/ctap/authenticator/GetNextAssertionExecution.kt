@@ -74,12 +74,20 @@ internal class GetNextAssertionExecution(
             signedData
         )
         val user = when (credential) {
-            is UserCredential -> CtapPublicKeyCredentialUserEntity(
-                credential.userHandle,
-                credential.username,
-                credential.displayName,
-                credential.icon
-            )
+            is UserCredential -> when(assertionObject.maskUserIdentifiableInfo){
+                true -> CtapPublicKeyCredentialUserEntity(
+                    credential.userHandle,
+                    null,
+                    null,
+                    null
+                )
+                false -> CtapPublicKeyCredentialUserEntity(
+                    credential.userHandle,
+                    credential.username,
+                    credential.displayName,
+                    credential.icon
+                )
+            }
             else -> null
         }
 

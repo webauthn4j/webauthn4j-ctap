@@ -295,7 +295,7 @@ internal class GetAssertionExecution :
                     }
                 }
             }
-            GetAssertionSession.AssertionObject(credential, outputsBuilder.build(), 0)
+            GetAssertionSession.AssertionObject(credential, false, outputsBuilder.build(), 0)
         }
     }
 
@@ -327,7 +327,7 @@ internal class GetAssertionExecution :
     //spec| Step8
     //spec| If no userCredentials were located in step 1, return CTAP2_ERR_NO_CREDENTIALS.
     private fun execStep8CheckUserCredentialCandidatesExistence() {
-        if (credentials.isEmpty()) {
+        if (assertionObjects.isEmpty()) {
             throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_NO_CREDENTIALS)
         }
     }
@@ -338,7 +338,7 @@ internal class GetAssertionExecution :
     //spec| Otherwise, order the userCredentials by the time when they were created in reverse order.
     //spec| The first credential is the most recent credential that was created.
     private fun execStep9SortUserCredentials() {
-        credentials.sortedBy { userCredential -> userCredential.createdAt.epochSecond }
+        assertionObjects.sortedBy { assertionObject -> assertionObject.credential.createdAt.epochSecond }
     }
 
     //spec| Step10
@@ -354,15 +354,7 @@ internal class GetAssertionExecution :
     private fun execStep10PrepareGetAssertionSession() {
         if(!(userVerificationPlan || authenticatorGetAssertionRequest.pinAuth != null )){
             assertionObjects.map {
-                when (val credential = it.credential) {
-                    is ResidentUserCredential -> {
-                        it.credential = ResidentUserCredential(credential.credentialId, credential.credentialKey, credential.userHandle, null, null, null, credential.rpId, credential.rpName, credential.rpIcon, credential.counter, credential.createdAt, credential.otherUI, credential.details)
-                    }
-                    is NonResidentUserCredential -> {
-                        it.credential = NonResidentUserCredential(credential.credentialId, credential.credentialKey, credential.userHandle, null, null, null, credential.rpId, credential.rpName, credential.rpIcon, credential.createdAt, credential.otherUI, credential.details)
-                    }
-                }
-
+                it.maskUserIdentifiableInfo = true
             }
         }
 
@@ -437,12 +429,20 @@ internal class GetAssertionExecution :
             signedData
         )
         val user = when (credential) {
-            is UserCredential -> CtapPublicKeyCredentialUserEntity(
+            is UserCredential -> when(assertionObject.maskUserIdentifiableInfo){
+                true -> CtapPublicKeyCredentialUserEntity(
+                    credential.userHandle,
+                    null,
+                    null,
+                    null
+                )
+                false -> CtapPublicKeyCredentialUserEntity(
                     credential.userHandle,
                     credential.username,
                     credential.displayName,
                     credential.icon
                 )
+            }
             else -> null
         }
         val numberOfCredentials = onGoingGetAssertionSession.numberOfAssertionObjects

@@ -104,6 +104,16 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun setConsentCachingSetting(consentCachingSetting: ConsentCachingSetting): Boolean {
+        return try {
+            configManager.consentCaching.value = consentCachingSetting
+            true
+        } catch (e: RuntimeException) {
+            logger.error("Unexpected exception is thrown", e)
+            false
+        }
+    }
+
     fun setCredentialSelectorSetting(credentialSelectorSetting: CredentialSelectorSetting): Boolean {
         return try {
             configManager.credentialSelector.value = credentialSelectorSetting
@@ -183,6 +193,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             false
         }
     }
+
 
 
 }

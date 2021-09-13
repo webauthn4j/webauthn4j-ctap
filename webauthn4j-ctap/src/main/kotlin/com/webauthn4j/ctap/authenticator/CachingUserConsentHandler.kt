@@ -1,8 +1,5 @@
-package com.unifidokey.app.handheld.presentation
+package com.webauthn4j.ctap.authenticator
 
-import com.webauthn4j.ctap.authenticator.GetAssertionConsentOptions
-import com.webauthn4j.ctap.authenticator.MakeCredentialConsentOptions
-import com.webauthn4j.ctap.authenticator.UserConsentHandler
 import java.time.Duration
 import java.time.Instant
 

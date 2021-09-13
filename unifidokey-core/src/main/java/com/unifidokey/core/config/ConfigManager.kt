@@ -4,6 +4,7 @@ import androidx.annotation.UiThread
 import com.unifidokey.core.adapter.PersistenceAdaptor
 import com.unifidokey.core.setting.KeyStorageSetting
 import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting
+import com.webauthn4j.ctap.authenticator.settings.ConsentCachingSetting
 import com.webauthn4j.ctap.authenticator.settings.ResidentKeySetting
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
@@ -37,11 +38,12 @@ class ConfigManager(
 
     // settings
     val userConsent = UserConsentConfigProperty(this)
-    val clientPIN = ClientPINConfigProperty(this)
+    val consentCaching = ConsentCachingConfigProperty(this)
     val resetProtection = ResetProtectionConfigProperty(this)
     val credentialSelector = CredentialSelectorConfigProperty(this)
     val keepScreenOn = KeepScreenOnConfigProperty(this)
     val platform = PlatformConfigProperty(this)
+    val clientPIN = ClientPINConfigProperty(this)
     val userVerification = UserVerificationConfigProperty(this)
     val userPresence = UserPresenceConfigProperty(this)
     val algorithms = AlgConfigProperty(this)
@@ -62,11 +64,12 @@ class ConfigManager(
         bthidDeviceHistory,
         isBTHIDBackgroundServiceModeEnabled,
         userConsent,
-        clientPIN,
+        consentCaching,
         resetProtection,
         credentialSelector,
         keepScreenOn,
         platform,
+        clientPIN,
         userVerification,
         userPresence,
         algorithms,

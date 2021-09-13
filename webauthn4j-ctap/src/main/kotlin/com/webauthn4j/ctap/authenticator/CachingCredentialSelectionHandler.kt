@@ -1,6 +1,5 @@
-package com.unifidokey.app.handheld.presentation
+package com.webauthn4j.ctap.authenticator
 
-import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
 import com.webauthn4j.ctap.authenticator.store.Credential
 import com.webauthn4j.util.Base64UrlUtil
 import org.slf4j.LoggerFactory
