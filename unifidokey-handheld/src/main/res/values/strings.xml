@@ -24,6 +24,9 @@
     <string name="example_type">Registration</string>
     <string name="example_event_message">"John Doe" is registered to "example.com"</string>
 
+    <string name="button_ok">OK</string>
+    <string name="button_cancel">Cancel</string>
+
 
     <!-- Main Activity -->
 
@@ -139,7 +142,10 @@
     <!-- About Activity -->
     <string name="title_activity_about">About</string>
     <string name="dummy_version">1.0.0.RELEASE</string>
-    <string name="ok_button">OK</string>
+
+    <string name="header_config_reset">Configuration Reset</string>
+    <string name="summary_config_reset">Reset configurations to defaults</string>
+    <string name="title_config_reset">Config Reset</string>
 
 
 </resources>

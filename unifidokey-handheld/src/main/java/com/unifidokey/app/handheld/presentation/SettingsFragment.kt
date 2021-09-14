@@ -3,6 +3,9 @@ package com.unifidokey.app.handheld.presentation
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -12,8 +15,8 @@ import com.unifidokey.R
 import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication
 import com.unifidokey.app.handheld.presentation.util.BluetoothPairingUtil
+import com.unifidokey.app.handheld.presentation.util.ConfigurationsResetConfirmationDialogUtil
 import com.unifidokey.core.config.*
-import com.unifidokey.core.config.ConfigManager.Companion.BTHID_PAIRING_PREF_KEY
 import com.unifidokey.core.service.BLEService
 import com.unifidokey.core.service.BLEStatus
 import com.unifidokey.core.service.BTHIDService
@@ -54,6 +57,16 @@ class SettingsFragment internal constructor(
         nfcService = unifidoKeyComponent.nfcService
         bleService = unifidoKeyComponent.bleService
         bthidService = unifidoKeyComponent.bthidService
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        this.onProModeChanged(configManager.proMode.value)
+        configManager.proMode.liveData.observe(this.viewLifecycleOwner, this@SettingsFragment::onProModeChanged)
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onResume() {
@@ -166,7 +179,7 @@ class SettingsFragment internal constructor(
                 }
             it.isVisible = configManager.bthidFeatureFlag
         }
-        findPreference<Preference>(BTHID_PAIRING_PREF_KEY)!!.let {
+        findPreference<Preference>(BTHID_PAIRING_KEY)!!.let {
             it.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 BluetoothPairingUtil.startPairing(this.requireContext())
                 return@OnPreferenceClickListener true
@@ -402,6 +415,17 @@ class SettingsFragment internal constructor(
                     return@OnPreferenceChangeListener false
                 }
             }
+
+        findPreference<Preference>(CONFIG_RESET_KEY)!!.let {
+            it.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+                ConfigurationsResetConfirmationDialogUtil.confirm(requireContext()){ confirmed ->
+                    if(confirmed){
+                        configManager.reset()
+                    }
+                }
+                return@OnPreferenceClickListener true
+            }
+        }
     }
 
     private fun setupNFCAdapterEnabledListener() {
@@ -441,7 +465,7 @@ class SettingsFragment internal constructor(
             findPreference<SwitchPreferenceCompat>(BLETransportEnabledConfigProperty.KEY)!!
         val bthidPreference =
             findPreference<SwitchPreferenceCompat>(BTHIDTransportEnabledConfigProperty.KEY)!!
-        val bluetoothParingPreference = findPreference<Preference>(BTHID_PAIRING_PREF_KEY)!!
+        val bluetoothParingPreference = findPreference<Preference>(BTHID_PAIRING_KEY)!!
 
         bleEnabledPreference.isEnabled = enabled
         bthidPreference.isEnabled = enabled
@@ -449,7 +473,19 @@ class SettingsFragment internal constructor(
     }
 
     private fun onBLEStatusChanged(bleStatus: BLEStatus) {
-        findPreference<Preference>(BTHID_PAIRING_PREF_KEY)!!.isEnabled = bleStatus == BLEStatus.ON
+        findPreference<Preference>(BTHID_PAIRING_KEY)!!.isEnabled = bleStatus == BLEStatus.ON
+    }
+
+    private fun onProModeChanged(proMode: Boolean){
+        findPreference<Preference>(UserConsentConfigProperty.KEY)!!.isVisible = proMode
+        findPreference<Preference>(CredentialSelectorConfigProperty.KEY)!!.isVisible = proMode
+        findPreference<Preference>(DEVELOPER_OPTIONS_KEY)!!.isVisible = proMode
+    }
+
+    companion object {
+        const val BTHID_PAIRING_KEY = "bthidPairing"
+        const val CONFIG_RESET_KEY = "configReset"
+        const val DEVELOPER_OPTIONS_KEY = "developerOptions"
     }
 
 }

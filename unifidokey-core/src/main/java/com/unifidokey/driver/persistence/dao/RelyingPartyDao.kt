@@ -8,15 +8,15 @@ import com.unifidokey.driver.persistence.entity.RelyingPartyEntity
 @Dao
 interface RelyingPartyDao {
     @Transaction
-    @Query("SELECT relying_party.sid AS rp_sid, relying_party.id AS rp_id, relying_party.name AS rp_name FROM relying_party LEFT JOIN user_credential WHERE relying_party.id = :rpId")
+    @Query("SELECT relying_party.sid AS rp_sid, relying_party.id AS rp_id, relying_party.name AS rp_name, relying_party.icon AS rp_icon FROM relying_party LEFT JOIN user_credential WHERE relying_party.id = :rpId")
     fun findOne(rpId: String): RelyingPartyAndUserCredentialsDto?
 
     @Transaction
-    @Query("SELECT relying_party.sid AS rp_sid, relying_party.id AS rp_id, relying_party.name AS rp_name FROM relying_party LEFT JOIN user_credential GROUP BY relying_party.id")
+    @Query("SELECT relying_party.sid AS rp_sid, relying_party.id AS rp_id, relying_party.name AS rp_name, relying_party.icon AS rp_icon FROM relying_party LEFT JOIN user_credential GROUP BY relying_party.id")
     fun findAll(): List<RelyingPartyAndUserCredentialsDto>
 
     @Transaction
-    @Query("SELECT relying_party.sid AS rp_sid, relying_party.id AS rp_id, relying_party.name AS rp_name FROM relying_party LEFT JOIN user_credential GROUP BY relying_party.id")
+    @Query("SELECT relying_party.sid AS rp_sid, relying_party.id AS rp_id, relying_party.name AS rp_name, relying_party.icon AS rp_icon FROM relying_party LEFT JOIN user_credential GROUP BY relying_party.id")
     fun findAllLiveData(): LiveData<List<RelyingPartyAndUserCredentialsDto>>
 
     @Insert

@@ -12,10 +12,6 @@ class DeviceWideCounterConfigProperty internal constructor(configManager: Config
         return configManager.persistenceAdaptor.loadPrimitiveInt(KEY).toUInt()
     }
 
-    fun reset() {
-        value = 0u
-    }
-
 
     companion object {
         const val KEY = "deviceWideCounter"

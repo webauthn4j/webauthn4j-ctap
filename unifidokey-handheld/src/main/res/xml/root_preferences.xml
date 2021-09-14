@@ -72,7 +72,7 @@
     </PreferenceCategory>
 
 
-    <PreferenceCategory app:title="@string/developer_options_header">
+    <PreferenceCategory app:title="@string/developer_options_header" app:key="developerOptions">
 
         <EditTextPreference
             app:key="aaguid"
@@ -143,6 +143,13 @@
             app:useSimpleSummaryProvider="true" />
 
 
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/header_config_reset">
+        <Preference
+            app:key="configReset"
+            app:summary="@string/summary_config_reset"
+            app:title="@string/title_config_reset" />
     </PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

@@ -16,6 +16,8 @@ class ConfigManager(
     val bleFeatureFlag: Boolean = true,
     val bthidFeatureFlag: Boolean = true
 ) {
+    // pro mode
+    val proMode = ProModeConfigProperty(this)
 
     // characteristics
     val aaguid = AAGUIDConfigProperty(this)
@@ -52,6 +54,7 @@ class ConfigManager(
     val keyStorage = KeyStorageConfigProperty(this)
 
     private val properties = listOf(
+        proMode,
         aaguid,
         credentialSourceEncryptionIV,
         caCertificates,
@@ -78,9 +81,31 @@ class ConfigManager(
         keyStorage
     )
 
+    private val resetTargetProperties = listOf(
+        proMode,
+        aaguid,
+        isNFCTransportEnabled,
+        isBLETransportEnabled,
+        isBTHIDTransportEnabled,
+        isBTHIDBackgroundServiceModeEnabled,
+        userConsent,
+        consentCaching,
+        resetProtection,
+        credentialSelector,
+        keepScreenOn,
+        platform,
+        clientPIN,
+        userVerification,
+        userPresence,
+        algorithms,
+        attestationStatementFormat,
+        residentKey,
+        keyStorage
+    ) // credentialSourceEncryptionIV, caCertificates, clientPINEnc, pinRetries, deviceWideCounter, bthidDeviceHistory are excluded by design
+
+
     companion object {
-        // transports
-        const val BTHID_PAIRING_PREF_KEY = "bthidPairing"
+
         fun generateIV(): ByteArray {
             val value = ByteArray(16)
             SecureRandom().nextBytes(value)
@@ -95,6 +120,10 @@ class ConfigManager(
 
     @UiThread
     fun setup() {
+    }
+
+    fun reset(){
+        resetTargetProperties.forEach { it.reset() }
     }
 
 

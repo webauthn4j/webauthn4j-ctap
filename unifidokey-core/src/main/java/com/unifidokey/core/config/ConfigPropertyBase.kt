@@ -46,9 +46,14 @@ abstract class ConfigPropertyBase<T> internal constructor(
         liveData.value //initialize lazy mutableLiveData
     }
 
+    fun reset() {
+        value = seedValue
+    }
+
     protected abstract fun save(value: T)
 
     @Throws(ConfigNotFoundException::class)
     protected abstract fun load(): T
+
 
 }
