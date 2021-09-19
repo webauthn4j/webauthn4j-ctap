@@ -15,7 +15,8 @@ Install from Google Play Store.
 
 Documentation
 
-* [User Guide]()
+* [User Guide(en)](https://docs.unifidokey.com/en)
+* [User Guide(ja)](https://docs.unifidokey.com/ja)
 
 ## Build from source
 
