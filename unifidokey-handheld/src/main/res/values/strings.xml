@@ -148,6 +148,7 @@
     <string name="header_config_reset">Configuration Reset</string>
     <string name="summary_config_reset">Reset configurations to defaults</string>
     <string name="title_config_reset">Config Reset</string>
+    <string name="menu_help">Help</string>
 
 
 </resources>

@@ -13,7 +13,7 @@ Just install the UnifidoKey app to your smartphone, and enjoy secure and conveni
 
 Install from Google Play Store.
 
-Documentation
+## Documentation
 
 * [User Guide(en)](https://docs.unifidokey.com/en)
 * [User Guide(ja)](https://docs.unifidokey.com/ja)

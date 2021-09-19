@@ -1,6 +1,7 @@
 package com.unifidokey.app.handheld.presentation
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -154,6 +155,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.nav_licenses -> {
                 intent = Intent(this, OssLicensesMenuActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.nav_help -> {
+                intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://docs.unifidokey.com/en/"))
                 startActivity(intent)
             }
             R.id.nav_about -> {
