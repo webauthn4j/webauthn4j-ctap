@@ -62,10 +62,9 @@ image::../images/authentication.png[Authentication screen, 40%]
 
 確認の上、"PROCEED"を押下して認証を承認して下さい。
 
-サイトが本人性確認を要求している場合、ClientPINを有効にしている場合、PC側のダイアログでPINの入力、
-User Verificationを有効にしている場合、スマートフォン側での生体認証が求められる場合があります。
+サイトが本人性確認を要求しており、ClientPINを有効にしている場合、PC側のダイアログでPINの入力が要求されます。
+User Verificationを有効にしている場合、スマートフォン側での生体認証が要求されます。
 画面の指示に従い、認証を進めて下さい。
-
 
 
 

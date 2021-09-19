@@ -1,6 +1,8 @@
-== What's WebAuthn4J UnifidoKey
+== Introduction
 
-WebAuthn4J UnifidoKey is an Android app, which turns your smart phone to a security key.
+=== What's WebAuthn4J UnifidoKey
+
+https://github.com/webauthn4j/UnifidoKey[WebAuthn4J UnifidoKey] is an Android app, which turns your smart phone to a security key.
 You no longer need to purchase an expensive physical security key.
 Installing UnifidoKey app makes your smartphone a Bluetooth/NFC connected security key.
 
