@@ -34,7 +34,7 @@ jobs:
           ./gradlew javadoc generateUserGuide
       - name: Deploy to surge
         run: |
-          surge docs/asciidoc/html5 docs.unifidokey.com
+          surge build/docs/asciidoc/html5 docs.unifidokey.com
         env:
           SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
           SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
