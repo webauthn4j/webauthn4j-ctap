@@ -1,6 +1,7 @@
 # WebAuthn4J UnifidoKey
 
-![UnifidoKey](./docs/images/unifidokey.png)
+![Home screen](./docs/images/home.png)
+![Registration screen](./docs/images/registration.png)
 
 [![Actions Status](https://github.com/webauthn4j/UnifidoKey/workflows/CI/badge.svg)](https://github.com/webauthn4j/unifidokey/actions)
 
