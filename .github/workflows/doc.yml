@@ -15,6 +15,9 @@ jobs:
         os: [ubuntu-latest]
 
     steps:
+      - name: Setup build env
+        run: |
+          sudo npm --global install surge
       - name: Checkout
         uses: actions/checkout@v2
       - name: Configure git
@@ -29,11 +32,9 @@ jobs:
       - name: Build with Gradle
         run: |
           ./gradlew javadoc generateUserGuide
-      - name: Commit & Push pages
+      - name: Deploy to surge
         run: |
-          rm -rf docs
-          mv build/docs/asciidoc/html5 docs
-          git add docs
-          git commit -m "Update docs"
-          git checkout -b gh-pages
-          git push origin gh-pages -f
+          surge docs/asciidoc/html5 docs.unifidokey.com
+        env:
+          SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
