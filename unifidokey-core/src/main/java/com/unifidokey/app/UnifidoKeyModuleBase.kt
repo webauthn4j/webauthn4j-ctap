@@ -14,8 +14,8 @@ import com.unifidokey.core.service.AuthenticatorService
 import com.unifidokey.core.service.BLEService
 import com.unifidokey.core.service.BTHIDService
 import com.unifidokey.core.service.NFCService
-import com.unifidokey.driver.attestation.AndroidKeyAttestationStatementGenerator
-import com.unifidokey.driver.attestation.AndroidSafetyNetAttestationStatementGenerator
+import com.unifidokey.driver.attestation.AndroidKeyAttestationStatementProvider
+import com.unifidokey.driver.attestation.AndroidSafetyNetAttestationStatementProvider
 import com.unifidokey.driver.persistence.UnifidoKeyAuthenticatorPropertyStoreImpl
 import com.unifidokey.driver.persistence.UnifidoKeyDatabase
 import com.unifidokey.driver.persistence.dao.*
@@ -23,11 +23,9 @@ import com.unifidokey.driver.transport.CtapBLEAndroidServiceContextualAdapter
 import com.unifidokey.driver.transport.CtapBTHIDAndroidServiceContextualAdapter
 import com.unifidokey.driver.transport.CtapNFCAndroidServiceAdapter
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementGenerator
-import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementGenerator
-import com.webauthn4j.ctap.authenticator.attestation.NoneAttestationStatementGenerator
-import com.webauthn4j.ctap.authenticator.attestation.PackedAttestationStatementGenerator
+import com.webauthn4j.ctap.authenticator.attestation.*
 import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting
+import com.webauthn4j.ctap.authenticator.settings.AttestationTypeSetting
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
 import com.webauthn4j.ctap.core.converter.jackson.PublicKeyCredentialSourceCBORModule
 import dagger.Module
@@ -35,6 +33,7 @@ import dagger.Provides
 import java.util.*
 import javax.inject.Named
 import javax.inject.Singleton
+import kotlin.collections.HashMap
 
 /**
  * Defines Dagger2 configuration
@@ -52,24 +51,22 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
         bleService: BLEService,
         bthidService: BTHIDService,
         eventDao: EventDao,
-        androidKeyAttestationStatementGenerator: AndroidKeyAttestationStatementGenerator,
-        androidSafetyNetAttestationStatementGenerator: AndroidSafetyNetAttestationStatementGenerator,
-        packedAttestationStatementGenerator: PackedAttestationStatementGenerator,
-        fidoU2FAttestationStatementGenerator: FIDOU2FAttestationStatementGenerator,
+        androidKeyAttestationStatementGenerator: AndroidKeyAttestationStatementProvider,
+        androidSafetyNetAttestationStatementGenerator: AndroidSafetyNetAttestationStatementProvider,
+        packedBasicAttestationStatementGenerator: PackedBasicAttestationStatementProvider,
+        packedSelfAttestationStatementProvider: PackedSelfAttestationStatementProvider,
+        fidoU2FBasicAttestationStatementGenerator: FIDOU2FBasicAttestationStatementProvider,
+        fidoU2FSelfAttestationStatementProvider: FIDOU2FSelfAttestationStatementProvider,
         objectConverter: ObjectConverter
     ): AuthenticatorService {
-        val attestationStatementGenerators: MutableMap<AttestationStatementFormatSetting, AttestationStatementGenerator> =
-            EnumMap(AttestationStatementFormatSetting::class.java)
-        attestationStatementGenerators[AttestationStatementFormatSetting.ANDROID_KEY] =
-            androidKeyAttestationStatementGenerator
-        attestationStatementGenerators[AttestationStatementFormatSetting.ANDROID_SAFETYNET] =
-            androidSafetyNetAttestationStatementGenerator
-        attestationStatementGenerators[AttestationStatementFormatSetting.PACKED] =
-            packedAttestationStatementGenerator
-        attestationStatementGenerators[AttestationStatementFormatSetting.FIDO_U2F] =
-            fidoU2FAttestationStatementGenerator
-        attestationStatementGenerators[AttestationStatementFormatSetting.NONE] =
-            NoneAttestationStatementGenerator()
+        val attestationStatementGenerators: MutableMap<Pair<AttestationTypeSetting, AttestationStatementFormatSetting>, AttestationStatementProvider> = HashMap()
+        attestationStatementGenerators[Pair(AttestationTypeSetting.BASIC, AttestationStatementFormatSetting.ANDROID_KEY)] = androidKeyAttestationStatementGenerator
+        attestationStatementGenerators[Pair(AttestationTypeSetting.BASIC, AttestationStatementFormatSetting.ANDROID_SAFETYNET)] = androidSafetyNetAttestationStatementGenerator
+        attestationStatementGenerators[Pair(AttestationTypeSetting.BASIC, AttestationStatementFormatSetting.PACKED)] = packedBasicAttestationStatementGenerator
+        attestationStatementGenerators[Pair(AttestationTypeSetting.SELF, AttestationStatementFormatSetting.PACKED)] = packedSelfAttestationStatementProvider
+        attestationStatementGenerators[Pair(AttestationTypeSetting.BASIC, AttestationStatementFormatSetting.FIDO_U2F)] = fidoU2FBasicAttestationStatementGenerator
+        attestationStatementGenerators[Pair(AttestationTypeSetting.SELF, AttestationStatementFormatSetting.FIDO_U2F)] = fidoU2FSelfAttestationStatementProvider
+        attestationStatementGenerators[Pair(AttestationTypeSetting.BASIC, AttestationStatementFormatSetting.NONE)] = NoneAttestationStatementProvider()
         return AuthenticatorService(
             authenticatorPropertyStore,
             configManager,
@@ -84,8 +81,8 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
 
     @Singleton
     @Provides
-    fun provideAndroidKeyAttestationStatementGenerator(objectConverter: ObjectConverter): AndroidKeyAttestationStatementGenerator {
-        return AndroidKeyAttestationStatementGenerator(objectConverter)
+    fun provideAndroidKeyAttestationStatementGenerator(objectConverter: ObjectConverter): AndroidKeyAttestationStatementProvider {
+        return AndroidKeyAttestationStatementProvider(objectConverter)
     }
 
     @Singleton
@@ -94,8 +91,8 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
         unifidoKeyApplication: TA,
         objectConverter: ObjectConverter,
         @Named("androidSafetyNetAPIKey") apiKey: String
-    ): AndroidSafetyNetAttestationStatementGenerator {
-        return AndroidSafetyNetAttestationStatementGenerator(
+    ): AndroidSafetyNetAttestationStatementProvider {
+        return AndroidSafetyNetAttestationStatementProvider(
             apiKey,
             unifidoKeyApplication,
             objectConverter
@@ -104,14 +101,26 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
 
     @Singleton
     @Provides
-    fun providePackedAttestationStatementGenerator(): PackedAttestationStatementGenerator {
-        return PackedAttestationStatementGenerator.createWithDemoAttestation() //TODO revisit
+    fun providePackedBasicAttestationStatementGenerator(): PackedBasicAttestationStatementProvider {
+        return PackedBasicAttestationStatementProvider.createWithDemoAttestationKey() //TODO revisit
     }
 
     @Singleton
     @Provides
-    fun provideFidoU2FAttestationStatementGenerator(): FIDOU2FAttestationStatementGenerator {
-        return FIDOU2FAttestationStatementGenerator.createWithDemoAttestation()  //TODO revisit
+    fun providePackedSelfAttestationStatementGenerator(objectConverter: ObjectConverter): PackedSelfAttestationStatementProvider {
+        return PackedSelfAttestationStatementProvider(DemoAttestationConstants.DEMO_ATTESTATION_NAME, objectConverter)
+    }
+
+    @Singleton
+    @Provides
+    fun provideFidoU2FBasicAttestationStatementGenerator(): FIDOU2FBasicAttestationStatementProvider {
+        return FIDOU2FBasicAttestationStatementProvider.createWithDemoAttestationKey()  //TODO revisit
+    }
+
+    @Singleton
+    @Provides
+    fun provideFidoU2FSelfAttestationStatementGenerator(): FIDOU2FSelfAttestationStatementProvider {
+        return FIDOU2FSelfAttestationStatementProvider(DemoAttestationConstants.DEMO_ATTESTATION_NAME)
     }
 
     @Singleton

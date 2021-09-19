@@ -42,19 +42,26 @@ class AttestationCertificateBuilder internal constructor(
     private val publicKey: PublicKey,
     private val issuerDN: String,
     private val issuerPrivateKey: PrivateKey,
-    private val signatureAlgorithm: SignatureAlgorithm,
-    private val aaguid: AAGUID
+    private val signatureAlgorithm: SignatureAlgorithm
 ) {
 
     private var notBefore = Instant.parse("2000-01-01T00:00:00Z")
     private var notAfter = Instant.parse("2999-12-31T23:59:59Z")
+    private var aaguid: AAGUID? = null
 
-    fun notBefore(notBefore: Instant) {
+    fun notBefore(notBefore: Instant): AttestationCertificateBuilder {
         this.notBefore = notBefore
+        return this
     }
 
-    fun notAfter(notAfter: Instant) {
+    fun notAfter(notAfter: Instant): AttestationCertificateBuilder {
         this.notAfter = notAfter
+        return this
+    }
+
+    fun aaguid(aaguid: AAGUID): AttestationCertificateBuilder{
+        this.aaguid = aaguid
+        return this
     }
 
     fun build(): X509Certificate {
@@ -67,11 +74,15 @@ class AttestationCertificateBuilder internal constructor(
                 X500Principal(subjectDN),
                 publicKey
             )
-            certificateBuilder.addExtension(
-                ID_FIDO_GEN_CE_AAGUID,
-                false,
-                DEROctetString(aaguid.bytes)
-            )
+            aaguid.let {
+                if(it != null){
+                    certificateBuilder.addExtension(
+                        ID_FIDO_GEN_CE_AAGUID,
+                        false,
+                        DEROctetString(it.bytes)
+                    )
+                }
+            }
             certificateBuilder.addExtension(
                 Extension.basicConstraints,
                 true,

@@ -4,6 +4,8 @@ WebAuthn4J UnifidoKey は、スマートフォンをセキュリティキーと�
 高価な物理セキュリティキーを購入し、持ち歩く必要はもうありません。スマートフォンにUnifidoKey アプリをインストールすれば、
 スマートフォンがBluetooth接続あるいはNFC接続のセキュリティキーとして利用出来るようになります。
 
+image::../images/home.png[Home screen, 40%]
+
 === インストール
 
 Google Play Storeからインストール

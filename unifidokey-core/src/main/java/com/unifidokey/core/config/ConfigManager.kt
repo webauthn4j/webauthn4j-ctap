@@ -4,6 +4,7 @@ import androidx.annotation.UiThread
 import com.unifidokey.core.adapter.PersistenceAdaptor
 import com.unifidokey.core.setting.KeyStorageSetting
 import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting
+import com.webauthn4j.ctap.authenticator.settings.AttestationTypeSetting
 import com.webauthn4j.ctap.authenticator.settings.ConsentCachingSetting
 import com.webauthn4j.ctap.authenticator.settings.ResidentKeySetting
 import com.webauthn4j.data.attestation.authenticator.AAGUID
@@ -49,6 +50,7 @@ class ConfigManager(
     val userVerification = UserVerificationConfigProperty(this)
     val userPresence = UserPresenceConfigProperty(this)
     val algorithms = AlgConfigProperty(this)
+    val attestationType = AttestationTypeConfigProperty(this)
     val attestationStatementFormat = AttestationStatementFormatConfigProperty(this)
     val residentKey = ResidentKeyConfigProperty(this)
     val keyStorage = KeyStorageConfigProperty(this)
@@ -76,6 +78,7 @@ class ConfigManager(
         userVerification,
         userPresence,
         algorithms,
+        attestationType,
         attestationStatementFormat,
         residentKey,
         keyStorage
@@ -98,6 +101,7 @@ class ConfigManager(
         userVerification,
         userPresence,
         algorithms,
+        attestationType,
         attestationStatementFormat,
         residentKey,
         keyStorage
@@ -139,15 +143,48 @@ class ConfigManager(
                 attestationStatementFormat.value = AttestationStatementFormatSetting.PACKED
             }
         }
+        attestationType.liveData.observeForever{ value ->
+            when(value){
+                AttestationTypeSetting.BASIC -> {
+                    if(attestationStatementFormat.value == AttestationStatementFormatSetting.NONE){
+                        attestationStatementFormat.value = AttestationStatementFormatSetting.PACKED
+                    }
+                }
+                AttestationTypeSetting.SELF -> {
+                    if(attestationStatementFormat.value != AttestationStatementFormatSetting.PACKED && attestationStatementFormat.value != AttestationStatementFormatSetting.FIDO_U2F){
+                        attestationStatementFormat.value = AttestationStatementFormatSetting.PACKED
+                    }
+                }
+                AttestationTypeSetting.NONE -> {
+                    attestationStatementFormat.value = AttestationStatementFormatSetting.NONE
+                }
+                else -> { /*nop*/ }
+            }
+        }
         attestationStatementFormat.liveData.observeForever { value ->
             when (value) {
                 AttestationStatementFormatSetting.ANDROID_KEY -> {
                     residentKey.value = ResidentKeySetting.ALWAYS
                     keyStorage.value = KeyStorageSetting.KEYSTORE
+                    attestationType.value = AttestationTypeSetting.BASIC
+                }
+                AttestationStatementFormatSetting.ANDROID_SAFETYNET -> {
+                    attestationType.value = AttestationTypeSetting.BASIC
+                }
+                AttestationStatementFormatSetting.PACKED -> {
+                    if(attestationType.value == AttestationTypeSetting.NONE){
+                        attestationType.value = AttestationTypeSetting.SELF
+                    }
                 }
                 AttestationStatementFormatSetting.FIDO_U2F -> {
                     aaguid.value = AAGUID.ZERO
                     algorithms.value = setOf(COSEAlgorithmIdentifier.ES256)
+                    if(attestationType.value == AttestationTypeSetting.NONE){
+                        attestationType.value = AttestationTypeSetting.SELF
+                    }
+                }
+                AttestationStatementFormatSetting.NONE -> {
+                    attestationType.value = AttestationTypeSetting.NONE
                 }
                 else -> { /*nop*/ }
             }

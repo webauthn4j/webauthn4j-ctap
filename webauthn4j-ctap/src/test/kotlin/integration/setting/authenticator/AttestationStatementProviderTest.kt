@@ -1,8 +1,8 @@
 package integration.setting.authenticator
 
-import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementGenerator
-import com.webauthn4j.ctap.authenticator.attestation.NoneAttestationStatementGenerator
-import com.webauthn4j.ctap.authenticator.attestation.PackedAttestationStatementGenerator
+import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FBasicAttestationStatementProvider
+import com.webauthn4j.ctap.authenticator.attestation.NoneAttestationStatementProvider
+import com.webauthn4j.ctap.authenticator.attestation.PackedBasicAttestationStatementProvider
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import com.webauthn4j.data.attestation.statement.FIDOU2FAttestationStatement
 import com.webauthn4j.data.attestation.statement.NoneAttestationStatement
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 import java.util.concurrent.ExecutionException
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-class AttestationStatementGeneratorTest {
+class AttestationStatementProviderTest {
 
     private val passwordlessTestCase = PasswordlessTestCase()
 
@@ -23,7 +23,7 @@ class AttestationStatementGeneratorTest {
     @Throws(ExecutionException::class, InterruptedException::class)
     fun attestationStatementGenerator_packed_test() = runBlockingTest {
         passwordlessTestCase.authenticator.attestationStatementGenerator =
-            PackedAttestationStatementGenerator.createWithDemoAttestation()
+            PackedBasicAttestationStatementProvider.createWithDemoAttestationKey()
         passwordlessTestCase.step1_createCredential()
         val registrationData = passwordlessTestCase.step2_validateCredentialForRegistration()
         Assertions.assertThat(registrationData.attestationObject!!.attestationStatement)
@@ -39,7 +39,7 @@ class AttestationStatementGeneratorTest {
         val attestationCertificate =
             TestAttestationUtil.load2tierTestAuthenticatorAttestationCertificate()
         passwordlessTestCase.authenticator.attestationStatementGenerator =
-            FIDOU2FAttestationStatementGenerator(privateKey, attestationCertificate)
+            FIDOU2FBasicAttestationStatementProvider(privateKey, attestationCertificate)
         passwordlessTestCase.authenticator.aaguid = AAGUID.ZERO
         passwordlessTestCase.step1_createCredential()
         val registrationData = passwordlessTestCase.step2_validateCredentialForRegistration()
@@ -53,7 +53,7 @@ class AttestationStatementGeneratorTest {
     @Throws(ExecutionException::class, InterruptedException::class)
     fun attestationStatementGenerator_none_test() = runBlockingTest {
         passwordlessTestCase.authenticator.attestationStatementGenerator =
-            NoneAttestationStatementGenerator()
+            NoneAttestationStatementProvider()
         passwordlessTestCase.authenticator.aaguid = AAGUID.ZERO
         passwordlessTestCase.step1_createCredential()
         val registrationData = passwordlessTestCase.step2_validateCredentialForRegistration()

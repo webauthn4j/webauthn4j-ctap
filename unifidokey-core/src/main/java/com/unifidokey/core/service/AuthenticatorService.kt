@@ -3,18 +3,19 @@ package com.unifidokey.core.service
 import androidx.annotation.UiThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.unifidokey.core.adapter.UnifidoKeyAuthenticatorPropertyStore
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.driver.persistence.converter.EventConverter
 import com.unifidokey.driver.persistence.dao.EventDao
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.*
-import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementGenerator
-import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementGenerator
+import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
+import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementProvider
+import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FBasicAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.event.Event
 import com.webauthn4j.ctap.authenticator.extension.HMACSecretExtensionProcessor
 import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting
+import com.webauthn4j.ctap.authenticator.settings.AttestationTypeSetting
 import com.webauthn4j.ctap.authenticator.settings.ConsentCachingSetting
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import kotlinx.coroutines.runBlocking
@@ -29,7 +30,7 @@ class AuthenticatorService(
     val bleService: BLEService,
     val bthidService: BTHIDService,
     private val eventDao: EventDao,
-    private val attestationStatementGenerators: Map<AttestationStatementFormatSetting, AttestationStatementGenerator>,
+    private val attestationStatementProviders: Map<Pair<AttestationTypeSetting, AttestationStatementFormatSetting>, AttestationStatementProvider>,
     val objectConverter: ObjectConverter
 ) : TransactionManager() {
 
@@ -98,6 +99,7 @@ class AuthenticatorService(
         val algorithms = configManager.algorithms.value
         val credentialSelectorSetting = configManager.credentialSelector.value
         val keyStorageSetting = configManager.keyStorage.value
+        val attestationTypeSetting = configManager.attestationType.value
         val attestationStatementFormatSetting = configManager.attestationStatementFormat.value
         val settings = CtapAuthenticatorSettings(
             aaguid,
@@ -111,18 +113,20 @@ class AuthenticatorService(
         )
         authenticatorPropertyStore.keyStorageSetting = keyStorageSetting
         authenticatorPropertyStore.algorithms = algorithms
-        val attestationStatementGenerator =
-            attestationStatementGenerators[attestationStatementFormatSetting]
+        val attestationStatementProvider =
+            attestationStatementProviders[Pair(attestationTypeSetting, attestationStatementFormatSetting)]
                 ?: throw IllegalArgumentException(
                     String.format(
-                        "Attestation statement format:'%s' is not registered.",
+                        "Attestation type: '%s' format:'%s' is not registered.",
+                        attestationTypeSetting,
                         attestationStatementFormatSetting
                     )
                 )
+        val fidoU2FAttestationStatementProvider = attestationStatementProviders[Pair(attestationTypeSetting, AttestationStatementFormatSetting.FIDO_U2F)] as FIDOU2FAttestationStatementProvider
         val extensionProcessors = listOf(HMACSecretExtensionProcessor())
         val ctapAuthenticator = CtapAuthenticator(
-            attestationStatementGenerator,
-            attestationStatementGenerators[AttestationStatementFormatSetting.FIDO_U2F] as FIDOU2FAttestationStatementGenerator,
+            attestationStatementProvider,
+            fidoU2FAttestationStatementProvider,
             extensionProcessors,
             authenticatorPropertyStore,
             objectConverter,

@@ -1,7 +1,7 @@
 package com.unifidokey.core.config
 
 class ProModeConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<Boolean>(configManager, KEY, true) {
+    ConfigPropertyBase<Boolean>(configManager, KEY, false) {
 
     override fun save(value: Boolean) {
         configManager.persistenceAdaptor.savePrimitiveBoolean(KEY, value)

@@ -2,9 +2,12 @@
 
 = WebAuthn4J UnifidoKey ユーザーガイド
 
-include::introduction.adoc[]
-include::quick-tour.adoc[]
-include::credential-management.adoc[]
-include::history.adoc[]
-include::advanced-usage.adoc[]
-include::configuration.adoc[]
+link:../en/index.html[English]
+link:../ja/index.html[Japanese]
+
+include::ja/introduction.adoc[]
+include::ja/quick-tour.adoc[]
+include::ja/credential-management.adoc[]
+include::ja/history.adoc[]
+include::ja/settings.adoc[]
+include::ja/advanced-usage.adoc[]

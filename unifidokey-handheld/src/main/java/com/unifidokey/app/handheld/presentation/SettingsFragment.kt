@@ -364,12 +364,29 @@ class SettingsFragment internal constructor(
                     return@OnPreferenceChangeListener false
                 }
             }
+        findPreference<Preference>(AttestationTypeConfigProperty.KEY)!!.onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any? ->
+                try {
+                    val attestationType = AttestationTypeSetting.create((newValue as String))
+                    return@OnPreferenceChangeListener viewModel.setAttestationTypeSetting(
+                        attestationType
+                    )
+                } catch (e: RuntimeException) {
+                    logger.error("Unexpected exception is thrown", e)
+                    Toast.makeText(
+                        settingsActivity,
+                        "Unexpected error has occurred.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@OnPreferenceChangeListener false
+                }
+            }
         findPreference<Preference>(AttestationStatementFormatConfigProperty.KEY)!!.onPreferenceChangeListener =
             Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any? ->
                 try {
-                    val identifier = AttestationStatementFormatSetting.create((newValue as String))
+                    val attestationStatementFormant = AttestationStatementFormatSetting.create((newValue as String))
                     return@OnPreferenceChangeListener viewModel.setAttestationStatementFormatSetting(
-                        identifier
+                        attestationStatementFormant
                     )
                 } catch (e: RuntimeException) {
                     logger.error("Unexpected exception is thrown", e)

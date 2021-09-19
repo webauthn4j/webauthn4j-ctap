@@ -12,6 +12,7 @@ UnifidoKeyをインストールしたスマートフォンにNFC機能が搭載�
 
 UnifidoKeyのNFC transportを有効化した上で、PCのNFCリーダーにUnifidoKeyを置くことで利用可能です。
 リーダーはNFCに対応している必要があります。FeliCa、MIFAREの読み取りのみに対応したリーダーでは利用することが出来ません。
+https://www.amazon.co.jp/-/en/gp/product/B00VR1WARC/[Sony NFC Reader "PaSoRi " RC-S380/S]で動作を確認しています。
 
 ==== Bluetooth HID 接続
 
@@ -46,14 +47,24 @@ https://docs.github.com/en/github/authenticating-to-github/securing-your-account
 です。
 セキュリティキーの登録が要求されると、UnifidoKeyでは、以下の画面が表示されます。
 
+image::../images/registration.png[Registration screen, 40%]
+
 登録しようとしているサイトの情報と一致しているか確認の上、"PROCEED"ボタンを押下して登録を承認して下さい。
+
+ClientPINを有効にしている場合、初回利用時にPC側のダイアログでPINの設定が求められる場合があります。画面の指示に従い、設定を進めて下さい。
 
 === 認証
 
 PCでWebAuthnに対応したサイトでセキュリティキーを用いた認証を実行して下さい。
 セキュリティキーを用いた認証が要求されると、UnifidoKeyでは、以下の画面が表示されます。
 
+image::../images/authentication.png[Authentication screen, 40%]
+
 確認の上、"PROCEED"を押下して認証を承認して下さい。
+
+サイトが本人性確認を要求している場合、ClientPINを有効にしている場合、PC側のダイアログでPINの入力、
+User Verificationを有効にしている場合、スマートフォン側での生体認証が求められる場合があります。
+画面の指示に従い、認証を進めて下さい。
 
 
 

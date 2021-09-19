@@ -4,19 +4,19 @@ import com.unifidokey.driver.persistence.dao.KeyStoreResidentCredentialKey
 import com.webauthn4j.converter.AuthenticatorDataConverter
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.SignatureCalculator
-import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementGenerator
+import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementRequest
 import com.webauthn4j.ctap.authenticator.store.CredentialKey
 import com.webauthn4j.data.attestation.statement.AndroidKeyAttestationStatement
 import java.nio.ByteBuffer
 
-class AndroidKeyAttestationStatementGenerator(objectConverter: ObjectConverter) :
-    AttestationStatementGenerator {
+class AndroidKeyAttestationStatementProvider(objectConverter: ObjectConverter) :
+    AttestationStatementProvider {
 
     private val authenticatorDataConverter: AuthenticatorDataConverter =
         AuthenticatorDataConverter(objectConverter)
 
-    override suspend fun generate(attestationStatementRequest: AttestationStatementRequest): AndroidKeyAttestationStatement {
+    override suspend fun provide(attestationStatementRequest: AttestationStatementRequest): AndroidKeyAttestationStatement {
         val clientDataHash = attestationStatementRequest.clientDataHash
         val authenticatorData = attestationStatementRequest.authenticatorData
         val authenticatorDataBytes = authenticatorDataConverter.convert(authenticatorData)

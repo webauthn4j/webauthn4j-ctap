@@ -4,7 +4,7 @@ import android.content.Context
 import com.google.android.gms.safetynet.SafetyNet
 import com.webauthn4j.converter.AuthenticatorDataConverter
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementGenerator
+import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementRequest
 import com.webauthn4j.data.attestation.statement.AndroidSafetyNetAttestationStatement
 import com.webauthn4j.data.attestation.statement.Response
@@ -16,7 +16,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-class AndroidSafetyNetAttestationStatementGenerator : AttestationStatementGenerator {
+class AndroidSafetyNetAttestationStatementProvider : AttestationStatementProvider {
 
     @Suppress("JoinDeclarationAndAssignment")
     private val apiKey: String
@@ -33,7 +33,7 @@ class AndroidSafetyNetAttestationStatementGenerator : AttestationStatementGenera
     }
 
 
-    override suspend fun generate(attestationStatementRequest: AttestationStatementRequest): AndroidSafetyNetAttestationStatement {
+    override suspend fun provide(attestationStatementRequest: AttestationStatementRequest): AndroidSafetyNetAttestationStatement {
         val ver = "12685023"
         val authenticatorData =
             authenticatorDataConverter.convert(attestationStatementRequest.authenticatorData)

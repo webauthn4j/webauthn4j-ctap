@@ -2,6 +2,9 @@ package com.webauthn4j.ctap.authenticator.attestation
 
 import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.util.exception.UnexpectedCheckedException
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.io.UncheckedIOException
 import java.security.KeyFactory
 import java.security.NoSuchAlgorithmException
 import java.security.PrivateKey
@@ -60,12 +63,12 @@ object DemoAttestationConstants {
     }
 
     private fun loadPublicKeyFromClassPath(classpath: String): PublicKey {
-        val data = ResourceLoader().load(classpath)
+        val data = load(classpath)
         return loadPublicKey(data)
     }
 
     private fun loadPrivateKeyFromClassPath(classpath: String): PrivateKey {
-        val data = ResourceLoader().load(classpath)
+        val data = load(classpath)
         return loadPrivateKey(data)
     }
 
@@ -95,5 +98,20 @@ object DemoAttestationConstants {
         }
     }
 
-
+    private fun load(classpath: String): ByteArray {
+        try {
+            this.javaClass.getResourceAsStream(classpath).use { inputStream ->
+                ByteArrayOutputStream().use { byteArrayOutputStream ->
+                    val buffer = ByteArray(1024)
+                    var length: Int
+                    while (inputStream.read(buffer).also { length = it } != -1) {
+                        byteArrayOutputStream.write(buffer, 0, length)
+                    }
+                    return byteArrayOutputStream.toByteArray()
+                }
+            }
+        } catch (e: IOException) {
+            throw UncheckedIOException(e)
+        }
+    }
 }

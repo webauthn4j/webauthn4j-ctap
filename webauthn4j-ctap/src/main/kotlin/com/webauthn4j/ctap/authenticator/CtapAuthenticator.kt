@@ -6,9 +6,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.webauthn4j.converter.AuthenticatorDataConverter
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementGenerator
-import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementGenerator
-import com.webauthn4j.ctap.authenticator.attestation.NoneAttestationStatementGenerator
+import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
+import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementProvider
+import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FBasicAttestationStatementProvider
+import com.webauthn4j.ctap.authenticator.attestation.NoneAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.event.Event
 import com.webauthn4j.ctap.authenticator.extension.ExtensionProcessor
 import com.webauthn4j.ctap.authenticator.settings.*
@@ -25,8 +26,8 @@ import org.slf4j.LoggerFactory
 class CtapAuthenticator @JvmOverloads constructor(
     // Core logic delegates
     // These are final as it should not be updated on the fly for integrity. To update these, new instance should be created.
-    val attestationStatementGenerator: AttestationStatementGenerator = NoneAttestationStatementGenerator(),
-    val fidoU2FAttestationStatementGenerator: FIDOU2FAttestationStatementGenerator = FIDOU2FAttestationStatementGenerator.createWithDemoAttestation(),
+    val attestationStatementProvider: AttestationStatementProvider = NoneAttestationStatementProvider(),
+    val fidoU2FBasicAttestationStatementGenerator: FIDOU2FAttestationStatementProvider = FIDOU2FBasicAttestationStatementProvider.createWithDemoAttestationKey(),
     val extensionProcessors: List<ExtensionProcessor> = listOf(),
     // Handlers
     var authenticatorPropertyStore: AuthenticatorPropertyStore = InMemoryAuthenticatorPropertyStore(),

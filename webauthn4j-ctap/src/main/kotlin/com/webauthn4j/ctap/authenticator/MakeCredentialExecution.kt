@@ -355,7 +355,7 @@ internal class MakeCredentialExecution :
 
         @Suppress("ConvertSecondaryConstructorToPrimary")
         val attestationStatement: AttestationStatement =
-            ctapAuthenticator.attestationStatementGenerator.generate(attestationStatementRequest)
+            ctapAuthenticator.attestationStatementProvider.provide(attestationStatementRequest)
         try {
             val responseData = AuthenticatorMakeCredentialResponseData(
                 attestationStatementRequest.authenticatorData,

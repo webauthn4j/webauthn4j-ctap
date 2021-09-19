@@ -121,6 +121,8 @@
 
     <string name="title_aaguid">AAGUID</string>
 
+    <string name="title_attestation_type">Attestation Type</string>
+
     <string name="title_attestation_statement_format">Attestation Statement Format</string>
 
     <string name="title_resident_key">Resident Key</string>

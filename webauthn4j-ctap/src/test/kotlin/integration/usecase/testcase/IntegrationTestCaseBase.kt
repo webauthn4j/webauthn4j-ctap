@@ -9,9 +9,9 @@ import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSettings
-import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementGenerator
-import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementGenerator
-import com.webauthn4j.ctap.authenticator.attestation.PackedAttestationStatementGenerator
+import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
+import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FBasicAttestationStatementProvider
+import com.webauthn4j.ctap.authenticator.attestation.PackedBasicAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.settings.*
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.Credential
@@ -55,8 +55,8 @@ abstract class IntegrationTestCaseBase {
 
 
     inner class Authenticator {
-        private val attestationStatementGeneratorParameter = TestParameter<AttestationStatementGenerator> { PackedAttestationStatementGenerator.createWithDemoAttestation() }
-        private val fidoU2FAttestationStatementGeneratorParameter = TestParameter { FIDOU2FAttestationStatementGenerator.createWithDemoAttestation() }
+        private val attestationStatementGeneratorParameter = TestParameter<AttestationStatementProvider> { PackedBasicAttestationStatementProvider.createWithDemoAttestationKey() }
+        private val fidoU2FAttestationStatementGeneratorParameter = TestParameter { FIDOU2FBasicAttestationStatementProvider.createWithDemoAttestationKey() }
         private val clientPINParameter = TestParameter { "clientPIN" }
         private val aaguidParameter = TestParameter { AAGUID(UUID.randomUUID()) }
         private val platformSettingParameter = TestParameter { PlatformSetting.CROSS_PLATFORM }

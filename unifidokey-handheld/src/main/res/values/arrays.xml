@@ -76,6 +76,18 @@
     </string-array>
 
     <!-- Attestation Preference -->
+    <string-array name="attestation_type_entries">
+        <item>Basic Attestation</item>
+        <item>Self Attestation</item>
+        <item>None</item>
+    </string-array>
+
+    <string-array name="attestation_type_values">
+        <item>basic</item>
+        <item>self</item>
+        <item>none</item>
+    </string-array>
+
     <string-array name="attestation_statement_format_entries">
         <item>Android Key</item>
         <item>Android SafetyNet</item>

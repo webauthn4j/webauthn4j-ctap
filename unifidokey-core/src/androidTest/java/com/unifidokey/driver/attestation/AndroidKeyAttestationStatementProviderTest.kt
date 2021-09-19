@@ -7,7 +7,7 @@ import com.webauthn4j.data.SignatureAlgorithm
 import org.junit.Test
 import java.util.*
 
-class AndroidKeyAttestationStatementGeneratorTest {
+class AndroidKeyAttestationStatementProviderTest {
 
     private val keyStoreDao: KeyStoreDao = AndroidKeyStoreDao()
 

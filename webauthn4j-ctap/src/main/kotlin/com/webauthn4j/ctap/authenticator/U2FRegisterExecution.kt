@@ -2,7 +2,6 @@ package com.webauthn4j.ctap.authenticator
 
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementRequest
 import com.webauthn4j.ctap.authenticator.exception.U2FCommandExecutionException
-import com.webauthn4j.ctap.core.data.U2FAuthenticationResponse
 import com.webauthn4j.ctap.core.data.U2FRegistrationRequest
 import com.webauthn4j.ctap.core.data.U2FRegistrationResponse
 import com.webauthn4j.ctap.core.data.U2FStatusCode
@@ -68,12 +67,12 @@ class U2FRegisterExecution(private val ctapAuthenticator: CtapAuthenticator, pri
         val keyHandle: ByteArray =
             CipherUtil.encryptWithAESCBCPKCS5Padding(data, encryptionKey, encryptionIV)
         val attestationStatementRequest = FIDOU2FAttestationStatementRequest(
-            keyPair.public as ECPublicKey,
+            keyPair,
             keyHandle,
             u2FRegistrationRequest.applicationParameter,
             u2FRegistrationRequest.challengeParameter
         )
-        val attestationStatement = ctapAuthenticator.fidoU2FAttestationStatementGenerator.generate(
+        val attestationStatement = ctapAuthenticator.fidoU2FBasicAttestationStatementGenerator.generate(
             attestationStatementRequest
         )
         return U2FRegistrationResponse(

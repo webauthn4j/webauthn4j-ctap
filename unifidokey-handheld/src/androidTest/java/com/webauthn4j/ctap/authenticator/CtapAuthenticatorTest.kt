@@ -9,8 +9,8 @@ import com.unifidokey.driver.persistence.dao.AndroidKeyStoreDao
 import com.unifidokey.driver.persistence.dao.KeyStoreDao
 import com.unifidokey.driver.persistence.dao.PreferenceDao
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementGenerator
-import com.webauthn4j.ctap.authenticator.attestation.NoneAttestationStatementGenerator
+import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
+import com.webauthn4j.ctap.authenticator.attestation.NoneAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.data.*
@@ -36,8 +36,8 @@ class CtapAuthenticatorTest {
         val application = ApplicationProvider.getApplicationContext<UnifidoKeyHandHeldApplication>()
         val unifidoKeyHandHeldComponent = application.unifidoKeyComponent
         val objectConverter = ObjectConverter()
-        val attestationStatementGenerator: AttestationStatementGenerator =
-            NoneAttestationStatementGenerator()
+        val attestationStatementProvider: AttestationStatementProvider =
+            NoneAttestationStatementProvider()
         val relyingPartyDao = application.unifidoKeyComponent.relyingPartyDao
         val userCredentialDao = unifidoKeyHandHeldComponent.userCredentialDao
         val preferenceDao = PreferenceDao(application)
@@ -50,7 +50,7 @@ class CtapAuthenticatorTest {
             keyStoreDao
         )
         ctapAuthenticator = CtapAuthenticator(
-            attestationStatementGenerator,
+            attestationStatementProvider,
             authenticatorPropertyStore,
             objectConverter,
             CtapAuthenticatorSettings()

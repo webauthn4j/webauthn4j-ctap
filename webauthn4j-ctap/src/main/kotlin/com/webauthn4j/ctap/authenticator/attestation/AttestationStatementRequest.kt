@@ -21,7 +21,6 @@ class AttestationStatementRequest(
     authenticatorDataProvider: AuthenticatorDataProvider
 ) {
 
-
     val rpIdHash: ByteArray
         get() = ArrayUtil.clone(field)
     val alg: COSEAlgorithmIdentifier

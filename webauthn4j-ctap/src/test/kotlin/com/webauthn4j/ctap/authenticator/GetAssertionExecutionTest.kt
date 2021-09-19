@@ -198,8 +198,8 @@ internal class GetAssertionExecutionTest {
         var ctapAuthenticator = CtapAuthenticator()
         makeCredential(ctapAuthenticator)
         ctapAuthenticator = CtapAuthenticator(
-            ctapAuthenticator.attestationStatementGenerator,
-            ctapAuthenticator.fidoU2FAttestationStatementGenerator,
+            ctapAuthenticator.attestationStatementProvider,
+            ctapAuthenticator.fidoU2FBasicAttestationStatementGenerator,
             emptyList(),
             ctapAuthenticator.authenticatorPropertyStore,
             ctapAuthenticator.objectConverter,

@@ -42,6 +42,22 @@
             app:title="@string/title_user_consent"
             app:useSimpleSummaryProvider="true" />
 
+        <ListPreference
+            app:defaultValue="enabled"
+            app:entries="@array/client_pin_entries"
+            app:entryValues="@array/client_pin_values"
+            app:key="clientPIN"
+            app:title="@string/title_client_pin"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="ready"
+            app:entries="@array/user_verification_entries"
+            app:entryValues="@array/user_verification_values"
+            app:key="userVerification"
+            app:title="@string/title_user_verification"
+            app:useSimpleSummaryProvider="true" />
+
         <SwitchPreferenceCompat
             app:key="consentCaching"
             app:summary="@string/summary_consent_caching"
@@ -88,22 +104,6 @@
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            app:defaultValue="enabled"
-            app:entries="@array/client_pin_entries"
-            app:entryValues="@array/client_pin_values"
-            app:key="clientPIN"
-            app:title="@string/title_client_pin"
-            app:useSimpleSummaryProvider="true" />
-
-        <ListPreference
-            app:defaultValue="ready"
-            app:entries="@array/user_verification_entries"
-            app:entryValues="@array/user_verification_values"
-            app:key="userVerification"
-            app:title="@string/title_user_verification"
-            app:useSimpleSummaryProvider="true" />
-
-        <ListPreference
             app:defaultValue="supported"
             app:entries="@array/user_presence_entries"
             app:entryValues="@array/user_presence_values"
@@ -117,6 +117,14 @@
             app:entryValues="@array/alg_values"
             app:key="alg"
             app:title="@string/title_alg" />
+
+        <ListPreference
+            app:defaultValue="none"
+            app:entries="@array/attestation_type_entries"
+            app:entryValues="@array/attestation_type_values"
+            app:key="attestationType"
+            app:title="@string/title_attestation_type"
+            app:useSimpleSummaryProvider="true" />
 
         <ListPreference
             app:defaultValue="none"

@@ -164,9 +164,19 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun setAttestationStatementFormatSetting(identifier: AttestationStatementFormatSetting): Boolean {
+    fun setAttestationTypeSetting(attestationType: AttestationTypeSetting): Boolean {
         return try {
-            configManager.attestationStatementFormat.value = identifier
+            configManager.attestationType.value = attestationType
+            true
+        } catch (e: RuntimeException) {
+            logger.error("Unexpected exception is thrown", e)
+            false
+        }
+    }
+
+    fun setAttestationStatementFormatSetting(attestationStatementFormant: AttestationStatementFormatSetting): Boolean {
+        return try {
+            configManager.attestationStatementFormat.value = attestationStatementFormant
             true
         } catch (e: RuntimeException) {
             logger.error("Unexpected exception is thrown", e)

@@ -1,0 +1,70 @@
+== Settings
+
+image::../images/settings.png[Settings screen, 40%]
+
+Various settings are available on the Settings screen.
+
+=== Transport
+
+==== NFC
+
+Enable/Disable NFC transport. * It can also be configurable from the Home screen.
+
+==== Bluetooth HID
+
+Enable/Disable Bluetooth HID transport. * I can also be configurable from the Home screen.
+
+==== Bluetooth HID Pairing
+
+Make the device discoverable from other nearby bluetooth devices.
+After starting pairing mode, pair and connect from your PC to your smart phone.
+
+=== Consent
+
+==== ClientPIN
+
+Setting for enabling / disabling PIN authentication.
+
+|==================================================================
+| Option                | Description
+
+| Enabled               | Enables PIN authentication
+| Disabled              | Disables PIN authentication
+|==================================================================
+
+
+==== User Verification
+
+Setting for local authentication(biometrics authentication) support.
+If you want to use local authentication(biometrics authentication) when user verification is requrested,
+set it to "Ready".
+
+|==================================================================
+| Option                 | Description
+
+| Ready                  | Claims that local authentication is available.
+| Not Ready              | Claims that local authentication is implemented, but not set up
+| Not Supported          | Claims that local authentication is not implemented
+|==================================================================
+
+==== Consent Caching
+
+Cache registration / authentication consent action. This helps consent action under unstable NFC transport.
+
+==== Reset Protection
+
+Rejects the reset command to prevent credentials from unauthorized deletion.
+
+=== User Interface
+
+Settings related to the user interface.
+
+==== Keep Screen ON
+
+NFC transport is only available while the screen is on. This setting make the screen remain ON
+while the app is open.
+
+=== Configuration Reset
+
+Resets the settings to the defaults.
+
