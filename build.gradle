@@ -15,8 +15,6 @@
  */
 
 buildscript {
-    //UnifidoKey
-    ext.unifidoKeyVersion = '0.7.0-SNAPSHOT'
 
     //kotlin
     ext.kotlinVersion = '1.5.31'
