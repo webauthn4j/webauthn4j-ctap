@@ -13,17 +13,20 @@ tasks.register('greeting', com.unifidokey.gradle.util.UploadApkTask) {
     greeting = 'howdy!'
 }
 
+def versionRegex = unifidoKeyVersion =~ /([0-9]+)\.([0-9]+)\.([0-9]+)(-SNAPSHOT|\.RELEASE)/
+versionRegex.find()
 
 android {
     compileSdkVersion 30 // Android 11.0
     buildToolsVersion '30.0.2'
+
 
     defaultConfig {
         applicationId 'com.unifidokey'
         minSdkVersion 28 // Android 9.0
         targetSdkVersion 30 // Android 11.0
         versionName "$unifidoKeyVersion"
-        versionCode 2
+        versionCode Integer.parseInt(versionRegex.group(1)) * 10000 + Integer.parseInt(versionRegex.group(2)) * 100 + Integer.parseInt(versionRegex.group(3))
 
         buildConfigField "String", "ANDROID_SAFETY_NET_API_KEY", "${project.property("unifidokey.androidSafetyNetApiKey")}"
 
