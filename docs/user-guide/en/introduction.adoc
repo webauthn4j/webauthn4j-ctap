@@ -28,7 +28,7 @@ It is tested in the following environment. However, it may not work due to the B
 === Precautions for use
 
 UnifidoKey doesn't provide a backup method for keys stored in UnifidoKey.
-In case of device lost or unexpected or unexpected UnifidoKey bug,
+In case of device lost or unexpected UnifidoKey bug,
 please prepare an alternative authentication method to the service other than UnifidoKey
 so that you can recover your account even if UnifidoKey becomes unavailable.
 

@@ -5,6 +5,15 @@ apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 //apply plugin: 'com.google.gms.google-services'
 //apply plugin: 'com.google.firebase.crashlytics'
 
+//tasks.register('UploadApkTask', com.unifidokey.gradle.util.UploadApkTask){
+//
+//}
+
+tasks.register('greeting', com.unifidokey.gradle.util.UploadApkTask) {
+    greeting = 'howdy!'
+}
+
+
 android {
     compileSdkVersion 30 // Android 11.0
     buildToolsVersion '30.0.2'

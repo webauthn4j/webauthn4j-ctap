@@ -1,0 +1,13 @@
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    api gradleApi()
+
+    implementation 'com.google.guava:guava:30.1.1-jre'
+    implementation 'com.google.apis:google-api-services-androidpublisher:v3-rev20210901-1.32.1'
+}
+
+
