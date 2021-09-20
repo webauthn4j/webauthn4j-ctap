@@ -231,6 +231,14 @@ task generateUserGuide(type: AsciidoctorTask) {
             revnumber: "${unifidoKeyVersion}"
 }
 
+task generateReleaseNote(type: JavaExec) {
+    group = "documentation"
+    classpath = files('gradle/lib/github-release-notes-generator.jar')
+
+    args(unifidoKeyVersion, file("build/release-note.md").absolutePath, "--spring.config.location=file:" + file("github-release-notes-generator.yml").absolutePath)
+
+}
+
 sonarqube {
     properties {
         property 'sonar.projectKey', 'webauthn4j-ctap'
