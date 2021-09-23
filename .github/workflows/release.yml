@@ -56,3 +56,15 @@ jobs:
           asset_path: ./unifidokey-handheld/build/outputs/bundle/release/unifidokey-handheld-release.aab
           asset_name: unifidokey-handheld-release.aab
           asset_content_type: application/octet-stream
+
+      - name: Publish App bundle to Google Play Console
+        run: |
+          echo $GOOGLE_SERVICE_ACCOUNT_BASE64 | base64 -d > google-service-account.json
+          export GOOGLE_APPLICATION_CREDENTIALS=./google-service-account.json
+          ./gradlew publishAppBundle
+        env:
+          KEYSTORE_BASE64 : ${{ secrets.KEYSTORE_BASE64  }}
+          KEYSTORE_PASS : ${{ secrets.KEYSTORE_PASS  }}
+          KEY_ALIAS : ${{ secrets.KEY_ALIAS  }}
+          KEY_PASS : ${{ secrets.KEY_PASS  }}
+          GOOGLE_SERVICE_ACCOUNT_BASE64 : ${{ secrets.GOOGLE_SERVICE_ACCOUNT_BASE64  }}

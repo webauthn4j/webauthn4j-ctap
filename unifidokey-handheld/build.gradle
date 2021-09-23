@@ -1,3 +1,6 @@
+import com.unifidokey.gradle.util.PublishAppBundleTask
+import com.unifidokey.gradle.util.VersionCodeUtil
+
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs'
@@ -5,28 +8,27 @@ apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 //apply plugin: 'com.google.gms.google-services'
 //apply plugin: 'com.google.firebase.crashlytics'
 
-//tasks.register('UploadApkTask', com.unifidokey.gradle.util.UploadApkTask){
-//
-//}
 
-tasks.register('greeting', com.unifidokey.gradle.util.UploadApkTask) {
-    greeting = 'howdy!'
+task publishAppBundle(type: PublishAppBundleTask){
+
+    applicationName = "UnifidoKey"
+    packageName = "com.unifidokey"
+    appBundle = "${buildDir}/outputs/bundle/release/unifidokey-handheld-release.aab"
+
 }
 
-def versionRegex = unifidoKeyVersion =~ /([0-9]+)\.([0-9]+)\.([0-9]+)(-SNAPSHOT|\.RELEASE)/
-versionRegex.find()
+def unifidoKeyVersionCode = VersionCodeUtil.getVersionCodeFromVersionString(unifidoKeyVersion)
 
 android {
     compileSdkVersion 30 // Android 11.0
     buildToolsVersion '30.0.2'
-
 
     defaultConfig {
         applicationId 'com.unifidokey'
         minSdkVersion 28 // Android 9.0
         targetSdkVersion 30 // Android 11.0
         versionName "$unifidoKeyVersion"
-        versionCode Integer.parseInt(versionRegex.group(1)) * 10000 + Integer.parseInt(versionRegex.group(2)) * 100 + Integer.parseInt(versionRegex.group(3))
+        versionCode unifidoKeyVersionCode
 
         buildConfigField "String", "ANDROID_SAFETY_NET_API_KEY", "${project.property("unifidokey.androidSafetyNetApiKey")}"
 
