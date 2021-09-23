@@ -20,8 +20,37 @@ Install from Google Play Store.
 
 ## Build from source
 
+UnifidoKey has two product-flavors:
+
+* OSS flavor
+  * OSS developers can build without friction
+* Play Store flavor
+  * OSS flavor + Firebase crashlytics + App signing
+
+### product-flavor: OSS
+
+Build Apk for local debug
+
 ```
-./gradlew build
+./gradlew assembleOssRelease
+```
+
+### product-flavor: Play Store
+
+Build App Bundle to be published to Play store
+
+```
+cd <project root>
+
+# place unifidokey-upload-key.jks which contains upload key
+cp <somewhere>/unifidokey-upload-key.jks ./unifidokey-upload-key.jks
+
+# export following environment variables:
+export KEYSTORE_PASS : ${{ secrets.KEYSTORE_PASS  }}
+export KEY_ALIAS : ${{ secrets.KEY_ALIAS  }}
+export KEY_PASS : ${{ secrets.KEY_PASS  }}
+
+./gradlew bundlePlaystoreRelease
 ```
 
 ### Build configuration

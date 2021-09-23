@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "743322218744",
+    "project_id": "unifidokey",
+    "storage_bucket": "unifidokey.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:743322218744:android:e6a546d25d1d077f4a8b0d",
+        "android_client_info": {
+          "package_name": "com.unifidokey"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "743322218744-jvc57c4a62c1u2eam271hiqvrt2n52pg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSdXOsKtKE-knSLwepVOrfGM645QnXGbA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "743322218744-jvc57c4a62c1u2eam271hiqvrt2n52pg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

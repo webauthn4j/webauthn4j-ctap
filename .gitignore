@@ -33,6 +33,5 @@ debug
 sample/node_modules
 sample/src/main/resources/application-local-with-services.yml
 local.properties
-secret.properties
 unifidokey-handheld/src/webauthn4j/google-services.json
 unifidokey-upload-key.jks

@@ -3,6 +3,7 @@ package com.unifidokey.core.service
 import androidx.annotation.UiThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.unifidokey.core.adapter.UnifidoKeyAuthenticatorPropertyStore
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.driver.persistence.converter.EventConverter
@@ -31,6 +32,7 @@ class AuthenticatorService(
     val bthidService: BTHIDService,
     private val eventDao: EventDao,
     private val attestationStatementProviders: Map<Pair<AttestationTypeSetting, AttestationStatementFormatSetting>, AttestationStatementProvider>,
+    val exceptionReporter: ExceptionReporter,
     val objectConverter: ObjectConverter
 ) : TransactionManager() {
 
@@ -149,7 +151,7 @@ class AuthenticatorService(
             }
         }
         ctapAuthenticator.registerEventListener(this::onEvent)
-        ctapAuthenticator.registerExceptionReporter(this::onException)
+        ctapAuthenticator.registerExceptionReporter(exceptionReporter)
         this@AuthenticatorService.ctapAuthenticator = ctapAuthenticator
     }
 
@@ -158,7 +160,4 @@ class AuthenticatorService(
         eventDao.create(eventEntity)
     }
 
-    private fun onException(exception: Exception){
-//        FirebaseCrashlytics.getInstance().recordException(exception) //TODO: enable again
-    }
 }

@@ -100,15 +100,6 @@ apply plugin: 'org.asciidoctor.jvm.convert'
 apply plugin: 'org.sonarqube'
 
 allprojects {
-    // Load secret.properties if it exists
-    if (new File("$project.rootDir/secret.properties").exists()) {
-        Properties props = new Properties()
-        props.load(new FileInputStream("$project.rootDir/secret.properties"))
-        props.each { prop ->
-            project.ext.set(prop.key, prop.value)
-        }
-    }
-
     configurations.all {
         resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
     }

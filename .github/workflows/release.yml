@@ -19,7 +19,7 @@ jobs:
       - name: Build/Unit test with Gradle
         run: |
           echo $KEYSTORE_BASE64 | base64 -d > unifidokey-upload-key.jks
-          ./gradlew build assembleRelease bundleRelease
+          ./gradlew build assemblePlaystoreRelease bundlePlaystoreRelease
         env:
           KEYSTORE_BASE64 : ${{ secrets.KEYSTORE_BASE64  }}
           KEYSTORE_PASS : ${{ secrets.KEYSTORE_PASS  }}
@@ -43,7 +43,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./unifidokey-handheld/build/outputs/apk/release/unifidokey-handheld-release.apk
+          asset_path: ./unifidokey-handheld/build/outputs/apk/playstore/release/unifidokey-handheld-playstore-release.apk
           asset_name: unifidokey-handheld-release.apk
           asset_content_type: application/octet-stream
 
@@ -53,7 +53,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./unifidokey-handheld/build/outputs/bundle/release/unifidokey-handheld-release.aab
+          asset_path: ./unifidokey-handheld/build/outputs/bundle/playstore/release/unifidokey-handheld-playstore-release.aab
           asset_name: unifidokey-handheld-release.aab
           asset_content_type: application/octet-stream
 

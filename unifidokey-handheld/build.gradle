@@ -1,21 +1,14 @@
 import com.unifidokey.gradle.util.PublishAppBundleTask
 import com.unifidokey.gradle.util.VersionCodeUtil
+import com.unifidokey.gradle.util.PropertyUtil
 
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs'
 apply plugin: 'com.google.android.gms.oss-licenses-plugin'
-//apply plugin: 'com.google.gms.google-services'
-//apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 
-
-task publishAppBundle(type: PublishAppBundleTask){
-
-    applicationName = "UnifidoKey"
-    packageName = "com.unifidokey"
-    appBundle = "${buildDir}/outputs/bundle/release/unifidokey-handheld-release.aab"
-
-}
 
 def unifidoKeyVersionCode = VersionCodeUtil.getVersionCodeFromVersionString(unifidoKeyVersion)
 
@@ -24,19 +17,15 @@ android {
     buildToolsVersion '30.0.2'
 
     defaultConfig {
-        applicationId 'com.unifidokey'
         minSdkVersion 28 // Android 9.0
         targetSdkVersion 30 // Android 11.0
         versionName "$unifidoKeyVersion"
         versionCode unifidoKeyVersionCode
-
-        buildConfigField "String", "ANDROID_SAFETY_NET_API_KEY", "${project.property("unifidokey.androidSafetyNetApiKey")}"
-
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         consumerProguardFiles 'consumer-rules.pro'
     }
     signingConfigs {
-        release {
+        playstore {
             storeFile rootProject.file('unifidokey-upload-key.jks')
             storePassword System.getenv('KEYSTORE_PASS')
             keyAlias System.getenv('KEY_ALIAS')
@@ -50,9 +39,26 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    flavorDimensions 'distribution'
+    productFlavors {
+        oss {
+            dimension 'distribution'
 
+            applicationId 'com.unifidokey.oss'
+            PropertyUtil.load(project, "src/oss/unifidokey.properties")
+            buildConfigField "String", "ANDROID_SAFETY_NET_API_KEY", "${project.property("unifidokey.androidSafetyNetApiKey")}"
+            getIsDefault().set(true)
+        }
+        playstore {
+            dimension 'distribution'
+
+            applicationId 'com.unifidokey'
+            PropertyUtil.load(project, "src/playstore/unifidokey.properties")
+            buildConfigField "String", "ANDROID_SAFETY_NET_API_KEY", "${project.property("unifidokey.androidSafetyNetApiKey")}"
             if (rootProject.file('unifidokey-upload-key.jks').exists()) {
-                signingConfig signingConfigs.release
+                signingConfig signingConfigs.playstore
             }
         }
     }
@@ -71,6 +77,19 @@ android {
     lintOptions {
         lintConfig file('lint.xml')
     }
+}
+
+// Disable Google Services Gradle Plugin on oss flavor since it requires google-services.json
+android.applicationVariants.all { variant ->
+    if (variant.productFlavors.name.contains('oss')) {
+        project.tasks.getByName('process' + variant.name.capitalize() + 'GoogleServices').enabled = false
+    }
+}
+
+task publishAppBundle(type: PublishAppBundleTask){
+    applicationName = "UnifidoKey"
+    packageName = "com.unifidokey"
+    appBundle = "${buildDir}/outputs/bundle/playstore/release/unifidokey-handheld-playstore-release.aab"
 }
 
 dependencies {

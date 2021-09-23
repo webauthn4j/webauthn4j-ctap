@@ -1,5 +1,6 @@
 package com.unifidokey.app.handheld
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.unifidokey.BuildConfig
 import com.unifidokey.app.UnifidoKeyModuleBase
 import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication.Companion.BLE_FEATURE_FLAG
@@ -9,6 +10,7 @@ import com.unifidokey.app.handheld.presentation.UnifidoKeyHandHeldNotificationCo
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.driver.notification.UnifidoKeyNotificationController
 import com.unifidokey.driver.persistence.dao.PreferenceDao
+import com.webauthn4j.ctap.authenticator.ExceptionReporter
 import dagger.Module
 import dagger.Provides
 import javax.inject.Named
@@ -45,6 +47,16 @@ class UnifidoKeyHandHeldModule(private val unifidoKeyHandHeldApplication: Unifid
     @Provides
     fun provideNotificationController(): UnifidoKeyNotificationController {
         return UnifidoKeyHandHeldNotificationController()
+    }
+
+    @Singleton
+    @Provides
+    fun provideExceptionReporter(): ExceptionReporter {
+        return ExceptionReporter { exception ->
+            if(!UnifidoKeyHandHeldApplication.isOssFlavor){
+                FirebaseCrashlytics.getInstance().recordException(exception)
+            }
+        }
     }
 
 }

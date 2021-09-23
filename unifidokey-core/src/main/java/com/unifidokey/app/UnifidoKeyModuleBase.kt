@@ -23,6 +23,7 @@ import com.unifidokey.driver.transport.CtapBLEAndroidServiceContextualAdapter
 import com.unifidokey.driver.transport.CtapBTHIDAndroidServiceContextualAdapter
 import com.unifidokey.driver.transport.CtapNFCAndroidServiceAdapter
 import com.webauthn4j.converter.util.ObjectConverter
+import com.webauthn4j.ctap.authenticator.ExceptionReporter
 import com.webauthn4j.ctap.authenticator.attestation.*
 import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting
 import com.webauthn4j.ctap.authenticator.settings.AttestationTypeSetting
@@ -34,6 +35,7 @@ import java.util.*
 import javax.inject.Named
 import javax.inject.Singleton
 import kotlin.collections.HashMap
+import kotlin.reflect.jvm.internal.impl.serialization.deserialization.ErrorReporter
 
 /**
  * Defines Dagger2 configuration
@@ -57,6 +59,7 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
         packedSelfAttestationStatementProvider: PackedSelfAttestationStatementProvider,
         fidoU2FBasicAttestationStatementGenerator: FIDOU2FBasicAttestationStatementProvider,
         fidoU2FSelfAttestationStatementProvider: FIDOU2FSelfAttestationStatementProvider,
+        exceptionReporter: ExceptionReporter,
         objectConverter: ObjectConverter
     ): AuthenticatorService {
         val attestationStatementGenerators: MutableMap<Pair<AttestationTypeSetting, AttestationStatementFormatSetting>, AttestationStatementProvider> = HashMap()
@@ -75,6 +78,7 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
             bthidService,
             eventDao,
             attestationStatementGenerators,
+            exceptionReporter,
             objectConverter
         )
     }

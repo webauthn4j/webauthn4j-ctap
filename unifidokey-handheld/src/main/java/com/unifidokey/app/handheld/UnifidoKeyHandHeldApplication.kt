@@ -1,5 +1,7 @@
 package com.unifidokey.app.handheld
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.unifidokey.BuildConfig
 import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.app.UnifidoKeyComponent
 import com.webauthn4j.ctap.authenticator.CachingCredentialSelectionHandler
@@ -15,6 +17,14 @@ class UnifidoKeyHandHeldApplication : UnifidoKeyApplicationBase<UnifidoKeyHandHe
         const val NFC_FEATURE_FLAG = true
         const val BLE_FEATURE_FLAG = false
         const val BTHID_FEATURE_FLAG = true
+
+        val isOssFlavor : Boolean
+            get() = BuildConfig.FLAVOR == "oss"
+    }
+
+
+    init {
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!isOssFlavor)
     }
 
     override fun onCreate() {
