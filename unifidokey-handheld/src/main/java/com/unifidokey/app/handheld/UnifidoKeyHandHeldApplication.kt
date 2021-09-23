@@ -1,5 +1,6 @@
 package com.unifidokey.app.handheld
 
+import com.google.firebase.FirebaseApp
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.unifidokey.BuildConfig
 import com.unifidokey.app.UnifidoKeyApplicationBase
@@ -22,10 +23,6 @@ class UnifidoKeyHandHeldApplication : UnifidoKeyApplicationBase<UnifidoKeyHandHe
             get() = BuildConfig.FLAVOR == "oss"
     }
 
-
-    init {
-        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!isOssFlavor)
-    }
 
     override fun onCreate() {
         super.onCreate()
