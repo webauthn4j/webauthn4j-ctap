@@ -20,6 +20,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.GradleException;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.TaskAction;
@@ -36,6 +37,7 @@ public class PublishAppBundleTask extends DefaultTask {
     private static final Log log = LogFactory.getLog(PublishAppBundleTask.class);
 
     private static final String MIME_TYPE = "application/octet-stream";
+    private static final String TRACK_INTERNAL = "internal";
     private static final String TRACK_ALPHA = "alpha";
 
     private String applicationName;
@@ -54,11 +56,11 @@ public class PublishAppBundleTask extends DefaultTask {
 
             String editId = createNewEdit(edits);
             Bundle bundle = uploadBundle(edits, editId);
-            assignBundleToTrack(edits, editId, bundle);
+            assignBundleToTrack(edits, editId, bundle, TRACK_INTERNAL);
             commitEdit(edits, editId);
 
         } catch (RuntimeException | IOException | GeneralSecurityException ex) {
-            log.error("Exception was thrown while uploading app bundle to alpha track", ex);
+            throw new GradleException("Exception was thrown while uploading app bundle to alpha track", ex);
         }
     }
 
@@ -80,27 +82,23 @@ public class PublishAppBundleTask extends DefaultTask {
                         appBundleFile);
         Bundle bundle = uploadRequest.execute();
         log.info(String.format("Version code %d has been uploaded", bundle.getVersionCode()));
-        return bundle;
+         return bundle;
     }
 
-    private void assignBundleToTrack(AndroidPublisher.Edits edits, String editId, Bundle bundle) throws IOException {
-        List<Long> apkVersionCodes = new ArrayList<>();
-        apkVersionCodes.add(Long.valueOf(bundle.getVersionCode()));
+    private void assignBundleToTrack(AndroidPublisher.Edits edits, String editId, Bundle bundle, String track) throws IOException {
+        List<Long> apkVersionCodes = Collections.singletonList(Long.valueOf(bundle.getVersionCode()));
         AndroidPublisher.Edits.Tracks.Update updateTrackRequest = edits
                 .tracks()
                 .update(packageName,
                         editId,
-                        TRACK_ALPHA,
-                        new Track().setReleases(
+                        track,
+                        new Track()
+                                .setReleases(
                                 Collections.singletonList(
                                         new TrackRelease()
-                                                .setName("My Alpha Release")
+                                                .setName(bundle.getVersionCode().toString())
                                                 .setVersionCodes(apkVersionCodes)
-                                                .setStatus("completed")
-                                                .setReleaseNotes(Collections.singletonList(
-                                                        new LocalizedText()
-                                                                .setLanguage("en-US")
-                                                                .setText("Adds the exciting new feature X!"))))));
+                                                .setStatus("completed"))));
         Track updatedTrack = updateTrackRequest.execute();
         log.info(String.format("Track %s has been updated.", updatedTrack.getTrack()));
     }
