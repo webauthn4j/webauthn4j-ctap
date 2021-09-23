@@ -53,7 +53,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./unifidokey-handheld/build/outputs/bundle/playstore/release/unifidokey-handheld-playstore-release.aab
+          asset_path: ./unifidokey-handheld/build/outputs/bundle/playstoreRelease/unifidokey-handheld-playstore-release.aab
           asset_name: unifidokey-handheld-release.aab
           asset_content_type: application/octet-stream
 

@@ -89,7 +89,7 @@ android.applicationVariants.all { variant ->
 task publishAppBundle(type: PublishAppBundleTask){
     applicationName = "UnifidoKey"
     packageName = "com.unifidokey"
-    appBundle = "${buildDir}/outputs/bundle/playstore/release/unifidokey-handheld-playstore-release.aab"
+    appBundle = "${buildDir}/outputs/bundle/playstoreRelease/unifidokey-handheld-playstore-release.aab"
 }
 
 dependencies {
