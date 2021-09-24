@@ -27,9 +27,9 @@ android {
         playstore {
             PropertyUtil.load(rootProject, "secret.properties")
             storeFile rootProject.file('unifidokey-upload-key.jks')
-            storePassword System.getenv('KEYSTORE_PASS') ?: project.property("unifidokey.keystorePass")
-            keyAlias System.getenv('KEY_ALIAS') ?: project.property("unifidokey.keyAlias")
-            keyPassword System.getenv('KEY_PASS') ?: project.property("unifidokey.keyPass")
+            storePassword System.getenv('KEYSTORE_PASS') ?: project.findProperty("unifidokey.keystorePass")
+            keyAlias System.getenv('KEY_ALIAS') ?: project.findProperty("unifidokey.keyAlias")
+            keyPassword System.getenv('KEY_PASS') ?: project.findProperty("unifidokey.keyPass")
         }
     }
     buildFeatures {
