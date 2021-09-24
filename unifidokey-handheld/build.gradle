@@ -79,7 +79,7 @@ android {
     }
 }
 
-// Disable Google Services Gradle Plugin on oss flavor since it requires google-services.json
+// Disable Google Services Gradle Plugin on oss flavor not to enable Firebase backed features
 android.applicationVariants.all { variant ->
     if (variant.productFlavors.name.contains('oss')) {
         project.tasks.getByName('process' + variant.name.capitalize() + 'GoogleServices').enabled = false

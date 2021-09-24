@@ -29,7 +29,7 @@ UnifidoKey has two product-flavors:
 
 ### product-flavor: OSS
 
-Build Apk for local debug
+Build OSS flavor Apk for local debug
 
 ```
 ./gradlew assembleOssRelease
@@ -37,25 +37,31 @@ Build Apk for local debug
 
 ### product-flavor: Play Store
 
-Build App Bundle to be published to Play store
+Build Play store flavor App Bundle
 
+place unifidokey-upload-key.jks which contains upload key
 ```
-cd <project root>
-
-# place unifidokey-upload-key.jks which contains upload key
 cp <somewhere>/unifidokey-upload-key.jks ./unifidokey-upload-key.jks
+```
 
-# export following environment variables:
+export following environment variables:
+```
 export KEYSTORE_PASS : ${{ secrets.KEYSTORE_PASS  }}
 export KEY_ALIAS : ${{ secrets.KEY_ALIAS  }}
 export KEY_PASS : ${{ secrets.KEY_PASS  }}
-
-./gradlew bundlePlaystoreRelease
 ```
 
-### Build configuration
+or you may specify them in `<project root>/secret.properties` file
+```
+unifidokey.keystorePass=<value>
+unifidokey.keyPass=<value>
+unifidokey.keyAlias=<value>
+```
 
-`unifidokey.androidSafetyNetApiKey` gradle property need to be set via `local.properties` file or `-Punifidokey.androidSafetyNetApiKey=<value>` command line argument for gradle execution.
+Build App Bundle
+```
+./gradlew bundlePlaystoreRelease
+```
 
 ## License
 
