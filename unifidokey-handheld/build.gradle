@@ -9,7 +9,6 @@ apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
-
 def unifidoKeyVersionCode = VersionCodeUtil.getVersionCodeFromVersionString(unifidoKeyVersion)
 
 android {
@@ -26,10 +25,11 @@ android {
     }
     signingConfigs {
         playstore {
+            PropertyUtil.load(rootProject, "secret.properties")
             storeFile rootProject.file('unifidokey-upload-key.jks')
-            storePassword System.getenv('KEYSTORE_PASS')
-            keyAlias System.getenv('KEY_ALIAS')
-            keyPassword System.getenv('KEY_PASS')
+            storePassword System.getenv('KEYSTORE_PASS') ?: project.property("unifidokey.keystorePass")
+            keyAlias System.getenv('KEY_ALIAS') ?: project.property("unifidokey.keyAlias")
+            keyPassword System.getenv('KEY_PASS') ?: project.property("unifidokey.keyPass")
         }
     }
     buildFeatures {

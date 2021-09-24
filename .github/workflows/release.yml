@@ -44,7 +44,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./unifidokey-handheld/build/outputs/apk/playstore/release/unifidokey-handheld-playstore-release.apk
-          asset_name: unifidokey-handheld-release.apk
+          asset_name: unifidokey-handheld-playstore-release.apk
           asset_content_type: application/octet-stream
 
       - name: Upload release bundle
@@ -54,7 +54,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./unifidokey-handheld/build/outputs/bundle/playstoreRelease/unifidokey-handheld-playstore-release.aab
-          asset_name: unifidokey-handheld-release.aab
+          asset_name: unifidokey-handheld-playstore-release.aab
           asset_content_type: application/octet-stream
 
       - name: Publish App bundle to Google Play Console

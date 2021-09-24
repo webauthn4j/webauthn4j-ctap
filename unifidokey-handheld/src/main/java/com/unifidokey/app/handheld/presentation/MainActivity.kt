@@ -26,6 +26,10 @@ import com.unifidokey.driver.transport.CtapBLEAndroidServiceContextualAdapter
 import com.unifidokey.driver.transport.CtapBTHIDAndroidServiceContextualAdapter
 import com.unifidokey.driver.transport.CtapNFCAndroidServiceAdapter
 import org.slf4j.LoggerFactory
+import com.google.firebase.analytics.FirebaseAnalytics
+
+
+
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
@@ -55,6 +59,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var bleServiceContextualAdapter: CtapBLEAndroidServiceContextualAdapter
     private lateinit var bthidServiceContextualAdapter: CtapBTHIDAndroidServiceContextualAdapter
 
+    private var firebaseAnalytics: FirebaseAnalytics? = null
+
+
     //region## Lifecycle event handlers ##
     override fun onCreate(savedInstanceState: Bundle?) {
         logger.debug("onCreate")
@@ -71,6 +78,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         bthidService = unifidoKeyComponent.bthidService
 
         // initialize components
+        initializeFirebaseAnalytics()
         bleServiceContextualAdapter.startService()
         bthidServiceContextualAdapter.startService()
         bleServiceContextualAdapter.bindService(this)
@@ -174,6 +182,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     //endregion
 
     // Methods
+    private fun initializeFirebaseAnalytics(){
+        if(!UnifidoKeyHandHeldApplication.isOssFlavor){
+            firebaseAnalytics = FirebaseAnalytics.getInstance(this)
+        }
+    }
+
     private fun initializeNavigationView() {
         navigationView.setNavigationItemSelectedListener(this)
     }

@@ -37,7 +37,7 @@
     <string name="nav_drawer_open">Open navigation drawer</string>
     <string name="nav_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">UnifidoKey</string>
-    <string name="nav_header_subtitle">CTAP2 Authenticator for Developers</string>
+    <string name="nav_header_subtitle">WebAuthn Authenticator for Developers</string>
     <string name="nav_header_desc">Navigation header</string>
 
     <string name="menu_home">Home</string>
