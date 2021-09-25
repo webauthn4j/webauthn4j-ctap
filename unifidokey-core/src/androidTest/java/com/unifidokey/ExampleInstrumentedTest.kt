@@ -17,6 +17,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        Assert.assertEquals("com.unifidokey.infrastructure.test", appContext.packageName)
+        Assert.assertEquals("com.unifidokey.core.test", appContext.packageName)
     }
 }

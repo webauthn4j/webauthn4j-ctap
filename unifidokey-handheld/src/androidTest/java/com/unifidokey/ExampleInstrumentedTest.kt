@@ -15,6 +15,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val context = ApplicationProvider.getApplicationContext<Context>()
-        Assert.assertEquals("com.unifidokey", context.packageName)
+        Assert.assertTrue(context.packageName == "com.unifidokey" || context.packageName == "com.unifidokey.oss")
     }
 }
