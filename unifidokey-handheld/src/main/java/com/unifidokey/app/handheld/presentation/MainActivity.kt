@@ -79,10 +79,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         // initialize components
         initializeFirebaseAnalytics()
-        bleServiceContextualAdapter.startService()
-        bthidServiceContextualAdapter.startService()
-        bleServiceContextualAdapter.bindService(this)
-        bthidServiceContextualAdapter.bindService(this)
+        if(bleServiceContextualAdapter.isBLEAdapterAvailable){
+            bleServiceContextualAdapter.startService()
+            bleServiceContextualAdapter.bindService(this)
+        }
+        if(bthidServiceContextualAdapter.isBTHIDAdapterAvailable){
+            bthidServiceContextualAdapter.startService()
+            bthidServiceContextualAdapter.bindService(this)
+        }
 
         // initialize view
         setContentView(R.layout.main_activity)

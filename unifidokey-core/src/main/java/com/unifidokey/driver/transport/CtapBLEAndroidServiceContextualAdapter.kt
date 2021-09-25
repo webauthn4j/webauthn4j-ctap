@@ -22,6 +22,9 @@ class CtapBLEAndroidServiceContextualAdapter(private val context: Context) : Cta
     private val packageManager = context.packageManager
     private val bluetoothManager =
         context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+    private val bluetoothAdapter: BluetoothAdapter? by lazy {
+        BluetoothAdapter.getDefaultAdapter()
+    }
     private var ctapBLEAndroidService: CtapBLEAndroidService? = null
     private var ctapBLEAndroidServiceConnection: CtapBLEAndroidServiceConnection? = null
     private val bleBroadcastReceiver = BLEBroadcastReceiver()
