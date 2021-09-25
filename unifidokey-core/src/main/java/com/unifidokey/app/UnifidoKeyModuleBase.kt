@@ -181,13 +181,7 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
     @Singleton
     @Provides
     fun provideUnifidoKeyDatabase(unifidoKeyHandHeldApplication: TA): UnifidoKeyDatabase {
-        return Room.databaseBuilder(
-            unifidoKeyHandHeldApplication,
-            UnifidoKeyDatabase::class.java,
-            "UnifidoKey"
-        )
-            .allowMainThreadQueries()
-            .build()
+        return UnifidoKeyDatabase.createInstance(unifidoKeyHandHeldApplication)
     }
 
     @Singleton
