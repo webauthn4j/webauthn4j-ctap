@@ -82,7 +82,7 @@ buildscript {
         classpath "org.asciidoctor:asciidoctor-gradle-jvm:$asciidoctorGradleVersion"
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:$sonarqubeVersion"
 
-        classpath 'com.google.guava:guava:30.1.1-jre'
+        classpath 'com.google.guava:guava:31.0.1-jre'
         classpath 'com.google.api-client:google-api-client:1.32.1'
         classpath 'com.google.apis:google-api-services-androidpublisher:v3-rev20210901-1.32.1'
 
