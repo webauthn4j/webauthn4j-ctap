@@ -1,6 +1,6 @@
 package integration.setting.authenticator
 
-import com.webauthn4j.ctap.authenticator.settings.ResetProtectionSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ResetProtectionSetting
 import com.webauthn4j.ctap.client.exception.CtapErrorException
 import integration.usecase.testcase.ResetTestCase
 import kotlinx.coroutines.test.runBlockingTest

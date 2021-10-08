@@ -20,8 +20,30 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep public class com.webauthn4j.data.**
--keep public class com.webauthn4j.ctap.core.data.**
--keep public class com.unifidokey.core.config.**
--keep public class com.unifidokey.core.setting.**
+-printusage build/outputs/unused.txt
 
+
+
+-dontwarn java.beans.Transient
+-dontwarn javax.mail.Address
+-dontwarn javax.mail.Authenticator
+-dontwarn javax.mail.BodyPart
+-dontwarn javax.mail.Message$RecipientType
+-dontwarn javax.mail.Message
+-dontwarn javax.mail.Multipart
+-dontwarn javax.mail.Session
+-dontwarn javax.mail.Transport
+-dontwarn javax.mail.internet.AddressException
+-dontwarn javax.mail.internet.InternetAddress
+-dontwarn javax.mail.internet.MimeBodyPart
+-dontwarn javax.mail.internet.MimeMessage
+-dontwarn javax.mail.internet.MimeMultipart
+-dontwarn javax.naming.NamingEnumeration
+-dontwarn javax.naming.NamingException
+-dontwarn javax.naming.directory.Attribute
+-dontwarn javax.naming.directory.Attributes
+-dontwarn javax.naming.directory.DirContext
+-dontwarn javax.naming.directory.InitialDirContext
+-dontwarn javax.naming.directory.SearchControls
+-dontwarn javax.naming.directory.SearchResult
+-dontwarn org.w3c.dom.bootstrap.DOMImplementationRegistry

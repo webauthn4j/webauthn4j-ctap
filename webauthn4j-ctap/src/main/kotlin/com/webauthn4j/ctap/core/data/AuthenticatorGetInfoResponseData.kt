@@ -2,7 +2,7 @@ package com.webauthn4j.ctap.core.data
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.webauthn4j.ctap.authenticator.options.*
+import com.webauthn4j.ctap.authenticator.data.options.*
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 
 @Suppress("CanBePrimaryConstructorProperty")

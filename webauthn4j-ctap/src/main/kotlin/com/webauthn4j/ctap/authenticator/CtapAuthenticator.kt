@@ -10,11 +10,11 @@ import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvide
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FBasicAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.NoneAttestationStatementProvider
-import com.webauthn4j.ctap.authenticator.event.Event
+import com.webauthn4j.ctap.authenticator.data.event.Event
 import com.webauthn4j.ctap.authenticator.extension.ExtensionProcessor
-import com.webauthn4j.ctap.authenticator.settings.*
+import com.webauthn4j.ctap.authenticator.data.settings.*
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
-import com.webauthn4j.ctap.authenticator.store.Credential
+import com.webauthn4j.ctap.authenticator.data.credential.Credential
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
 import com.webauthn4j.ctap.core.converter.jackson.PublicKeyCredentialSourceCBORModule

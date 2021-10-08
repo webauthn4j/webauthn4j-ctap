@@ -1,6 +1,8 @@
 package com.webauthn4j.ctap.authenticator.store
 
 import com.webauthn4j.ctap.authenticator.ClientPINService
+import com.webauthn4j.ctap.authenticator.data.credential.ResidentCredentialKey
+import com.webauthn4j.ctap.authenticator.data.credential.ResidentUserCredential
 import com.webauthn4j.ctap.authenticator.exception.CredentialNotFoundException
 import com.webauthn4j.ctap.authenticator.exception.RelyingPartyNotFoundException
 import com.webauthn4j.ctap.authenticator.internal.KeyPairUtil.createCredentialKeyPair

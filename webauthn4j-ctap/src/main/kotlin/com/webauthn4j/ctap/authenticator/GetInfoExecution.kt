@@ -1,7 +1,7 @@
 package com.webauthn4j.ctap.authenticator
 
-import com.webauthn4j.ctap.authenticator.options.*
-import com.webauthn4j.ctap.authenticator.settings.*
+import com.webauthn4j.ctap.authenticator.data.options.*
+import com.webauthn4j.ctap.authenticator.data.settings.*
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData

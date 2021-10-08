@@ -1,7 +1,7 @@
 package com.unifidokey.core.config
 
-import com.webauthn4j.ctap.authenticator.settings.PlatformSetting
-import com.webauthn4j.ctap.authenticator.settings.PlatformSetting.Companion.create
+import com.webauthn4j.ctap.authenticator.data.settings.PlatformSetting
+import com.webauthn4j.ctap.authenticator.data.settings.PlatformSetting.Companion.create
 
 class PlatformConfigProperty internal constructor(configManager: ConfigManager) :
     ConfigPropertyBase<PlatformSetting>(configManager, KEY, PlatformSetting.CROSS_PLATFORM) {

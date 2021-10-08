@@ -1,7 +1,7 @@
 package com.unifidokey.driver.persistence.converter.room
 
 import androidx.room.TypeConverter
-import com.webauthn4j.ctap.authenticator.event.EventType
+import com.webauthn4j.ctap.authenticator.data.event.EventType
 
 class EventTypeConverter {
     @TypeConverter

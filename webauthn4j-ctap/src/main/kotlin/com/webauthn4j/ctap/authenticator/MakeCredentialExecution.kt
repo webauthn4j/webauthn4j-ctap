@@ -2,15 +2,19 @@ package com.webauthn4j.ctap.authenticator
 
 import com.webauthn4j.converter.util.CborConverter
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementRequest
-import com.webauthn4j.ctap.authenticator.event.MakeCredentialEvent
+import com.webauthn4j.ctap.authenticator.data.credential.CredentialKey
+import com.webauthn4j.ctap.authenticator.data.credential.NonResidentCredentialKey
+import com.webauthn4j.ctap.authenticator.data.credential.ResidentUserCredential
+import com.webauthn4j.ctap.authenticator.data.credential.UserCredential
+import com.webauthn4j.ctap.authenticator.data.event.MakeCredentialEvent
 import com.webauthn4j.ctap.authenticator.exception.CtapCommandExecutionException
 import com.webauthn4j.ctap.authenticator.exception.StoreFullException
 import com.webauthn4j.ctap.authenticator.extension.RegistrationExtensionContext
 import com.webauthn4j.ctap.authenticator.extension.RegistrationExtensionProcessor
 import com.webauthn4j.ctap.authenticator.internal.KeyPairUtil.createCredentialKeyPair
-import com.webauthn4j.ctap.authenticator.settings.ResidentKeySetting
-import com.webauthn4j.ctap.authenticator.settings.UserPresenceSetting
-import com.webauthn4j.ctap.authenticator.settings.UserVerificationSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
 import com.webauthn4j.ctap.authenticator.store.*
 import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.ctap.core.validator.AuthenticatorMakeCredentialRequestValidator

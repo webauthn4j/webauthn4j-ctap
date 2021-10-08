@@ -2,7 +2,7 @@ package com.webauthn4j.ctap.core.converter.jackson
 
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.webauthn4j.ctap.authenticator.U2FKeyEnvelope
-import com.webauthn4j.ctap.authenticator.options.*
+import com.webauthn4j.ctap.authenticator.data.options.*
 import com.webauthn4j.ctap.core.converter.jackson.deserializer.*
 import com.webauthn4j.ctap.core.converter.jackson.serializer.*
 import com.webauthn4j.ctap.core.data.*

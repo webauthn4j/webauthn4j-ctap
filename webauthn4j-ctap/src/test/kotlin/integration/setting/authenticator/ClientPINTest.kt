@@ -1,7 +1,7 @@
 package integration.setting.authenticator
 
 import com.webauthn4j.ctap.authenticator.ClientPINService
-import com.webauthn4j.ctap.authenticator.settings.ClientPINSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
 import com.webauthn4j.ctap.client.exception.CtapErrorException
 import integration.usecase.testcase.ClientPINTestCase
 import kotlinx.coroutines.test.runBlockingTest

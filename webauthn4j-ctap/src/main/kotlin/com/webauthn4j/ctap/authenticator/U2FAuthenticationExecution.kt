@@ -1,13 +1,10 @@
 package com.webauthn4j.ctap.authenticator
 
-import com.webauthn4j.ctap.authenticator.exception.CtapCommandExecutionException
 import com.webauthn4j.ctap.authenticator.exception.U2FCommandExecutionException
-import com.webauthn4j.ctap.authenticator.settings.UserPresenceSetting
-import com.webauthn4j.ctap.core.data.CtapStatusCode
+import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.core.data.U2FAuthenticationRequest
 import com.webauthn4j.ctap.core.data.U2FAuthenticationResponse
 import com.webauthn4j.ctap.core.data.U2FStatusCode
-import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.ctap.core.validator.U2FAuthenticationRequestValidator

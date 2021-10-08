@@ -23,8 +23,8 @@ import com.unifidokey.core.service.BTHIDService
 import com.unifidokey.core.service.NFCService
 import com.unifidokey.core.setting.KeepScreenOnSetting
 import com.unifidokey.core.setting.KeyStorageSetting
-import com.webauthn4j.ctap.authenticator.settings.*
-import com.webauthn4j.ctap.authenticator.settings.ResidentKeySetting.Companion.create
+import com.webauthn4j.ctap.authenticator.data.settings.*
+import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting.Companion.create
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import com.webauthn4j.util.AssertUtil

@@ -3,9 +3,9 @@ package com.webauthn4j.ctap.core.converter.jackson.deserializer
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
-import com.webauthn4j.ctap.authenticator.options.ClientPINOption
-import com.webauthn4j.ctap.authenticator.options.PlatformOption
-import com.webauthn4j.ctap.authenticator.options.PlatformOption.Companion.create
+import com.webauthn4j.ctap.authenticator.data.options.ClientPINOption
+import com.webauthn4j.ctap.authenticator.data.options.PlatformOption
+import com.webauthn4j.ctap.authenticator.data.options.PlatformOption.Companion.create
 import java.io.IOException
 
 class PlatformOptionDeserializer : StdDeserializer<PlatformOption?>(ClientPINOption::class.java) {

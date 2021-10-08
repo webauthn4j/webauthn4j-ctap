@@ -1,6 +1,6 @@
 package integration.setting.authenticator
 
-import com.webauthn4j.ctap.authenticator.settings.PlatformSetting
+import com.webauthn4j.ctap.authenticator.data.settings.PlatformSetting
 import com.webauthn4j.ctap.client.exception.WebAuthnClientException
 import com.webauthn4j.data.AuthenticatorAttachment
 import integration.usecase.testcase.PasswordlessTestCase

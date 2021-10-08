@@ -1,6 +1,6 @@
 package com.unifidokey.core.config
 
-import com.webauthn4j.ctap.authenticator.settings.ConsentCachingSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ConsentCachingSetting
 
 class ConsentCachingConfigProperty internal constructor(configManager: ConfigManager) :
     ConfigPropertyBase<ConsentCachingSetting>(configManager, KEY, ConsentCachingSetting.ENABLED) {

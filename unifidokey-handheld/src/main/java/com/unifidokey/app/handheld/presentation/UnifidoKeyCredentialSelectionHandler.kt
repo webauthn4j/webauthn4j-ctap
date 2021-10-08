@@ -2,8 +2,8 @@ package com.unifidokey.app.handheld.presentation
 
 import android.content.Context
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
-import com.webauthn4j.ctap.authenticator.store.Credential
-import com.webauthn4j.ctap.authenticator.store.UserCredential
+import com.webauthn4j.ctap.authenticator.data.credential.Credential
+import com.webauthn4j.ctap.authenticator.data.credential.UserCredential
 
 class UnifidoKeyCredentialSelectionHandler(private val context: Context) :
     CredentialSelectionHandler {

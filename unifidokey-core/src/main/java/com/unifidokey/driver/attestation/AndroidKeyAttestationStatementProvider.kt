@@ -6,7 +6,7 @@ import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.SignatureCalculator
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementRequest
-import com.webauthn4j.ctap.authenticator.store.CredentialKey
+import com.webauthn4j.ctap.authenticator.data.credential.CredentialKey
 import com.webauthn4j.data.attestation.statement.AndroidKeyAttestationStatement
 import java.nio.ByteBuffer
 

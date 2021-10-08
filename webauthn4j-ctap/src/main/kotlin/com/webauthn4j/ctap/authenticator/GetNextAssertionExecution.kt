@@ -1,7 +1,7 @@
 package com.webauthn4j.ctap.authenticator
 
 import com.webauthn4j.ctap.authenticator.SignatureCalculator.calculate
-import com.webauthn4j.ctap.authenticator.store.UserCredential
+import com.webauthn4j.ctap.authenticator.data.credential.UserCredential
 import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialType

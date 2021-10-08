@@ -1,9 +1,9 @@
 package com.webauthn4j.ctap.client
 
-import com.webauthn4j.ctap.authenticator.options.ClientPINOption
-import com.webauthn4j.ctap.authenticator.options.PlatformOption
-import com.webauthn4j.ctap.authenticator.options.ResidentKeyOption
-import com.webauthn4j.ctap.authenticator.options.UserVerificationOption
+import com.webauthn4j.ctap.authenticator.data.options.ClientPINOption
+import com.webauthn4j.ctap.authenticator.data.options.PlatformOption
+import com.webauthn4j.ctap.authenticator.data.options.ResidentKeyOption
+import com.webauthn4j.ctap.authenticator.data.options.UserVerificationOption
 import com.webauthn4j.data.AuthenticatorAttachment
 import com.webauthn4j.data.ResidentKeyRequirement
 import com.webauthn4j.data.UserVerificationRequirement

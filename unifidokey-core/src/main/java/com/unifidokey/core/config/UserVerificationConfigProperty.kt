@@ -1,7 +1,7 @@
 package com.unifidokey.core.config
 
-import com.webauthn4j.ctap.authenticator.settings.UserVerificationSetting
-import com.webauthn4j.ctap.authenticator.settings.UserVerificationSetting.Companion.create
+import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting.Companion.create
 
 class UserVerificationConfigProperty internal constructor(configManager: ConfigManager) :
     ConfigPropertyBase<UserVerificationSetting>(

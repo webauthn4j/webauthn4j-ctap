@@ -6,7 +6,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.webauthn4j.converter.util.CborConverter
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
-import com.webauthn4j.ctap.authenticator.options.*
+import com.webauthn4j.ctap.authenticator.data.options.*
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
 import com.webauthn4j.ctap.core.data.PinProtocolVersion

@@ -1,7 +1,7 @@
 package com.unifidokey.core.config
 
-import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting
-import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting.Companion.create
+import com.webauthn4j.ctap.authenticator.data.settings.AttestationStatementFormatSetting
+import com.webauthn4j.ctap.authenticator.data.settings.AttestationStatementFormatSetting.Companion.create
 
 class AttestationStatementFormatConfigProperty internal constructor(configManager: ConfigManager) :
     ConfigPropertyBase<AttestationStatementFormatSetting>(

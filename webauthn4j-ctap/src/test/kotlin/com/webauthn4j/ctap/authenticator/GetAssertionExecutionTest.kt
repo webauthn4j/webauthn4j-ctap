@@ -1,10 +1,10 @@
 package com.webauthn4j.ctap.authenticator
 
 import com.webauthn4j.ctap.authenticator.exception.StoreFullException
-import com.webauthn4j.ctap.authenticator.settings.UserPresenceSetting
-import com.webauthn4j.ctap.authenticator.settings.UserVerificationSetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
-import com.webauthn4j.ctap.authenticator.store.ResidentUserCredential
+import com.webauthn4j.ctap.authenticator.data.credential.ResidentUserCredential
 import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialParameters

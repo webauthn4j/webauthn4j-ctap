@@ -1,6 +1,7 @@
 package com.webauthn4j.ctap.authenticator
 
 import com.webauthn4j.converter.util.ObjectConverter
+import com.webauthn4j.ctap.authenticator.data.credential.*
 import com.webauthn4j.ctap.authenticator.store.*
 import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import java.io.Serializable
@@ -23,7 +24,7 @@ class UserCredentialBuilder(private val objectConverter: ObjectConverter, privat
     private var otherUI: Serializable? = null
     private val detailsBuilder: UserCredentialDetailsBuilder = UserCredentialDetailsBuilder()
 
-    fun build(): UserCredential{
+    fun build(): UserCredential {
         val details = detailsBuilder.build()
         credentialKey.let {
             return if(it is ResidentCredentialKey){

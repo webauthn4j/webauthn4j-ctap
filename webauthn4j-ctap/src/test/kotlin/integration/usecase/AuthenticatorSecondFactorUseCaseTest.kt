@@ -1,9 +1,9 @@
 package integration.usecase
 
-import com.webauthn4j.ctap.authenticator.settings.ClientPINSetting
-import com.webauthn4j.ctap.authenticator.settings.ResidentKeySetting
-import com.webauthn4j.ctap.authenticator.settings.UserPresenceSetting
-import com.webauthn4j.ctap.authenticator.settings.UserVerificationSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
 import com.webauthn4j.ctap.client.exception.UPNotSupportedException
 import integration.usecase.testcase.SecondFactorTestCase
 import kotlinx.coroutines.test.runBlockingTest

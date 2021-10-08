@@ -3,7 +3,6 @@ package com.unifidokey.core.service
 import androidx.annotation.UiThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.unifidokey.core.adapter.UnifidoKeyAuthenticatorPropertyStore
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.driver.persistence.converter.EventConverter
@@ -12,12 +11,11 @@ import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.*
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementProvider
-import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FBasicAttestationStatementProvider
-import com.webauthn4j.ctap.authenticator.event.Event
+import com.webauthn4j.ctap.authenticator.data.event.Event
 import com.webauthn4j.ctap.authenticator.extension.HMACSecretExtensionProcessor
-import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting
-import com.webauthn4j.ctap.authenticator.settings.AttestationTypeSetting
-import com.webauthn4j.ctap.authenticator.settings.ConsentCachingSetting
+import com.webauthn4j.ctap.authenticator.data.settings.AttestationStatementFormatSetting
+import com.webauthn4j.ctap.authenticator.data.settings.AttestationTypeSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ConsentCachingSetting
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import kotlinx.coroutines.runBlocking
 

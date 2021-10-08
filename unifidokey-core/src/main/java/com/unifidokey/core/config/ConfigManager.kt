@@ -3,10 +3,9 @@ package com.unifidokey.core.config
 import androidx.annotation.UiThread
 import com.unifidokey.core.adapter.PersistenceAdaptor
 import com.unifidokey.core.setting.KeyStorageSetting
-import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting
-import com.webauthn4j.ctap.authenticator.settings.AttestationTypeSetting
-import com.webauthn4j.ctap.authenticator.settings.ConsentCachingSetting
-import com.webauthn4j.ctap.authenticator.settings.ResidentKeySetting
+import com.webauthn4j.ctap.authenticator.data.settings.AttestationStatementFormatSetting
+import com.webauthn4j.ctap.authenticator.data.settings.AttestationTypeSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import java.security.SecureRandom

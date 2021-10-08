@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication
 import com.unifidokey.app.handheld.UnifidoKeyHandHeldComponent
 import com.unifidokey.core.service.AuthenticatorService
-import com.webauthn4j.ctap.authenticator.event.Event
+import com.webauthn4j.ctap.authenticator.data.event.Event
 
 class HistoryViewModel(application: Application) : AndroidViewModel(application) {
 

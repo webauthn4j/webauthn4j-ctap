@@ -1,8 +1,8 @@
 package com.unifidokey.app.handheld.presentation
 
 import androidx.lifecycle.ViewModel
-import com.webauthn4j.ctap.authenticator.event.Event
-import com.webauthn4j.ctap.authenticator.event.EventType
+import com.webauthn4j.ctap.authenticator.data.event.Event
+import com.webauthn4j.ctap.authenticator.data.event.EventType
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter

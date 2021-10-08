@@ -7,6 +7,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.webauthn4j.converter.util.CborConverter
 import com.webauthn4j.converter.util.ObjectConverter
+import com.webauthn4j.ctap.authenticator.data.credential.NonResidentCredentialKey
+import com.webauthn4j.ctap.authenticator.data.credential.NonResidentUserCredential
 import com.webauthn4j.ctap.core.converter.jackson.PublicKeyCredentialSourceCBORModule
 import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.util.ECUtil

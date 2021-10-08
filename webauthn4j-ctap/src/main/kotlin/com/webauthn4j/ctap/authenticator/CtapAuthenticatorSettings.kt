@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.authenticator
 
-import com.webauthn4j.ctap.authenticator.settings.*
+import com.webauthn4j.ctap.authenticator.data.settings.*
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 
 data class CtapAuthenticatorSettings(

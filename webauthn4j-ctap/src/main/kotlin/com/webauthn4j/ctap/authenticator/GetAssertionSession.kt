@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.authenticator
 
-import com.webauthn4j.ctap.authenticator.store.Credential
+import com.webauthn4j.ctap.authenticator.data.credential.Credential
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthenticatorOutput
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorOutputs
 import java.time.Instant

@@ -1,7 +1,7 @@
 package com.unifidokey.core.config
 
-import com.webauthn4j.ctap.authenticator.settings.ClientPINSetting
-import com.webauthn4j.ctap.authenticator.settings.ClientPINSetting.Companion.create
+import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting.Companion.create
 
 class ClientPINConfigProperty internal constructor(configManager: ConfigManager) :
     ConfigPropertyBase<ClientPINSetting>(configManager, KEY, ClientPINSetting.ENABLED) {

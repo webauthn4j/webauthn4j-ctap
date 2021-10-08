@@ -8,7 +8,7 @@ import com.unifidokey.core.config.BTHIDDeviceHistoryEntry
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.core.setting.KeepScreenOnSetting
 import com.unifidokey.core.setting.KeyStorageSetting
-import com.webauthn4j.ctap.authenticator.settings.*
+import com.webauthn4j.ctap.authenticator.data.settings.*
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import org.slf4j.LoggerFactory

@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.authenticator
 
-import com.webauthn4j.ctap.authenticator.store.Credential
+import com.webauthn4j.ctap.authenticator.data.credential.Credential
 import com.webauthn4j.util.Base64UrlUtil
 import org.slf4j.LoggerFactory
 import java.time.Duration

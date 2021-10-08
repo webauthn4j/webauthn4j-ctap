@@ -1,7 +1,7 @@
 package com.webauthn4j.ctap.core.data.hid
 
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.options.*
+import com.webauthn4j.ctap.authenticator.data.options.*
 import com.webauthn4j.ctap.authenticator.transport.hid.HIDResponseMessageBuilder
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData

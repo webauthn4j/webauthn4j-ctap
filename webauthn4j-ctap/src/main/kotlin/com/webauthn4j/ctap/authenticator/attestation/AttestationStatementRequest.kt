@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.authenticator.attestation
 
-import com.webauthn4j.ctap.authenticator.store.CredentialKey
+import com.webauthn4j.ctap.authenticator.data.credential.CredentialKey
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData
 import com.webauthn4j.data.attestation.authenticator.COSEKey
 import com.webauthn4j.data.attestation.authenticator.EC2COSEKey

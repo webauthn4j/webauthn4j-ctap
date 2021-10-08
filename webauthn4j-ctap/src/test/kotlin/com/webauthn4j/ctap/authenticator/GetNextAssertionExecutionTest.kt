@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.authenticator
 
-import com.webauthn4j.ctap.authenticator.settings.CredentialSelectorSetting
+import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
 import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialParameters

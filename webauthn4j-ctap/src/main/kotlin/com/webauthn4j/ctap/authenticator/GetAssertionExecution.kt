@@ -2,14 +2,15 @@ package com.webauthn4j.ctap.authenticator
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.webauthn4j.ctap.authenticator.SignatureCalculator.calculate
-import com.webauthn4j.ctap.authenticator.event.GetAssertionEvent
+import com.webauthn4j.ctap.authenticator.data.credential.*
+import com.webauthn4j.ctap.authenticator.data.event.GetAssertionEvent
 import com.webauthn4j.ctap.authenticator.exception.CtapCommandExecutionException
 import com.webauthn4j.ctap.authenticator.exception.StoreFullException
 import com.webauthn4j.ctap.authenticator.extension.AuthenticationExtensionContext
 import com.webauthn4j.ctap.authenticator.extension.AuthenticationExtensionProcessor
-import com.webauthn4j.ctap.authenticator.settings.CredentialSelectorSetting
-import com.webauthn4j.ctap.authenticator.settings.UserPresenceSetting
-import com.webauthn4j.ctap.authenticator.settings.UserVerificationSetting
+import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
 import com.webauthn4j.ctap.authenticator.store.*
 import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.ctap.core.util.internal.BooleanUtil

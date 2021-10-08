@@ -1,6 +1,6 @@
 package integration.setting.authenticator
 
-import com.webauthn4j.ctap.authenticator.settings.UserPresenceSetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.client.exception.UPNotSupportedException
 import integration.usecase.testcase.PasswordlessTestCase
 import kotlinx.coroutines.test.runBlockingTest

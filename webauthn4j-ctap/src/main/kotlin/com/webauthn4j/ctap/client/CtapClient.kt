@@ -2,10 +2,10 @@ package com.webauthn4j.ctap.client
 
 import com.webauthn4j.ctap.authenticator.exception.ClientPINUserVerificationCanceledException
 import com.webauthn4j.ctap.authenticator.exception.CtapCommandExecutionException
-import com.webauthn4j.ctap.authenticator.options.ClientPINOption
-import com.webauthn4j.ctap.authenticator.options.ResidentKeyOption
-import com.webauthn4j.ctap.authenticator.options.UserPresenceOption
-import com.webauthn4j.ctap.authenticator.options.UserVerificationOption
+import com.webauthn4j.ctap.authenticator.data.options.ClientPINOption
+import com.webauthn4j.ctap.authenticator.data.options.ResidentKeyOption
+import com.webauthn4j.ctap.authenticator.data.options.UserPresenceOption
+import com.webauthn4j.ctap.authenticator.data.options.UserVerificationOption
 import com.webauthn4j.ctap.client.exception.ResponseDataValidationException
 import com.webauthn4j.ctap.client.exception.UPNotSupportedException
 import com.webauthn4j.ctap.client.exception.UVNotReadyException

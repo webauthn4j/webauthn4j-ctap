@@ -1,6 +1,6 @@
 package integration.setting.authenticator
 
-import com.webauthn4j.ctap.authenticator.settings.ResidentKeySetting
+import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
 import com.webauthn4j.ctap.client.exception.WebAuthnClientException
 import integration.usecase.testcase.PasswordlessTestCase
 import kotlinx.coroutines.test.runBlockingTest

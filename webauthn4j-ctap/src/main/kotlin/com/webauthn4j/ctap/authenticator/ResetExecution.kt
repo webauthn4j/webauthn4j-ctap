@@ -1,7 +1,7 @@
 package com.webauthn4j.ctap.authenticator
 
-import com.webauthn4j.ctap.authenticator.event.ResetEvent
-import com.webauthn4j.ctap.authenticator.settings.ResetProtectionSetting
+import com.webauthn4j.ctap.authenticator.data.event.ResetEvent
+import com.webauthn4j.ctap.authenticator.data.settings.ResetProtectionSetting
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.core.data.AuthenticatorResetRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorResetResponse

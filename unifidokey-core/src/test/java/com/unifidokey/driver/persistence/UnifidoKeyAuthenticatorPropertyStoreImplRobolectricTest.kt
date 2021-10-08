@@ -10,8 +10,8 @@ import com.unifidokey.driver.persistence.dao.KeyStoreDao
 import com.unifidokey.driver.persistence.dao.PreferenceDao
 import com.webauthn4j.ctap.authenticator.ClientPINService
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
-import com.webauthn4j.ctap.authenticator.store.ResidentCredentialKey
-import com.webauthn4j.ctap.authenticator.store.ResidentUserCredential
+import com.webauthn4j.ctap.authenticator.data.credential.ResidentCredentialKey
+import com.webauthn4j.ctap.authenticator.data.credential.ResidentUserCredential
 import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.util.ECUtil
 import org.junit.Before

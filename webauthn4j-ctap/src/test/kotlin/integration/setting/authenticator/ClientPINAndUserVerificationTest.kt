@@ -1,7 +1,7 @@
 package integration.setting.authenticator
 
-import com.webauthn4j.ctap.authenticator.settings.ClientPINSetting
-import com.webauthn4j.ctap.authenticator.settings.UserVerificationSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
 import com.webauthn4j.ctap.client.exception.WebAuthnClientException
 import integration.usecase.testcase.PasswordlessTestCase
 import kotlinx.coroutines.test.runBlockingTest

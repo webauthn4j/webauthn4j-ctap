@@ -1,6 +1,5 @@
 package com.unifidokey.app
 
-import androidx.room.Room
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.cfg.CoercionAction
 import com.fasterxml.jackson.databind.cfg.CoercionInputShape
@@ -25,17 +24,15 @@ import com.unifidokey.driver.transport.CtapNFCAndroidServiceAdapter
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.ExceptionReporter
 import com.webauthn4j.ctap.authenticator.attestation.*
-import com.webauthn4j.ctap.authenticator.settings.AttestationStatementFormatSetting
-import com.webauthn4j.ctap.authenticator.settings.AttestationTypeSetting
+import com.webauthn4j.ctap.authenticator.data.settings.AttestationStatementFormatSetting
+import com.webauthn4j.ctap.authenticator.data.settings.AttestationTypeSetting
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
 import com.webauthn4j.ctap.core.converter.jackson.PublicKeyCredentialSourceCBORModule
 import dagger.Module
 import dagger.Provides
-import java.util.*
 import javax.inject.Named
 import javax.inject.Singleton
 import kotlin.collections.HashMap
-import kotlin.reflect.jvm.internal.impl.serialization.deserialization.ErrorReporter
 
 /**
  * Defines Dagger2 configuration

@@ -1,7 +1,7 @@
 package com.unifidokey.core.config
 
-import com.webauthn4j.ctap.authenticator.settings.CredentialSelectorSetting
-import com.webauthn4j.ctap.authenticator.settings.CredentialSelectorSetting.Companion.create
+import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
+import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting.Companion.create
 
 class CredentialSelectorConfigProperty internal constructor(configManager: ConfigManager) :
     ConfigPropertyBase<CredentialSelectorSetting>(

@@ -18,7 +18,7 @@ import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication
 import com.unifidokey.core.adapter.BluetoothDeviceHandle
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.core.service.*
-import com.webauthn4j.ctap.authenticator.event.Event
+import com.webauthn4j.ctap.authenticator.data.event.Event
 import com.webauthn4j.data.attestation.statement.AndroidSafetyNetAttestationStatement
 import com.webauthn4j.data.attestation.statement.NoneAttestationStatement
 import org.slf4j.LoggerFactory

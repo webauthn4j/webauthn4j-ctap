@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.unifidokey.R
 import com.unifidokey.databinding.HistoryItemLayoutBinding
-import com.webauthn4j.ctap.authenticator.event.Event
+import com.webauthn4j.ctap.authenticator.data.event.Event
 
 class HistoryItemRecyclerViewAdapter :
     ListAdapter<Event, HistoryItemRecyclerViewAdapter.ViewHolder>(DIFF_CALLBACK) {
