@@ -43,7 +43,7 @@ buildscript {
     ext.googlePlayServicesSafetyNetVersion = "17.0.1"
     ext.googlePlayServicesOSSLicensesVersion = "17.0.0"
     ext.androidGradlePluginVersion = "7.0.2"
-    ext.navigationSafeArgsGradlePluginVersion = "2.4.0-alpha09"
+    ext.navigationSafeArgsGradlePluginVersion = "2.4.0-alpha10"
     ext.ossLicensesPluginVersion = "0.10.4"
 
     // Third party libraries
