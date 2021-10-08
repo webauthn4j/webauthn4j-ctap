@@ -19,3 +19,9 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-keep public class com.webauthn4j.data.**
+-keep public class com.webauthn4j.ctap.core.data.**
+-keep public class com.unifidokey.core.config.**
+-keep public class com.unifidokey.core.setting.**
+

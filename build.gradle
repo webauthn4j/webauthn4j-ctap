@@ -133,6 +133,10 @@ subprojects {
     }
 
     dependencies {
+        //BOM
+        implementation platform("com.google.firebase:firebase-bom:${firebaseBomVersion}")
+        implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+
         constraints {
             // kotlin
 
@@ -172,6 +176,7 @@ subprojects {
             implementation("com.google.android.gms:play-services-oss-licenses:$googlePlayServicesOSSLicensesVersion")
 
             // third party
+            implementation("org.bouncycastle:bcutil-jdk15on:$bouncyCastleVersion")
             implementation("org.bouncycastle:bcprov-jdk15on:$bouncyCastleVersion")
             implementation("org.bouncycastle:bcpkix-jdk15on:$bouncyCastleVersion")
             implementation("com.github.webauthn4j.webauthn4j:webauthn4j-util:$webauthn4jVersion")
@@ -195,9 +200,6 @@ subprojects {
             implementation("junit:junit:$junitVersion")
         }
 
-        //BOM
-        implementation platform("com.google.firebase:firebase-bom:${firebaseBomVersion}")
-        implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
     }
 }
 
