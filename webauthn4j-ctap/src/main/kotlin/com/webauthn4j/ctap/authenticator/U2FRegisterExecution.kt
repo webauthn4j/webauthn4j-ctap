@@ -18,6 +18,7 @@ class U2FRegisterExecution(private val ctapAuthenticator: CtapAuthenticator, pri
     private val logger = LoggerFactory.getLogger(U2FAuthenticationExecution::class.java)
     private val u2fRegistrationRequestValidator = U2FRegistrationRequestValidator()
 
+    @Suppress("RedundantSuspendModifier")
     suspend fun validate() {
         u2fRegistrationRequestValidator.validate(u2FRegistrationRequest)
     }

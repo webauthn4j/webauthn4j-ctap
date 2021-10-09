@@ -14,7 +14,7 @@ import com.unifidokey.driver.persistence.dto.SerializableConverter
 import com.unifidokey.driver.persistence.entity.EventEntity
 import com.unifidokey.driver.persistence.entity.RelyingPartyEntity
 import com.unifidokey.driver.persistence.entity.UserCredentialEntity
-import com.unifidokey.driver.persistence.migration.V1_2Migration
+import com.unifidokey.driver.persistence.migration.V1ToV2Migration
 
 @Database(
     entities = [RelyingPartyEntity::class, UserCredentialEntity::class, EventEntity::class],
@@ -44,7 +44,7 @@ abstract class UnifidoKeyDatabase : RoomDatabase() {
                 "UnifidoKey"
             )
                 .allowMainThreadQueries()
-                .addMigrations(V1_2Migration())
+                .addMigrations(V1ToV2Migration())
                 .build()
         }
     }

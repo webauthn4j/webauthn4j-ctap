@@ -11,12 +11,16 @@ class DeviceBootBroadcastReceiver : BroadcastReceiver() {
     private val logger =
         LoggerFactory.getLogger(DeviceBootBroadcastReceiver::class.java)
 
-    override fun onReceive(context: Context, intent: Intent?) {
+    override fun onReceive(context: Context, intent: Intent) {
         logger.debug("onReceive")
-        val unifidoKeyApplication = context.applicationContext as UnifidoKeyApplicationBase<*>
-        val bthidServiceContextualAdapter = unifidoKeyApplication.unifidoKeyComponent.bthidServiceContextualAdapter
-        if(unifidoKeyApplication.unifidoKeyComponent.bthidService.isBTHIDBackgroundServiceModeEnabled.value == true){
-            bthidServiceContextualAdapter.startForegroundService()
+        when (intent.action) {
+            Intent.ACTION_BOOT_COMPLETED -> {
+                val unifidoKeyApplication = context.applicationContext as UnifidoKeyApplicationBase<*>
+                val bthidServiceContextualAdapter = unifidoKeyApplication.unifidoKeyComponent.bthidServiceContextualAdapter
+                if(unifidoKeyApplication.unifidoKeyComponent.bthidService.isBTHIDBackgroundServiceModeEnabled.value == true){
+                    bthidServiceContextualAdapter.startForegroundService()
+                }
+            }
         }
     }
 

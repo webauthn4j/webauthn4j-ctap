@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.fasterxml.jackson.dataformat.cbor.CBORGenerator
 import java.io.IOException
-import java.math.BigInteger
 import java.util.function.Function
 
 abstract class AbstractCtapCanonicalCborSerializer<T>(

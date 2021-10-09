@@ -19,6 +19,7 @@ class U2FAuthenticationExecution(
     private val logger = LoggerFactory.getLogger(U2FAuthenticationExecution::class.java)
     private val u2fAuthenticationRequestValidator = U2FAuthenticationRequestValidator()
 
+    @Suppress("RedundantSuspendModifier")
     suspend fun validate() {
         u2fAuthenticationRequestValidator.validate(u2fAuthenticationRequest)
     }

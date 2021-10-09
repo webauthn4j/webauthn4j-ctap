@@ -85,6 +85,7 @@ public class PublishAppBundleTask extends DefaultTask {
          return bundle;
     }
 
+    @SuppressWarnings("SameParameterValue")
     private void assignBundleToTrack(AndroidPublisher.Edits edits, String editId, Bundle bundle, String track) throws IOException {
         List<Long> apkVersionCodes = Collections.singletonList(Long.valueOf(bundle.getVersionCode()));
         AndroidPublisher.Edits.Tracks.Update updateTrackRequest = edits

@@ -48,7 +48,20 @@ class UnifidoKeyModuleBaseTest {
 
     }
 
-    data class ByteArrayContainerTestDto(var field: ByteArray)
+    data class ByteArrayContainerTestDto(var field: ByteArray) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is ByteArrayContainerTestDto) return false
+
+            if (!field.contentEquals(other.field)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            return field.contentHashCode()
+        }
+    }
 
 
 }
