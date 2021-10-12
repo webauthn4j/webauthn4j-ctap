@@ -1,6 +1,6 @@
+import com.unifidokey.gradle.util.PropertyUtil
 import com.unifidokey.gradle.util.PublishAppBundleTask
 import com.unifidokey.gradle.util.VersionCodeUtil
-import com.unifidokey.gradle.util.PropertyUtil
 
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
