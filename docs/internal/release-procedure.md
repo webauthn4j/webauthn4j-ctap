@@ -13,6 +13,7 @@ git checkout -b release-<version>
 ##### Update version variables in build.gradle
 
 gradle.properties
+
 ```
 unifidoKeyVersion=<version>.RELEASE
 ```
@@ -78,6 +79,7 @@ git checkout -b <new version>-development
 ##### Update version variables in build.gradle
 
 gradle.properties
+
 ```
 unifidoKeyVersion=<new version>-SNAPSHOT
 ```
@@ -87,7 +89,7 @@ unifidoKeyVersion=<new version>-SNAPSHOT
  ```
 git commit -a -m "Start <new version> development"
  ```
- 
+
 ##### Push the release branch
 
 ```

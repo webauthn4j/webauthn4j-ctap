@@ -2,7 +2,6 @@ package com.webauthn4j.ctap.authenticator.attestation
 
 import com.webauthn4j.util.ArrayUtil
 import java.security.KeyPair
-import java.security.interfaces.ECPublicKey
 
 class FIDOU2FAttestationStatementRequest {
     @Suppress("JoinDeclarationAndAssignment")

@@ -66,9 +66,16 @@ class CreateOperation(
         val clientDataHash = MessageDigestUtil.createSHA256().digest(clientDataJSON)
         val rpId = publicKeyCredentialCreationOptions.rp.id ?: clientProperty.origin.host
         ?: throw WebAuthnClientException("WebAuthn client must have origin.")
-        val rp = CtapPublicKeyCredentialRpEntity(rpId, publicKeyCredentialCreationOptions.rp.name, null)
-        val user = CtapPublicKeyCredentialUserEntity(publicKeyCredentialCreationOptions.user.id, publicKeyCredentialCreationOptions.user.name, publicKeyCredentialCreationOptions.user.displayName, null)
-        val authenticatorExtensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>? = null //TODO: implement extension handling
+        val rp =
+            CtapPublicKeyCredentialRpEntity(rpId, publicKeyCredentialCreationOptions.rp.name, null)
+        val user = CtapPublicKeyCredentialUserEntity(
+            publicKeyCredentialCreationOptions.user.id,
+            publicKeyCredentialCreationOptions.user.name,
+            publicKeyCredentialCreationOptions.user.displayName,
+            null
+        )
+        val authenticatorExtensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>? =
+            null //TODO: implement extension handling
         val makeCredentialRequest = MakeCredentialRequest(
             clientDataHash,
             rp,

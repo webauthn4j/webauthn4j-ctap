@@ -47,7 +47,12 @@ class ResponseAPDU(data: ByteArray?, sw1: Byte, sw2: Byte) {
     }
 
     override fun toString(): String {
-        return "ResponseAPDU(data=${HexUtil.encodeToString(data)}, sw1=${String.format("%02X", sw1)}, sw2=${String.format("%02X", sw2)})"
+        return "ResponseAPDU(data=${HexUtil.encodeToString(data)}, sw1=${
+            String.format(
+                "%02X",
+                sw1
+            )
+        }, sw2=${String.format("%02X", sw2)})"
     }
 
 

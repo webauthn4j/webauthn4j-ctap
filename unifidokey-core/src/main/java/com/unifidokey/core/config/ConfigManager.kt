@@ -125,7 +125,7 @@ class ConfigManager(
     fun setup() {
     }
 
-    fun reset(){
+    fun reset() {
         resetTargetProperties.forEach { it.reset() }
     }
 
@@ -137,27 +137,28 @@ class ConfigManager(
                 attestationStatementFormat.value = AttestationStatementFormatSetting.PACKED
             }
         }
-        algorithms.liveData.observeForever{ value ->
-            if(value != setOf(COSEAlgorithmIdentifier.ES256) && attestationStatementFormat.value == AttestationStatementFormatSetting.FIDO_U2F){
+        algorithms.liveData.observeForever { value ->
+            if (value != setOf(COSEAlgorithmIdentifier.ES256) && attestationStatementFormat.value == AttestationStatementFormatSetting.FIDO_U2F) {
                 attestationStatementFormat.value = AttestationStatementFormatSetting.PACKED
             }
         }
-        attestationType.liveData.observeForever{ value ->
-            when(value){
+        attestationType.liveData.observeForever { value ->
+            when (value) {
                 AttestationTypeSetting.BASIC -> {
-                    if(attestationStatementFormat.value == AttestationStatementFormatSetting.NONE){
+                    if (attestationStatementFormat.value == AttestationStatementFormatSetting.NONE) {
                         attestationStatementFormat.value = AttestationStatementFormatSetting.PACKED
                     }
                 }
                 AttestationTypeSetting.SELF -> {
-                    if(attestationStatementFormat.value != AttestationStatementFormatSetting.PACKED && attestationStatementFormat.value != AttestationStatementFormatSetting.FIDO_U2F){
+                    if (attestationStatementFormat.value != AttestationStatementFormatSetting.PACKED && attestationStatementFormat.value != AttestationStatementFormatSetting.FIDO_U2F) {
                         attestationStatementFormat.value = AttestationStatementFormatSetting.PACKED
                     }
                 }
                 AttestationTypeSetting.NONE -> {
                     attestationStatementFormat.value = AttestationStatementFormatSetting.NONE
                 }
-                else -> { /*nop*/ }
+                else -> { /*nop*/
+                }
             }
         }
         attestationStatementFormat.liveData.observeForever { value ->
@@ -171,21 +172,22 @@ class ConfigManager(
                     attestationType.value = AttestationTypeSetting.BASIC
                 }
                 AttestationStatementFormatSetting.PACKED -> {
-                    if(attestationType.value == AttestationTypeSetting.NONE){
+                    if (attestationType.value == AttestationTypeSetting.NONE) {
                         attestationType.value = AttestationTypeSetting.SELF
                     }
                 }
                 AttestationStatementFormatSetting.FIDO_U2F -> {
                     aaguid.value = AAGUID.ZERO
                     algorithms.value = setOf(COSEAlgorithmIdentifier.ES256)
-                    if(attestationType.value == AttestationTypeSetting.NONE){
+                    if (attestationType.value == AttestationTypeSetting.NONE) {
                         attestationType.value = AttestationTypeSetting.SELF
                     }
                 }
                 AttestationStatementFormatSetting.NONE -> {
                     attestationType.value = AttestationTypeSetting.NONE
                 }
-                else -> { /*nop*/ }
+                else -> { /*nop*/
+                }
             }
         }
         residentKey.liveData.observeForever { value: ResidentKeySetting ->

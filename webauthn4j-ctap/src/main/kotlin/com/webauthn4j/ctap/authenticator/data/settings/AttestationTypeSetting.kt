@@ -20,8 +20,8 @@ enum class AttestationTypeSetting(@get:JsonValue val value: String) {
         }
     }
 
-    fun toAttestationType() : AttestationType {
-        return when(this){
+    fun toAttestationType(): AttestationType {
+        return when (this) {
             BASIC -> AttestationType.BASIC
             SELF -> AttestationType.SELF
             NONE -> AttestationType.NONE

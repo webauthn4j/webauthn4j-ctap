@@ -13,7 +13,10 @@ import org.slf4j.LoggerFactory
 import java.security.interfaces.ECPublicKey
 import java.time.Instant
 
-class U2FRegisterExecution(private val ctapAuthenticator: CtapAuthenticator, private val u2FRegistrationRequest: U2FRegistrationRequest) {
+class U2FRegisterExecution(
+    private val ctapAuthenticator: CtapAuthenticator,
+    private val u2FRegistrationRequest: U2FRegistrationRequest
+) {
 
     private val logger = LoggerFactory.getLogger(U2FAuthenticationExecution::class.java)
     private val u2fRegistrationRequestValidator = U2FRegistrationRequestValidator()
@@ -29,13 +32,11 @@ class U2FRegisterExecution(private val ctapAuthenticator: CtapAuthenticator, pri
         val response: U2FRegistrationResponse
 
         validate()
-        try{
+        try {
             response = doExecute()
-        }
-        catch (e: U2FCommandExecutionException){
+        } catch (e: U2FCommandExecutionException) {
             throw e
-        }
-        catch (e: java.lang.RuntimeException){
+        } catch (e: java.lang.RuntimeException) {
             logger.error("Unknown error occurred while processing U2F Registration Command.", e)
             ctapAuthenticator.reportException(e)
             throw U2FCommandExecutionException(U2FStatusCode.WRONG_DATA, e)
@@ -73,9 +74,10 @@ class U2FRegisterExecution(private val ctapAuthenticator: CtapAuthenticator, pri
             u2FRegistrationRequest.applicationParameter,
             u2FRegistrationRequest.challengeParameter
         )
-        val attestationStatement = ctapAuthenticator.fidoU2FBasicAttestationStatementGenerator.generate(
-            attestationStatementRequest
-        )
+        val attestationStatement =
+            ctapAuthenticator.fidoU2FBasicAttestationStatementGenerator.generate(
+                attestationStatementRequest
+            )
         return U2FRegistrationResponse(
             reservedByte,
             userPublicKey,
@@ -85,8 +87,13 @@ class U2FRegisterExecution(private val ctapAuthenticator: CtapAuthenticator, pri
         )
     }
 
-    private suspend fun requestUserPresence(applicationParameter: ByteArray): Boolean{
-        val options = MakeCredentialConsentOptions(applicationParameter,null, isUserPresence = true, isUserVerification = false)
+    private suspend fun requestUserPresence(applicationParameter: ByteArray): Boolean {
+        val options = MakeCredentialConsentOptions(
+            applicationParameter,
+            null,
+            isUserPresence = true,
+            isUserVerification = false
+        )
         return ctapAuthenticator.userConsentHandler.consentMakeCredential(options)
     }
 

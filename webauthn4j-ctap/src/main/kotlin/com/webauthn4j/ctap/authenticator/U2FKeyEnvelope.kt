@@ -6,12 +6,13 @@ import com.webauthn4j.data.attestation.authenticator.EC2COSEKey
 import java.time.Instant
 
 class U2FKeyEnvelope {
-    companion object{
+    companion object {
         @JvmStatic
         fun create(
             keyPair: EC2COSEKey,
             applicationParameter: ByteArray,
-            createdAt: Instant): U2FKeyEnvelope {
+            createdAt: Instant
+        ): U2FKeyEnvelope {
             return U2FKeyEnvelope(1u, keyPair, applicationParameter, createdAt)
         }
 
@@ -21,8 +22,14 @@ class U2FKeyEnvelope {
             @JsonProperty("1") version: Byte,
             @JsonProperty("2") keyPair: EC2COSEKey,
             @JsonProperty("3") applicationParameter: ByteArray,
-            @JsonProperty("4") createdAt: Long): U2FKeyEnvelope {
-            return U2FKeyEnvelope(version.toUByte(), keyPair, applicationParameter, Instant.ofEpochSecond(createdAt))
+            @JsonProperty("4") createdAt: Long
+        ): U2FKeyEnvelope {
+            return U2FKeyEnvelope(
+                version.toUByte(),
+                keyPair,
+                applicationParameter,
+                Instant.ofEpochSecond(createdAt)
+            )
         }
     }
 
@@ -36,7 +43,8 @@ class U2FKeyEnvelope {
         version: UByte,
         keyPair: EC2COSEKey,
         applicationParameter: ByteArray,
-        createdAt: Instant){
+        createdAt: Instant
+    ) {
         this.version = version
         this.keyPair = keyPair
         this.applicationParameter = applicationParameter

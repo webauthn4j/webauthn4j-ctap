@@ -73,7 +73,10 @@ class JCEKSFileKeyStoreDao : KeyStoreDaoBase {
         }
     }
 
-    private fun generateSelfSignedCertificate(keyPair: KeyPair, signatureAlgorithm: SignatureAlgorithm): X509Certificate {
+    private fun generateSelfSignedCertificate(
+        keyPair: KeyPair,
+        signatureAlgorithm: SignatureAlgorithm
+    ): X509Certificate {
         val rootCACertificateBuilder = RootCACertificateBuilder(
             "CN=UnifidoKeyKeystoreKey,O=WebAuthn4J Project,C=US",
             keyPair.public,

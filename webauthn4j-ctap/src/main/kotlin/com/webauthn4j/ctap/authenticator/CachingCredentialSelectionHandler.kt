@@ -7,6 +7,9 @@ import java.time.Duration
 import java.time.Instant
 import java.util.stream.Collectors
 
+/**
+ * [CredentialSelectionHandler] implementation which caches selection result
+ */
 class CachingCredentialSelectionHandler(private val credentialSelectionHandler: CredentialSelectionHandler) :
     CredentialSelectionHandler {
     private val logger = LoggerFactory.getLogger(CachingCredentialSelectionHandler::class.java)

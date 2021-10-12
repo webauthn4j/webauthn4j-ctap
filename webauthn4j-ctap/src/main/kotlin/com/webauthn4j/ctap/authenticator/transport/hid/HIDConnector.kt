@@ -33,7 +33,8 @@ class HIDConnector(
         private const val CTAP_REQUEST_HID_PACKET_LOGGING_TEMPLATE = "CTAP Request HID Packet: {}"
         private const val CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE = "CTAP Response HID Packet: {}"
         private const val CTAP_REQUEST_HID_MESSAGE_LOGGING_TEMPLATE = "CTAP Request HID Message: {}"
-        private const val CTAP_RESPONSE_HID_MESSAGE_LOGGING_TEMPLATE = "CTAP Request HID Message: {}"
+        private const val CTAP_RESPONSE_HID_MESSAGE_LOGGING_TEMPLATE =
+            "CTAP Request HID Message: {}"
     }
 
     private val logger = LoggerFactory.getLogger(HIDConnector::class.java)
@@ -60,32 +61,34 @@ class HIDConnector(
 
 
             val hidPacket = hidPacketConverter.convert(packetBytes)
-            try{
+            try {
                 logger.debug(CTAP_REQUEST_HID_PACKET_LOGGING_TEMPLATE, hidPacket.toString())
 
                 var hidChannel = hidChannels[hidPacket.channelId]
                 if (hidChannel == null) {
-                    if(hidPacket is HIDContinuationPacket){
+                    if (hidPacket is HIDContinuationPacket) {
                         logger.debug("Unexpected continuation packet is received. Skipped.")
                         return
-                    }
-                    else{
+                    } else {
                         hidChannel = HIDChannel(hidPacket.channelId)
                         hidChannels[hidPacket.channelId] = hidChannel
                     }
                 }
                 hidChannel.handlePacket(hidPacket) { responsePacket ->
-                    logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, responsePacket.toString())
+                    logger.debug(
+                        CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE,
+                        responsePacket.toString()
+                    )
                     val responseBytes = hidPacketConverter.convert(responsePacket)
                     hidPacketHandler.onResponse(responseBytes)
                 }
-            }
-            catch (e: RuntimeException){
+            } catch (e: RuntimeException) {
                 logger.error("Unexpected exception is thrown while processing HID packet", e)
-                HIDERRORResponseMessage(hidPacket.channelId, HIDErrorCode.OTHER).toHIDPackets().forEach{
-                    logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, it.toString())
-                    hidPacketHandler.onResponse(it.toBytes())
-                }
+                HIDERRORResponseMessage(hidPacket.channelId, HIDErrorCode.OTHER).toHIDPackets()
+                    .forEach {
+                        logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, it.toString())
+                        hidPacketHandler.onResponse(it.toBytes())
+                    }
             }
         } catch (e: RuntimeException) {
             logger.error("Unexpected exception is thrown while processing HID packet", e)
@@ -101,7 +104,8 @@ class HIDConnector(
 
         private val hidRequestMessageBuilder = HIDRequestMessageBuilder()
 
-        private val hidKeepAliveWorker = newSingleThreadContext("hid-keepalive-worker-" + HexUtil.encodeToString(channelId.value))
+        private val hidKeepAliveWorker =
+            newSingleThreadContext("hid-keepalive-worker-" + HexUtil.encodeToString(channelId.value))
 
         suspend fun handlePacket(
             hidPacket: HIDPacket,
@@ -175,7 +179,13 @@ class HIDConnector(
         ) {
             coroutineScope {
 
-                val conditionNotSatisfiedMessage = HIDMSGResponseMessage(hidMessage.channelId, ResponseAPDU(U2FStatusCode.CONDITION_NOT_SATISFIED.sw1, U2FStatusCode.CONDITION_NOT_SATISFIED.sw2))
+                val conditionNotSatisfiedMessage = HIDMSGResponseMessage(
+                    hidMessage.channelId,
+                    ResponseAPDU(
+                        U2FStatusCode.CONDITION_NOT_SATISFIED.sw1,
+                        U2FStatusCode.CONDITION_NOT_SATISFIED.sw2
+                    )
+                )
 
                 u2fConfirmationStatus.let {
                     when {
@@ -184,12 +194,11 @@ class HIDConnector(
                             responseCallback.onResponse(conditionNotSatisfiedMessage)
                         }
                         it.isCompleted -> {
-                            if(hidMessage == activeRequest){
+                            if (hidMessage == activeRequest) {
                                 u2fConfirmationStatus = null
                                 activeRequest = null
                                 responseCallback.onResponse(it.await())
-                            }
-                            else{
+                            } else {
                                 resetU2FConfirmationStatus(hidMessage)
                                 responseCallback.onResponse(conditionNotSatisfiedMessage)
                             }
@@ -204,8 +213,8 @@ class HIDConnector(
             }
         }
 
-        private suspend fun resetU2FConfirmationStatus(hidMessage: HIDMSGRequestMessage){
-            u2fConfirmationStatus= CoroutineScope(u2fConfirmationWorker).async {
+        private suspend fun resetU2FConfirmationStatus(hidMessage: HIDMSGRequestMessage) {
+            u2fConfirmationStatus = CoroutineScope(u2fConfirmationWorker).async {
                 val responseAPDU = u2fAPDUProcessor.process(hidMessage.commandAPDU)
                 HIDMSGResponseMessage(hidMessage.channelId, responseAPDU)
             }

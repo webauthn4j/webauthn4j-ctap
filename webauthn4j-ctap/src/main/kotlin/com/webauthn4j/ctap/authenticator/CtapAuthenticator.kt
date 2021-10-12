@@ -10,11 +10,11 @@ import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvide
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FBasicAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.NoneAttestationStatementProvider
-import com.webauthn4j.ctap.authenticator.data.event.Event
-import com.webauthn4j.ctap.authenticator.extension.ExtensionProcessor
-import com.webauthn4j.ctap.authenticator.data.settings.*
-import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.data.credential.Credential
+import com.webauthn4j.ctap.authenticator.data.event.Event
+import com.webauthn4j.ctap.authenticator.data.settings.*
+import com.webauthn4j.ctap.authenticator.extension.ExtensionProcessor
+import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
 import com.webauthn4j.ctap.core.converter.jackson.PublicKeyCredentialSourceCBORModule
@@ -23,6 +23,9 @@ import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import org.slf4j.LoggerFactory
 
+/**
+ * Ctap Authenticator
+ */
 class CtapAuthenticator @JvmOverloads constructor(
     // Core logic delegates
     // These are final as it should not be updated on the fly for integrity. To update these, new instance should be created.
@@ -132,7 +135,7 @@ class CtapAuthenticator @JvmOverloads constructor(
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    suspend fun u2fSign(u2fAuthenticationRequest: U2FAuthenticationRequest): U2FAuthenticationResponse{
+    suspend fun u2fSign(u2fAuthenticationRequest: U2FAuthenticationRequest): U2FAuthenticationResponse {
         return U2FAuthenticationExecution(this, u2fAuthenticationRequest).execute()
     }
 
@@ -180,16 +183,16 @@ class CtapAuthenticator @JvmOverloads constructor(
         eventListeners.forEach { it.onEvent(event) }
     }
 
-    fun registerExceptionReporter(exceptionReporter: ExceptionReporter){
+    fun registerExceptionReporter(exceptionReporter: ExceptionReporter) {
         exceptionReporters.add(exceptionReporter)
     }
 
-    fun unregisterExceptionReporter(exceptionReporter: ExceptionReporter){
+    fun unregisterExceptionReporter(exceptionReporter: ExceptionReporter) {
         exceptionReporters.remove(exceptionReporter)
     }
 
-    internal fun reportException(exception: Exception){
-        exceptionReporters.forEach{ it.report(exception) }
+    internal fun reportException(exception: Exception) {
+        exceptionReporters.forEach { it.report(exception) }
     }
 
 

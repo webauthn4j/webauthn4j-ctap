@@ -25,7 +25,7 @@ import javax.crypto.spec.SecretKeySpec
 class ClientPINService(private val authenticatorPropertyStore: AuthenticatorPropertyStore) {
 
     companion object {
-        const val MAX_PIN_RETRIES : UInt = 8u
+        const val MAX_PIN_RETRIES: UInt = 8u
         const val MAX_VOLATILE_PIN_RETRIES = 3
         private val ZERO_IV = byteArrayOf(
             0x00,
@@ -75,7 +75,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
     }
 
     //spec| - Authenticator responds back with public key of authenticatorKeyAgreementKey, "aG".
-    fun getKeyAgreement(): AuthenticatorClientPINResponse{
+    fun getKeyAgreement(): AuthenticatorClientPINResponse {
 
         //spec| - Authenticator responds back with public key of authenticatorKeyAgreementKey, "aG".
         val keyAgreement = EC2COSEKey.create(
@@ -177,7 +177,10 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
         //spec| -- Authenticator decrypts pinHashEnc and verifies against its internal stored LEFT(SHA-256(curPin), 16).
         val secretKey: SecretKey = SecretKeySpec(sharedSecret, "AES")
         val pinHash = CipherUtil.decryptWithAESCBCNoPadding(pinHashEnc, secretKey, ZERO_IV)
-        val clientPIN = authenticatorPropertyStore.loadClientPIN() ?: return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_NOT_SET)
+        val clientPIN =
+            authenticatorPropertyStore.loadClientPIN() ?: return AuthenticatorClientPINResponse(
+                CtapStatusCode.CTAP2_ERR_PIN_NOT_SET
+            )
         val currentPINHash = Arrays.copyOf(MessageDigestUtil.createSHA256().digest(clientPIN), 16)
 
         if (!Arrays.equals(pinHash, currentPINHash)) {
@@ -277,7 +280,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
         return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_OK, responseData)
     }
 
-    fun generateSharedSecret(platformKeyAgreementKey: COSEKey): ByteArray{
+    fun generateSharedSecret(platformKeyAgreementKey: COSEKey): ByteArray {
         return MessageDigestUtil.createSHA256().digest(
             KeyAgreementUtil.generateSecret(
                 authenticatorKeyAgreementKey.private as ECPrivateKey,

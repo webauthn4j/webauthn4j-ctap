@@ -7,7 +7,7 @@ import com.webauthn4j.util.ECUtil
 import java.nio.ByteBuffer
 import java.security.interfaces.ECPublicKey
 
-class U2FRegistrationResponse : AuthenticatorResponse{
+class U2FRegistrationResponse : AuthenticatorResponse {
 
     @Suppress("JoinDeclarationAndAssignment")
     val reservedByte: Byte
@@ -32,14 +32,15 @@ class U2FRegistrationResponse : AuthenticatorResponse{
         this.signature = ArrayUtil.clone(signature)
     }
 
-    fun toBytes(): ByteArray{
+    fun toBytes(): ByteArray {
         val attestationCertificateBytes = attestationCertificate.certificate.encoded
         val publicKey = ECUtil.createUncompressedPublicKey(userPublicKey)
         val keyHandleSize = keyHandle.size.toUByte()
-        val length =  1 + 65 + 1 + keyHandle.size + attestationCertificateBytes.size + signature.size
-        return ByteBuffer.allocate(length).put(reservedByte).put(publicKey).put(keyHandleSize.toByte()).put(keyHandle).put(attestationCertificateBytes).put(signature).array()
+        val length = 1 + 65 + 1 + keyHandle.size + attestationCertificateBytes.size + signature.size
+        return ByteBuffer.allocate(length).put(reservedByte).put(publicKey)
+            .put(keyHandleSize.toByte()).put(keyHandle).put(attestationCertificateBytes)
+            .put(signature).array()
     }
-
 
 
     override fun equals(other: Any?): Boolean {
@@ -65,7 +66,15 @@ class U2FRegistrationResponse : AuthenticatorResponse{
     }
 
     override fun toString(): String {
-        return "U2FRegistrationResponse(reservedByte=$reservedByte, userPublicKey=${HexUtil.encodeToString(ECUtil.createUncompressedPublicKey(userPublicKey))}, keyHandle=${HexUtil.encodeToString(keyHandle)}, attestationCertificate=${attestationCertificate.certificate.subjectX500Principal}, signature=${HexUtil.encodeToString(signature)})"
+        return "U2FRegistrationResponse(reservedByte=$reservedByte, userPublicKey=${
+            HexUtil.encodeToString(
+                ECUtil.createUncompressedPublicKey(userPublicKey)
+            )
+        }, keyHandle=${HexUtil.encodeToString(keyHandle)}, attestationCertificate=${attestationCertificate.certificate.subjectX500Principal}, signature=${
+            HexUtil.encodeToString(
+                signature
+            )
+        })"
     }
 
 

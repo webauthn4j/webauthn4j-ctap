@@ -22,7 +22,7 @@ abstract class ConfigPropertyBase<T> internal constructor(
         }
         @UiThread
         set(value) {
-            if(this.mutableLiveData.value != value){
+            if (this.mutableLiveData.value != value) {
                 this.mutableLiveData.value = value
             }
         }

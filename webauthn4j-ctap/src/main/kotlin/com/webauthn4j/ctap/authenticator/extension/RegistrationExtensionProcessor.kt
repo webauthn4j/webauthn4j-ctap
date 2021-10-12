@@ -10,7 +10,8 @@ interface RegistrationExtensionProcessor : ExtensionProcessor {
     fun processRegistrationExtension(
         context: RegistrationExtensionContext,
         userCredentialBuilder: UserCredentialBuilder,
-        extensionOutputsBuilder: AuthenticationExtensionsAuthenticatorOutputs.BuilderForRegistration)
+        extensionOutputsBuilder: AuthenticationExtensionsAuthenticatorOutputs.BuilderForRegistration
+    )
 
     fun supportsRegistrationExtension(extension: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>?): Boolean
 

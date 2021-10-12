@@ -11,7 +11,12 @@ class HIDInitializationPacket : HIDPacket {
     val command: HIDCommand
     val length: UShort
 
-    constructor(channelId: HIDChannelId, command: HIDCommand, length: UShort, data: ByteArray) : super(
+    constructor(
+        channelId: HIDChannelId,
+        command: HIDCommand,
+        length: UShort,
+        data: ByteArray
+    ) : super(
         channelId
     ) {
 //        require(data.size == MAX_INIT_PACKET_DATA_SIZE){ "HIDInitializationPacket data size must be %d bytes".format(MAX_INIT_PACKET_DATA_SIZE) }

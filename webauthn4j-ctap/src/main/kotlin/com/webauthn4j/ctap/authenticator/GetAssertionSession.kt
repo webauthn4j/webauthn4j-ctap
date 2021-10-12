@@ -42,6 +42,11 @@ class GetAssertionSession(
         return GetAssertionSession(assertionObjects, clientDataHash)
     }
 
-    data class AssertionObject(var credential: Credential, var maskUserIdentifiableInfo: Boolean, var extensions: AuthenticationExtensionsAuthenticatorOutputs<AuthenticationExtensionAuthenticatorOutput>, var flags: Byte)
+    data class AssertionObject(
+        var credential: Credential,
+        var maskUserIdentifiableInfo: Boolean,
+        var extensions: AuthenticationExtensionsAuthenticatorOutputs<AuthenticationExtensionAuthenticatorOutput>,
+        var flags: Byte
+    )
 
 }

@@ -37,6 +37,9 @@ import java.time.Instant
 import java.util.*
 import javax.security.auth.x500.X500Principal
 
+/**
+ * Attestation certificate builder
+ */
 class AttestationCertificateBuilder internal constructor(
     private val subjectDN: String,
     private val publicKey: PublicKey,
@@ -59,7 +62,7 @@ class AttestationCertificateBuilder internal constructor(
         return this
     }
 
-    fun aaguid(aaguid: AAGUID): AttestationCertificateBuilder{
+    fun aaguid(aaguid: AAGUID): AttestationCertificateBuilder {
         this.aaguid = aaguid
         return this
     }
@@ -75,7 +78,7 @@ class AttestationCertificateBuilder internal constructor(
                 publicKey
             )
             aaguid.let {
-                if(it != null){
+                if (it != null) {
                     certificateBuilder.addExtension(
                         ID_FIDO_GEN_CE_AAGUID,
                         false,

@@ -3,6 +3,9 @@ package com.webauthn4j.ctap.authenticator
 import java.time.Duration
 import java.time.Instant
 
+/**
+ * [UserConsentHandler] implementation which caches consent result
+ */
 class CachingUserConsentHandler(private val userConsentHandler: UserConsentHandler) :
     UserConsentHandler {
     private var cachedMakeCredentialConsentOptions: MakeCredentialConsentOptions? = null

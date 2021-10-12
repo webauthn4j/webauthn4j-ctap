@@ -10,7 +10,6 @@
 | Consent Automatically | 常に自動で同意・認証成功の応答を返却します。再認証も画面ロック解除も求めない為、UnifidoKeyを所持していて、NFCあるいはBluetooth HID接続しているだけで認証が成立します。利便性と引換にセキュリティが低下しているのに注意してください。
 |==================================================================
 
-
 ==== Account Selector
 
 認証時、複数のアカウントが存在する場合のアカウント選択ユーザーインタフェースに関する設定です。
@@ -22,11 +21,9 @@
 | Client Platform        | クライアント（ブラウザ）ダイアログ側でアカウントを選択します
 |==================================================================
 
-
 === Developer Options
 
-WebAuthn Relying Party開発者が開発時に様々な構成のセキュリティキーを模擬して試験出来るように用意されたオプションです。
-通常は設定変更する必要はございません。
+WebAuthn Relying Party開発者が開発時に様々な構成のセキュリティキーを模擬して試験出来るように用意されたオプションです。 通常は設定変更する必要はございません。
 
 ==== AAGUID
 
@@ -42,7 +39,6 @@ WebAuthn Relying Party開発者が開発時に様々な構成のセキュリテ�
 | Platform               | Platform Authenticatorであると主張します
 | Cross Platform         | Cross Platform Authenticatorであると主張します
 |==================================================================
-
 
 ==== User Presence
 
@@ -87,8 +83,7 @@ Assertion Signatureで利用出来るアルゴリズムの選択肢です。多�
 
 ==== Resident Key
 
-アカウントをResident Key(Discoverable Credential)として作成するか、
-Non-Resident Keyとして作成するかに関するオプションです。
+アカウントをResident Key(Discoverable Credential)として作成するか、 Non-Resident Keyとして作成するかに関するオプションです。
 
 |==================================================================
 | Option                | Description

@@ -15,7 +15,8 @@ class CoercionLessStringDeserializer : StringDeserializer() {
     @Throws(IOException::class)
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext?): String {
         if (p.currentToken != JsonToken.VALUE_STRING) {
-            val message: String = MessageFormat.format("Cannot coerce {0} to String value", p.currentToken)
+            val message: String =
+                MessageFormat.format("Cannot coerce {0} to String value", p.currentToken)
             throw MismatchedInputException.from(p, String::class.java, message)
         }
         return super.deserialize(p, ctxt)

@@ -11,8 +11,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        java_version: [11]
-        os: [ubuntu-20.04]
+        java_version: [ 11 ]
+        os: [ ubuntu-20.04 ]
 
     steps:
       - name: Setup build env

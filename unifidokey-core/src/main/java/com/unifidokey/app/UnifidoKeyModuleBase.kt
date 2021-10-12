@@ -32,7 +32,6 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Named
 import javax.inject.Singleton
-import kotlin.collections.HashMap
 
 /**
  * Defines Dagger2 configuration
@@ -59,14 +58,36 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
         exceptionReporter: ExceptionReporter,
         objectConverter: ObjectConverter
     ): AuthenticatorService {
-        val attestationStatementGenerators: MutableMap<Pair<AttestationTypeSetting, AttestationStatementFormatSetting>, AttestationStatementProvider> = HashMap()
-        attestationStatementGenerators[Pair(AttestationTypeSetting.BASIC, AttestationStatementFormatSetting.ANDROID_KEY)] = androidKeyAttestationStatementGenerator
-        attestationStatementGenerators[Pair(AttestationTypeSetting.BASIC, AttestationStatementFormatSetting.ANDROID_SAFETYNET)] = androidSafetyNetAttestationStatementGenerator
-        attestationStatementGenerators[Pair(AttestationTypeSetting.BASIC, AttestationStatementFormatSetting.PACKED)] = packedBasicAttestationStatementGenerator
-        attestationStatementGenerators[Pair(AttestationTypeSetting.SELF, AttestationStatementFormatSetting.PACKED)] = packedSelfAttestationStatementProvider
-        attestationStatementGenerators[Pair(AttestationTypeSetting.BASIC, AttestationStatementFormatSetting.FIDO_U2F)] = fidoU2FBasicAttestationStatementGenerator
-        attestationStatementGenerators[Pair(AttestationTypeSetting.SELF, AttestationStatementFormatSetting.FIDO_U2F)] = fidoU2FSelfAttestationStatementProvider
-        attestationStatementGenerators[Pair(AttestationTypeSetting.BASIC, AttestationStatementFormatSetting.NONE)] = NoneAttestationStatementProvider()
+        val attestationStatementGenerators: MutableMap<Pair<AttestationTypeSetting, AttestationStatementFormatSetting>, AttestationStatementProvider> =
+            HashMap()
+        attestationStatementGenerators[Pair(
+            AttestationTypeSetting.BASIC,
+            AttestationStatementFormatSetting.ANDROID_KEY
+        )] = androidKeyAttestationStatementGenerator
+        attestationStatementGenerators[Pair(
+            AttestationTypeSetting.BASIC,
+            AttestationStatementFormatSetting.ANDROID_SAFETYNET
+        )] = androidSafetyNetAttestationStatementGenerator
+        attestationStatementGenerators[Pair(
+            AttestationTypeSetting.BASIC,
+            AttestationStatementFormatSetting.PACKED
+        )] = packedBasicAttestationStatementGenerator
+        attestationStatementGenerators[Pair(
+            AttestationTypeSetting.SELF,
+            AttestationStatementFormatSetting.PACKED
+        )] = packedSelfAttestationStatementProvider
+        attestationStatementGenerators[Pair(
+            AttestationTypeSetting.BASIC,
+            AttestationStatementFormatSetting.FIDO_U2F
+        )] = fidoU2FBasicAttestationStatementGenerator
+        attestationStatementGenerators[Pair(
+            AttestationTypeSetting.SELF,
+            AttestationStatementFormatSetting.FIDO_U2F
+        )] = fidoU2FSelfAttestationStatementProvider
+        attestationStatementGenerators[Pair(
+            AttestationTypeSetting.BASIC,
+            AttestationStatementFormatSetting.NONE
+        )] = NoneAttestationStatementProvider()
         return AuthenticatorService(
             authenticatorPropertyStore,
             configManager,
@@ -109,7 +130,10 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
     @Singleton
     @Provides
     fun providePackedSelfAttestationStatementGenerator(objectConverter: ObjectConverter): PackedSelfAttestationStatementProvider {
-        return PackedSelfAttestationStatementProvider(DemoAttestationConstants.DEMO_ATTESTATION_NAME, objectConverter)
+        return PackedSelfAttestationStatementProvider(
+            DemoAttestationConstants.DEMO_ATTESTATION_NAME,
+            objectConverter
+        )
     }
 
     @Singleton
@@ -130,16 +154,26 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
         val jsonMapper = ObjectMapper()
         jsonMapper.registerModule(JavaTimeModule())
         val cborMapper = ObjectMapper(CBORFactory())
-        cborMapper.coercionConfigFor(LogicalType.Textual).setCoercion(CoercionInputShape.Boolean, CoercionAction.Fail)
-        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.Boolean, CoercionAction.Fail)
-        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.String, CoercionAction.Fail)
-        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.Array, CoercionAction.Fail)
-        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.EmptyArray, CoercionAction.Fail)
-        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.EmptyObject, CoercionAction.Fail)
-        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.EmptyString, CoercionAction.Fail)
-        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.Float, CoercionAction.Fail)
-        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.Integer, CoercionAction.Fail)
-        cborMapper.coercionConfigFor(LogicalType.Binary).setCoercion(CoercionInputShape.Object, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Textual)
+            .setCoercion(CoercionInputShape.Boolean, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary)
+            .setCoercion(CoercionInputShape.Boolean, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary)
+            .setCoercion(CoercionInputShape.String, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary)
+            .setCoercion(CoercionInputShape.Array, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary)
+            .setCoercion(CoercionInputShape.EmptyArray, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary)
+            .setCoercion(CoercionInputShape.EmptyObject, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary)
+            .setCoercion(CoercionInputShape.EmptyString, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary)
+            .setCoercion(CoercionInputShape.Float, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary)
+            .setCoercion(CoercionInputShape.Integer, CoercionAction.Fail)
+        cborMapper.coercionConfigFor(LogicalType.Binary)
+            .setCoercion(CoercionInputShape.Object, CoercionAction.Fail)
         cborMapper.registerModule(CtapCBORModule())
         cborMapper.registerModule(PublicKeyCredentialSourceCBORModule())
         cborMapper.registerModule(JavaTimeModule())

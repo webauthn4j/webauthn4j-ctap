@@ -86,6 +86,9 @@ class CtapCBORModule : SimpleModule("WebAuthnCBORModule") {
         this.addDeserializer(PlatformOption::class.java, PlatformOptionDeserializer())
         this.addDeserializer(ResidentKeyOption::class.java, ResidentKeyOptionDeserializer())
         this.addDeserializer(UserPresenceOption::class.java, UserPresenceOptionDeserializer())
-        this.addDeserializer(UserVerificationOption::class.java, UserVerificationOptionDeserializer())
+        this.addDeserializer(
+            UserVerificationOption::class.java,
+            UserVerificationOptionDeserializer()
+        )
     }
 }

@@ -8,7 +8,7 @@ import com.webauthn4j.data.attestation.authenticator.AAGUID
 @Suppress("CanBePrimaryConstructorProperty")
 class AuthenticatorGetInfoResponseData : CtapResponseData {
 
-    companion object{
+    companion object {
 
         @JvmStatic
         @JsonCreator
@@ -19,8 +19,15 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
             @JsonProperty("4") options: Options?,
             @JsonProperty("5") maxMsgSize: Long?,
             @JsonProperty("6") pinProtocols: List<PinProtocolVersion>?
-        ) : AuthenticatorGetInfoResponseData{
-            return AuthenticatorGetInfoResponseData(versions, extensions, aaguid, options, maxMsgSize?.toUInt(), pinProtocols)
+        ): AuthenticatorGetInfoResponseData {
+            return AuthenticatorGetInfoResponseData(
+                versions,
+                extensions,
+                aaguid,
+                options,
+                maxMsgSize?.toUInt(),
+                pinProtocols
+            )
         }
     }
 

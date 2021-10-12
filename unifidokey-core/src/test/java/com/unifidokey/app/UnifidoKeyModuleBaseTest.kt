@@ -21,11 +21,13 @@ class UnifidoKeyModuleBaseTest {
     @Test
     fun cborConverter_String_test() {
         val data = HexUtil.decode("A1656669656C64F5") // {"field": true}
-        try{
-            objectConverter.cborConverter.readValue(data, StringContainerTestDto::class.java) // should fail because field is String type
+        try {
+            objectConverter.cborConverter.readValue(
+                data,
+                StringContainerTestDto::class.java
+            ) // should fail because field is String type
             fail("should not reach here")
-        }
-        catch (e : DataConversionException){
+        } catch (e: DataConversionException) {
             //nop
         }
 
@@ -37,11 +39,13 @@ class UnifidoKeyModuleBaseTest {
     fun cborConverter_ByteArray_test() {
 //        val data = HexUtil.decode("A1656669656C64F5") // {"field": true}
         val data = HexUtil.decode("A1656669656C6460") // {"field": ""}
-        try{
-            objectConverter.cborConverter.readValue(data, ByteArrayContainerTestDto::class.java) // should fail because field is String type
+        try {
+            objectConverter.cborConverter.readValue(
+                data,
+                ByteArrayContainerTestDto::class.java
+            ) // should fail because field is String type
             fail("should not reach here")
-        }
-        catch (e : DataConversionException){
+        } catch (e: DataConversionException) {
             //nop
             e.toString()
         }

@@ -11,7 +11,7 @@ import javax.crypto.SecretKey
  *
  * @param <T> user credential extra data
 </T> */
-interface AuthenticatorPropertyStore{
+interface AuthenticatorPropertyStore {
     /**
      * Create a new [ResidentCredentialKey]. This method doesn't require to persist a credential key.
      *

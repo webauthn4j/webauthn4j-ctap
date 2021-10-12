@@ -7,6 +7,9 @@ import com.webauthn4j.data.*
 import com.webauthn4j.data.extension.client.AuthenticationExtensionClientOutput
 import com.webauthn4j.data.extension.client.RegistrationExtensionClientOutput
 
+/**
+ * WebAuthn Client
+ */
 @Suppress("CanBePrimaryConstructorProperty")
 class WebAuthnClient(
     ctapAuthenticatorHandles: List<CtapAuthenticatorHandle> = listOf(),

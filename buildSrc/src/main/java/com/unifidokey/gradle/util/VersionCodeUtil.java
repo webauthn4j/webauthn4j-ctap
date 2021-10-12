@@ -5,9 +5,9 @@ import java.util.regex.Pattern;
 
 public class VersionCodeUtil {
 
-    public static Integer getVersionCodeFromVersionString(String versionString){
+    public static Integer getVersionCodeFromVersionString(String versionString) {
         Matcher matcher = Pattern.compile("([0-9]+)\\.([0-9]+)\\.([0-9]+)(-SNAPSHOT|\\.RELEASE)").matcher(versionString);
-        if(!matcher.find()){
+        if (!matcher.find()) {
             throw new IllegalArgumentException("versionString doesn't conform format contract.");
         }
         int major = Integer.parseInt(matcher.group(1));

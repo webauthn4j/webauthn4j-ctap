@@ -22,7 +22,8 @@ class BLEFrame @JvmOverloads constructor(val cmd: BLEFrameCommand, data: ByteArr
                 i == 0 -> {
                     val maxDataSize = maxFragmentSize - 3
                     val slicedData = sliceData(data, position, maxDataSize)
-                    bleFrameFragment = BLEInitializationFrameFragment(cmd, data.size.toUShort(), slicedData)
+                    bleFrameFragment =
+                        BLEInitializationFrameFragment(cmd, data.size.toUShort(), slicedData)
                     position += slicedData.size
                 }
                 i <= 0x7f -> {

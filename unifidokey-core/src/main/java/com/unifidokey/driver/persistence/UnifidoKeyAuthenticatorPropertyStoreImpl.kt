@@ -11,11 +11,11 @@ import com.unifidokey.driver.persistence.dao.UserCredentialDao
 import com.unifidokey.driver.persistence.entity.RelyingPartyEntity
 import com.unifidokey.driver.persistence.entity.UserCredentialEntity
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.exception.StoreFullException
-import com.webauthn4j.ctap.authenticator.internal.KeyPairUtil.createCredentialKeyPair
 import com.webauthn4j.ctap.authenticator.data.credential.CredentialKey
 import com.webauthn4j.ctap.authenticator.data.credential.ResidentCredentialKey
 import com.webauthn4j.ctap.authenticator.data.credential.ResidentUserCredential
+import com.webauthn4j.ctap.authenticator.exception.StoreFullException
+import com.webauthn4j.ctap.authenticator.internal.KeyPairUtil.createCredentialKeyPair
 import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import kotlinx.coroutines.Dispatchers
@@ -80,7 +80,11 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
         // existing relying party will not be updated
         val dto = relyingPartyDao.findOne(userCredential.rpId)
         if (dto == null) {
-            val relyingPartyEntity = RelyingPartyEntity(userCredential.rpId, userCredential.rpName, userCredential.rpIcon)
+            val relyingPartyEntity = RelyingPartyEntity(
+                userCredential.rpId,
+                userCredential.rpName,
+                userCredential.rpIcon
+            )
             relyingPartyDao.create(relyingPartyEntity)
         }
 
@@ -144,7 +148,9 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
                     TODO("throw proper exception")
                 }
             }
-            val details = jsonConverter.readValue(userCredentialEntity.details, object : TypeReference<Map<String, String>>(){})!!
+            val details = jsonConverter.readValue(
+                userCredentialEntity.details,
+                object : TypeReference<Map<String, String>>() {})!!
             ResidentUserCredential(
                 userCredentialEntity.credentialId,
                 userCredentialKey,
@@ -190,7 +196,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
         val encrypted =
             CipherUtil.encryptWithAESCBCPKCS5Padding(clientPIN, secretKey, loadEncryptionIV())
         runBlocking {
-            launch(Dispatchers.Main.immediate){
+            launch(Dispatchers.Main.immediate) {
                 configManager.clientPINEnc.value = encrypted
             }
         }
@@ -212,7 +218,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
 
     override fun savePINRetries(pinRetries: UInt) {
         runBlocking {
-            launch(Dispatchers.Main.immediate){
+            launch(Dispatchers.Main.immediate) {
                 configManager.pinRetries.value = pinRetries
             }
         }
@@ -224,7 +230,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
 
     override fun saveDeviceWideCounter(deviceWideCounter: UInt) {
         runBlocking {
-            launch(Dispatchers.Main.immediate){
+            launch(Dispatchers.Main.immediate) {
                 configManager.deviceWideCounter.value = deviceWideCounter
             }
         }
@@ -234,7 +240,7 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
         relyingPartyDao.deleteAll()
         keyStoreDao.deleteAll()
         runBlocking {
-            launch(Dispatchers.Main.immediate){
+            launch(Dispatchers.Main.immediate) {
                 configManager.pinRetries.reset()
                 configManager.clientPINEnc.reset()
                 configManager.deviceWideCounter.reset()

@@ -9,6 +9,9 @@ import com.webauthn4j.ctap.core.data.CtapStatusCode
 import org.slf4j.LoggerFactory
 import java.time.Instant
 
+/**
+ * Reset command execution
+ */
 class ResetExecution internal constructor(
     private val ctapAuthenticator: CtapAuthenticator,
     authenticatorResetRequest: AuthenticatorResetRequest

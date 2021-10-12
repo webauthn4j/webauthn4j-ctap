@@ -13,11 +13,16 @@ class U2FAuthenticationRequest : AuthenticatorRequest {
             require(dataIn.size >= 65) { "command.dataIn must be at least 65 bytes length." }
 
             val controlByte = command.p1
-            val challengeParameter : ByteArray = dataIn.copyOfRange(0, 32)
-            val applicationParameter : ByteArray = dataIn.copyOfRange(32, 64)
+            val challengeParameter: ByteArray = dataIn.copyOfRange(0, 32)
+            val applicationParameter: ByteArray = dataIn.copyOfRange(32, 64)
             val keyHandleLength = dataIn[64].toUByte().toInt()
             val keyHandle = dataIn.copyOfRange(65, 65 + keyHandleLength)
-            return U2FAuthenticationRequest(controlByte, challengeParameter, applicationParameter, keyHandle)
+            return U2FAuthenticationRequest(
+                controlByte,
+                challengeParameter,
+                applicationParameter,
+                keyHandle
+            )
         }
     }
 
@@ -42,7 +47,7 @@ class U2FAuthenticationRequest : AuthenticatorRequest {
         this.keyHandle = ArrayUtil.clone(keyHandle)
     }
 
-    fun toBytes(): ByteArray{
+    fun toBytes(): ByteArray {
         val length = 1 + 32 + 32 + 1 + keyHandle.size
         val keyHandleLength = keyHandle.size.toByte()
         return ByteBuffer.allocate(length)

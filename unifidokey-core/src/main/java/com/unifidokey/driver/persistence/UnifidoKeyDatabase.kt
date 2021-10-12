@@ -33,11 +33,11 @@ import com.unifidokey.driver.persistence.migration.V1ToV2Migration
 )
 abstract class UnifidoKeyDatabase : RoomDatabase() {
 
-    companion object{
+    companion object {
         const val DB_VERSION_1 = 1
         const val DB_VERSION_2 = 2
 
-        fun createInstance(context: Context): UnifidoKeyDatabase{
+        fun createInstance(context: Context): UnifidoKeyDatabase {
             return Room.databaseBuilder(
                 context,
                 UnifidoKeyDatabase::class.java,

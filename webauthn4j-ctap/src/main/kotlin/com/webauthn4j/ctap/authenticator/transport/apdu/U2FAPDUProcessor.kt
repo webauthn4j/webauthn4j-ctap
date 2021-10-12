@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 
 class U2FAPDUProcessor(
     private val transactionManager: TransactionManager
-) : CommandAPDUProcessor{
+) : CommandAPDUProcessor {
     private val logger = LoggerFactory.getLogger(U2FAPDUProcessor::class.java)
 
     private val u2fResponseQueue = ResponseAPDUQueue()
@@ -18,7 +18,8 @@ class U2FAPDUProcessor(
     private val u2fRegisterCommandAPDUProcessor = U2FRegisterCommandAPDUProcessor()
     private val u2fAuthenticateCommandAPDUProcessor = U2FAuthenticateCommandAPDUProcessor()
     private val u2fVersionCommandAPDUProcessor = U2FVersionCommandAPDUProcessor()
-    private val u2fContinuationAPDURequestCommandAPDUProcessor = U2FContinuationAPDURequestCommandAPDUProcessor()
+    private val u2fContinuationAPDURequestCommandAPDUProcessor =
+        U2FContinuationAPDURequestCommandAPDUProcessor()
 
     private val commandAPDUProcessors: List<CommandAPDUProcessor> = listOf(
         u2fRegisterCommandAPDUProcessor,
@@ -59,16 +60,18 @@ class U2FAPDUProcessor(
 
         override suspend fun process(command: CommandAPDU): ResponseAPDU {
             val dataIn = command.dataIn
-            if(dataIn == null){
+            if (dataIn == null) {
                 logger.debug("command data is missing")
                 return ResponseAPDU.createErrorResponseAPDU()
             }
-            val u2fRegistrationRequest: U2FRegistrationRequest = U2FRegistrationRequest.createFromCommandAPDU(command)
-            return try{
-                val u2fRegistrationResponse: U2FRegistrationResponse = transactionManager.invokeCommand(u2fRegistrationRequest)
+            val u2fRegistrationRequest: U2FRegistrationRequest =
+                U2FRegistrationRequest.createFromCommandAPDU(command)
+            return try {
+                val u2fRegistrationResponse: U2FRegistrationResponse =
+                    transactionManager.invokeCommand(u2fRegistrationRequest)
                 u2fResponseQueue.initialize(u2fRegistrationResponse.toBytes())
                 u2fResponseQueue.poll(command)
-            } catch (e: U2FCommandExecutionException){
+            } catch (e: U2FCommandExecutionException) {
                 logger.error("U2F registration failed", e)
                 ResponseAPDU(e.statusCode.sw1, e.statusCode.sw2)
             }
@@ -86,16 +89,18 @@ class U2FAPDUProcessor(
 
         override suspend fun process(command: CommandAPDU): ResponseAPDU {
             val dataIn = command.dataIn
-            if(dataIn == null){
+            if (dataIn == null) {
                 logger.debug("command data is missing")
                 return ResponseAPDU.createErrorResponseAPDU()
             }
-            val u2fAuthenticationRequest: U2FAuthenticationRequest = U2FAuthenticationRequest.createFromCommandAPDU(command)
-            return try{
-                val u2fAuthenticationResponse: U2FAuthenticationResponse = transactionManager.invokeCommand(u2fAuthenticationRequest)
+            val u2fAuthenticationRequest: U2FAuthenticationRequest =
+                U2FAuthenticationRequest.createFromCommandAPDU(command)
+            return try {
+                val u2fAuthenticationResponse: U2FAuthenticationResponse =
+                    transactionManager.invokeCommand(u2fAuthenticationRequest)
                 u2fResponseQueue.initialize(u2fAuthenticationResponse.toBytes())
                 u2fResponseQueue.poll(command)
-            } catch (e: U2FCommandExecutionException){
+            } catch (e: U2FCommandExecutionException) {
                 logger.error("U2F authentication failed", e)
                 ResponseAPDU(e.statusCode.sw1, e.statusCode.sw2)
             }
@@ -119,7 +124,8 @@ class U2FAPDUProcessor(
 
     inner class U2FContinuationAPDURequestCommandAPDUProcessor : CommandAPDUProcessor {
 
-        private val logger = LoggerFactory.getLogger(U2FContinuationAPDURequestCommandAPDUProcessor::class.java)
+        private val logger =
+            LoggerFactory.getLogger(U2FContinuationAPDURequestCommandAPDUProcessor::class.java)
 
         override fun isTarget(command: CommandAPDU): Boolean {
             return command.cla == 0x00.toByte() && command.ins == 0xc0.toByte()

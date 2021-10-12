@@ -12,7 +12,8 @@ class CoercionLessByteArrayDeserializer : StdDeserializer<ByteArray>(StdDeserial
 
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext?): ByteArray {
         if (p.currentToken != JsonToken.VALUE_EMBEDDED_OBJECT) {
-            val message: String = MessageFormat.format("Cannot coerce {0} to ByteArray value", p.currentToken)
+            val message: String =
+                MessageFormat.format("Cannot coerce {0} to ByteArray value", p.currentToken)
             throw MismatchedInputException.from(p, String::class.java, message)
         }
         val deserializer = PrimitiveArrayDeserializers.forType(Byte::class.java)

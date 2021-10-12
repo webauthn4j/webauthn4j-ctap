@@ -24,7 +24,7 @@ open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
     private lateinit var credentialSourceEncryptionKey: SecretKey
     private lateinit var credentialSourceEncryptionIV: ByteArray
     private var clientPIN: ByteArray? = null
-    private var pinRetries : UInt = 0u
+    private var pinRetries: UInt = 0u
     private var deviceWideCounter = 0u
 
     init {

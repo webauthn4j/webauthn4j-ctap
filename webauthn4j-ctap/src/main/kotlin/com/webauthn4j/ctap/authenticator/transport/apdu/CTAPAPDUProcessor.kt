@@ -22,11 +22,14 @@ class CTAPAPDUProcessor(
     private val logger = LoggerFactory.getLogger(CTAPAPDUProcessor::class.java)
 
     private val ctapCommandFragmentCommandAPDUProcessor = CtapCommandFragmentCommandAPDUProcessor()
-    private val ctapCommandFinalFragmentCommandAPDUProcessor = CtapRequestFinalFragmentCommandAPDUProcessor()
-    private val ctapContinuationAPDURequestCommandAPDUProcessor = CtapContinuationAPDURequestCommandAPDUProcessor()
+    private val ctapCommandFinalFragmentCommandAPDUProcessor =
+        CtapRequestFinalFragmentCommandAPDUProcessor()
+    private val ctapContinuationAPDURequestCommandAPDUProcessor =
+        CtapContinuationAPDURequestCommandAPDUProcessor()
 
     private val ctapRequestConverter: CtapRequestConverter = CtapRequestConverter(objectConverter)
-    private val ctapResponseConverter: CtapResponseConverter = CtapResponseConverter(objectConverter)
+    private val ctapResponseConverter: CtapResponseConverter =
+        CtapResponseConverter(objectConverter)
 
     private val commandAPDUProcessors: List<CommandAPDUProcessor> = listOf(
         ctapCommandFragmentCommandAPDUProcessor,
@@ -137,7 +140,8 @@ class CTAPAPDUProcessor(
 
     inner class CtapContinuationAPDURequestCommandAPDUProcessor : CommandAPDUProcessor {
 
-        private val logger = LoggerFactory.getLogger(CtapContinuationAPDURequestCommandAPDUProcessor::class.java)
+        private val logger =
+            LoggerFactory.getLogger(CtapContinuationAPDURequestCommandAPDUProcessor::class.java)
 
         override fun isTarget(command: CommandAPDU): Boolean {
             return command.cla == 0x80.toByte() && command.ins == 0xc0.toByte()

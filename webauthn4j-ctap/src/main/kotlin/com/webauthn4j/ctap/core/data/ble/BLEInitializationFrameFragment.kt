@@ -4,7 +4,11 @@ import com.webauthn4j.util.ArrayUtil
 import com.webauthn4j.util.UnsignedNumberUtil
 import java.nio.ByteBuffer
 
-class BLEInitializationFrameFragment(val cmd: BLEFrameCommand, val length: UShort, data: ByteArray) :
+class BLEInitializationFrameFragment(
+    val cmd: BLEFrameCommand,
+    val length: UShort,
+    data: ByteArray
+) :
     BLEFrameFragment {
 
     override val data: ByteArray

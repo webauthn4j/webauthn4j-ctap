@@ -11,7 +11,11 @@ class ConsentCachingConfigProperty internal constructor(configManager: ConfigMan
 
     @Throws(ConfigNotFoundException::class)
     override fun load(): ConsentCachingSetting {
-        return ConsentCachingSetting.create(configManager.persistenceAdaptor.loadPrimitiveBoolean(KEY))
+        return ConsentCachingSetting.create(
+            configManager.persistenceAdaptor.loadPrimitiveBoolean(
+                KEY
+            )
+        )
     }
 
     companion object {

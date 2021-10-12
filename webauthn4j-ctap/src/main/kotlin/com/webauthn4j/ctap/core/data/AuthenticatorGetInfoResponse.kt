@@ -1,7 +1,10 @@
 package com.webauthn4j.ctap.core.data
 
 class AuthenticatorGetInfoResponse : AbstractCtapResponse<AuthenticatorGetInfoResponseData> {
-    constructor(statusCode: CtapStatusCode, responseData: AuthenticatorGetInfoResponseData?) : super(
+    constructor(
+        statusCode: CtapStatusCode,
+        responseData: AuthenticatorGetInfoResponseData?
+    ) : super(
         statusCode,
         responseData
     )

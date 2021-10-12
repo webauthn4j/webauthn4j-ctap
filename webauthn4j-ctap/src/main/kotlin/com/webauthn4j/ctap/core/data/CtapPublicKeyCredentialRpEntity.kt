@@ -12,7 +12,7 @@ import java.io.Serializable
  *
  * @see [§5.4.2. Relying Party Parameters for Credential Generation](https://www.w3.org/TR/webauthn-1/.dictdef-publickeycredentialrpentity)
  * @see [§5.1. authenticatorMakeCredential (0x01)](https://fidoalliance.org/specs/fido2/fido-client-to-authenticator-protocol-v2.1-rd-20191217.html#authenticatorMakeCredential) */
-class CtapPublicKeyCredentialRpEntity :Serializable {
+class CtapPublicKeyCredentialRpEntity : Serializable {
 
     // ~ Instance fields
     // ================================================================================================

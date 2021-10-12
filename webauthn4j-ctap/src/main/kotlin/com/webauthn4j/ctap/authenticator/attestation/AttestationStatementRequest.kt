@@ -50,10 +50,12 @@ class AttestationStatementRequest(
             keyPair.let {
                 val keyAlgorithm = it.public.algorithm
                 credentialPublicKey = when (keyAlgorithm) {
-                    "EC" -> EC2COSEKey.create((it.public as ECPublicKey),
+                    "EC" -> EC2COSEKey.create(
+                        (it.public as ECPublicKey),
                         COSEAlgorithmIdentifier.create(this.credentialKey.alg!!)
                     )
-                    "RSA" -> RSACOSEKey.create((it.public as RSAPublicKey),
+                    "RSA" -> RSACOSEKey.create(
+                        (it.public as RSAPublicKey),
                         COSEAlgorithmIdentifier.create(this.credentialKey.alg!!)
                     )
                     else -> throw IllegalArgumentException(

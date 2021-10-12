@@ -34,7 +34,8 @@ class NFCConnector(
         )
         private const val NFC_CTAP_CONTROL = 0x12.toByte()
         internal const val NFC_CTAP_MSG = 0x10.toByte()
-        internal const val UNEXPECTED_EXCEPTION_MESSAGE = "Unexpected exception is thrown while processing commandAPDU"
+        internal const val UNEXPECTED_EXCEPTION_MESSAGE =
+            "Unexpected exception is thrown while processing commandAPDU"
     }
 
     private val logger = LoggerFactory.getLogger(NFCConnector::class.java)
@@ -127,8 +128,6 @@ class NFCConnector(
             return response
         }
     }
-
-
 
 
 }

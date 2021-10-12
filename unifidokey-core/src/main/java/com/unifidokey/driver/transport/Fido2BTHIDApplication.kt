@@ -79,7 +79,13 @@ class Fido2BTHIDApplication(
     @WorkerThread
     override fun onSetReport(device: BluetoothDevice, type: Byte, id: Byte, data: ByteArray?) {
         super.onSetReport(device, type, id, data)
-        logger.debug("onSetProtocol: device=${device.name}, type=${type}, id=${id}, data=${HexUtil.encodeToString(data)}")
+        logger.debug(
+            "onSetProtocol: device=${device.name}, type=${type}, id=${id}, data=${
+                HexUtil.encodeToString(
+                    data
+                )
+            }"
+        )
         bluetoothHidDevice.reportError(device, BluetoothHidDevice.ERROR_RSP_SUCCESS)
     }
 
@@ -92,7 +98,13 @@ class Fido2BTHIDApplication(
     @WorkerThread
     override fun onInterruptData(device: BluetoothDevice, reportId: Byte, data: ByteArray?) {
         CoroutineScope(bthidWorker).launch {
-            logger.debug("Received report: device=${device.name}, id=${reportId}, data=${HexUtil.encodeToString(data)}")
+            logger.debug(
+                "Received report: device=${device.name}, id=${reportId}, data=${
+                    HexUtil.encodeToString(
+                        data
+                    )
+                }"
+            )
             if (data == null) {
                 throw RuntimeException("data must not be null")
             }
@@ -103,7 +115,11 @@ class Fido2BTHIDApplication(
                         throw RuntimeException("send failed")
                     }
                     logger.debug(
-                        "Sent report: device=${device.name}, id=${reportId}, data=${HexUtil.encodeToString(response)}"
+                        "Sent report: device=${device.name}, id=${reportId}, data=${
+                            HexUtil.encodeToString(
+                                response
+                            )
+                        }"
                     )
                 }
             }

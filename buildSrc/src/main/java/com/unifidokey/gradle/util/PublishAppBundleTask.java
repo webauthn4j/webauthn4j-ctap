@@ -11,7 +11,6 @@ import com.google.api.services.androidpublisher.AndroidPublisher;
 import com.google.api.services.androidpublisher.AndroidPublisherScopes;
 import com.google.api.services.androidpublisher.model.AppEdit;
 import com.google.api.services.androidpublisher.model.Bundle;
-import com.google.api.services.androidpublisher.model.LocalizedText;
 import com.google.api.services.androidpublisher.model.Track;
 import com.google.api.services.androidpublisher.model.TrackRelease;
 import com.google.auth.http.HttpCredentialsAdapter;
@@ -28,7 +27,6 @@ import org.gradle.api.tasks.TaskAction;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,12 +42,12 @@ public class PublishAppBundleTask extends DefaultTask {
     private String packageName;
     private File appBundle;
 
-    public PublishAppBundleTask(){
+    public PublishAppBundleTask() {
         getDependsOn().add("assembleRelease");
     }
 
     @TaskAction
-    public void execute(){
+    public void execute() {
         try {
             AndroidPublisher service = createAndroidPublisher(applicationName);
             AndroidPublisher.Edits edits = service.edits();
@@ -82,7 +80,7 @@ public class PublishAppBundleTask extends DefaultTask {
                         appBundleFile);
         Bundle bundle = uploadRequest.execute();
         log.info(String.format("Version code %d has been uploaded", bundle.getVersionCode()));
-         return bundle;
+        return bundle;
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -95,11 +93,11 @@ public class PublishAppBundleTask extends DefaultTask {
                         track,
                         new Track()
                                 .setReleases(
-                                Collections.singletonList(
-                                        new TrackRelease()
-                                                .setName(bundle.getVersionCode().toString())
-                                                .setVersionCodes(apkVersionCodes)
-                                                .setStatus("completed"))));
+                                        Collections.singletonList(
+                                                new TrackRelease()
+                                                        .setName(bundle.getVersionCode().toString())
+                                                        .setVersionCodes(apkVersionCodes)
+                                                        .setStatus("completed"))));
         Track updatedTrack = updateTrackRequest.execute();
         log.info(String.format("Track %s has been updated.", updatedTrack.getTrack()));
     }

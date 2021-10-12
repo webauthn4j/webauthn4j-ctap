@@ -1,11 +1,11 @@
 package com.webauthn4j.ctap.client
 
-import com.webauthn4j.ctap.authenticator.exception.ClientPINUserVerificationCanceledException
-import com.webauthn4j.ctap.authenticator.exception.CtapCommandExecutionException
 import com.webauthn4j.ctap.authenticator.data.options.ClientPINOption
 import com.webauthn4j.ctap.authenticator.data.options.ResidentKeyOption
 import com.webauthn4j.ctap.authenticator.data.options.UserPresenceOption
 import com.webauthn4j.ctap.authenticator.data.options.UserVerificationOption
+import com.webauthn4j.ctap.authenticator.exception.ClientPINUserVerificationCanceledException
+import com.webauthn4j.ctap.authenticator.exception.CtapCommandExecutionException
 import com.webauthn4j.ctap.client.exception.ResponseDataValidationException
 import com.webauthn4j.ctap.client.exception.UPNotSupportedException
 import com.webauthn4j.ctap.client.exception.UVNotReadyException
@@ -27,13 +27,14 @@ import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 
 /**
- * Provides high-level API on the top of [CtapAuthenticatorHandle]
+ * Ctap Client, which provides high-level API on the top of [CtapAuthenticatorHandle]
  */
 class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
 
     companion object {
         private const val RESPONSE_DATA_NULL_MESSAGE = "authenticatorClientPIN responseData is null"
-        private const val KEY_AGREEMENT_NULL_MESSAGE = "authenticatorClientPIN responseData.keyAgreement is null"
+        private const val KEY_AGREEMENT_NULL_MESSAGE =
+            "authenticatorClientPIN responseData.keyAgreement is null"
         private val ZERO_IV = byteArrayOf(
             0x00,
             0x00,

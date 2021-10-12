@@ -4,7 +4,6 @@ import com.webauthn4j.ctap.authenticator.exception.APDUProcessingException
 import com.webauthn4j.ctap.core.data.U2FStatusCode
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.util.ArrayUtil
-import com.webauthn4j.util.AssertUtil
 import com.webauthn4j.util.UnsignedNumberUtil
 
 class CommandAPDU {
@@ -70,7 +69,6 @@ class CommandAPDU {
     }
 
 
-
     val maxResponseDataSize: Int
         get() {
             val length = le
@@ -105,7 +103,7 @@ class CommandAPDU {
 
             // APDU format ref. https://smartcardguy.hatenablog.jp/entry/2018/08/11/153334
 
-            if(apdu.size < HEADER_LENGTH){
+            if (apdu.size < HEADER_LENGTH) {
                 throw APDUProcessingException(U2FStatusCode.WRONG_LENGTH)
             }
             val cla = apdu[POS_CLA]
@@ -121,20 +119,21 @@ class CommandAPDU {
                 lc = null
                 dataIn = null
                 le = null
-            }
-            else if (apdu[POS_P2_NEXT] == 0.toByte() && apdu.size != CASE2_SHORT_APDU_LENGTH) {
+            } else if (apdu[POS_P2_NEXT] == 0.toByte() && apdu.size != CASE2_SHORT_APDU_LENGTH) {
                 // case2 extended APDU
                 if (apdu.size == CASE2_EXTENDED_APDU_LENGTH) {
-                    val length = apdu.copyOfRange(POS_P2_NEXT, POS_P2_NEXT + CASE2_EXTENDED_LENGTH_LE_LENGTH)
+                    val length =
+                        apdu.copyOfRange(POS_P2_NEXT, POS_P2_NEXT + CASE2_EXTENDED_LENGTH_LE_LENGTH)
                     lc = null
                     dataIn = null
                     le = length
                 } else {
-                    val length = apdu.copyOfRange(POS_P2_NEXT, POS_P2_NEXT + EXTENDED_LENGTH_LC_LENGTH)
+                    val length =
+                        apdu.copyOfRange(POS_P2_NEXT, POS_P2_NEXT + EXTENDED_LENGTH_LC_LENGTH)
                     lc = length
                     val dataLength = getLengthFromLengthField(lc)
                     val dataPos = POS_P2_NEXT + EXTENDED_LENGTH_LC_LENGTH
-                    val remainingLeSize = apdu.size - (dataPos+dataLength)
+                    val remainingLeSize = apdu.size - (dataPos + dataLength)
                     le = when (remainingLeSize) {
                         // case3 extended APDU
                         0 -> null
@@ -142,7 +141,7 @@ class CommandAPDU {
                         1 -> apdu.copyOfRange(dataPos + dataLength, apdu.size)
                         2 -> apdu.copyOfRange(dataPos + dataLength, apdu.size)
                         3 -> apdu.copyOfRange(dataPos + dataLength, apdu.size)
-                        else-> throw APDUProcessingException(U2FStatusCode.WRONG_LENGTH)
+                        else -> throw APDUProcessingException(U2FStatusCode.WRONG_LENGTH)
                     }
                     dataIn = apdu.copyOfRange(dataPos, dataPos + dataLength)
                 }
@@ -156,7 +155,7 @@ class CommandAPDU {
                     lc = byteArrayOf(apdu[POS_P2_NEXT])
                     val dataLength = getLengthFromLengthField(lc)
                     val dataPos = POS_P2_NEXT + SHORT_LENGTH_LC_LENGTH
-                    val remainingLeSize = apdu.size - (dataPos+dataLength)
+                    val remainingLeSize = apdu.size - (dataPos + dataLength)
 
                     le = when (remainingLeSize) {
                         // case3 short APDU
@@ -182,7 +181,12 @@ class CommandAPDU {
                     }
                 }
                 2, 3 -> {
-                    when (val length = UnsignedNumberUtil.getUnsignedShort(bytes.copyOfRange(bytes.size - 2, bytes.size))) {
+                    when (val length = UnsignedNumberUtil.getUnsignedShort(
+                        bytes.copyOfRange(
+                            bytes.size - 2,
+                            bytes.size
+                        )
+                    )) {
                         0 -> UShort.MAX_VALUE.toInt()
                         else -> length
                     }
@@ -193,7 +197,11 @@ class CommandAPDU {
     }
 
     override fun toString(): String {
-        return "CommandAPDU(cla=$cla, ins=$ins, p1=$p1, p2=$p2, lc=${HexUtil.encodeToString(lc)}, dataIn=${HexUtil.encodeToString(dataIn)}, le=${HexUtil.encodeToString(le)})"
+        return "CommandAPDU(cla=$cla, ins=$ins, p1=$p1, p2=$p2, lc=${HexUtil.encodeToString(lc)}, dataIn=${
+            HexUtil.encodeToString(
+                dataIn
+            )
+        }, le=${HexUtil.encodeToString(le)})"
     }
 
     @SuppressWarnings("kotlin:S3776")

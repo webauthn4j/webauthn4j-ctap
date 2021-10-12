@@ -1,6 +1,6 @@
 == Settings
 
-image::../images/settings.png[Settings screen, 40%]
+image::../images/settings.png[Settings screen,40%]
 
 Various settings are available on the Settings screen.
 
@@ -8,11 +8,13 @@ Various settings are available on the Settings screen.
 
 ==== NFC
 
-Enable/Disable NFC transport. * It can also be configurable from the Home screen.
+Enable/Disable NFC transport.
+* It can also be configurable from the Home screen.
 
 ==== Bluetooth HID
 
-Enable/Disable Bluetooth HID transport. * I can also be configurable from the Home screen.
+Enable/Disable Bluetooth HID transport.
+* I can also be configurable from the Home screen.
 
 ==== Bluetooth HID Pairing
 
@@ -32,12 +34,10 @@ Setting for enabling / disabling PIN authentication.
 | Disabled              | Disables PIN authentication
 |==================================================================
 
-
 ==== User Verification
 
 Setting for local authentication(biometrics authentication) support.
-If you want to use local authentication(biometrics authentication) when user verification is requrested,
-set it to "Ready".
+If you want to use local authentication(biometrics authentication) when user verification is requrested, set it to "Ready".
 
 |==================================================================
 | Option                 | Description
@@ -49,7 +49,8 @@ set it to "Ready".
 
 ==== Consent Caching
 
-Cache registration / authentication consent action. This helps consent action under unstable NFC transport.
+Cache registration / authentication consent action.
+This helps consent action under unstable NFC transport.
 
 ==== Reset Protection
 
@@ -61,8 +62,8 @@ Settings related to the user interface.
 
 ==== Keep Screen ON
 
-NFC transport is only available while the screen is on. This setting make the screen remain ON
-while the app is open.
+NFC transport is only available while the screen is on.
+This setting make the screen remain ON while the app is open.
 
 === Configuration Reset
 

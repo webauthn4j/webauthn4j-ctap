@@ -15,9 +15,11 @@ class DeviceBootBroadcastReceiver : BroadcastReceiver() {
         logger.debug("onReceive")
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED -> {
-                val unifidoKeyApplication = context.applicationContext as UnifidoKeyApplicationBase<*>
-                val bthidServiceContextualAdapter = unifidoKeyApplication.unifidoKeyComponent.bthidServiceContextualAdapter
-                if(unifidoKeyApplication.unifidoKeyComponent.bthidService.isBTHIDBackgroundServiceModeEnabled.value == true){
+                val unifidoKeyApplication =
+                    context.applicationContext as UnifidoKeyApplicationBase<*>
+                val bthidServiceContextualAdapter =
+                    unifidoKeyApplication.unifidoKeyComponent.bthidServiceContextualAdapter
+                if (unifidoKeyApplication.unifidoKeyComponent.bthidService.isBTHIDBackgroundServiceModeEnabled.value == true) {
                     bthidServiceContextualAdapter.startForegroundService()
                 }
             }

@@ -57,16 +57,21 @@ class CtapNFCAndroidService : HostApduService(), CoroutineScope {
         launch(nfcWorker) {
             logger.debug("Received command APDU: {}", ArrayUtil.toHexString(apdu))
             if (nfcService.nfcStatus.value == NFCStatus.ON) {
-                try{
+                try {
                     val commandAPDU = CommandAPDU.parse(apdu)
                     val responseAPDU = nfcConnector.handleCommandAPDU(commandAPDU)
                     sendResponseApdu(responseAPDU.toBytes())
-                    logger.debug("Sent response APDU: {}", ArrayUtil.toHexString(responseAPDU.toBytes()))
-                }
-                catch (e: APDUProcessingException){
+                    logger.debug(
+                        "Sent response APDU: {}",
+                        ArrayUtil.toHexString(responseAPDU.toBytes())
+                    )
+                } catch (e: APDUProcessingException) {
                     val responseAPDU = ResponseAPDU(e.statusCode.sw1, e.statusCode.sw2)
                     sendResponseApdu(responseAPDU.toBytes())
-                    logger.debug("Sent response APDU: {}", ArrayUtil.toHexString(responseAPDU.toBytes()))
+                    logger.debug(
+                        "Sent response APDU: {}",
+                        ArrayUtil.toHexString(responseAPDU.toBytes())
+                    )
                 }
             } else {
                 val errorResponseAPDU = ResponseAPDU.createErrorResponseAPDU()

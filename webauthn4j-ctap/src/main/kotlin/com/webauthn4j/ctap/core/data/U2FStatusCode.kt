@@ -43,7 +43,7 @@ class U2FStatusCode(val sw1: Byte, val sw2: Byte) {
         }
     }
 
-    fun toResponseAPDU(): ResponseAPDU{
+    fun toResponseAPDU(): ResponseAPDU {
         return ResponseAPDU(sw1, sw2)
     }
 

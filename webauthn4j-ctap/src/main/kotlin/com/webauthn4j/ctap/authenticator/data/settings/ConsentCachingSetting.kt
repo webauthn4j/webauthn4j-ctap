@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.authenticator.data.settings
 
-enum class ConsentCachingSetting (val value: Boolean) {
+enum class ConsentCachingSetting(val value: Boolean) {
     ENABLED(true),
     DISABLED(false);
 

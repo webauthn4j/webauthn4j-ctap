@@ -15,7 +15,8 @@ internal class BLEFrameBuilder {
     fun initialize(initializationFragment: BLEInitializationFrameFragment) {
         this.initializationFragment = initializationFragment
         continuationFragments.clear()
-        remaining = initializationFragment.length.toLong() - initializationFragment.data.size.toLong()
+        remaining =
+            initializationFragment.length.toLong() - initializationFragment.data.size.toLong()
     }
 
     fun append(continuationFragment: BLEContinuationFrameFragment) {

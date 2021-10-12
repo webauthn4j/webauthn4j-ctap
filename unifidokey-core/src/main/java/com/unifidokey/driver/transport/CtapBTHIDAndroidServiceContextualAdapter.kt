@@ -31,33 +31,36 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
         BluetoothAdapter.getDefaultAdapter()
     }
     private var ctapBTHIDAndroidService: CtapBTHIDAndroidService? = null
-    private var ctapBTHIDDroidServiceConnection: CtapBTHIDAndroidServiceContextualAdapter.CtapBTHIDDroidServiceConnection? = null
+    private var ctapBTHIDDroidServiceConnection: CtapBTHIDAndroidServiceContextualAdapter.CtapBTHIDDroidServiceConnection? =
+        null
 
     private val bthidBroadcastReceiver = BTHIDBroadcastReceiver()
 
     override val bluetoothDevices: LiveData<List<BluetoothDeviceHandle>> by lazy {
-        MediatorLiveData<List<BluetoothDeviceHandle>>().also{ mediatorLiveData ->
+        MediatorLiveData<List<BluetoothDeviceHandle>>().also { mediatorLiveData ->
             mediatorLiveData.value = listBluetoothDevices()
-            mediatorLiveData.addSource(isBTHIDAdapterEnabled){ enabled ->
-                if(enabled){
+            mediatorLiveData.addSource(isBTHIDAdapterEnabled) { enabled ->
+                if (enabled) {
                     mediatorLiveData.value = listBluetoothDevices()
-                }
-                else{
+                } else {
                     mediatorLiveData.value = emptyList()
                 }
             }
-            mediatorLiveData.addSource(deviceHistoryConfigProperty.liveData){ deviceHistory ->
+            mediatorLiveData.addSource(deviceHistoryConfigProperty.liveData) { deviceHistory ->
                 val deviceList = mediatorLiveData.value
                 deviceHistory?.forEach { entry ->
-                    deviceList?.firstOrNull{ deviceHandle -> deviceHandle.address == entry.address}?.lastConnectedAt = entry.lastConnectedAt
+                    deviceList?.firstOrNull { deviceHandle -> deviceHandle.address == entry.address }?.lastConnectedAt =
+                        entry.lastConnectedAt
                 }
-                mediatorLiveData.value = deviceList?.sortedWith(compareBy<BluetoothDeviceHandle>{ it.lastConnectedAt }.thenBy{ it.name })?.reversed()
+                mediatorLiveData.value =
+                    deviceList?.sortedWith(compareBy<BluetoothDeviceHandle> { it.lastConnectedAt }.thenBy { it.name })
+                        ?.reversed()
             }
         }
     }
 
-    private fun listBluetoothDevices(): List<BluetoothDeviceHandle>{
-        return if(isBTHIDAdapterEnabled.value!!){
+    private fun listBluetoothDevices(): List<BluetoothDeviceHandle> {
+        return if (isBTHIDAdapterEnabled.value!!) {
             (bluetoothAdapter?.bondedDevices ?: emptyList()).filter {
                 it.name != null &&
                         it.address != null &&
@@ -76,11 +79,12 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
                             else -> true
                         }
             }.map {
-                val deviceHistoryEntry = deviceHistoryConfigProperty.value?.firstOrNull { deviceHistoryEntry -> deviceHistoryEntry.address == it.address }
+                val deviceHistoryEntry =
+                    deviceHistoryConfigProperty.value?.firstOrNull { deviceHistoryEntry -> deviceHistoryEntry.address == it.address }
                 BluetoothDeviceHandle(it.name, it.address, deviceHistoryEntry?.lastConnectedAt)
-            }.sortedWith(compareBy<BluetoothDeviceHandle>{ it.lastConnectedAt }.thenBy{ it.name }).reversed()
-        }
-        else emptyList()
+            }.sortedWith(compareBy<BluetoothDeviceHandle> { it.lastConnectedAt }.thenBy { it.name })
+                .reversed()
+        } else emptyList()
     }
 
     private var isBound = false
@@ -262,9 +266,10 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
                             resolveConnectionState(connectionState),
                             bluetoothDevice?.name
                         )
-                        if(bluetoothDevice != null){
-                            val bluetoothDeviceHandle = (bluetoothDevices.value ?: emptyList()).firstOrNull { it.address == bluetoothDevice.address }
-                            if(bluetoothDeviceHandle != null){
+                        if (bluetoothDevice != null) {
+                            val bluetoothDeviceHandle = (bluetoothDevices.value
+                                ?: emptyList()).firstOrNull { it.address == bluetoothDevice.address }
+                            if (bluetoothDeviceHandle != null) {
                                 val resolved = resolveConnectionState(connectionState)
                                 bluetoothDeviceHandle.setConnectionState(resolved)
                                 val deviceHistory = deviceHistoryConfigProperty.value ?: listOf()
@@ -275,7 +280,10 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
                                     deviceHistoryConfigProperty.value = deviceHistory
                                 } else {
                                     val deviceHistoryEntity =
-                                        BTHIDDeviceHistoryEntry(bluetoothDevice.address, Instant.now())
+                                        BTHIDDeviceHistoryEntry(
+                                            bluetoothDevice.address,
+                                            Instant.now()
+                                        )
                                     deviceHistoryConfigProperty.value =
                                         mutableListOf<BTHIDDeviceHistoryEntry>().apply {
                                             addAll(deviceHistory)
@@ -289,7 +297,6 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
                 }
             }
         }
-
 
 
     }

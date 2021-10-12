@@ -8,7 +8,7 @@ interface FIDOU2FAttestationStatementProvider : AttestationStatementProvider {
     override suspend fun provide(attestationStatementRequest: AttestationStatementRequest): FIDOU2FAttestationStatement {
 
         val publicKey = attestationStatementRequest.credentialKey.keyPair!!.public
-        if(publicKey !is ECPublicKey){
+        if (publicKey !is ECPublicKey) {
             throw IllegalArgumentException("attestationStatementRequest.userCredentialKey.keyPair must be Elliptic Curve key pair.")
         }
 

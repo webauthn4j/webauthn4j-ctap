@@ -2,7 +2,7 @@ package com.unifidokey.core.config
 
 import com.webauthn4j.ctap.authenticator.data.settings.AttestationTypeSetting
 
-class AttestationTypeConfigProperty  internal constructor(configManager: ConfigManager) :
+class AttestationTypeConfigProperty internal constructor(configManager: ConfigManager) :
     ConfigPropertyBase<AttestationTypeSetting>(
         configManager,
         KEY,

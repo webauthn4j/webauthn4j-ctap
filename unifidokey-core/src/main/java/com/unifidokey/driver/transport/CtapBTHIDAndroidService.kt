@@ -128,9 +128,10 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
     fun connect(deviceHandle: BluetoothDeviceHandle) {
         val remoteDevice = bluetoothAdapter.getRemoteDevice(deviceHandle.address)
         val result = bluetoothHidDevice?.connect(remoteDevice)!!
-        if(result){
+        if (result) {
             val history: List<BTHIDDeviceHistoryEntry>? = bthidDeviceHistory.value
-            history?.firstOrNull { it.address == deviceHandle.address }?.lastConnectedAt = Instant.now()
+            history?.firstOrNull { it.address == deviceHandle.address }?.lastConnectedAt =
+                Instant.now()
             bthidDeviceHistory.value = history
         }
     }
@@ -148,7 +149,8 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
         objectConverter = unifidoKeyApplication.unifidoKeyComponent.objectConverter
         unifidoKeyNotificationController =
             unifidoKeyApplication.unifidoKeyComponent.unifidoKeyNotificationController
-        bthidDeviceHistory = unifidoKeyApplication.unifidoKeyComponent.configManager.bthidDeviceHistory
+        bthidDeviceHistory =
+            unifidoKeyApplication.unifidoKeyComponent.configManager.bthidDeviceHistory
         bthidService.isBTHIDBackgroundServiceModeEnabled.observeForever {
             when {
                 it -> startForeground()
@@ -222,7 +224,7 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
             }
         }
 
-        fun configureApp(){
+        fun configureApp() {
             if (bluetoothHidDevice != null) {
                 if (isAppEnabled) {
                     registerApp()

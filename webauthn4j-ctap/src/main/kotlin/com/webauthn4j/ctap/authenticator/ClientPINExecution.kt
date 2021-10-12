@@ -7,6 +7,9 @@ import com.webauthn4j.ctap.core.data.PinSubCommand
 import com.webauthn4j.ctap.core.validator.AuthenticatorClientPINRequestValidator
 import org.slf4j.LoggerFactory
 
+/**
+ * Client PIN command execution
+ */
 internal class ClientPINExecution(
     private val ctapAuthenticator: CtapAuthenticator,
     private val authenticatorClientPINRequest: AuthenticatorClientPINRequest

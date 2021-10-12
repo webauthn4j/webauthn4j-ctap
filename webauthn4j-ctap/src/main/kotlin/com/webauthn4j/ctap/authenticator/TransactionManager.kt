@@ -3,6 +3,9 @@ package com.webauthn4j.ctap.authenticator
 import com.webauthn4j.ctap.core.data.*
 import kotlinx.coroutines.*
 
+/**
+ * Ctap Command transaction manager
+ */
 open class TransactionManager(ctapAuthenticator: CtapAuthenticator = CtapAuthenticator()) {
 
     //single thread worker to synchronize authenticator access

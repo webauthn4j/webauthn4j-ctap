@@ -60,7 +60,6 @@ class BTHIDService constructor(
     }
 
 
-
     @UiThread
     fun toggleConnection(deviceHandle: BluetoothDeviceHandle) {
         // disconnect all devices

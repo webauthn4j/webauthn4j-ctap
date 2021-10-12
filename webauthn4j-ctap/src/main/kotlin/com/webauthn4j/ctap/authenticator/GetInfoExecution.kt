@@ -8,6 +8,9 @@ import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
 import com.webauthn4j.ctap.core.data.CtapStatusCode
 import org.slf4j.LoggerFactory
 
+/**
+ * GetInfo command execution
+ */
 internal class GetInfoExecution(
     private val ctapAuthenticator: CtapAuthenticator,
     authenticatorGetInfoRequest: AuthenticatorGetInfoRequest

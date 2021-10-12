@@ -6,6 +6,9 @@ import com.webauthn4j.ctap.core.data.CtapResponse
 import com.webauthn4j.ctap.core.data.CtapStatusCode
 import org.slf4j.LoggerFactory
 
+/**
+ * Base class for Ctap command execution
+ */
 abstract class CtapCommandExecutionBase<TC : CtapRequest, TR : CtapResponse>(private val ctapAuthenticator: CtapAuthenticator, private val ctapCommand: TC) {
 
     private val logger = LoggerFactory.getLogger(CtapCommandExecutionBase::class.java)

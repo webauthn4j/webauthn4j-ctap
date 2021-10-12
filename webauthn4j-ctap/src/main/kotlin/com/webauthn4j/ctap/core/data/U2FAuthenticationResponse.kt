@@ -17,10 +17,9 @@ class U2FAuthenticationResponse : AuthenticatorResponse {
     }
 
     constructor(userPresence: Boolean, counter: UInt, signature: ByteArray) {
-        if(userPresence){
+        if (userPresence) {
             this.userPresenceByte = 1
-        }
-        else{
+        } else {
             this.userPresenceByte = 0
         }
         this.counter = counter
@@ -29,7 +28,8 @@ class U2FAuthenticationResponse : AuthenticatorResponse {
 
     fun toBytes(): ByteArray {
         val length = 1 + 4 + signature.size
-        return ByteBuffer.allocate(length).put(userPresenceByte).putInt(counter.toInt()).put(signature).array()
+        return ByteBuffer.allocate(length).put(userPresenceByte).putInt(counter.toInt())
+            .put(signature).array()
     }
 
     override fun equals(other: Any?): Boolean {

@@ -21,10 +21,10 @@ jobs:
           echo $KEYSTORE_BASE64 | base64 -d > unifidokey-upload-key.jks
           ./gradlew build assemblePlaystoreRelease bundlePlaystoreRelease
         env:
-          KEYSTORE_BASE64 : ${{ secrets.KEYSTORE_BASE64  }}
-          KEYSTORE_PASS : ${{ secrets.KEYSTORE_PASS  }}
-          KEY_ALIAS : ${{ secrets.KEY_ALIAS  }}
-          KEY_PASS : ${{ secrets.KEY_PASS  }}
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64  }}
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS  }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS  }}
+          KEY_PASS: ${{ secrets.KEY_PASS  }}
 
       - name: Create GitHub release
         id: create_release
@@ -63,8 +63,8 @@ jobs:
           export GOOGLE_APPLICATION_CREDENTIALS=./google-service-account.json
           ./gradlew publishAppBundle
         env:
-          KEYSTORE_BASE64 : ${{ secrets.KEYSTORE_BASE64  }}
-          KEYSTORE_PASS : ${{ secrets.KEYSTORE_PASS  }}
-          KEY_ALIAS : ${{ secrets.KEY_ALIAS  }}
-          KEY_PASS : ${{ secrets.KEY_PASS  }}
-          GOOGLE_SERVICE_ACCOUNT_BASE64 : ${{ secrets.GOOGLE_SERVICE_ACCOUNT_BASE64  }}
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64  }}
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS  }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS  }}
+          KEY_PASS: ${{ secrets.KEY_PASS  }}
+          GOOGLE_SERVICE_ACCOUNT_BASE64: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_BASE64  }}

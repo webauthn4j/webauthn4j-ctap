@@ -12,10 +12,10 @@ import com.webauthn4j.ctap.authenticator.*
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.data.event.Event
-import com.webauthn4j.ctap.authenticator.extension.HMACSecretExtensionProcessor
 import com.webauthn4j.ctap.authenticator.data.settings.AttestationStatementFormatSetting
 import com.webauthn4j.ctap.authenticator.data.settings.AttestationTypeSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ConsentCachingSetting
+import com.webauthn4j.ctap.authenticator.extension.HMACSecretExtensionProcessor
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import kotlinx.coroutines.runBlocking
 
@@ -74,7 +74,7 @@ class AuthenticatorService(
         configManager.isBTHIDTransportEnabled.liveData.observeForever { renewCtapAuthenticator() }
         configManager.isBLETransportEnabled.liveData.observeForever { renewCtapAuthenticator() }
         configManager.userConsent.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.consentCaching.liveData.observeForever{ renewCtapAuthenticator() }
+        configManager.consentCaching.liveData.observeForever { renewCtapAuthenticator() }
         configManager.resetProtection.liveData.observeForever { renewCtapAuthenticator() }
         configManager.credentialSelector.liveData.observeForever { renewCtapAuthenticator() }
         configManager.platform.liveData.observeForever { renewCtapAuthenticator() }
@@ -114,7 +114,10 @@ class AuthenticatorService(
         authenticatorPropertyStore.keyStorageSetting = keyStorageSetting
         authenticatorPropertyStore.algorithms = algorithms
         val attestationStatementProvider =
-            attestationStatementProviders[Pair(attestationTypeSetting, attestationStatementFormatSetting)]
+            attestationStatementProviders[Pair(
+                attestationTypeSetting,
+                attestationStatementFormatSetting
+            )]
                 ?: throw IllegalArgumentException(
                     String.format(
                         "Attestation type: '%s' format:'%s' is not registered.",
@@ -122,7 +125,10 @@ class AuthenticatorService(
                         attestationStatementFormatSetting
                     )
                 )
-        val fidoU2FAttestationStatementProvider = attestationStatementProviders[Pair(attestationTypeSetting, AttestationStatementFormatSetting.FIDO_U2F)] as FIDOU2FAttestationStatementProvider
+        val fidoU2FAttestationStatementProvider = attestationStatementProviders[Pair(
+            attestationTypeSetting,
+            AttestationStatementFormatSetting.FIDO_U2F
+        )] as FIDOU2FAttestationStatementProvider
         val extensionProcessors = listOf(HMACSecretExtensionProcessor())
         val ctapAuthenticator = CtapAuthenticator(
             attestationStatementProvider,
@@ -142,10 +148,11 @@ class AuthenticatorService(
         }
         credentialSelectionHandler.let {
             if (it != null) {
-                ctapAuthenticator.credentialSelectionHandler = when(configManager.consentCaching.value){
-                    ConsentCachingSetting.ENABLED -> CachingCredentialSelectionHandler(it)
-                    else -> it
-                }
+                ctapAuthenticator.credentialSelectionHandler =
+                    when (configManager.consentCaching.value) {
+                        ConsentCachingSetting.ENABLED -> CachingCredentialSelectionHandler(it)
+                        else -> it
+                    }
             }
         }
         ctapAuthenticator.registerEventListener(this::onEvent)

@@ -17,19 +17,25 @@ class FIDOU2FBasicAttestationStatementProvider(
 
     override suspend fun generate(attestationStatementRequest: FIDOU2FAttestationStatementRequest): FIDOU2FAttestationStatement {
         val rfu: Byte = 0x00
-        val toBeSigned = ByteBuffer.allocate(1 + 32 + 32 + attestationStatementRequest.keyHandle.size + 65)
-            .put(rfu)
-            .put(attestationStatementRequest.applicationParameter)
-            .put(attestationStatementRequest.challengeParameter)
-            .put(attestationStatementRequest.keyHandle)
-            .put(ECUtil.createUncompressedPublicKey(attestationStatementRequest.credentialKey.public as ECPublicKey))
-            .array()
+        val toBeSigned =
+            ByteBuffer.allocate(1 + 32 + 32 + attestationStatementRequest.keyHandle.size + 65)
+                .put(rfu)
+                .put(attestationStatementRequest.applicationParameter)
+                .put(attestationStatementRequest.challengeParameter)
+                .put(attestationStatementRequest.keyHandle)
+                .put(ECUtil.createUncompressedPublicKey(attestationStatementRequest.credentialKey.public as ECPublicKey))
+                .array()
         val sig = SignatureCalculator.calculate(
             SignatureAlgorithm.ES256,
             attestationPrivateKey,
             toBeSigned
         )
-        return FIDOU2FAttestationStatement(AttestationCertificatePath(attestationCertificate, emptyList()), sig)
+        return FIDOU2FAttestationStatement(
+            AttestationCertificatePath(
+                attestationCertificate,
+                emptyList()
+            ), sig
+        )
     }
 
     companion object {

@@ -40,6 +40,9 @@ import java.util.*
 import kotlin.collections.HashMap
 import kotlin.experimental.or
 
+/**
+ * MakeCredential command execution
+ */
 @Suppress("ConvertSecondaryConstructorToPrimary", "FunctionName")
 internal class MakeCredentialExecution :
     CtapCommandExecutionBase<AuthenticatorMakeCredentialRequest, AuthenticatorMakeCredentialResponse> {

@@ -5,9 +5,9 @@
 
 [![Actions Status](https://github.com/webauthn4j/UnifidoKey/workflows/CI/badge.svg)](https://github.com/webauthn4j/unifidokey/actions)
 
-WebAuthn4J UnifidoKey is an Android app which act as a WebAuthn security key.
-No longer need to buy an expensive physical security key and carry it everyday. 
-Just install the UnifidoKey app to your smartphone, and enjoy secure and convenient authentication.
+WebAuthn4J UnifidoKey is an Android app which act as a WebAuthn security key. No longer need to buy
+an expensive physical security key and carry it everyday. Just install the UnifidoKey app to your
+smartphone, and enjoy secure and convenient authentication.
 
 ## Install
 
@@ -23,9 +23,9 @@ Install from Google Play Store.
 UnifidoKey has two product-flavors:
 
 * OSS flavor
-  * OSS developers can build without friction
+    * OSS developers can build without friction
 * Play Store flavor
-  * OSS flavor + Firebase crashlytics + App signing
+    * OSS flavor + Firebase crashlytics + App signing
 
 ### product-flavor: OSS
 
@@ -40,11 +40,13 @@ Build OSS flavor Apk for local debug
 Build Play store flavor App Bundle
 
 place unifidokey-upload-key.jks which contains upload key
+
 ```
 cp <somewhere>/unifidokey-upload-key.jks ./unifidokey-upload-key.jks
 ```
 
 export following environment variables:
+
 ```
 export KEYSTORE_PASS : ${{ secrets.KEYSTORE_PASS  }}
 export KEY_ALIAS : ${{ secrets.KEY_ALIAS  }}
@@ -52,6 +54,7 @@ export KEY_PASS : ${{ secrets.KEY_PASS  }}
 ```
 
 or you may specify them in `<project root>/secret.properties` file
+
 ```
 unifidokey.keystorePass=<value>
 unifidokey.keyPass=<value>
@@ -59,6 +62,7 @@ unifidokey.keyAlias=<value>
 ```
 
 Build App Bundle
+
 ```
 ./gradlew bundlePlaystoreRelease
 ```
@@ -70,5 +74,6 @@ WebAuthn4J UnifidoKey is Open Source software released under the
 
 ## Contributing
 
-Interested in helping out with WebAuthn4J? Great! Your participation in the community is much appreciated!
+Interested in helping out with WebAuthn4J? Great! Your participation in the community is much
+appreciated!
 Please feel free to open issues and send pull-requests.

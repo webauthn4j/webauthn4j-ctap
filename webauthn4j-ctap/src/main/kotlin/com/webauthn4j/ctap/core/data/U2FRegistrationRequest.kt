@@ -5,9 +5,9 @@ import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.util.ArrayUtil
 import java.nio.ByteBuffer
 
-class U2FRegistrationRequest : AuthenticatorRequest{
+class U2FRegistrationRequest : AuthenticatorRequest {
 
-    companion object{
+    companion object {
 
         fun createFromCommandAPDU(command: CommandAPDU): U2FRegistrationRequest {
             val dataIn = command.dataIn
@@ -27,10 +27,9 @@ class U2FRegistrationRequest : AuthenticatorRequest{
         this.applicationParameter = ArrayUtil.clone(applicationParameter)
     }
 
-    fun toBytes(): ByteArray{
+    fun toBytes(): ByteArray {
         return ByteBuffer.allocate(64).put(challengeParameter).put(applicationParameter).array()
     }
-
 
 
     override fun equals(other: Any?): Boolean {
@@ -50,7 +49,11 @@ class U2FRegistrationRequest : AuthenticatorRequest{
     }
 
     override fun toString(): String {
-        return "U2FRegistrationRequest(challengeParameter=${HexUtil.encodeToString(challengeParameter)}, applicationParameter=${HexUtil.encodeToString(applicationParameter)})"
+        return "U2FRegistrationRequest(challengeParameter=${
+            HexUtil.encodeToString(
+                challengeParameter
+            )
+        }, applicationParameter=${HexUtil.encodeToString(applicationParameter)})"
     }
 
 

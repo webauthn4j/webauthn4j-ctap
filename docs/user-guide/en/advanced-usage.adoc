@@ -2,8 +2,7 @@
 
 === Login to Azure AD joined Windows 10 devices with UnifidoKey
 
-Since https://docs.microsoft.com/en-us/azure/active-directory/authentication/howto-authentication-passwordless-security-key-windows[Azure AD joined Windows 10 devices supports security key login],
-UnifidoKey can be used as the security key to login Azure AD joined Windows 10 devices.
+Since https://docs.microsoft.com/en-us/azure/active-directory/authentication/howto-authentication-passwordless-security-key-windows[Azure AD joined Windows 10 devices supports security key login], UnifidoKey can be used as the security key to login Azure AD joined Windows 10 devices.
 Please follow the Azure AD document to set up Azure AD tenant, register UnifidoKey as a security key.
 
 Please note https://docs.microsoft.com/en-us/azure/active-directory/authentication/howto-authentication-passwordless-security-key#fido-security-key-optional-settings[Azure AD's "FIDO Security Key optional settings" - "Enforce attestation" configuration needs to be set to "NO"] because UnifidoKey is not registered to FIDO Alliance Metadata Service.

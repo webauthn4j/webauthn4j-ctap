@@ -8,7 +8,8 @@ interface AuthenticationExtensionProcessor : ExtensionProcessor {
 
     fun processAuthenticationExtension(
         context: AuthenticationExtensionContext,
-        outputsBuilder: AuthenticationExtensionsAuthenticatorOutputs.BuilderForAuthentication)
+        outputsBuilder: AuthenticationExtensionsAuthenticatorOutputs.BuilderForAuthentication
+    )
 
     fun supportsAuthenticationExtension(extensions: AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>?): Boolean
 }

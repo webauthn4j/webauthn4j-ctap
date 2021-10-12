@@ -8,6 +8,9 @@ import java.io.Serializable
 import java.time.Instant
 import javax.crypto.SecretKey
 
+/**
+ * Builder for UserCredential
+ */
 class UserCredentialBuilder(private val objectConverter: ObjectConverter, private val encryptionKey: SecretKey, private val encryptionIV: ByteArray) {
 
     private lateinit var credentialId: ByteArray

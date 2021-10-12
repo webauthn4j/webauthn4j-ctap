@@ -14,11 +14,13 @@ abstract class PackedAttestationStatementProviderBase(
     objectConverter: ObjectConverter
 ) : AttestationStatementProvider {
 
-    private var authenticatorDataConverter: AuthenticatorDataConverter = AuthenticatorDataConverter(objectConverter)
+    private var authenticatorDataConverter: AuthenticatorDataConverter =
+        AuthenticatorDataConverter(objectConverter)
 
     override suspend fun provide(attestationStatementRequest: AttestationStatementRequest): PackedAttestationStatement {
 
-        val authenticatorData: AuthenticatorData<RegistrationExtensionAuthenticatorOutput> = attestationStatementRequest.authenticatorData
+        val authenticatorData: AuthenticatorData<RegistrationExtensionAuthenticatorOutput> =
+            attestationStatementRequest.authenticatorData
         val authenticatorDataBytes = authenticatorDataConverter.convert(authenticatorData)
         val clientDataHash = attestationStatementRequest.clientDataHash
         val toBeSigned = ByteBuffer.allocate(authenticatorDataBytes.size + clientDataHash.size)
@@ -32,7 +34,7 @@ abstract class PackedAttestationStatementProviderBase(
         )
     }
 
-    protected abstract fun sign(credentialKey: KeyPair, toBeSigned: ByteArray) : ByteArray
+    protected abstract fun sign(credentialKey: KeyPair, toBeSigned: ByteArray): ByteArray
     protected abstract fun createAttestationCertificatePath(attestationStatementRequest: AttestationStatementRequest): AttestationCertificatePath
 
 }
