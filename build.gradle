@@ -52,7 +52,7 @@ buildscript {
     ext.logbackAndroidVersion = "2.0.0"
     ext.webauthn4jVersion = "unifidokey-dev-SNAPSHOT"
     ext.mockitoVersion = "4.0.0"
-    ext.mockitoKotlinVersion = "3.2.0"
+    ext.mockitoKotlinVersion = "4.0.0"
     ext.asciidoctorGradleVersion = "3.3.2"
 
     // Test libraries
