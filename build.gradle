@@ -84,7 +84,7 @@ buildscript {
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:$sonarqubeVersion"
 
         classpath 'com.google.guava:guava:31.0.1-jre'
-        classpath 'com.google.api-client:google-api-client:1.32.1'
+        classpath 'com.google.api-client:google-api-client:1.32.2'
         classpath 'com.google.apis:google-api-services-androidpublisher:v3-rev20211006-1.32.1'
 
         // workaround from https://issuetracker.google.com/issues/159151549
