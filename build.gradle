@@ -47,7 +47,7 @@ buildscript {
     ext.ossLicensesPluginVersion = "0.10.4"
 
     // Third party libraries
-    ext.springBootVersion = "2.5.6"
+    ext.springBootVersion = "2.5.7"
     ext.bouncyCastleVersion = "1.69"
     ext.logbackAndroidVersion = "2.0.0"
     ext.webauthn4jVersion = "unifidokey-dev-SNAPSHOT"
