@@ -62,7 +62,7 @@ buildscript {
     ext.androidxTestExtJUnitVersion = "1.1.3"
     ext.espressoVersion = "3.4.0"
     ext.androidSupportVersion = "28.0.0"
-    ext.robolectricVersion = "4.7.1"
+    ext.robolectricVersion = "4.7.2"
     ext.sonarqubeVersion = "3.3"
 
     repositories {
