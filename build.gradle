@@ -51,7 +51,7 @@ buildscript {
     ext.bouncyCastleVersion = "1.69"
     ext.logbackAndroidVersion = "2.0.0"
     ext.webauthn4jVersion = "unifidokey-dev-SNAPSHOT"
-    ext.mockitoVersion = "4.0.0"
+    ext.mockitoVersion = "4.1.0"
     ext.mockitoKotlinVersion = "4.0.0"
     ext.asciidoctorGradleVersion = "3.3.2"
 
