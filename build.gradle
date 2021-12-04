@@ -85,7 +85,7 @@ buildscript {
 
         classpath 'com.google.guava:guava:31.0.1-jre'
         classpath 'com.google.api-client:google-api-client:1.32.2'
-        classpath 'com.google.apis:google-api-services-androidpublisher:v3-rev20211021-1.32.1'
+        classpath 'com.google.apis:google-api-services-androidpublisher:v3-rev20211125-1.32.1'
 
         // workaround from https://issuetracker.google.com/issues/159151549
         classpath "org.ow2.asm:asm:$asmVersion"
