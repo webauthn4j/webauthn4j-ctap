@@ -17,17 +17,17 @@
 buildscript {
 
     //kotlin
-    ext.kotlinVersion = '1.5.31'
+    ext.kotlinVersion = '1.6.0'
     ext.coreKtxVersion = "1.6.0"
     ext.kotlinxCoroutinesVersion = "1.5.1-native-mt"
 
-    ext.daggerVersion = "2.39.1"
+    ext.daggerVersion = "2.40.2"
     ext.roomVersion = "2.3.0"
 
     // Android libraries
     ext.asmVersion = "9.2"
     ext.appcompatVersion = "1.3.1"
-    ext.constraintlayoutVersion = "2.1.1"
+    ext.constraintlayoutVersion = "2.1.2"
     ext.biometricVersion = "1.1.0"
     ext.legacySupportV4Version = "1.0.0"
     ext.preferenceVersion = "1.1.1"
@@ -36,23 +36,23 @@ buildscript {
     ext.lifecycleKtxVersion = "2.3.1"
     ext.materialVersion = "1.4.0"
     ext.googleServicesVersion = "4.3.10"
-    ext.firebaseBomVersion = "28.4.2"
-    ext.firebaseCrashlyticsGradleVersion = "2.7.1"
+    ext.firebaseBomVersion = "29.0.0"
+    ext.firebaseCrashlyticsGradleVersion = "2.8.0"
     ext.googlePlayServicesAuthVersion = "19.2.0"
     ext.googlePlayServicesFidoVersion = "18.1.0"
     ext.googlePlayServicesSafetyNetVersion = "17.0.1"
     ext.googlePlayServicesOSSLicensesVersion = "17.0.0"
-    ext.androidGradlePluginVersion = "7.0.2"
-    ext.navigationSafeArgsGradlePluginVersion = "2.4.0-alpha10"
+    ext.androidGradlePluginVersion = "7.0.3"
+    ext.navigationSafeArgsGradlePluginVersion = "2.4.0-beta02"
     ext.ossLicensesPluginVersion = "0.10.4"
 
     // Third party libraries
-    ext.springBootVersion = "2.5.5"
+    ext.springBootVersion = "2.5.7"
     ext.bouncyCastleVersion = "1.69"
     ext.logbackAndroidVersion = "2.0.0"
     ext.webauthn4jVersion = "unifidokey-dev-SNAPSHOT"
-    ext.mockitoVersion = "4.0.0"
-    ext.mockitoKotlinVersion = "3.2.0"
+    ext.mockitoVersion = "4.1.0"
+    ext.mockitoKotlinVersion = "4.0.0"
     ext.asciidoctorGradleVersion = "3.3.2"
 
     // Test libraries
@@ -62,7 +62,7 @@ buildscript {
     ext.androidxTestExtJUnitVersion = "1.1.3"
     ext.espressoVersion = "3.4.0"
     ext.androidSupportVersion = "28.0.0"
-    ext.robolectricVersion = "4.6.1"
+    ext.robolectricVersion = "4.7.2"
     ext.sonarqubeVersion = "3.3"
 
     repositories {
@@ -84,8 +84,8 @@ buildscript {
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:$sonarqubeVersion"
 
         classpath 'com.google.guava:guava:31.0.1-jre'
-        classpath 'com.google.api-client:google-api-client:1.32.1'
-        classpath 'com.google.apis:google-api-services-androidpublisher:v3-rev20211006-1.32.1'
+        classpath 'com.google.api-client:google-api-client:1.32.2'
+        classpath 'com.google.apis:google-api-services-androidpublisher:v3-rev20211021-1.32.1'
 
         // workaround from https://issuetracker.google.com/issues/159151549
         classpath "org.ow2.asm:asm:$asmVersion"
