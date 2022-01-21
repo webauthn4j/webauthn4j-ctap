@@ -1,8 +1,8 @@
 package integration.setting.relyingparty
 
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
-import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
 import com.webauthn4j.ctap.authenticator.data.credential.Credential
+import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
 import com.webauthn4j.ctap.client.exception.CtapErrorException
 import com.webauthn4j.data.*
 import com.webauthn4j.data.extension.client.RegistrationExtensionClientOutput

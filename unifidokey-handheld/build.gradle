@@ -1,6 +1,6 @@
+import com.unifidokey.gradle.util.PropertyUtil
 import com.unifidokey.gradle.util.PublishAppBundleTask
 import com.unifidokey.gradle.util.VersionCodeUtil
-import com.unifidokey.gradle.util.PropertyUtil
 
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
@@ -69,8 +69,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility 11
-        targetCompatibility 11
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     testOptions {
         unitTests {

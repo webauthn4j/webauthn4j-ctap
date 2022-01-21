@@ -1,12 +1,8 @@
 package com.unifidokey.app.handheld
 
-import com.google.firebase.FirebaseApp
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.unifidokey.BuildConfig
 import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.app.UnifidoKeyComponent
-import com.webauthn4j.ctap.authenticator.CachingCredentialSelectionHandler
-import com.webauthn4j.ctap.authenticator.CachingUserConsentHandler
 import com.unifidokey.app.handheld.presentation.UnifidoKeyCredentialSelectionHandler
 import com.unifidokey.app.handheld.presentation.UnifidoKeyUserConsentHandler
 import com.unifidokey.core.config.ConfigManager

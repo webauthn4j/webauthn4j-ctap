@@ -12,9 +12,9 @@ import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSettings
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FBasicAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.PackedBasicAttestationStatementProvider
+import com.webauthn4j.ctap.authenticator.data.credential.Credential
 import com.webauthn4j.ctap.authenticator.data.settings.*
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
-import com.webauthn4j.ctap.authenticator.data.credential.Credential
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
 import com.webauthn4j.ctap.client.ClientProperty
 import com.webauthn4j.ctap.client.CtapAuthenticatorHandle

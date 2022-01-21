@@ -19,7 +19,6 @@ buildscript {
     //kotlin
     ext.kotlinVersion = '1.6.10'
     ext.coreKtxVersion = "1.6.0"
-    ext.kotlinxCoroutinesVersion = "1.5.1-native-mt"
 
     ext.daggerVersion = "2.40.5"
     ext.roomVersion = "2.3.0"
@@ -134,6 +133,7 @@ subprojects {
 
     dependencies {
         //BOM
+        implementation platform("org.jetbrains.kotlin:kotlin-bom:${kotlinVersion}")
         implementation platform("com.google.firebase:firebase-bom:${firebaseBomVersion}")
         implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
 
@@ -176,9 +176,9 @@ subprojects {
             implementation("com.google.android.gms:play-services-oss-licenses:$googlePlayServicesOSSLicensesVersion")
 
             // third party
-            implementation("org.bouncycastle:bcutil-jdk15on:$bouncyCastleVersion")
-            implementation("org.bouncycastle:bcprov-jdk15on:$bouncyCastleVersion")
-            implementation("org.bouncycastle:bcpkix-jdk15on:$bouncyCastleVersion")
+            implementation("org.bouncycastle:bcutil-jdk15to18:$bouncyCastleVersion")
+            implementation("org.bouncycastle:bcprov-jdk15to18:$bouncyCastleVersion")
+            implementation("org.bouncycastle:bcpkix-jdk15to18:$bouncyCastleVersion")
             implementation("com.github.webauthn4j.webauthn4j:webauthn4j-util:$webauthn4jVersion")
             implementation("com.github.webauthn4j.webauthn4j:webauthn4j-core:$webauthn4jVersion")
             implementation("com.github.webauthn4j.webauthn4j:webauthn4j-test:$webauthn4jVersion")

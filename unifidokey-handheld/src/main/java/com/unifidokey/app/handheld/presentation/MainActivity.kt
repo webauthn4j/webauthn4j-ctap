@@ -15,6 +15,7 @@ import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.unifidokey.R
 import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication
@@ -26,10 +27,6 @@ import com.unifidokey.driver.transport.CtapBLEAndroidServiceContextualAdapter
 import com.unifidokey.driver.transport.CtapBTHIDAndroidServiceContextualAdapter
 import com.unifidokey.driver.transport.CtapNFCAndroidServiceAdapter
 import org.slf4j.LoggerFactory
-import com.google.firebase.analytics.FirebaseAnalytics
-
-
-
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
