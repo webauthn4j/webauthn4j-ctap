@@ -36,7 +36,7 @@ buildscript {
     ext.lifecycleKtxVersion = "2.3.1"
     ext.materialVersion = "1.4.0"
     ext.googleServicesVersion = "4.3.10"
-    ext.firebaseBomVersion = "29.0.3"
+    ext.firebaseBomVersion = "29.0.4"
     ext.firebaseCrashlyticsGradleVersion = "2.8.0"
     ext.googlePlayServicesAuthVersion = "20.0.1"
     ext.googlePlayServicesFidoVersion = "18.1.0"
@@ -51,7 +51,7 @@ buildscript {
     ext.bouncyCastleVersion = "1.70"
     ext.logbackAndroidVersion = "2.0.0"
     ext.webauthn4jVersion = "unifidokey-dev-SNAPSHOT"
-    ext.mockitoVersion = "4.1.0"
+    ext.mockitoVersion = "4.2.0"
     ext.mockitoKotlinVersion = "4.0.0"
     ext.asciidoctorGradleVersion = "3.3.2"
 
