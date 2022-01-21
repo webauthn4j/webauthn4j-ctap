@@ -12,12 +12,12 @@ apply plugin: 'com.google.firebase.crashlytics'
 def unifidoKeyVersionCode = VersionCodeUtil.getVersionCodeFromVersionString(unifidoKeyVersion)
 
 android {
-    compileSdkVersion 30 // Android 11.0
+    compileSdkVersion 31 // Android 12.0
     buildToolsVersion '30.0.2'
 
     defaultConfig {
         minSdkVersion 28 // Android 9.0
-        targetSdkVersion 30 // Android 11.0
+        targetSdkVersion 31 // Android 12.0
         versionName "$unifidoKeyVersion"
         versionCode unifidoKeyVersionCode
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
