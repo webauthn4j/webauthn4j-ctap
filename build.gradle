@@ -21,7 +21,7 @@ buildscript {
     ext.coreKtxVersion = "1.6.0"
 
     ext.daggerVersion = "2.40.5"
-    ext.roomVersion = "2.3.0"
+    ext.roomVersion = "2.4.1"
 
     // Android libraries
     ext.asmVersion = "9.2"
