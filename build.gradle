@@ -17,17 +17,17 @@
 buildscript {
 
     //kotlin
-    ext.kotlinVersion = '1.6.0'
+    ext.kotlinVersion = '1.6.10'
     ext.coreKtxVersion = "1.6.0"
     ext.kotlinxCoroutinesVersion = "1.5.1-native-mt"
 
-    ext.daggerVersion = "2.40.3"
+    ext.daggerVersion = "2.40.5"
     ext.roomVersion = "2.3.0"
 
     // Android libraries
     ext.asmVersion = "9.2"
     ext.appcompatVersion = "1.3.1"
-    ext.constraintlayoutVersion = "2.1.2"
+    ext.constraintlayoutVersion = "2.1.3"
     ext.biometricVersion = "1.1.0"
     ext.legacySupportV4Version = "1.0.0"
     ext.preferenceVersion = "1.1.1"
@@ -36,14 +36,14 @@ buildscript {
     ext.lifecycleKtxVersion = "2.3.1"
     ext.materialVersion = "1.4.0"
     ext.googleServicesVersion = "4.3.10"
-    ext.firebaseBomVersion = "29.0.1"
+    ext.firebaseBomVersion = "29.0.4"
     ext.firebaseCrashlyticsGradleVersion = "2.8.0"
-    ext.googlePlayServicesAuthVersion = "19.2.0"
+    ext.googlePlayServicesAuthVersion = "20.0.1"
     ext.googlePlayServicesFidoVersion = "18.1.0"
-    ext.googlePlayServicesSafetyNetVersion = "17.0.1"
+    ext.googlePlayServicesSafetyNetVersion = "18.0.1"
     ext.googlePlayServicesOSSLicensesVersion = "17.0.0"
-    ext.androidGradlePluginVersion = "7.0.3"
-    ext.navigationSafeArgsGradlePluginVersion = "2.4.0-beta02"
+    ext.androidGradlePluginVersion = "7.0.4"
+    ext.navigationSafeArgsGradlePluginVersion = "2.4.0-rc01"
     ext.ossLicensesPluginVersion = "0.10.4"
 
     // Third party libraries
@@ -51,7 +51,7 @@ buildscript {
     ext.bouncyCastleVersion = "1.70"
     ext.logbackAndroidVersion = "2.0.0"
     ext.webauthn4jVersion = "unifidokey-dev-SNAPSHOT"
-    ext.mockitoVersion = "4.1.0"
+    ext.mockitoVersion = "4.2.0"
     ext.mockitoKotlinVersion = "4.0.0"
     ext.asciidoctorGradleVersion = "3.3.2"
 
@@ -84,7 +84,7 @@ buildscript {
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:$sonarqubeVersion"
 
         classpath 'com.google.guava:guava:31.0.1-jre'
-        classpath 'com.google.api-client:google-api-client:1.32.2'
+        classpath 'com.google.api-client:google-api-client:1.33.0'
         classpath 'com.google.apis:google-api-services-androidpublisher:v3-rev20211125-1.32.1'
 
         // workaround from https://issuetracker.google.com/issues/159151549
