@@ -3,10 +3,10 @@ apply plugin: 'org.jetbrains.kotlin.jvm'
 description = 'CTAP Authenticator library'
 
 compileKotlin {
-    kotlinOptions.jvmTarget = 11
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8
 }
 compileTestKotlin {
-    kotlinOptions.jvmTarget = 11
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8
 }
 
 test {
