@@ -6,6 +6,7 @@ on:
       - '*'
     branches:
       - '*'
+  pull_request: {}
   schedule:
     # everyday 11AM (UTC)
     - cron: '* 9 * * *'
