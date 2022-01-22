@@ -96,13 +96,13 @@ dependencies {
     kaptTest 'androidx.room:room-compiler'
 
     // Android test dependencies
-    androidTestImplementation 'androidx.test:core'
-    androidTestImplementation 'androidx.test.ext:junit'
-    androidTestImplementation 'androidx.test:runner'
-    androidTestImplementation 'androidx.test.espresso:espresso-core'
-    androidTestImplementation 'com.google.truth:truth'
-    androidTestImplementation 'com.google.truth.extensions:truth-java8-extension'
-    androidTestImplementation 'com.android.support:support-annotations'
+    androidTestImplementation "androidx.test:core:$androidxTestVersion"
+    androidTestImplementation "androidx.test:runner:$androidxTestVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxTestExtJUnitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    androidTestImplementation "com.google.truth:truth:$truthVersion"
+    androidTestImplementation "com.google.truth.extensions:truth-java8-extension:$truthVersion"
+    androidTestImplementation "com.android.support:support-annotations:$androidSupportVersion"
 
 }
 
