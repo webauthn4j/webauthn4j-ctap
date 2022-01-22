@@ -41,7 +41,7 @@ abstract class ConfigPropertyBase<T> internal constructor(
                 seedValue
             }
         }
-        mutableLiveData.value = initialValue
+        mutableLiveData.value = initialValue as T
         mutableLiveData.observeForever { value ->
             save(value)
         }
