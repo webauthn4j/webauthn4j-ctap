@@ -37,7 +37,7 @@ buildscript {
     ext.materialVersion = "1.5.0"
     ext.googleServicesVersion = "4.3.10"
     ext.firebaseBomVersion = "29.0.4"
-    ext.firebaseCrashlyticsGradleVersion = "2.8.0"
+    ext.firebaseCrashlyticsGradleVersion = "2.8.1"
     ext.googlePlayServicesAuthVersion = "20.0.1"
     ext.googlePlayServicesFidoVersion = "18.1.0"
     ext.googlePlayServicesSafetyNetVersion = "18.0.1"
