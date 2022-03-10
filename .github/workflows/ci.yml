@@ -5,11 +5,11 @@ on:
     tags:
       - '*'
     branches:
-      - '*'
+      - 'master'
   pull_request: {}
-  schedule:
-    # everyday 11AM (UTC)
-    - cron: '* 9 * * *'
+#  schedule:
+#    # everyday 11AM (UTC)
+#    - cron: '* 9 * * *'
 
 
 jobs:
