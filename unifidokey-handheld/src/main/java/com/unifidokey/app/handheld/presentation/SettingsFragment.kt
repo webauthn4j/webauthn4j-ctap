@@ -63,7 +63,7 @@ class SettingsFragment internal constructor(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         this.onProModeChanged(configManager.proMode.value)
         configManager.proMode.liveData.observe(this.viewLifecycleOwner, this@SettingsFragment::onProModeChanged)
         return super.onCreateView(inflater, container, savedInstanceState)
@@ -100,7 +100,7 @@ class SettingsFragment internal constructor(
 
     private fun configurePreferences(rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
-        preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+        preferenceScreen.sharedPreferences!!.registerOnSharedPreferenceChangeListener(this)
         findPreference<Preference>(NFCTransportEnabledConfigProperty.KEY)!!.let {
             it.summaryProvider = NFCPreferenceSummaryProvider()
             it.onPreferenceChangeListener =
