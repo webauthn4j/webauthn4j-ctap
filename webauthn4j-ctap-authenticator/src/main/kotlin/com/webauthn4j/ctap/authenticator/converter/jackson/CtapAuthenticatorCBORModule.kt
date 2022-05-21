@@ -6,7 +6,7 @@ import com.webauthn4j.ctap.authenticator.converter.jackson.deserializer.*
 import com.webauthn4j.ctap.authenticator.converter.jackson.serializer.U2FKeyEnvelopeSerializer
 import com.webauthn4j.ctap.core.data.options.*
 
-class CtapAuthenticatorCBORModule : SimpleModule("WebAuthnCBORModule") {
+class CtapAuthenticatorCBORModule : SimpleModule("CtapAuthenticatorCBORModule") {
     init {
         this.addSerializer(U2FKeyEnvelope::class.java, U2FKeyEnvelopeSerializer())
 

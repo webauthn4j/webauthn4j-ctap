@@ -5,7 +5,7 @@ import com.webauthn4j.ctap.core.converter.jackson.deserializer.*
 import com.webauthn4j.ctap.core.converter.jackson.serializer.*
 import com.webauthn4j.ctap.core.data.*
 
-class CtapCBORModule : SimpleModule("WebAuthnCBORModule") {
+class CtapCBORModule : SimpleModule("CtapCBORModule") {
     init {
         this.addSerializer(
             AuthenticatorClientPINRequest::class.java,
