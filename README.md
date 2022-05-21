@@ -1,8 +1,5 @@
 # WebAuthn4J CTAP
 
-![Home screen](docs/images/home.png)
-![Registration screen](./docs/images/registration.png)
-
 [![Actions Status](https://github.com/webauthn4j/webauthn4j-ctap/workflows/CI/badge.svg)](https://github.com/webauthn4j/webauthn4j-ctap/actions)
 
 WebAuthn4J CTAP is a pure Kotlin library implementing FIDO CTAP2
@@ -33,6 +30,14 @@ git clone https://github.com/webauthn4j/webauthn4j-ctap
 
 WebAuthn4J CTAP is Open Source software released under the
 [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0.html).
+
+## Sample App
+
+WebAuthn4J UnifidoKey is an Android app which act as a WebAuthn security key.
+
+![Home screen](docs/images/home.png)
+![Registration screen](./docs/images/registration.png)
+
 
 ## Contributing
 
