@@ -112,7 +112,15 @@ repositories {
 }
 
 // To use dependencies block in this parent file, apply plugins in this file first
-project(':webauthn4j-ctap') {
+project(':webauthn4j-ctap-core') {
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+    apply plugin: 'jacoco'
+}
+project(':webauthn4j-ctap-authenticator') {
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+    apply plugin: 'jacoco'
+}
+project(':webauthn4j-ctap-client') {
     apply plugin: 'org.jetbrains.kotlin.jvm'
     apply plugin: 'jacoco'
 }

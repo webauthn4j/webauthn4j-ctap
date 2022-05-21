@@ -110,7 +110,7 @@ dependencies {
 
     // Project dependencies
     implementation project(':unifidokey-core')
-    implementation project(':webauthn4j-ctap')
+    implementation project(':webauthn4j-ctap-authenticator')
 
     // Third Party dependencies
     implementation 'com.github.tony19:logback-android'

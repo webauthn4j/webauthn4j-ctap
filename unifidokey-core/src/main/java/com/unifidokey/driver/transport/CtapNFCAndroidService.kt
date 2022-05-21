@@ -7,7 +7,7 @@ import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.core.service.NFCService
 import com.unifidokey.core.service.NFCStatus
-import com.webauthn4j.ctap.authenticator.exception.APDUProcessingException
+import com.webauthn4j.ctap.core.exception.APDUProcessingException
 import com.webauthn4j.ctap.authenticator.transport.nfc.NFCConnector
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU

@@ -39,7 +39,7 @@ dependencies {
 
     // project dependencies
     implementation 'com.github.webauthn4j.webauthn4j:webauthn4j-core'
-    implementation project(':webauthn4j-ctap')
+    implementation project(':webauthn4j-ctap-authenticator')
 
     // Third Party dependencies
     implementation 'org.slf4j:slf4j-api'
