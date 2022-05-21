@@ -1,75 +1,37 @@
-# WebAuthn4J UnifidoKey
+# WebAuthn4J CTAP
 
 ![Home screen](docs/images/home.png)
 ![Registration screen](./docs/images/registration.png)
 
-[![Actions Status](https://github.com/webauthn4j/UnifidoKey/workflows/CI/badge.svg)](https://github.com/webauthn4j/unifidokey/actions)
+[![Actions Status](https://github.com/webauthn4j/webauthn4j-ctap/workflows/CI/badge.svg)](https://github.com/webauthn4j/webauthn4j-ctap/actions)
 
-WebAuthn4J UnifidoKey is an Android app which act as a WebAuthn security key. No longer need to buy
-an expensive physical security key and carry it everyday. Just install the UnifidoKey app to your
-smartphone, and enjoy secure and convenient authentication.
-
-## Install
-
-Install from Google Play Store.
-
-## Documentation
-
-* [User Guide(en)](https://docs.unifidokey.com/en)
-* [User Guide(ja)](https://docs.unifidokey.com/ja)
+WebAuthn4J CTAP is a pure Kotlin library implementing FIDO CTAP2
 
 ## Build from source
 
-UnifidoKey has two product-flavors:
+WebAuthn4J uses a Gradle based build system.
+In the instructions below, `gradlew` is invoked from the root of the source tree and serves as a cross-platform,
+self-contained bootstrap mechanism for the build.
 
-* OSS flavor
-    * OSS developers can build without friction
-* Play Store flavor
-    * OSS flavor + Firebase crashlytics + App signing
+### Prerequisites
 
-### product-flavor: OSS
+- Java8 or later
 
-Build OSS flavor Apk for local debug
-
-```
-./gradlew assembleOssRelease
-```
-
-### product-flavor: Play Store
-
-Build Play store flavor App Bundle
-
-place unifidokey-upload-key.jks which contains upload key
+### Checkout sources
 
 ```
-cp <somewhere>/unifidokey-upload-key.jks ./unifidokey-upload-key.jks
+git clone https://github.com/webauthn4j/webauthn4j-ctap
 ```
 
-export following environment variables:
+### Build all jars
 
 ```
-export KEYSTORE_PASS : ${{ secrets.KEYSTORE_PASS  }}
-export KEY_ALIAS : ${{ secrets.KEY_ALIAS  }}
-export KEY_PASS : ${{ secrets.KEY_PASS  }}
-```
-
-or you may specify them in `<project root>/secret.properties` file
-
-```
-unifidokey.keystorePass=<value>
-unifidokey.keyPass=<value>
-unifidokey.keyAlias=<value>
-```
-
-Build App Bundle
-
-```
-./gradlew bundlePlaystoreRelease
+./gradlew build
 ```
 
 ## License
 
-WebAuthn4J UnifidoKey is Open Source software released under the
+WebAuthn4J CTAP is Open Source software released under the
 [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0.html).
 
 ## Contributing
