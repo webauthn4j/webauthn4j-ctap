@@ -67,7 +67,7 @@ buildscript {
 
     // Tools
     ext.asciidoctorGradleVersion = "3.3.2"
-    ext.sonarqubeVersion = "3.3"
+    ext.sonarqubeVersion = "3.4.0.2513"
 
     repositories {
         google()
