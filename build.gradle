@@ -33,7 +33,7 @@ buildscript {
     ext.preferenceVersion = "1.2.0"
     ext.lifecycleExtensions = "2.2.0"
     ext.navigationVersion = "2.4.2"
-    ext.lifecycleKtxVersion = "2.4.1"
+    ext.lifecycleKtxVersion = "2.5.0"
     ext.materialVersion = "1.6.1"
     ext.googleServicesVersion = "4.3.10"
     ext.firebaseBomVersion = "30.1.0"
