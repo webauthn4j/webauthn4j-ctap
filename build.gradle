@@ -50,7 +50,7 @@ buildscript {
     ext.webauthn4jVersion = "unifidokey-dev-SNAPSHOT"
 
     // Third party libraries
-    ext.slf4jVersion = "1.7.36"
+    ext.slf4jVersion = "2.0.0"
     ext.logbackAndroidVersion = "2.0.0"
     ext.bouncyCastleVersion = "1.70"
     ext.jacksonVersion = "2.13.3"
