@@ -21,7 +21,7 @@ buildscript {
     ext.kotlinCoroutinesVersion = '1.6.4'
     ext.coreKtxVersion = "1.8.0"
 
-    ext.daggerVersion = "2.44"
+    ext.daggerVersion = "2.44.2"
     ext.roomVersion = "2.4.3"
 
     // Android libraries
