@@ -51,7 +51,7 @@ buildscript {
 
     // Third party libraries
     ext.slf4jVersion = "2.0.3"
-    ext.logbackAndroidVersion = "2.0.0"
+    ext.logbackAndroidVersion = "2.0.1"
     ext.bouncyCastleVersion = "1.72"
     ext.jacksonVersion = "2.13.4"
 
