@@ -32,7 +32,7 @@ buildscript {
     ext.legacySupportV4Version = "1.0.0"
     ext.preferenceVersion = "1.2.0"
     ext.lifecycleExtensions = "2.2.0"
-    ext.navigationVersion = "2.5.2"
+    ext.navigationVersion = "2.5.3"
     ext.lifecycleKtxVersion = "2.5.1"
     ext.materialVersion = "1.6.1"
     ext.googleServicesVersion = "4.3.14"
