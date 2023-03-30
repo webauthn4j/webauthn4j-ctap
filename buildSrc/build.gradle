@@ -2,7 +2,7 @@ buildscript {
 
     ext.guavaVersion = "31.0.1-jre"
     ext.googleAuthLibraryOauth2HttpVersion = "1.1.0"
-    ext.googleApiServicesAndroidPublisherVersion = "v3-rev20210901-1.32.1"
+    ext.googleApiServicesAndroidPublisherVersion = "v3-rev20230327-2.0.0"
 
 }
 
