@@ -25,7 +25,7 @@ buildscript {
     ext.roomVersion = "2.5.2"
 
     // Android libraries
-    ext.asmVersion = "9.5"
+    ext.asmVersion = "9.6"
     ext.appcompatVersion = "1.6.1"
     ext.constraintlayoutVersion = "2.1.4"
     ext.biometricVersion = "1.1.0"
