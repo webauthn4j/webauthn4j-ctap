@@ -40,7 +40,7 @@ buildscript {
     ext.googlePlayServicesAuthVersion = "20.4.1"
     ext.googlePlayServicesFidoVersion = "20.1.0"
     ext.googlePlayServicesSafetyNetVersion = "18.0.1"
-    ext.googlePlayServicesOSSLicensesVersion = "17.0.0"
+    ext.googlePlayServicesOSSLicensesVersion = "17.0.1"
     ext.androidGradlePluginVersion = '7.4.2'
     ext.navigationSafeArgsGradlePluginVersion = "2.5.2"
     ext.ossLicensesPluginVersion = "0.10.6"
