@@ -3,10 +3,10 @@ apply plugin: 'org.jetbrains.kotlin.jvm'
 description = 'CTAP core library'
 
 compileKotlin {
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_11
 }
 compileTestKotlin {
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_11
 }
 
 test {
