@@ -44,7 +44,7 @@ buildscript {
     ext.googlePlayServicesOSSLicensesVersion = "17.0.0"
     ext.androidGradlePluginVersion = '7.4.2'
     ext.navigationSafeArgsGradlePluginVersion = "2.5.2"
-    ext.ossLicensesPluginVersion = "0.10.4"
+    ext.ossLicensesPluginVersion = "0.10.6"
 
     // WebAuthn4J
     ext.webauthn4jVersion = "unifidokey-dev-SNAPSHOT"
