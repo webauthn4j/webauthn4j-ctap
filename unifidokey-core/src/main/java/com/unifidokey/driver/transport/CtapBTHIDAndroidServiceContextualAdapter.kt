@@ -1,5 +1,6 @@
 package com.unifidokey.driver.transport
 
+import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothClass.Device
 import android.bluetooth.BluetoothDevice
@@ -9,6 +10,7 @@ import android.content.*
 import android.content.pm.PackageManager
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -101,6 +103,9 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
 
     override val isBTHIDAdapterAvailable: Boolean
         get() {
+            if(ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED){
+                return false
+            }
             if (packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
                 return bluetoothAdapter != null
             }

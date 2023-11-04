@@ -1,5 +1,6 @@
 package com.unifidokey.driver.transport
 
+import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -7,6 +8,7 @@ import android.content.*
 import android.content.pm.PackageManager
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.unifidokey.core.adapter.CtapBLEAdapter
@@ -36,6 +38,9 @@ class CtapBLEAndroidServiceContextualAdapter(private val context: Context) : Cta
 
     override val isBLEAdapterAvailable: Boolean
         get() {
+            if(ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED){
+                return false
+            }
             if (!packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
                 return false
             }

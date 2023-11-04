@@ -19,7 +19,7 @@ class UnifidoKeyHandHeldNotificationController : UnifidoKeyNotificationControlle
         val notificationChannel = createOrGetNotificationChannel(context)
         val contentIntent = Intent(context, MainActivity::class.java)
         val pendingContentIntent: PendingIntent =
-            PendingIntent.getActivity(context, 0, contentIntent, 0)
+            PendingIntent.getActivity(context, 0, contentIntent, PendingIntent.FLAG_IMMUTABLE)
         val turnoffActionIntent =
             Intent(context, NotificationEventBroadcastReceiver::class.java).apply {
                 action =
