@@ -26,7 +26,7 @@ buildscript {
 
     // Android libraries
     ext.asmVersion = "9.5"
-    ext.appcompatVersion = "1.4.2"
+    ext.appcompatVersion = "1.6.1"
     ext.constraintlayoutVersion = "2.1.4"
     ext.biometricVersion = "1.1.0"
     ext.legacySupportV4Version = "1.0.0"
