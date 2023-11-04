@@ -19,7 +19,7 @@ buildscript {
     //kotlin
     ext.kotlinVersion = '1.8.20'
     ext.kotlinCoroutinesVersion = '1.6.4'
-    ext.coreKtxVersion = "1.8.0"
+    ext.coreKtxVersion = "1.10.1"
 
     ext.daggerVersion = "2.48.1"
     ext.roomVersion = "2.4.3"
