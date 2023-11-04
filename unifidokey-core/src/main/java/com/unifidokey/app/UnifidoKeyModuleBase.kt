@@ -177,7 +177,7 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
         cborMapper.registerModule(CtapCBORModule())
         cborMapper.registerModule(PublicKeyCredentialSourceCBORModule())
         cborMapper.registerModule(JavaTimeModule())
-        cborMapper.registerModule(KotlinModule())
+        cborMapper.registerModule(KotlinModule.Builder().build())
         return ObjectConverter(jsonMapper, cborMapper)
     }
 

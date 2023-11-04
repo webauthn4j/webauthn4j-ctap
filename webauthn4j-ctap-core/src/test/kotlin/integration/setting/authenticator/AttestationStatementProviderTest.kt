@@ -9,7 +9,7 @@ import com.webauthn4j.data.attestation.statement.NoneAttestationStatement
 import com.webauthn4j.data.attestation.statement.PackedAttestationStatement
 import com.webauthn4j.test.TestAttestationUtil
 import integration.usecase.testcase.PasswordlessTestCase
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import java.util.concurrent.ExecutionException
@@ -21,7 +21,7 @@ class AttestationStatementProviderTest {
 
     @Test
     @Throws(ExecutionException::class, InterruptedException::class)
-    fun attestationStatementGenerator_packed_test() = runBlockingTest {
+    fun attestationStatementGenerator_packed_test() = runTest {
         passwordlessTestCase.authenticator.attestationStatementGenerator =
             PackedBasicAttestationStatementProvider.createWithDemoAttestationKey()
         passwordlessTestCase.step1_createCredential()
@@ -34,7 +34,7 @@ class AttestationStatementProviderTest {
 
     @Test
     @Throws(ExecutionException::class, InterruptedException::class)
-    fun attestationStatementGenerator_fido_u2f_test() = runBlockingTest {
+    fun attestationStatementGenerator_fido_u2f_test() = runTest {
         val privateKey = TestAttestationUtil.load2tierTestAuthenticatorAttestationPrivateKey()
         val attestationCertificate =
             TestAttestationUtil.load2tierTestAuthenticatorAttestationCertificate()
@@ -51,7 +51,7 @@ class AttestationStatementProviderTest {
 
     @Test
     @Throws(ExecutionException::class, InterruptedException::class)
-    fun attestationStatementGenerator_none_test() = runBlockingTest {
+    fun attestationStatementGenerator_none_test() = runTest {
         passwordlessTestCase.authenticator.attestationStatementGenerator =
             NoneAttestationStatementProvider()
         passwordlessTestCase.authenticator.aaguid = AAGUID.ZERO

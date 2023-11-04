@@ -11,7 +11,7 @@ import com.webauthn4j.data.extension.client.AuthenticationExtensionClientOutput
 import com.webauthn4j.data.extension.client.RegistrationExtensionClientOutput
 import com.webauthn4j.validator.exception.BadSignatureException
 import integration.usecase.testcase.PasswordlessTestCase
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -23,7 +23,7 @@ class CredentialSelectorSettingTest {
     @Nested
     inner class credentialSelector_authenticator {
         @Test
-        fun correct_selection_test() = runBlockingTest {
+        fun correct_selection_test() = runTest {
             var publicKeyCredential: PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput>? =
                 null
 
@@ -43,7 +43,7 @@ class CredentialSelectorSettingTest {
         }
 
         @Test
-        fun incorrect_selection_test() = runBlockingTest {
+        fun incorrect_selection_test() = runTest {
             var publicKeyCredential: PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput>? =
                 null
 
@@ -61,9 +61,7 @@ class CredentialSelectorSettingTest {
             passwordlessTestCase.step2_validateCredentialForRegistration()
             passwordlessTestCase.step3_getCredential()
             Assertions.assertThatThrownBy {
-                runBlockingTest {
-                    passwordlessTestCase.step4_validateCredentialForAuthentication()
-                }
+                passwordlessTestCase.step4_validateCredentialForAuthentication()
             }.isInstanceOf(BadSignatureException::class.java)
                 .hasMessageContaining("Assertion signature is not valid.")
         }
@@ -74,7 +72,7 @@ class CredentialSelectorSettingTest {
     inner class credentialSelector_client_platform {
 
         @Test
-        fun correct_selection_test() = runBlockingTest {
+        fun correct_selection_test() = runTest {
 
             var publicKeyCredential: PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput>? =
                 null
@@ -97,7 +95,7 @@ class CredentialSelectorSettingTest {
         }
 
         @Test
-        fun incorrect_selection_test() = runBlockingTest {
+        fun incorrect_selection_test() = runTest {
             var publicKeyCredential: PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput>? =
                 null
 
@@ -116,9 +114,7 @@ class CredentialSelectorSettingTest {
             passwordlessTestCase.step2_validateCredentialForRegistration()
             passwordlessTestCase.step3_getCredential()
             Assertions.assertThatThrownBy {
-                runBlockingTest {
-                    passwordlessTestCase.step4_validateCredentialForAuthentication()
-                }
+                passwordlessTestCase.step4_validateCredentialForAuthentication()
             }.isInstanceOf(BadSignatureException::class.java)
                 .hasMessageContaining("Assertion signature is not valid.")
         }

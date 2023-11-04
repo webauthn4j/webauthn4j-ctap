@@ -8,7 +8,16 @@ import com.unifidokey.core.config.BTHIDDeviceHistoryEntry
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.core.setting.KeepScreenOnSetting
 import com.unifidokey.core.setting.KeyStorageSetting
-import com.webauthn4j.ctap.authenticator.data.settings.*
+import com.webauthn4j.ctap.authenticator.data.settings.AttestationStatementFormatSetting
+import com.webauthn4j.ctap.authenticator.data.settings.AttestationTypeSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ConsentCachingSetting
+import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
+import com.webauthn4j.ctap.authenticator.data.settings.PlatformSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ResetProtectionSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import org.slf4j.LoggerFactory

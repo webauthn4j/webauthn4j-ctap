@@ -5,9 +5,14 @@ import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
 import com.webauthn4j.ctap.authenticator.exception.StoreFullException
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
-import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialRequest
+import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialResponse
+import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
+import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
+import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.ctap.core.data.CtapStatusCode.Companion.CTAP2_ERR_OPERATION_DENIED
 import com.webauthn4j.ctap.core.data.CtapStatusCode.Companion.CTAP2_ERR_UNSUPPORTED_ALGORITHM
+import com.webauthn4j.ctap.core.data.PinProtocolVersion
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialParameters
 import com.webauthn4j.data.PublicKeyCredentialType
@@ -15,7 +20,7 @@ import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
 import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenticatorInput
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -29,7 +34,7 @@ internal class MakeCredentialExecutionTest {
     private val ctapAuthenticator = CtapAuthenticator()
 
     @Test
-    fun test() = runBlockingTest {
+    fun test() = runTest {
         val clientDataHash = ByteArray(0)
         val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
         val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
@@ -64,7 +69,7 @@ internal class MakeCredentialExecutionTest {
     }
 
     @Test
-    fun store_full_test() = runBlockingTest {
+    fun store_full_test() = runTest {
         val authenticatorPropertyStore = spy<InMemoryAuthenticatorPropertyStore> {
             onGeneric {
                 createUserCredentialKey(
@@ -118,7 +123,7 @@ internal class MakeCredentialExecutionTest {
         residentKeySetting: ResidentKeySetting,
         statusCode: CtapStatusCode,
         createdResidentKeyCount: Int
-    ) = runBlockingTest {
+    ) = runTest {
         val clientDataHash = ByteArray(0)
         val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
         val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
@@ -171,7 +176,7 @@ internal class MakeCredentialExecutionTest {
         residentKeySetting: ResidentKeySetting,
         statusCode: CtapStatusCode,
         createdResidentKeyCount: Int
-    ) = runBlockingTest {
+    ) = runTest {
         val clientDataHash = ByteArray(0)
         val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
         val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
@@ -225,7 +230,7 @@ internal class MakeCredentialExecutionTest {
         uv: Boolean,
         userVerificationSetting: UserVerificationSetting,
         statusCode: CtapStatusCode
-    ) = runBlockingTest {
+    ) = runTest {
         val clientDataHash = ByteArray(0)
         val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
         val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
@@ -269,7 +274,7 @@ internal class MakeCredentialExecutionTest {
         ]
     )
     fun userPresence_test(userPresenceSetting: UserPresenceSetting, statusCode: CtapStatusCode) =
-        runBlockingTest {
+        runTest {
             val clientDataHash = ByteArray(0)
             val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
             val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
@@ -306,7 +311,7 @@ internal class MakeCredentialExecutionTest {
         }
 
     @Test
-    fun userConsent_false_test() = runBlockingTest {
+    fun userConsent_false_test() = runTest {
         val clientDataHash = ByteArray(0)
         val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
         val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
@@ -349,7 +354,7 @@ internal class MakeCredentialExecutionTest {
     }
 
     @Test
-    fun unsupported_alg_test() = runBlockingTest {
+    fun unsupported_alg_test() = runTest {
         val clientDataHash = ByteArray(0)
         val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
         val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")

@@ -1,8 +1,13 @@
 package com.webauthn4j.ctap.authenticator
 
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.data.credential.*
-import com.webauthn4j.ctap.authenticator.store.*
+import com.webauthn4j.ctap.authenticator.data.credential.CredentialKey
+import com.webauthn4j.ctap.authenticator.data.credential.NonResidentCredentialKey
+import com.webauthn4j.ctap.authenticator.data.credential.NonResidentUserCredential
+import com.webauthn4j.ctap.authenticator.data.credential.NonResidentUserCredentialSource
+import com.webauthn4j.ctap.authenticator.data.credential.ResidentCredentialKey
+import com.webauthn4j.ctap.authenticator.data.credential.ResidentUserCredential
+import com.webauthn4j.ctap.authenticator.data.credential.UserCredential
 import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import java.io.Serializable
 import java.time.Instant

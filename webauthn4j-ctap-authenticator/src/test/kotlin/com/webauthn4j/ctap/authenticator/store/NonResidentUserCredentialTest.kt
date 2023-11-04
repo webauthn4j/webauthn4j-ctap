@@ -27,7 +27,7 @@ internal class NonResidentUserCredentialTest {
         val cborMapper = ObjectMapper(CBORFactory())
         cborMapper.registerModule(JavaTimeModule())
         cborMapper.registerModule(PublicKeyCredentialSourceCBORModule())
-        cborMapper.registerModule(KotlinModule())
+        cborMapper.registerModule(KotlinModule.Builder().build())
         cborConverter = ObjectConverter(jsonMapper, cborMapper).cborConverter
     }
 

@@ -4,7 +4,8 @@ import com.webauthn4j.ctap.core.data.ble.BLEContinuationFrameFragment
 import com.webauthn4j.ctap.core.data.ble.BLEFrame
 import com.webauthn4j.ctap.core.data.ble.BLEInitializationFrameFragment
 import java.nio.ByteBuffer
-import java.util.*
+import java.util.LinkedList
+import java.util.Queue
 import java.util.function.Consumer
 
 internal class BLEFrameBuilder {

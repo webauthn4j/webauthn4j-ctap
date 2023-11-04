@@ -3,7 +3,7 @@ package integration.setting.authenticator
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import integration.usecase.testcase.PasswordlessTestCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.util.*
@@ -16,7 +16,7 @@ class AAGUIDTest {
     @ExperimentalCoroutinesApi
     @Test
     @Throws(ExecutionException::class, InterruptedException::class)
-    fun aaguid_custom_test() = runBlockingTest {
+    fun aaguid_custom_test() = runTest {
         val aaguid = AAGUID(UUID.randomUUID())
         passwordlessTestCase.authenticator.aaguid = aaguid
         passwordlessTestCase.step1_createCredential()

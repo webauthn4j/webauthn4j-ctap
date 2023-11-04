@@ -1,7 +1,14 @@
 package integration.usecase.testcase
 
 import com.webauthn4j.authenticator.AuthenticatorImpl
-import com.webauthn4j.data.*
+import com.webauthn4j.data.AuthenticationParameters
+import com.webauthn4j.data.AuthenticationRequest
+import com.webauthn4j.data.AuthenticatorTransport
+import com.webauthn4j.data.PublicKeyCredentialDescriptor
+import com.webauthn4j.data.PublicKeyCredentialType
+import com.webauthn4j.data.RegistrationParameters
+import com.webauthn4j.data.RegistrationRequest
+import com.webauthn4j.data.UserVerificationRequirement
 import org.junit.jupiter.api.fail
 
 class SecondFactorTestCase : IntegrationTestCaseBase() {

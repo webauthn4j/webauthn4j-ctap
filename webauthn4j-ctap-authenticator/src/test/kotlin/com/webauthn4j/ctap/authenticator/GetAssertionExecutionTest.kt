@@ -5,7 +5,13 @@ import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
 import com.webauthn4j.ctap.authenticator.exception.StoreFullException
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
-import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionRequest
+import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionResponse
+import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialRequest
+import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
+import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
+import com.webauthn4j.ctap.core.data.CtapStatusCode
+import com.webauthn4j.ctap.core.data.PinProtocolVersion
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialParameters
 import com.webauthn4j.data.PublicKeyCredentialType
@@ -14,7 +20,7 @@ import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthen
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
 import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenticatorInput
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -37,7 +43,7 @@ internal class GetAssertionExecutionTest {
     }
 
     @Test
-    fun getAssertion_test() = runBlockingTest {
+    fun getAssertion_test() = runTest {
         val ctapAuthenticator = CtapAuthenticator()
         makeCredential(ctapAuthenticator)
 
@@ -63,7 +69,7 @@ internal class GetAssertionExecutionTest {
     }
 
     @Test
-    fun userConsent_false_test() = runBlockingTest {
+    fun userConsent_false_test() = runTest {
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.userConsentHandler = object : UserConsentHandler {
             override suspend fun consentMakeCredential(options: MakeCredentialConsentOptions): Boolean =
@@ -95,7 +101,7 @@ internal class GetAssertionExecutionTest {
     }
 
     @Test
-    fun no_credentials_test() = runBlockingTest {
+    fun no_credentials_test() = runTest {
         val ctapAuthenticator = CtapAuthenticator()
 
         val clientDataHash = ByteArray(0)
@@ -119,7 +125,7 @@ internal class GetAssertionExecutionTest {
     }
 
     @Test
-    fun options_null_test() = runBlockingTest {
+    fun options_null_test() = runTest {
         val ctapAuthenticator = CtapAuthenticator()
         makeCredential(ctapAuthenticator)
 
@@ -144,7 +150,7 @@ internal class GetAssertionExecutionTest {
     }
 
     @Test
-    fun store_full_test() = runBlockingTest {
+    fun store_full_test() = runTest {
         var isFull = false
         val authenticatorPropertyStoreSpy =
             object : InMemoryAuthenticatorPropertyStore() {
@@ -194,7 +200,7 @@ internal class GetAssertionExecutionTest {
         up: Boolean,
         userPresenceSetting: UserPresenceSetting,
         statusCode: CtapStatusCode
-    ) = runBlockingTest {
+    ) = runTest {
         var ctapAuthenticator = CtapAuthenticator()
         makeCredential(ctapAuthenticator)
         ctapAuthenticator = CtapAuthenticator(
@@ -242,7 +248,7 @@ internal class GetAssertionExecutionTest {
         uv: Boolean,
         userVerificationSetting: UserVerificationSetting,
         statusCode: CtapStatusCode
-    ) = runBlockingTest {
+    ) = runTest {
         val ctapAuthenticator =
             CtapAuthenticator(settings = CtapAuthenticatorSettings(userVerification = userVerificationSetting))
         makeCredential(ctapAuthenticator, uv = false)

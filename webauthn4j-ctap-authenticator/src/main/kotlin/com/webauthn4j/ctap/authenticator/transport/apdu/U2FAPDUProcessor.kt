@@ -3,7 +3,11 @@ package com.webauthn4j.ctap.authenticator.transport.apdu
 import com.webauthn4j.ctap.authenticator.TransactionManager
 import com.webauthn4j.ctap.authenticator.exception.U2FCommandExecutionException
 import com.webauthn4j.ctap.authenticator.transport.nfc.NFCConnector
-import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.ctap.core.data.U2FAuthenticationRequest
+import com.webauthn4j.ctap.core.data.U2FAuthenticationResponse
+import com.webauthn4j.ctap.core.data.U2FRegistrationRequest
+import com.webauthn4j.ctap.core.data.U2FRegistrationResponse
+import com.webauthn4j.ctap.core.data.U2FStatusCode
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import org.slf4j.LoggerFactory

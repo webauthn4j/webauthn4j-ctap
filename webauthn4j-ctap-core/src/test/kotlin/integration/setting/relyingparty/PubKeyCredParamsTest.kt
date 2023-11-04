@@ -5,7 +5,7 @@ import com.webauthn4j.data.PublicKeyCredentialParameters
 import com.webauthn4j.data.PublicKeyCredentialType
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import integration.usecase.testcase.PasswordlessTestCase
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -23,7 +23,7 @@ class PubKeyCredParamsTest {
             )
         )
         Assertions.assertThatThrownBy {
-            runBlockingTest {
+            runTest {
                 passwordlessTestCase.run()
             }
         }.isInstanceOf(CtapErrorException::class.java)

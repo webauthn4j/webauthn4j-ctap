@@ -7,7 +7,7 @@ import com.webauthn4j.ctap.client.exception.CtapErrorException
 import com.webauthn4j.data.*
 import com.webauthn4j.data.extension.client.RegistrationExtensionClientOutput
 import integration.usecase.testcase.PasswordlessTestCase
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
@@ -18,7 +18,7 @@ class ExcludeCredentialsTest {
     @Test
     fun excludeCredentials_test() {
         assertThatThrownBy {
-            runBlockingTest {
+            runTest {
                 var result: PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput>? =
                     null
                 passwordlessTestCase.authenticator.credentialSelectorSetting =
@@ -44,7 +44,7 @@ class ExcludeCredentialsTest {
     }
 
     @Test
-    fun excludeCredentials_other_authenticator_test() = runBlockingTest {
+    fun excludeCredentials_other_authenticator_test() = runTest {
         var result: PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput>? =
             null
         passwordlessTestCase.authenticator.credentialSelectorSetting =

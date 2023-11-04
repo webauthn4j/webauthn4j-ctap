@@ -2,15 +2,26 @@ package com.unifidokey.driver.persistence.dao
 
 import android.security.keystore.KeyProperties
 import com.webauthn4j.data.SignatureAlgorithm
-import com.webauthn4j.data.SignatureAlgorithm.*
+import com.webauthn4j.data.SignatureAlgorithm.ES256
+import com.webauthn4j.data.SignatureAlgorithm.ES384
+import com.webauthn4j.data.SignatureAlgorithm.ES512
+import com.webauthn4j.data.SignatureAlgorithm.RS1
+import com.webauthn4j.data.SignatureAlgorithm.RS256
+import com.webauthn4j.data.SignatureAlgorithm.RS384
+import com.webauthn4j.data.SignatureAlgorithm.RS512
 import com.webauthn4j.data.attestation.statement.AttestationCertificatePath
 import com.webauthn4j.util.exception.UnexpectedCheckedException
-import java.security.*
+import java.security.KeyPair
+import java.security.KeyStore
+import java.security.KeyStoreException
+import java.security.NoSuchAlgorithmException
+import java.security.PrivateKey
+import java.security.UnrecoverableEntryException
 import java.security.cert.Certificate
 import java.security.cert.X509Certificate
 import java.security.spec.AlgorithmParameterSpec
 import java.security.spec.ECGenParameterSpec
-import java.util.*
+import java.util.Arrays
 import java.util.stream.Collectors
 import javax.crypto.SecretKey
 

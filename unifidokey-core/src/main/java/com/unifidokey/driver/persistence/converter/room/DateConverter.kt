@@ -1,7 +1,7 @@
 package com.unifidokey.driver.persistence.converter.room
 
 import androidx.room.TypeConverter
-import java.util.*
+import java.util.Date
 
 class DateConverter {
     @TypeConverter

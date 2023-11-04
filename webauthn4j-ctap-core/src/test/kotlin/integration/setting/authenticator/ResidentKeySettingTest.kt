@@ -3,7 +3,7 @@ package integration.setting.authenticator
 import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
 import com.webauthn4j.ctap.client.exception.WebAuthnClientException
 import integration.usecase.testcase.PasswordlessTestCase
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
@@ -13,13 +13,13 @@ class ResidentKeySettingTest {
     private val passwordlessTestCase = PasswordlessTestCase()
 
     @Test
-    fun residentKey_always_test() = runBlockingTest {
+    fun residentKey_always_test() = runTest {
         passwordlessTestCase.authenticator.residentKeySetting = ResidentKeySetting.ALWAYS
         passwordlessTestCase.run()
     }
 
     @Test
-    fun residentKey_if_required_test() = runBlockingTest {
+    fun residentKey_if_required_test() = runTest {
         passwordlessTestCase.authenticator.residentKeySetting = ResidentKeySetting.IF_REQUIRED
         passwordlessTestCase.run()
     }
@@ -28,7 +28,7 @@ class ResidentKeySettingTest {
     fun residentKey_never_test() {
         passwordlessTestCase.authenticator.residentKeySetting = ResidentKeySetting.NEVER
         assertThatThrownBy {
-            runBlockingTest {
+            runTest {
                 passwordlessTestCase.run()
             }
         }.isInstanceOf(WebAuthnClientException::class.java)

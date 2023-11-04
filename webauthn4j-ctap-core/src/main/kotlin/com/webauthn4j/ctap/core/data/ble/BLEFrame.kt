@@ -1,7 +1,7 @@
 package com.webauthn4j.ctap.core.data.ble
 
 import com.webauthn4j.util.ArrayUtil
-import java.util.*
+import java.util.Arrays
 import kotlin.math.min
 
 class BLEFrame @JvmOverloads constructor(val cmd: BLEFrameCommand, data: ByteArray? = null) {

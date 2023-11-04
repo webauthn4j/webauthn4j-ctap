@@ -4,7 +4,7 @@ package integration.setting.relyingparty
 
 import com.webauthn4j.validator.exception.BadRpIdException
 import integration.usecase.testcase.PasswordlessTestCase
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -24,13 +24,13 @@ class RpIdTest {
         }
 
         @Test
-        fun frontend_rpId_null_test() = runBlockingTest {
+        fun frontend_rpId_null_test() = runTest {
             passwordlessTestCase.relyingParty.registration.frontend.rpId = null
             passwordlessTestCase.run()
         }
 
         @Test
-        fun frontend_backend_rpId_match_test() = runBlockingTest {
+        fun frontend_backend_rpId_match_test() = runTest {
             passwordlessTestCase.relyingParty.registration.backend.rpId = "example.com"
             passwordlessTestCase.run()
         }
@@ -39,7 +39,7 @@ class RpIdTest {
         fun frontend_backend_rpId_mismatch_test() {
             passwordlessTestCase.relyingParty.registration.backend.rpId = "bad-rp-id.example.com"
             Assertions.assertThatThrownBy {
-                runBlockingTest {
+                runTest {
                     passwordlessTestCase.run()
                 }
             }.isInstanceOf(BadRpIdException::class.java)
@@ -56,13 +56,13 @@ class RpIdTest {
         }
 
         @Test
-        fun frontend_rpId_null_test() = runBlockingTest {
+        fun frontend_rpId_null_test() = runTest {
             passwordlessTestCase.relyingParty.authentication.frontend.rpId = null
             passwordlessTestCase.run()
         }
 
         @Test
-        fun frontend_backend_rpId_match_test() = runBlockingTest {
+        fun frontend_backend_rpId_match_test() = runTest {
             passwordlessTestCase.relyingParty.authentication.backend.rpId = "example.com"
             passwordlessTestCase.run()
         }
@@ -71,7 +71,7 @@ class RpIdTest {
         fun frontend_backend_rpId_mismatch_test() {
             passwordlessTestCase.relyingParty.authentication.backend.rpId = "bad-rp-id.example.com"
             Assertions.assertThatThrownBy {
-                runBlockingTest {
+                runTest {
                     passwordlessTestCase.run()
                 }
             }.isInstanceOf(BadRpIdException::class.java)
@@ -85,7 +85,7 @@ class RpIdTest {
             passwordlessTestCase.relyingParty.authentication.backend.rpId =
                 "authentication.example.com"
             Assertions.assertThatThrownBy {
-                runBlockingTest {
+                runTest {
                     passwordlessTestCase.run()
                 }
             }.isInstanceOf(BadRpIdException::class.java)

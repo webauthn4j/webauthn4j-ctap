@@ -6,7 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.unifidokey.driver.persistence.UnifidoKeyDatabase.Companion.DB_VERSION_2
-import com.unifidokey.driver.persistence.converter.room.*
+import com.unifidokey.driver.persistence.converter.room.ByteArrayConverter
+import com.unifidokey.driver.persistence.converter.room.DateConverter
+import com.unifidokey.driver.persistence.converter.room.EventTypeConverter
+import com.unifidokey.driver.persistence.converter.room.InstantConverter
+import com.unifidokey.driver.persistence.converter.room.KeyPairConverter
+import com.unifidokey.driver.persistence.converter.room.SignatureAlgorithmConverter
+import com.unifidokey.driver.persistence.converter.room.UUIDConverter
 import com.unifidokey.driver.persistence.dao.EventDao
 import com.unifidokey.driver.persistence.dao.RelyingPartyDao
 import com.unifidokey.driver.persistence.dao.UserCredentialDao

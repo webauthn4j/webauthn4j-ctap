@@ -7,7 +7,7 @@ import com.webauthn4j.data.attestation.authenticator.EC2COSEKey
 import com.webauthn4j.data.attestation.authenticator.RSACOSEKey
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import integration.usecase.testcase.PasswordlessTestCase
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -31,7 +31,7 @@ class AlgorithmsTest {
         }
 
         @Test
-        fun authenticator_supports_ES256_test() = runBlockingTest {
+        fun authenticator_supports_ES256_test() = runTest {
             passwordlessTestCase.authenticator.algorithms = setOf(COSEAlgorithmIdentifier.ES256)
             passwordlessTestCase.step1_createCredential()
             val registrationData = passwordlessTestCase.step2_validateCredentialForRegistration()
@@ -45,7 +45,7 @@ class AlgorithmsTest {
         fun authenticator_supports_RS256_test() {
             passwordlessTestCase.authenticator.algorithms = setOf(COSEAlgorithmIdentifier.RS256)
             Assertions.assertThatThrownBy {
-                runBlockingTest {
+                runTest {
                     passwordlessTestCase.run()
                 }
             }.isInstanceOf(CtapErrorException::class.java)
@@ -70,7 +70,7 @@ class AlgorithmsTest {
         fun authenticator_supports_ES256_test() {
             passwordlessTestCase.authenticator.algorithms = setOf(COSEAlgorithmIdentifier.ES256)
             Assertions.assertThatThrownBy {
-                runBlockingTest {
+                runTest {
                     passwordlessTestCase.run()
                 }
             }.isInstanceOf(CtapErrorException::class.java)
@@ -78,7 +78,7 @@ class AlgorithmsTest {
         }
 
         @Test
-        fun authenticator_supports_RS256_test() = runBlockingTest {
+        fun authenticator_supports_RS256_test() = runTest {
             passwordlessTestCase.authenticator.algorithms = setOf(COSEAlgorithmIdentifier.RS256)
             passwordlessTestCase.step1_createCredential()
             val registrationData = passwordlessTestCase.step2_validateCredentialForRegistration()
@@ -103,7 +103,7 @@ class AlgorithmsTest {
         }
 
         @Test
-        fun authenticator_supports_RS1_test() = runBlockingTest {
+        fun authenticator_supports_RS1_test() = runTest {
             passwordlessTestCase.authenticator.algorithms = setOf(COSEAlgorithmIdentifier.RS1)
             passwordlessTestCase.step1_createCredential()
             val registrationData = passwordlessTestCase.step2_validateCredentialForRegistration()

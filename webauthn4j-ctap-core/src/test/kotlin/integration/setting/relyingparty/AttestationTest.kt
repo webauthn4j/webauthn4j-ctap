@@ -6,7 +6,7 @@ import com.webauthn4j.data.attestation.statement.NoneAttestationStatement
 import com.webauthn4j.data.attestation.statement.PackedAttestationStatement
 import integration.usecase.testcase.PasswordlessTestCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -18,7 +18,7 @@ class AttestationTest {
 
 
     @Test
-    fun attestation_none_test() = runBlockingTest {
+    fun attestation_none_test() = runTest {
         passwordlessTestCase.relyingParty.registration.frontend.attestation =
             AttestationConveyancePreference.NONE
 
@@ -32,7 +32,7 @@ class AttestationTest {
 
     @Disabled
     @Test
-    fun attestation_indirect_test() = runBlockingTest {
+    fun attestation_indirect_test() = runTest {
         passwordlessTestCase.relyingParty.registration.frontend.attestation =
             AttestationConveyancePreference.INDIRECT
 
@@ -45,7 +45,7 @@ class AttestationTest {
     }
 
     @Test
-    fun attestation_direct_test() = runBlockingTest {
+    fun attestation_direct_test() = runTest {
         passwordlessTestCase.relyingParty.registration.frontend.attestation =
             AttestationConveyancePreference.DIRECT
 

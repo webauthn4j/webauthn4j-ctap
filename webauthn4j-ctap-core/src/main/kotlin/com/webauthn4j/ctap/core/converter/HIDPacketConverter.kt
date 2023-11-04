@@ -1,7 +1,11 @@
 package com.webauthn4j.ctap.core.converter
 
-import com.webauthn4j.ctap.core.data.hid.*
+import com.webauthn4j.ctap.core.data.hid.HIDChannelId
+import com.webauthn4j.ctap.core.data.hid.HIDCommand
 import com.webauthn4j.ctap.core.data.hid.HIDCommand.Companion.CMD_BIT
+import com.webauthn4j.ctap.core.data.hid.HIDContinuationPacket
+import com.webauthn4j.ctap.core.data.hid.HIDInitializationPacket
+import com.webauthn4j.ctap.core.data.hid.HIDPacket
 import java.nio.ByteBuffer
 import kotlin.experimental.and
 import kotlin.experimental.inv

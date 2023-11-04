@@ -1,15 +1,24 @@
 package com.webauthn4j.ctap.client
 
-import com.webauthn4j.ctap.core.data.options.ClientPINOption
-import com.webauthn4j.ctap.core.data.options.ResidentKeyOption
-import com.webauthn4j.ctap.core.data.options.UserPresenceOption
-import com.webauthn4j.ctap.core.data.options.UserVerificationOption
 import com.webauthn4j.ctap.authenticator.exception.ClientPINUserVerificationCanceledException
 import com.webauthn4j.ctap.authenticator.exception.CtapCommandExecutionException
 import com.webauthn4j.ctap.client.exception.ResponseDataValidationException
 import com.webauthn4j.ctap.client.exception.UPNotSupportedException
 import com.webauthn4j.ctap.client.exception.UVNotReadyException
-import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.ctap.core.data.AuthenticatorClientPINRequest
+import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponse
+import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionRequest
+import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionResponse
+import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponse
+import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
+import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponse
+import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialRequest
+import com.webauthn4j.ctap.core.data.CtapStatusCode
+import com.webauthn4j.ctap.core.data.PinProtocolVersion
+import com.webauthn4j.ctap.core.data.options.ClientPINOption
+import com.webauthn4j.ctap.core.data.options.ResidentKeyOption
+import com.webauthn4j.ctap.core.data.options.UserPresenceOption
+import com.webauthn4j.ctap.core.data.options.UserVerificationOption
 import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import com.webauthn4j.ctap.core.util.internal.KeyAgreementUtil
 import com.webauthn4j.data.ResidentKeyRequirement
@@ -22,7 +31,7 @@ import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import java.security.interfaces.ECPrivateKey
 import java.security.interfaces.ECPublicKey
-import java.util.*
+import java.util.Arrays
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 

@@ -2,9 +2,21 @@ package com.webauthn4j.ctap.core.converter
 
 import com.webauthn4j.converter.util.CborConverter
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponse
+import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponseData
+import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionResponse
+import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionResponseData
+import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponse
+import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
+import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponse
+import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponseData
+import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialResponse
+import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialResponseData
+import com.webauthn4j.ctap.core.data.AuthenticatorResetResponse
+import com.webauthn4j.ctap.core.data.CtapResponse
+import com.webauthn4j.ctap.core.data.CtapStatusCode
 import java.nio.ByteBuffer
-import java.util.*
+import java.util.Arrays
 
 class CtapResponseConverter(objectConverter: ObjectConverter) {
 

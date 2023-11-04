@@ -1,7 +1,7 @@
 package com.webauthn4j.ctap.authenticator
 
-import com.webauthn4j.ctap.core.data.options.*
 import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.ctap.core.data.options.*
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialParameters
 import com.webauthn4j.data.PublicKeyCredentialType
@@ -10,7 +10,7 @@ import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthen
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
 import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenticatorInput
 import com.webauthn4j.util.exception.UnexpectedCheckedException
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import java.util.concurrent.ExecutionException
@@ -20,7 +20,7 @@ internal class CtapAuthenticatorTest {
     private val ctapAuthenticator = CtapAuthenticator()
 
     @Test
-    fun getInfo_test() = runBlockingTest {
+    fun getInfo_test() = runTest {
         val response = ctapAuthenticator.getInfo()
         Assertions.assertThat(response.responseData).isNotNull
         Assertions.assertThat(response.responseData!!.aaguid).isEqualTo(CtapAuthenticator.AAGUID)
@@ -43,7 +43,7 @@ internal class CtapAuthenticatorTest {
     }
 
     @Test
-    fun getAssertion_test() = runBlockingTest {
+    fun getAssertion_test() = runTest {
         makeCredential()
         val clientDataHash = ByteArray(0)
         val allowList: List<PublicKeyCredentialDescriptor> = emptyList()
@@ -67,7 +67,7 @@ internal class CtapAuthenticatorTest {
     }
 
     @Test
-    fun reset_test() = runBlockingTest {
+    fun reset_test() = runTest {
         makeCredential()
         Assertions.assertThat(ctapAuthenticator.authenticatorPropertyStore.loadUserCredentials(RP_ID))
             .hasSize(1)
