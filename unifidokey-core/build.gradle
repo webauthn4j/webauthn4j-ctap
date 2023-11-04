@@ -3,7 +3,6 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 33 // Android 13.0
-    buildToolsVersion '30.0.2'
 
     defaultConfig {
         minSdkVersion 28 // Android 9.0
@@ -25,7 +24,13 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     packagingOptions {
-        exclude 'README.txt'
+        resources {
+            excludes += ['README.txt']
+        }
+    }
+    namespace 'com.unifidokey.core'
+    lintOptions {
+        baseline(file("lint-baseline.xml"))
     }
 }
 

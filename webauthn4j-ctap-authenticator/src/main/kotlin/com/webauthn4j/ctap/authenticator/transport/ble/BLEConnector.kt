@@ -8,7 +8,12 @@ import com.webauthn4j.ctap.core.converter.CtapRequestConverter
 import com.webauthn4j.ctap.core.converter.CtapResponseConverter
 import com.webauthn4j.ctap.core.data.CtapRequest
 import com.webauthn4j.ctap.core.data.CtapResponse
-import com.webauthn4j.ctap.core.data.ble.*
+import com.webauthn4j.ctap.core.data.ble.BLEContinuationFrameFragment
+import com.webauthn4j.ctap.core.data.ble.BLEFrame
+import com.webauthn4j.ctap.core.data.ble.BLEFrameCommand
+import com.webauthn4j.ctap.core.data.ble.BLEFrameError
+import com.webauthn4j.ctap.core.data.ble.BLEFrameFragment
+import com.webauthn4j.ctap.core.data.ble.BLEInitializationFrameFragment
 import com.webauthn4j.ctap.core.util.internal.ArrayUtil.toHexString
 import org.slf4j.LoggerFactory
 

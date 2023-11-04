@@ -1,7 +1,17 @@
 package com.webauthn4j.ctap.authenticator.transport.hid
 
 import com.webauthn4j.ctap.core.data.CtapStatusCode
-import com.webauthn4j.ctap.core.data.hid.*
+import com.webauthn4j.ctap.core.data.hid.HIDCBORResponseMessage
+import com.webauthn4j.ctap.core.data.hid.HIDCapability
+import com.webauthn4j.ctap.core.data.hid.HIDChannelId
+import com.webauthn4j.ctap.core.data.hid.HIDCommand
+import com.webauthn4j.ctap.core.data.hid.HIDINITResponseMessage
+import com.webauthn4j.ctap.core.data.hid.HIDKEEPALIVEResponseMessage
+import com.webauthn4j.ctap.core.data.hid.HIDLOCKResponseMessage
+import com.webauthn4j.ctap.core.data.hid.HIDPINGResponseMessage
+import com.webauthn4j.ctap.core.data.hid.HIDResponseMessage
+import com.webauthn4j.ctap.core.data.hid.HIDStatusCode
+import com.webauthn4j.ctap.core.data.hid.HIDWINKResponseMessage
 
 class HIDResponseMessageBuilder : HIDMessageBuilderBase<HIDResponseMessage>() {
     override fun createMessage(

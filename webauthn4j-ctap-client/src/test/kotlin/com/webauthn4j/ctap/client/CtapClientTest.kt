@@ -4,7 +4,7 @@ import com.webauthn4j.ctap.authenticator.ClientPINService
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.client.transport.InProcessTransportAdaptor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets
@@ -18,7 +18,7 @@ internal class CtapClientTest {
     @ExperimentalCoroutinesApi
     @Test
     @Throws(ExecutionException::class, InterruptedException::class)
-    fun setPIN_test() = runBlockingTest {
+    fun setPIN_test() = runTest {
         target.reset()
         target.setPIN("newPIN")
         assertThat(ctapAuthenticator.authenticatorPropertyStore.loadClientPIN()).isEqualTo(
@@ -31,7 +31,7 @@ internal class CtapClientTest {
     @ExperimentalCoroutinesApi
     @Test
     @Throws(ExecutionException::class, InterruptedException::class)
-    fun changePIN_test() = runBlockingTest {
+    fun changePIN_test() = runTest {
         target.reset()
         target.setPIN("currentPIN")
         assertThat(ctapAuthenticator.authenticatorPropertyStore.loadClientPIN()).isEqualTo(
@@ -51,7 +51,7 @@ internal class CtapClientTest {
     @ExperimentalCoroutinesApi
     @Test
     @Throws(ExecutionException::class, InterruptedException::class)
-    fun getRetries_test() = runBlockingTest {
+    fun getRetries_test() = runTest {
         assertThat(target.getRetries()).isEqualTo(ClientPINService.MAX_PIN_RETRIES)
         try {
             target.changePIN("wrongPIN", "newPIN")
@@ -65,7 +65,7 @@ internal class CtapClientTest {
     @ExperimentalCoroutinesApi
     @Test
     @Throws(ExecutionException::class, InterruptedException::class)
-    fun reset_test() = runBlockingTest {
+    fun reset_test() = runTest {
         target.reset()
     }
 }

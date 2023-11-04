@@ -4,7 +4,7 @@ import com.webauthn4j.ctap.authenticator.ClientPINService
 import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
 import com.webauthn4j.ctap.client.exception.CtapErrorException
 import integration.usecase.testcase.ClientPINTestCase
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Disabled
@@ -22,7 +22,7 @@ class ClientPINTest {
         @Test
         fun pin_already_set_test() {
             assertThatThrownBy {
-                runBlockingTest {
+                runTest {
                     clientPINTestCase.clientPlatform.ctapService.setPIN("new-PIN")
                 }
             }.isInstanceOf(CtapErrorException::class.java)
@@ -30,22 +30,22 @@ class ClientPINTest {
         }
 
         @Test
-        fun pin_not_already_set_test() = runBlockingTest {
+        fun pin_not_already_set_test() = runTest {
             clientPINTestCase.clientPlatform.ctapService.reset()
             clientPINTestCase.clientPlatform.ctapService.setPIN("new-PIN")
         }
     }
 
     @Test
-    fun changePIN_test() = runBlockingTest {
+    fun changePIN_test() = runTest {
         clientPINTestCase.clientPlatform.ctapService.changePIN("clientPIN", "new-PIN")
     }
 
     @Test
-    fun changePIN_with_invalid_PIN_and_reach_MAX_VOLATILE_PIN_RETRIES_test() = runBlockingTest {
+    fun changePIN_with_invalid_PIN_and_reach_MAX_VOLATILE_PIN_RETRIES_test() {
         repeat(3) {
             assertThatThrownBy {
-                runBlockingTest {
+                runTest {
                     clientPINTestCase.clientPlatform.ctapService.changePIN(
                         "invalid-PIN",
                         "invalid-PIN"
@@ -55,7 +55,7 @@ class ClientPINTest {
                 .hasMessageContaining("CTAP2_ERR_PIN_INVALID")
         }
         assertThatThrownBy {
-            runBlockingTest {
+            runTest {
                 clientPINTestCase.clientPlatform.ctapService.changePIN("invalid-PIN", "invalid-PIN")
             }
         }.isInstanceOf(CtapErrorException::class.java)
@@ -63,10 +63,10 @@ class ClientPINTest {
     }
 
     @Test
-    fun changePIN_with_invalid_PIN_and_reach_MAX_PIN_RETRIES_test() = runBlockingTest {
+    fun changePIN_with_invalid_PIN_and_reach_MAX_PIN_RETRIES_test() {
         repeat(8) {
             assertThatThrownBy {
-                runBlockingTest {
+                runTest {
                     clientPINTestCase.clientPlatform.ctapService.changePIN(
                         "invalid-PIN",
                         "invalid-PIN"
@@ -78,7 +78,7 @@ class ClientPINTest {
             clientPINTestCase.authenticator.ctapAuthenticator.clientPINService.resetVolatilePinRetryCounter() // reset volatile PIN retries
         }
         assertThatThrownBy {
-            runBlockingTest {
+            runTest {
                 clientPINTestCase.clientPlatform.ctapService.changePIN("invalid-PIN", "invalid-PIN")
             }
         }.isInstanceOf(CtapErrorException::class.java).hasMessageContaining("CTAP2_ERR_PIN_BLOCKED")
@@ -87,7 +87,7 @@ class ClientPINTest {
 
 
     @Test
-    fun getRetries_test() = runBlockingTest {
+    fun getRetries_test() = runTest {
         assertThat(clientPINTestCase.clientPlatform.ctapService.getRetries()).isEqualTo(
             ClientPINService.MAX_PIN_RETRIES
         )
@@ -102,7 +102,7 @@ class ClientPINTest {
 
     @Disabled
     @Test
-    fun clientPINSetting_DISABLED_test() = runBlockingTest {
+    fun clientPINSetting_DISABLED_test() = runTest {
         clientPINTestCase.authenticator.clientPINSetting = ClientPINSetting.ENABLED
         clientPINTestCase.clientPlatform.ctapService.setPIN("dummy")
     }

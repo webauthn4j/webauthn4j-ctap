@@ -1,11 +1,19 @@
 package com.webauthn4j.ctap.authenticator
 
-import com.webauthn4j.ctap.core.data.options.*
-import com.webauthn4j.ctap.authenticator.data.settings.*
+import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
+import com.webauthn4j.ctap.authenticator.data.settings.PlatformSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
 import com.webauthn4j.ctap.core.data.CtapStatusCode
+import com.webauthn4j.ctap.core.data.options.ClientPINOption
+import com.webauthn4j.ctap.core.data.options.PlatformOption
+import com.webauthn4j.ctap.core.data.options.ResidentKeyOption
+import com.webauthn4j.ctap.core.data.options.UserPresenceOption
+import com.webauthn4j.ctap.core.data.options.UserVerificationOption
 import org.slf4j.LoggerFactory
 
 /**

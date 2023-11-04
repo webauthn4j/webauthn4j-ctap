@@ -5,7 +5,7 @@ import com.google.common.truth.Truth
 import com.webauthn4j.data.SignatureAlgorithm
 import org.junit.Before
 import org.junit.Test
-import java.util.*
+import java.util.UUID
 
 class AndroidKeyStoreDaoTest {
 

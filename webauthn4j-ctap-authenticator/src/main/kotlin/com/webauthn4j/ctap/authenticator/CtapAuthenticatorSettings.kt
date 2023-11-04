@@ -1,6 +1,12 @@
 package com.webauthn4j.ctap.authenticator
 
-import com.webauthn4j.ctap.authenticator.data.settings.*
+import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
+import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
+import com.webauthn4j.ctap.authenticator.data.settings.PlatformSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ResetProtectionSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 
 data class CtapAuthenticatorSettings(

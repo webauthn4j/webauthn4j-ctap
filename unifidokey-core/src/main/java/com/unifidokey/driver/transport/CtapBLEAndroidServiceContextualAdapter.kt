@@ -12,6 +12,7 @@ import androidx.lifecycle.MutableLiveData
 import com.unifidokey.core.adapter.CtapBLEAdapter
 import org.slf4j.LoggerFactory
 
+
 /**
  * An [CtapBLEAdapter] for managing [CtapBLEAndroidService].
 

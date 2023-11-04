@@ -1,6 +1,10 @@
 package com.webauthn4j.ctap.authenticator.transport.hid
 
-import com.webauthn4j.ctap.core.data.hid.*
+import com.webauthn4j.ctap.core.data.hid.HIDChannelId
+import com.webauthn4j.ctap.core.data.hid.HIDCommand
+import com.webauthn4j.ctap.core.data.hid.HIDContinuationPacket
+import com.webauthn4j.ctap.core.data.hid.HIDInitializationPacket
+import com.webauthn4j.ctap.core.data.hid.HIDMessage
 import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.MAX_CONT_PACKET_DATA_SIZE
 import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.MAX_INIT_PACKET_DATA_SIZE
 import java.nio.ByteBuffer

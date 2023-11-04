@@ -1,6 +1,11 @@
 package com.unifidokey.driver.persistence.entity
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Ignore
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import com.webauthn4j.data.SignatureAlgorithm
 import java.io.Serializable
 import java.security.KeyPair

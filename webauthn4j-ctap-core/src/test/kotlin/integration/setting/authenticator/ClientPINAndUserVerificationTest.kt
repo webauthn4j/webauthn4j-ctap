@@ -4,7 +4,7 @@ import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
 import com.webauthn4j.ctap.client.exception.WebAuthnClientException
 import integration.usecase.testcase.PasswordlessTestCase
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -23,14 +23,14 @@ class ClientPINAndUserVerificationTest {
         }
 
         @Test
-        fun userVerification_ready_test() = runBlockingTest {
+        fun userVerification_ready_test() = runTest {
             passwordlessTestCase.authenticator.userVerificationSetting =
                 UserVerificationSetting.READY
             passwordlessTestCase.run()
         }
 
         @Test
-        fun userVerification_not_ready_test() = runBlockingTest {
+        fun userVerification_not_ready_test() = runTest {
             passwordlessTestCase.authenticator.userVerificationSetting =
                 UserVerificationSetting.NOT_READY
             passwordlessTestCase.run()
@@ -46,7 +46,7 @@ class ClientPINAndUserVerificationTest {
         }
 
         @Test
-        fun userVerification_ready_test() = runBlockingTest {
+        fun userVerification_ready_test() = runTest {
             passwordlessTestCase.authenticator.userVerificationSetting =
                 UserVerificationSetting.READY
             passwordlessTestCase.run()
@@ -57,7 +57,7 @@ class ClientPINAndUserVerificationTest {
             passwordlessTestCase.authenticator.userVerificationSetting =
                 UserVerificationSetting.NOT_READY
             assertThatThrownBy {
-                runBlockingTest {
+                runTest {
                     passwordlessTestCase.run()
                 }
             }.isInstanceOf(WebAuthnClientException::class.java)
@@ -69,7 +69,7 @@ class ClientPINAndUserVerificationTest {
             passwordlessTestCase.authenticator.userVerificationSetting =
                 UserVerificationSetting.NOT_SUPPORTED
             assertThatThrownBy {
-                runBlockingTest {
+                runTest {
                     passwordlessTestCase.run()
                 }
             }.isInstanceOf(WebAuthnClientException::class.java)

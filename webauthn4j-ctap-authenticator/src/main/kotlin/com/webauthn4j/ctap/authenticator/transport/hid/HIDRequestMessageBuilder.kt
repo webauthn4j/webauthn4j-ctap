@@ -1,7 +1,18 @@
 package com.webauthn4j.ctap.authenticator.transport.hid
 
 import com.webauthn4j.ctap.core.data.CtapCommand
-import com.webauthn4j.ctap.core.data.hid.*
+import com.webauthn4j.ctap.core.data.hid.HIDCANCELRequestMessage
+import com.webauthn4j.ctap.core.data.hid.HIDCBORRequestMessage
+import com.webauthn4j.ctap.core.data.hid.HIDChannelId
+import com.webauthn4j.ctap.core.data.hid.HIDCommand
+import com.webauthn4j.ctap.core.data.hid.HIDINITRequestMessage
+import com.webauthn4j.ctap.core.data.hid.HIDKEEPALIVEResponseMessage
+import com.webauthn4j.ctap.core.data.hid.HIDLOCKRequestMessage
+import com.webauthn4j.ctap.core.data.hid.HIDMSGRequestMessage
+import com.webauthn4j.ctap.core.data.hid.HIDPINGRequestMessage
+import com.webauthn4j.ctap.core.data.hid.HIDRequestMessage
+import com.webauthn4j.ctap.core.data.hid.HIDStatusCode
+import com.webauthn4j.ctap.core.data.hid.HIDWINKRequestMessage
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 
 class HIDRequestMessageBuilder : HIDMessageBuilderBase<HIDRequestMessage>() {

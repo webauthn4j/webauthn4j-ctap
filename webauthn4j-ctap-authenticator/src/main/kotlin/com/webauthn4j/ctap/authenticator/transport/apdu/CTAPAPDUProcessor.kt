@@ -5,14 +5,19 @@ import com.webauthn4j.ctap.authenticator.TransactionManager
 import com.webauthn4j.ctap.authenticator.transport.nfc.NFCConnector
 import com.webauthn4j.ctap.core.converter.CtapRequestConverter
 import com.webauthn4j.ctap.core.converter.CtapResponseConverter
-import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.ctap.core.data.AuthenticatorGenericErrorResponse
+import com.webauthn4j.ctap.core.data.CtapRequest
+import com.webauthn4j.ctap.core.data.CtapResponse
+import com.webauthn4j.ctap.core.data.CtapStatusCode
+import com.webauthn4j.ctap.core.data.U2FStatusCode
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.UncheckedIOException
-import java.util.*
+import java.util.LinkedList
+import java.util.Queue
 
 class CTAPAPDUProcessor(
     private val transactionManager: TransactionManager,

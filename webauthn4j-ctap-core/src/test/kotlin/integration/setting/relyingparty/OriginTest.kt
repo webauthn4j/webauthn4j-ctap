@@ -6,7 +6,7 @@ import com.webauthn4j.data.client.Origin
 import com.webauthn4j.data.extension.client.RegistrationExtensionClientOutput
 import com.webauthn4j.validator.exception.BadOriginException
 import integration.usecase.testcase.PasswordlessTestCase
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
@@ -22,7 +22,7 @@ internal class OriginTest {
         passwordlessTestCase.relyingParty.registration.backend.origin =
             Origin("https://mismatch.example.com")
         Assertions.assertThatThrownBy {
-            runBlockingTest {
+            runTest {
                 passwordlessTestCase.run()
             }
         }.isInstanceOf(BadOriginException::class.java)

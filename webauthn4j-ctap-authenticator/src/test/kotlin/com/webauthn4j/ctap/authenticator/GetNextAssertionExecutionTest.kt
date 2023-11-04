@@ -1,7 +1,14 @@
 package com.webauthn4j.ctap.authenticator
 
 import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
-import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionRequest
+import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionRequest
+import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponse
+import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialRequest
+import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
+import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
+import com.webauthn4j.ctap.core.data.CtapStatusCode
+import com.webauthn4j.ctap.core.data.PinProtocolVersion
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialParameters
 import com.webauthn4j.data.PublicKeyCredentialType
@@ -10,7 +17,7 @@ import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthen
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
 import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenticatorInput
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
@@ -31,7 +38,7 @@ class GetNextAssertionExecutionTest {
     }
 
     @Test
-    fun getNextAssertion_test() = runBlockingTest {
+    fun getNextAssertion_test() = runTest {
         val ctapAuthenticator =
             CtapAuthenticator(settings = CtapAuthenticatorSettings(credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM))
         makeCredential(ctapAuthenticator)
@@ -60,7 +67,7 @@ class GetNextAssertionExecutionTest {
     }
 
     @Test
-    fun getNextAssertion_when_no_session_exist_test() = runBlockingTest {
+    fun getNextAssertion_when_no_session_exist_test() = runTest {
         val ctapAuthenticator =
             CtapAuthenticator(settings = CtapAuthenticatorSettings(credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM))
         makeCredential(ctapAuthenticator)
@@ -70,7 +77,7 @@ class GetNextAssertionExecutionTest {
     }
 
     @Test
-    fun getNextAssertion_when_next_credential_does_not_exist_test() = runBlockingTest {
+    fun getNextAssertion_when_next_credential_does_not_exist_test() = runTest {
         val ctapAuthenticator =
             CtapAuthenticator(settings = CtapAuthenticatorSettings(credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM))
         makeCredential(ctapAuthenticator)
@@ -100,7 +107,7 @@ class GetNextAssertionExecutionTest {
     }
 
     @Test
-    fun expiration_test() = runBlockingTest {
+    fun expiration_test() = runTest {
         val ctapAuthenticator =
             CtapAuthenticator(settings = CtapAuthenticatorSettings(credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM))
         makeCredential(ctapAuthenticator)

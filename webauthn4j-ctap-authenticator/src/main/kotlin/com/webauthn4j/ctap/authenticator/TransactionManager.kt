@@ -1,7 +1,14 @@
 package com.webauthn4j.ctap.authenticator
 
-import com.webauthn4j.ctap.core.data.*
-import kotlinx.coroutines.*
+import com.webauthn4j.ctap.core.data.AuthenticatorRequest
+import com.webauthn4j.ctap.core.data.AuthenticatorResponse
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.runBlocking
 
 /**
  * Ctap Command transaction manager

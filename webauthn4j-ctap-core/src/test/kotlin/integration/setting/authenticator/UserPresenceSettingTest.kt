@@ -3,7 +3,7 @@ package integration.setting.authenticator
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.client.exception.UPNotSupportedException
 import integration.usecase.testcase.PasswordlessTestCase
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
@@ -12,7 +12,7 @@ class UserPresenceSettingTest {
     private val passwordlessTestCase = PasswordlessTestCase()
 
     @Test
-    fun userPresence_supported_test() = runBlockingTest {
+    fun userPresence_supported_test() = runTest {
         passwordlessTestCase.authenticator.userPresenceSetting = UserPresenceSetting.SUPPORTED
         passwordlessTestCase.run()
     }
@@ -21,7 +21,7 @@ class UserPresenceSettingTest {
     fun userPresence_not_supported_test() {
         passwordlessTestCase.authenticator.userPresenceSetting = UserPresenceSetting.NOT_SUPPORTED
         assertThatThrownBy {
-            runBlockingTest {
+            runTest {
                 passwordlessTestCase.run()
             }
         }.isInstanceOf(UPNotSupportedException::class.java)

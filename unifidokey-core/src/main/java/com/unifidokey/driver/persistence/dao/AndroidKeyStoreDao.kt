@@ -5,7 +5,12 @@ import android.security.keystore.KeyProperties
 import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.util.exception.UnexpectedCheckedException
 import java.io.IOException
-import java.security.*
+import java.security.InvalidAlgorithmParameterException
+import java.security.KeyPairGenerator
+import java.security.KeyStore
+import java.security.KeyStoreException
+import java.security.NoSuchAlgorithmException
+import java.security.NoSuchProviderException
 import java.security.cert.CertificateException
 import java.security.spec.AlgorithmParameterSpec
 import javax.crypto.KeyGenerator

@@ -4,7 +4,7 @@ import com.webauthn4j.ctap.authenticator.data.settings.PlatformSetting
 import com.webauthn4j.ctap.client.exception.WebAuthnClientException
 import com.webauthn4j.data.AuthenticatorAttachment
 import integration.usecase.testcase.PasswordlessTestCase
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -25,7 +25,7 @@ class PlatformSettingTest {
 
         @Test
         @Throws(ExecutionException::class, InterruptedException::class)
-        fun platform_platform_test() = runBlockingTest {
+        fun platform_platform_test() = runTest {
             passwordlessTestCase.authenticator.platformSetting = PlatformSetting.PLATFORM
             passwordlessTestCase.run()
         }
@@ -34,7 +34,7 @@ class PlatformSettingTest {
         fun platform_cross_platform_test() {
             passwordlessTestCase.authenticator.platformSetting = PlatformSetting.CROSS_PLATFORM
             assertThatThrownBy {
-                runBlockingTest {
+                runTest {
                     passwordlessTestCase.run()
                 }
             }.isInstanceOf(WebAuthnClientException::class.java)
@@ -54,7 +54,7 @@ class PlatformSettingTest {
         fun platform_platform_test() {
             passwordlessTestCase.authenticator.platformSetting = PlatformSetting.PLATFORM
             assertThatThrownBy {
-                runBlockingTest {
+                runTest {
                     passwordlessTestCase.run()
                 }
             }.isInstanceOf(WebAuthnClientException::class.java)
@@ -63,7 +63,7 @@ class PlatformSettingTest {
 
         @Test
         @Throws(ExecutionException::class, InterruptedException::class)
-        fun platform_cross_platform_test() = runBlockingTest {
+        fun platform_cross_platform_test() = runTest {
             passwordlessTestCase.authenticator.platformSetting = PlatformSetting.CROSS_PLATFORM
             passwordlessTestCase.run()
         }
@@ -79,14 +79,14 @@ class PlatformSettingTest {
 
         @Test
         @Throws(ExecutionException::class, InterruptedException::class)
-        fun platform_platform_test() = runBlockingTest {
+        fun platform_platform_test() = runTest {
             passwordlessTestCase.authenticator.platformSetting = PlatformSetting.PLATFORM
             passwordlessTestCase.run()
         }
 
         @Test
         @Throws(ExecutionException::class, InterruptedException::class)
-        fun platform_cross_platform_test() = runBlockingTest {
+        fun platform_cross_platform_test() = runTest {
             passwordlessTestCase.authenticator.platformSetting = PlatformSetting.CROSS_PLATFORM
             passwordlessTestCase.run()
         }

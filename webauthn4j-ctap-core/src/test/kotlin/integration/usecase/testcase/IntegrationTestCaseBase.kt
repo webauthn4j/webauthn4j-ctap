@@ -44,7 +44,7 @@ abstract class IntegrationTestCaseBase {
         cborMapper.registerModule(JavaTimeModule())
         cborMapper.registerModule(CtapCBORModule())
         cborMapper.registerModule(PublicKeyCredentialSourceCBORModule())
-        cborMapper.registerModule(KotlinModule())
+        cborMapper.registerModule(KotlinModule.Builder().build())
         ObjectConverter(jsonMapper, cborMapper)
     }
     var objectConverter by objectConverterParameter

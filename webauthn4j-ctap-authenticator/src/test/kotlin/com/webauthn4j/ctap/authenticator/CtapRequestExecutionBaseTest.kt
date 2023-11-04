@@ -4,8 +4,7 @@ import com.webauthn4j.ctap.core.data.CtapRequest
 import com.webauthn4j.ctap.core.data.CtapResponse
 import com.webauthn4j.ctap.core.data.CtapStatusCode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
-import org.assertj.core.api.Assertions.assertThatCode
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 
@@ -13,15 +12,11 @@ import org.mockito.Mockito.mock
 internal class CtapRequestExecutionBaseTest {
 
     @Test
-    fun unexpected_execution_error_test() = runBlockingTest {
+    fun unexpected_execution_error_test() = runTest {
 
         val ctapAuthenticator = CtapAuthenticator()
         val target = TestCtapCommandExecution(ctapAuthenticator, mock(CtapRequest::class.java))
-        assertThatCode {
-            runBlockingTest {
-                target.execute()
-            }
-        }.doesNotThrowAnyException()
+        target.execute()
     }
 
     inner class TestCtapCommandExecution(ctapAuthenticator: CtapAuthenticator, ctapRequest: CtapRequest) :

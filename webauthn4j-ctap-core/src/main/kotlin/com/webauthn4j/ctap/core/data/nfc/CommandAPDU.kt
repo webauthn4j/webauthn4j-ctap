@@ -1,7 +1,7 @@
 package com.webauthn4j.ctap.core.data.nfc
 
-import com.webauthn4j.ctap.core.exception.APDUProcessingException
 import com.webauthn4j.ctap.core.data.U2FStatusCode
+import com.webauthn4j.ctap.core.exception.APDUProcessingException
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.util.ArrayUtil
 import com.webauthn4j.util.UnsignedNumberUtil

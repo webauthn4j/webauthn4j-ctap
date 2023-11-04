@@ -1,9 +1,39 @@
 package com.webauthn4j.ctap.core.converter.jackson
 
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.webauthn4j.ctap.core.converter.jackson.deserializer.*
-import com.webauthn4j.ctap.core.converter.jackson.serializer.*
-import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.ctap.core.converter.jackson.deserializer.CoercionLessByteArrayDeserializer
+import com.webauthn4j.ctap.core.converter.jackson.deserializer.CoercionLessStringDeserializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorClientPINRequestSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorClientPINResponseDataSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorGetAssertionRequestOptionsSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorGetAssertionRequestSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorGetAssertionResponseDataSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorGetInfoRequestSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorGetInfoResponseDataOptionsSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorGetInfoResponseDataSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorGetNextAssertionRequestSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorGetNextAssertionResponseDataSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorMakeCredentialRequestOptionsSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorMakeCredentialRequestSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorMakeCredentialResponseDataSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorResetRequestSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorResetResponseDataSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.CtapPublicKeyCredentialRpEntitySerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.CtapPublicKeyCredentialUserEntitySerializer
+import com.webauthn4j.ctap.core.data.AuthenticatorClientPINRequest
+import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponseData
+import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionRequest
+import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionResponseData
+import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoRequest
+import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
+import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionRequest
+import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponseData
+import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialRequest
+import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialResponseData
+import com.webauthn4j.ctap.core.data.AuthenticatorResetRequest
+import com.webauthn4j.ctap.core.data.AuthenticatorResetResponseData
+import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
+import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
 
 class CtapCBORModule : SimpleModule("CtapCBORModule") {
     init {

@@ -7,12 +7,17 @@ import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.core.service.NFCService
 import com.unifidokey.core.service.NFCStatus
-import com.webauthn4j.ctap.core.exception.APDUProcessingException
 import com.webauthn4j.ctap.authenticator.transport.nfc.NFCConnector
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
+import com.webauthn4j.ctap.core.exception.APDUProcessingException
 import com.webauthn4j.ctap.core.util.internal.ArrayUtil
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newSingleThreadContext
 import org.slf4j.LoggerFactory
 import kotlin.coroutines.CoroutineContext
 

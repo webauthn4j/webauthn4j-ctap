@@ -64,7 +64,7 @@ class CtapAuthenticator @JvmOverloads constructor(
             cborMapper.registerModule(CtapCBORModule())
             cborMapper.registerModule(PublicKeyCredentialSourceCBORModule())
             cborMapper.registerModule(JavaTimeModule())
-            cborMapper.registerModule(KotlinModule())
+            cborMapper.registerModule(KotlinModule.Builder().build())
             return ObjectConverter(jsonMapper, cborMapper)
         }
     }

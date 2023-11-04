@@ -5,7 +5,7 @@ import com.unifidokey.driver.persistence.dao.AndroidKeyStoreDao
 import com.unifidokey.driver.persistence.dao.KeyStoreDao
 import com.webauthn4j.data.SignatureAlgorithm
 import org.junit.Test
-import java.util.*
+import java.util.UUID
 
 class AndroidKeyAttestationStatementProviderTest {
 

@@ -8,7 +8,14 @@ import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.driver.persistence.converter.EventConverter
 import com.unifidokey.driver.persistence.dao.EventDao
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.*
+import com.webauthn4j.ctap.authenticator.CachingCredentialSelectionHandler
+import com.webauthn4j.ctap.authenticator.CachingUserConsentHandler
+import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
+import com.webauthn4j.ctap.authenticator.CtapAuthenticator
+import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSettings
+import com.webauthn4j.ctap.authenticator.ExceptionReporter
+import com.webauthn4j.ctap.authenticator.TransactionManager
+import com.webauthn4j.ctap.authenticator.UserConsentHandler
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.data.event.Event

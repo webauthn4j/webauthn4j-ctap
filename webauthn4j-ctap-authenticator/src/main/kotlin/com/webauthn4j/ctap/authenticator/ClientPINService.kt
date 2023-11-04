@@ -18,7 +18,7 @@ import java.nio.ByteBuffer
 import java.security.SecureRandom
 import java.security.interfaces.ECPrivateKey
 import java.security.interfaces.ECPublicKey
-import java.util.*
+import java.util.Arrays
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 
