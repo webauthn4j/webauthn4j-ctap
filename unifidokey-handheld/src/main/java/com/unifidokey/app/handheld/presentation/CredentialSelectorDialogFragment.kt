@@ -40,6 +40,7 @@ class CredentialSelectorDialogFragment : Fragment(),
         super.onViewCreated(view, savedInstanceState)
 
         val intent = requireActivity().intent
+        @Suppress("DEPRECATION")
         val request =
             intent.getSerializableExtra(CredentialSelectorDialogActivity.EXTRA_REQUEST) as CredentialSelectorDialogActivityRequest
         viewModel.credentials = request.credentials

@@ -38,6 +38,7 @@ class RegistrationConsentDialogActivityStarter(private val context: Context) {
         override fun onReceive(context: Context, intent: Intent) {
             val localBroadcastManager = LocalBroadcastManager.getInstance(context)
             localBroadcastManager.unregisterReceiver(this)
+            @Suppress("DEPRECATION")
             val registrationConsentDialogActivityResponse =
                 intent.getSerializableExtra(RegistrationConsentDialogActivity.EXTRA_RESPONSE) as RegistrationConsentDialogActivityResponse
             onGoingDialogFutureResult.complete(registrationConsentDialogActivityResponse)

@@ -29,6 +29,7 @@ class AuthenticationConsentDialogActivity : AppCompatActivity(),
         setShowWhenLocked(true)
         hideActionBar()
         val intent = intent
+        @Suppress("DEPRECATION")
         val request =
             intent.getSerializableExtra(EXTRA_REQUEST) as AuthenticationConsentDialogActivityRequest
         val binding: AuthenticationConsentDialogActivityBinding =

@@ -35,6 +35,7 @@ class CredentialSelectorDialogActivityStarter(private val context: Context) {
         override fun onReceive(context: Context, intent: Intent) {
             val localBroadcastManager = LocalBroadcastManager.getInstance(context)
             localBroadcastManager.unregisterReceiver(this)
+            @Suppress("DEPRECATION")
             val credentialSelectorDialogActivityResponse =
                 intent.getSerializableExtra(CredentialSelectorDialogActivity.EXTRA_RESPONSE) as CredentialSelectorDialogActivityResponse
             onGoingDialogFutureResult.complete(credentialSelectorDialogActivityResponse)

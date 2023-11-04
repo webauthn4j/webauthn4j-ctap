@@ -35,6 +35,7 @@ class AuthenticationConsentDialogActivityStarter(private val context: Context) {
         override fun onReceive(context: Context, intent: Intent) {
             val localBroadcastManager = LocalBroadcastManager.getInstance(context)
             localBroadcastManager.unregisterReceiver(this)
+            @Suppress("DEPRECATION")
             val authenticationConsentDialogActivityResponse =
                 intent.getSerializableExtra(AuthenticationConsentDialogActivity.EXTRA_RESPONSE) as AuthenticationConsentDialogActivityResponse
             onGoingDialogFutureResult.complete(authenticationConsentDialogActivityResponse)

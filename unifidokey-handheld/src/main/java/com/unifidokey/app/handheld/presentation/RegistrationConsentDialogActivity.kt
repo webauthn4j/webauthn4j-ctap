@@ -34,6 +34,7 @@ class RegistrationConsentDialogActivity : AppCompatActivity(),
         biometricPrompt = BiometricPrompt(this, this.mainExecutor, AuthenticationCallback())
         viewModel = ViewModelProvider(this).get(RegistrationConsentDialogViewModel::class.java)
         val intent = intent
+        @Suppress("DEPRECATION")
         val request =
             intent.getSerializableExtra(EXTRA_REQUEST) as RegistrationConsentDialogActivityRequest
         viewModel.request = request
