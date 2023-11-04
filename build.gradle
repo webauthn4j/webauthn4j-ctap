@@ -52,7 +52,7 @@ buildscript {
     ext.slf4jVersion = "2.0.7"
     ext.logbackAndroidVersion = "3.0.0"
     ext.bouncyCastleVersion = "1.76"
-    ext.jacksonVersion = "2.14.2"
+    ext.jacksonVersion = "2.15.3"
 
     // Test libraries
     ext.springBootVersion = "2.7.17"
