@@ -48,6 +48,8 @@ class HIDConnector(
     private val hidChannels: MutableMap<HIDChannelId, HIDChannel> = HashMap()
     private var lastAllocatedChannelId: HIDChannelId = HIDChannelId(0)
 
+
+    @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
     private val u2fConfirmationWorker = newSingleThreadContext("u2f-confirmation-worker")
 
     suspend fun handle(bytes: ByteArray, hidPacketHandler: HIDPacketHandler) {
@@ -104,6 +106,8 @@ class HIDConnector(
 
         private val hidRequestMessageBuilder = HIDRequestMessageBuilder()
 
+
+        @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
         private val hidKeepAliveWorker =
             newSingleThreadContext("hid-keepalive-worker-" + HexUtil.encodeToString(channelId.value))
 

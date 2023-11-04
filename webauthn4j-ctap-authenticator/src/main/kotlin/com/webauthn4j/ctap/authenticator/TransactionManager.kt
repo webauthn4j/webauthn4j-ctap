@@ -4,6 +4,8 @@ import com.webauthn4j.ctap.core.data.AuthenticatorRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -16,6 +18,7 @@ import kotlinx.coroutines.runBlocking
 open class TransactionManager(ctapAuthenticator: CtapAuthenticator = CtapAuthenticator()) {
 
     //single thread worker to synchronize authenticator access
+    @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
     private val authenticatorWorker = newSingleThreadContext("authenticator-worker")
 
     private var transaction: Transaction<*>? = null

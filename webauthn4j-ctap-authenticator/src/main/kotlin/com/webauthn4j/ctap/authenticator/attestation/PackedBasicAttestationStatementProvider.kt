@@ -29,7 +29,7 @@ class PackedBasicAttestationStatementProvider(
         val builder = AttestationCertificateBuilder(
             subjectDN,
             attestationKeyPair.public,
-            caCertificates.first().subjectDN.name,
+            caCertificates.first().subjectX500Principal.name,
             issuerPrivateKey,
             signatureAlgorithm,
         ).aaguid(attestationStatementRequest.authenticatorData.attestedCredentialData!!.aaguid)
