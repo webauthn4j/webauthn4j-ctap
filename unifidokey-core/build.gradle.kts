@@ -61,7 +61,7 @@ dependencies {
     val roomVersion = "2.5.2"
 
     // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation(libs.kotlin.stdlib.jdk8)
 
     // project dependencies
     implementation("com.github.webauthn4j.webauthn4j:webauthn4j-core")

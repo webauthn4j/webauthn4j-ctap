@@ -149,16 +149,7 @@ subprojects {
         constraints {
             // kotlin
 
-            implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$kotlinCoroutinesVersion")
             implementation("androidx.core:core-ktx:$coreKtxVersion")
-//            implementation("androidx.lifecycle:lifecycle-viewmodel:$lifecycleVersion")
-//            implementation("androidx.lifecycle:lifecycle-livedata:$lifecycleVersion")
-//            implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
-//            implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
-//            implementation("androidx.lifecycle:lifecycle-process:$lifecycleVersion")
-//            implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
             implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleExtensionsVersion")
 
             // google

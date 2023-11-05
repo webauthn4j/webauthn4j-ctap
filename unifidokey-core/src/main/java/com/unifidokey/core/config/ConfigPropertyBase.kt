@@ -41,6 +41,7 @@ abstract class ConfigPropertyBase<T> internal constructor(
                 seedValue
             }
         }
+        @Suppress("USELESS_CAST")
         mutableLiveData.value = initialValue as T
         mutableLiveData.observeForever { value ->
             save(value)

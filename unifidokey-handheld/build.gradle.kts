@@ -130,8 +130,8 @@ dependencies {
     val roomVersion = "2.4.3"
 
     // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
+    implementation(libs.kotlin.stdlib.jdk8)
+    implementation(libs.kotlinx.coroutines.core)
 
     // Project dependencies
     implementation(project(":unifidokey-core"))

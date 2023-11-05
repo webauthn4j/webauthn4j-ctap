@@ -31,18 +31,17 @@ dependencies {
     // Project dependencies
     api("com.github.webauthn4j.webauthn4j:webauthn4j-core")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+    implementation(libs.kotlinx.coroutines.core)
 
     // Third-party dependencies
-    implementation("org.slf4j:slf4j-api")
+    implementation(libs.slf4j.api)
 
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation(libs.jackson.module.kotlin)
+    implementation(libs.jackson.dataformat.cbor)
+    implementation(libs.jackson.datatype.jsr310)
 
-
-    implementation("org.bouncycastle:bcpkix-jdk15to18")
-    implementation("org.bouncycastle:bcprov-jdk15to18")
+    implementation(libs.bouncycastle.bcpkix.jdk15to18)
+    implementation(libs.bouncycastle.bcprov.jdk15to18)
 
     // Test dependencies
     testImplementation(project(":webauthn4j-ctap-authenticator"))

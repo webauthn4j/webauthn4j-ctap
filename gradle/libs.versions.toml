@@ -1,4 +1,7 @@
 [versions]
+kotlin = "1.9.20"
+kotlinx-coroutines = "1.7.3"
+
 androidx-lifecycle = "2.6.1"
 
 androidx-test = "1.5.0"
@@ -9,6 +12,9 @@ truth = "1.1.5"
 robolectric = "4.11.1"
 mockito-kotlin = "5.1.0"
 android-support-annotations = "28.0.0"
+slf4j = "2.0.9"
+jackson = "2.15.3"
+bouncycastle = "1.76"
 
 
 androidSupport = "28.0.0"
@@ -16,11 +22,29 @@ androidSupport = "28.0.0"
 springBoot = "2.7.17"
 
 [libraries]
+# Kotlin
+kotlin-stdlib-jdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-jdk8 = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk8", version.ref = "kotlinx-coroutines" }
+
+# Android
 androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "androidx-lifecycle"}
 androidx-lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-livedata", version.ref = "androidx-lifecycle"}
 androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle"}
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "androidx-lifecycle"}
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle"}
+
+# Third-party libraries
+slf4j-api = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j"}
+
+jackson-datatype-jsr310 = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version.ref = "jackson"}
+jackson-dataformat-cbor = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-cbor", version.ref = "jackson"}
+jackson-module-kotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version.ref = "jackson"}
+
+bouncycastle-bcpkix-jdk15to18 = { group = "org.bouncycastle", name = "bcpkix-jdk15to18", version.ref = "bouncycastle"}
+bouncycastle-bcprov-jdk15to18 = { group = "org.bouncycastle", name = "bcprov-jdk15to18", version.ref = "bouncycastle"}
+
+
 
 androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidx-test"}
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidx-test"}
@@ -33,11 +57,6 @@ mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", versio
 espresso = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockito-kotlin" }
 android-support-annotations = { group = "com.android.support", name = "support-annotations", version.ref = "android-support-annotations"}
 
-
-
-#implementation("androidx.lifecycle:lifecycle-process")
-#implementation("androidx.lifecycle:lifecycle-livedata")
-#implementation("androidx.lifecycle:lifecycle-viewmodel")
-#implementation("androidx.lifecycle:lifecycle-livedata-ktx")
-#implementation("androidx.lifecycle:lifecycle-viewmodel-ktx")
-#implementation("androidx.lifecycle:lifecycle-extensions")
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-plugin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
