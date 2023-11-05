@@ -121,7 +121,7 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
         return true
     }
 
-    override fun onChanged(bthidStatus: BTHIDStatus?) {
+    override fun onChanged(bthidStatus: BTHIDStatus) {
         hidProfileServiceListener.isAppEnabled = bthidStatus == BTHIDStatus.ON
     }
 

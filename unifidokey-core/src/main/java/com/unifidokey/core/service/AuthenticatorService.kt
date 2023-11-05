@@ -2,7 +2,7 @@ package com.unifidokey.core.service
 
 import androidx.annotation.UiThread
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.unifidokey.core.adapter.UnifidoKeyAuthenticatorPropertyStore
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.driver.persistence.converter.EventConverter
@@ -63,7 +63,7 @@ class AuthenticatorService(
             }
         }
 
-    val events: LiveData<List<Event>> = Transformations.map(eventDao.findAllLiveData()) {
+    val events: LiveData<List<Event>> = eventDao.findAllLiveData().map {
         return@map it.map { item -> eventConverter.toEvent(item) }
     }
 

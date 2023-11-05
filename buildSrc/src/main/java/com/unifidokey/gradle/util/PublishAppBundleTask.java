@@ -38,9 +38,12 @@ public class PublishAppBundleTask extends DefaultTask {
     private static final String TRACK_INTERNAL = "internal";
     private static final String TRACK_ALPHA = "alpha";
 
-    private String applicationName;
-    private String packageName;
-    private File appBundle;
+    @Input
+    public String applicationName;
+    @Input
+    public String packageName;
+    @InputFile
+    public File appBundle;
 
     public PublishAppBundleTask() {
         getDependsOn().add("assembleRelease");
@@ -120,30 +123,30 @@ public class PublishAppBundleTask extends DefaultTask {
                 .build();
     }
 
-    @Input
-    public String getApplicationName() {
-        return applicationName;
-    }
-
-    public void setApplicationName(String applicationName) {
-        this.applicationName = applicationName;
-    }
-
-    @Input
-    public String getPackageName() {
-        return packageName;
-    }
-
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
-    }
-
-    @InputFile
-    public File getAppBundle() {
-        return appBundle;
-    }
-
-    public void setAppBundle(Object appBundle) {
-        this.appBundle = getProject().file(appBundle);
-    }
+//    @Input
+//    public String getApplicationName() {
+//        return applicationName;
+//    }
+//
+//    public void setApplicationName(String applicationName) {
+//        this.applicationName = applicationName;
+//    }
+//
+//    @Input
+//    public String getPackageName() {
+//        return packageName;
+//    }
+//
+//    public void setPackageName(String packageName) {
+//        this.packageName = packageName;
+//    }
+//
+//    @InputFile
+//    public File getAppBundle() {
+//        return appBundle;
+//    }
+//
+//    public void setAppBundle(Object appBundle) {
+//        this.appBundle = getProject().file(appBundle);
+//    }
 }

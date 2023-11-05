@@ -22,7 +22,7 @@ buildscript {
     ext.coreKtxVersion = "1.10.1"
 
     ext.daggerVersion = "2.48.1"
-    ext.roomVersion = "2.5.2"
+    ext.roomVersion = "2.4.3"
 
     // Android libraries
     ext.asmVersion = "9.6"
@@ -33,6 +33,7 @@ buildscript {
     ext.preferenceVersion = "1.2.1"
     ext.navigationVersion = "2.5.3"
     ext.lifecycleVersion = "2.5.1"
+    ext.lifecycleExtensionsVersion = "2.2.0"
     ext.materialVersion = "1.6.1"
     ext.googleServicesVersion = "4.4.0"
     ext.firebaseBomVersion = "32.5.0"
@@ -41,7 +42,7 @@ buildscript {
     ext.googlePlayServicesFidoVersion = "20.1.0"
     ext.googlePlayServicesSafetyNetVersion = "18.0.1"
     ext.googlePlayServicesOSSLicensesVersion = "17.0.1"
-    ext.androidGradlePluginVersion = '7.4.2'
+    ext.androidGradlePluginVersion = '8.1.2'
     ext.navigationSafeArgsGradlePluginVersion = "2.5.2"
     ext.ossLicensesPluginVersion = "0.10.6"
 
@@ -152,10 +153,13 @@ subprojects {
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutinesVersion")
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$kotlinCoroutinesVersion")
             implementation("androidx.core:core-ktx:$coreKtxVersion")
-            implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
-            implementation("androidx.lifecycle:lifecycle-process:$lifecycleVersion")
-            implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
-            implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
+//            implementation("androidx.lifecycle:lifecycle-viewmodel:$lifecycleVersion")
+//            implementation("androidx.lifecycle:lifecycle-livedata:$lifecycleVersion")
+//            implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
+//            implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
+//            implementation("androidx.lifecycle:lifecycle-process:$lifecycleVersion")
+//            implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
+            implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleExtensionsVersion")
 
             // google
             implementation("androidx.navigation:navigation-fragment:$navigationVersion")

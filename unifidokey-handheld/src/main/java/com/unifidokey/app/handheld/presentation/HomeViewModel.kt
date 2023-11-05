@@ -9,7 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import androidx.navigation.Navigation
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.unifidokey.R
@@ -39,11 +39,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val nfcService: NFCService = unifidoKeyComponent.nfcService
     private val bthidService: BTHIDService = unifidoKeyComponent.bthidService
 
-    val isNoneAttestation = Transformations.map(configManager.attestationStatementFormat.liveData) {
+    val isNoneAttestation = configManager.attestationStatementFormat.liveData.map {
         it.value == NoneAttestationStatement.FORMAT
     }
 
-    val isAndroidSafetyNetAttestation = Transformations.map(configManager.attestationStatementFormat.liveData) {
+    val isAndroidSafetyNetAttestation = configManager.attestationStatementFormat.liveData.map {
         it.value == AndroidSafetyNetAttestationStatement.FORMAT
     }
 
@@ -60,12 +60,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         get() = bthidService.bluetoothDevices
 
     val recentEvents: LiveData<List<Event>> =
-        Transformations.map(authenticatorService.events) { events -> events.take(3) }
+        authenticatorService.events.map { events -> events.take(3) }
 
     val isBTHIDBackgroundServiceModeEnabled: LiveData<Boolean>
         get() = bthidService.isBTHIDBackgroundServiceModeEnabled
 
-    val nfcStatusMessage = Transformations.map(nfcService.nfcStatus) {
+    val nfcStatusMessage = nfcService.nfcStatus.map {
         when (it) {
             NFCStatus.ON -> "NFC transport is ON"
             NFCStatus.OFF -> "NFC transport is OFF"
@@ -73,7 +73,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             else -> throw IllegalStateException("Unexpected NFCStatus")
         }
     }
-    val nfcButtonText = Transformations.map(nfcService.nfcStatus) {
+    val nfcButtonText = nfcService.nfcStatus.map {
         when (it) {
             NFCStatus.ON -> "Disable"
             NFCStatus.OFF -> "Enable"
@@ -84,7 +84,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     val isNFCAdapterAvailable: Boolean
         get() = nfcService.isNFCAdapterAvailable
 
-    val bthidStatusMessage = Transformations.map(bthidService.bthidStatus) {
+    val bthidStatusMessage = bthidService.bthidStatus.map {
         when (it) {
             BTHIDStatus.ON -> "Bluetooth HID transport is ON"
             BTHIDStatus.OFF -> "Bluetooth HID transport is OFF"
@@ -92,7 +92,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             else -> throw IllegalStateException("Unexpected BTHIDStatus")
         }
     }
-    val bthidButtonText = Transformations.map(bthidService.bthidStatus) {
+    val bthidButtonText = bthidService.bthidStatus.map {
         when (it) {
             BTHIDStatus.ON -> "Disable"
             BTHIDStatus.OFF -> "Enable"
