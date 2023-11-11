@@ -1,13 +1,14 @@
 plugins {
     id("kotlin-android")
     id("kotlin-kapt")
+    kotlin("plugin.serialization") version "1.9.0"
 }
 
 android {
 
     defaultConfig {
-        compileSdk = 33 // Android 13.0
-        minSdk = 28 // Android 9.0
+        compileSdk = 34 // Android 14.0
+        minSdk = 34 // Android 14.0
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -66,6 +67,7 @@ dependencies {
     // project dependencies
     implementation("com.github.webauthn4j.webauthn4j:webauthn4j-core")
     implementation(project(":webauthn4j-ctap-authenticator"))
+    implementation(project(":webauthn4j-ctap-client"))
 
     // Third Party dependencies
     implementation("org.slf4j:slf4j-api")
@@ -95,6 +97,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation("androidx.lifecycle:lifecycle-extensions")
 
+    implementation(libs.androidx.credentials)
+
     implementation("com.google.dagger:dagger")
     implementation("com.google.dagger:dagger-android")
     implementation("com.google.dagger:dagger-android-support")
@@ -103,6 +107,8 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
 
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
     // Annotation processor
     kapt("com.google.dagger:dagger-compiler:$daggerVersion")

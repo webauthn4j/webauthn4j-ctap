@@ -13,7 +13,7 @@ class UnifidoKeyHandHeldApplication : UnifidoKeyApplicationBase<UnifidoKeyHandHe
     companion object {
         const val NFC_FEATURE_FLAG = true
         const val BLE_FEATURE_FLAG = false
-        const val BTHID_FEATURE_FLAG = true
+        const val BTHID_FEATURE_FLAG = false
 
         val isOssFlavor : Boolean
             get() = BuildConfig.FLAVOR == "oss"

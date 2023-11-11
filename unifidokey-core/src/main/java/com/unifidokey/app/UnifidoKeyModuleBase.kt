@@ -15,6 +15,7 @@ import com.unifidokey.core.service.BTHIDService
 import com.unifidokey.core.service.NFCService
 import com.unifidokey.driver.attestation.AndroidKeyAttestationStatementProvider
 import com.unifidokey.driver.attestation.AndroidSafetyNetAttestationStatementProvider
+import com.unifidokey.driver.converter.jackson.Base64UrlRepresentationModule
 import com.unifidokey.driver.persistence.UnifidoKeyAuthenticatorPropertyStoreImpl
 import com.unifidokey.driver.persistence.UnifidoKeyDatabase
 import com.unifidokey.driver.persistence.dao.*
@@ -153,6 +154,7 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
     fun provideObjectConverter(): ObjectConverter {
         val jsonMapper = ObjectMapper()
         jsonMapper.registerModule(JavaTimeModule())
+        jsonMapper.registerModule(Base64UrlRepresentationModule())
         val cborMapper = ObjectMapper(CBORFactory())
         cborMapper.coercionConfigFor(LogicalType.Textual)
             .setCoercion(CoercionInputShape.Boolean, CoercionAction.Fail)

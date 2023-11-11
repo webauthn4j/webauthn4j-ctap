@@ -24,6 +24,27 @@
         android:required="true" />
 
     <application>
+        <service android:name="com.unifidokey.driver.provider.PasskeyCredentialProviderService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="UnifidoKey"
+            android:permission="android.permission.BIND_CREDENTIAL_PROVIDER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.credentials.CredentialProviderService"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.credentials.provider"
+                android:resource="@xml/provider"/>
+        </service>
+<!--        <receiver-->
+<!--            android:name="com.unifidokey.driver.provider.PasskeyIntentReceiver"-->
+<!--            android:exported="false">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="com.unifidokey.provider.CREATE_PASSKEY" />-->
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
+
         <service
             android:name="com.unifidokey.driver.transport.CtapNFCAndroidService"
             android:enabled="true"

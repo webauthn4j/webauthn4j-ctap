@@ -89,11 +89,14 @@ class SettingsFragment internal constructor(
         configurePreferences(rootKey)
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if(key == null){
+            return
+        }
         // Update the value index of ListPreference to reflect the change to the user interface
         val preference = findPreference<Preference>(key)
         if (preference is ListPreference) {
-            val newValue = sharedPreferences.getString(key, null)
+            val newValue = sharedPreferences?.getString(key, null)
             preference.setValueIndex(preference.findIndexOfValue(newValue))
         }
     }

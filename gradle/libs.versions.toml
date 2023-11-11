@@ -3,6 +3,7 @@ kotlin = "1.9.20"
 kotlinx-coroutines = "1.7.3"
 
 androidx-lifecycle = "2.6.2"
+androidx-credentials = "1.2.0"
 
 androidx-test = "1.5.0"
 androidx-test-ext-junit = "1.1.5"
@@ -33,6 +34,7 @@ androidx-lifecycle-livedata = { group = "androidx.lifecycle", name = "lifecycle-
 androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle"}
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "androidx-lifecycle"}
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle"}
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "androidx-credentials"}
 
 # Third-party libraries
 slf4j-api = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j"}

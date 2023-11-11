@@ -44,6 +44,21 @@
             android:name=".app.handheld.presentation.CredentialSelectorDialogActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/AppTheme.FullscreenTheme" />
+
+        <activity
+            android:name=".app.handheld.presentation.PasskeyRegistrationConsentDialogActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@style/AppTheme.FullscreenTheme"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.unifidokey.provider.CREATE_PASSKEY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+
+
+
     </application>
 
 </manifest>

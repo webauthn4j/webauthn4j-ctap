@@ -19,9 +19,9 @@ val unifidoKeyVersionCode = VersionCodeUtil.getVersionCodeFromVersionString(unif
 android {
 
     defaultConfig {
-        compileSdk = 33 // Android 13.0
-        minSdk = 28 // Android 9.0
-        targetSdk = 31 // Android 12.0
+        compileSdk = 34 // Android 14.0
+        minSdk = 34 // Android 14.0
+        targetSdk = 34 // Android 14.0
         versionName = unifidoKeyVersion
         versionCode = unifidoKeyVersionCode
 
@@ -136,6 +136,7 @@ dependencies {
     // Project dependencies
     implementation(project(":unifidokey-core"))
     implementation(project(":webauthn4j-ctap-authenticator"))
+    implementation(project(":webauthn4j-ctap-client"))
 
     // Third Party dependencies
     implementation("com.github.tony19:logback-android")
@@ -166,6 +167,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation("androidx.lifecycle:lifecycle-extensions")
+
+    implementation(libs.androidx.credentials)
+
 
     implementation("com.google.android.material:material")
 

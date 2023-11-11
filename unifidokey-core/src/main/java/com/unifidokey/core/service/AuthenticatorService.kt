@@ -43,7 +43,7 @@ class AuthenticatorService(
 
     companion object {
         @JvmField
-        val AAGUID = AAGUID("62b0f4c6-5a10-4eba-b094-b44529d77bb0")
+        val AAGUID: AAGUID = com.webauthn4j.data.attestation.authenticator.AAGUID.ZERO //AAGUID("62b0f4c6-5a10-4eba-b094-b44529d77bb0")
     }
 
     private val eventConverter = EventConverter(objectConverter)
