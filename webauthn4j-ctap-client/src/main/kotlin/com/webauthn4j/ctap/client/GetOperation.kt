@@ -17,7 +17,7 @@ import com.webauthn4j.util.MessageDigestUtil
 class GetOperation(
     webAuthnClient: WebAuthnClient,
     private val publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions,
-    private val clientProperty: ClientProperty
+    private val getPublicKeyCredentialContext: GetPublicKeyCredentialContext
 ) : WebAuthnOperationBase(webAuthnClient) {
 
     suspend fun execute(): PublicKeyCredential<AuthenticatorAssertionResponse, AuthenticationExtensionClientOutput> {
@@ -25,7 +25,7 @@ class GetOperation(
         if (ctapClients.isEmpty()) {
             throw WebAuthnClientException("Matching authenticator doesn't exist.")
         }
-        val ctapClient = webAuthnClient.ctapAuthenticatorSelectionHandler.select(ctapClients)
+        val ctapClient = getPublicKeyCredentialContext.ctapAuthenticatorSelectionHandler.select(ctapClients)
         return getAssertions(ctapClient)
     }
 
@@ -42,16 +42,14 @@ class GetOperation(
         val collectedClientData = CollectedClientData(
             ClientDataType.WEBAUTHN_GET,
             publicKeyCredentialRequestOptions.challenge,
-            clientProperty.origin,
+            getPublicKeyCredentialContext.origin,
             TokenBinding(TokenBindingStatus.NOT_SUPPORTED, null as ByteArray?)
         )
         val clientDataJSON =
             webAuthnClient.collectedClientDataConverter.convertToBytes(collectedClientData)
         val clientDataHash = MessageDigestUtil.createSHA256().digest(clientDataJSON)
-        val authenticatorExtensions: AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>? =
-            null //TODO: implement extension handling
-        val rpId = publicKeyCredentialRequestOptions.rpId ?: clientProperty.origin.host
-        ?: throw WebAuthnClientException("WebAuthn client must have origin.")
+        val authenticatorExtensions: AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>? = null //TODO: implement extension handling
+        val rpId = publicKeyCredentialRequestOptions.rpId ?: getPublicKeyCredentialContext.origin.host ?: throw WebAuthnClientException("WebAuthn client must have origin.")
         val getAssertionsRequest = GetAssertionsRequest(
             rpId,
             clientDataHash,
@@ -59,10 +57,8 @@ class GetOperation(
             authenticatorExtensions,
             publicKeyCredentialRequestOptions.userVerification,
             publicKeyCredentialRequestOptions.timeout?.toULong(),
-            object : com.webauthn4j.ctap.client.ClientPINUserVerificationHandler {
-                override suspend fun onClientPINRequested(): String = clientProperty.clientPIN
-            },
-            object : com.webauthn4j.ctap.client.AuthenticatorUserVerificationHandler {
+            { getPublicKeyCredentialContext.clientPINProvider.provide() },
+            object : AuthenticatorUserVerificationHandler {
                 override suspend fun onAuthenticatorUserVerificationStarted() {
                     //nop
                 }
@@ -73,26 +69,24 @@ class GetOperation(
             }
         )
         val ctapService = CtapClient(ctapAuthenticatorHandle)
-        val getAssertionsResponse: GetAssertionsResponse =
-            ctapService.getAssertions(getAssertionsRequest)
-        val publicKeyCredentials = getAssertionsResponse.assertions.map {
-            val credentialId = it.credential?.id
-            val authenticatorData = it.authData
-            val signature = it.signature
-            val userHandle = it.user?.id
-            val clientExtensionResults: AuthenticationExtensionsClientOutputs<AuthenticationExtensionClientOutput>? =
-                null //TODO: implement extension handling
-            PublicKeyCredential(
-                credentialId,
-                AuthenticatorAssertionResponse(
-                    clientDataJSON,
-                    authenticatorData,
-                    signature,
-                    userHandle
-                ),
-                clientExtensionResults
-            )
-        }
-        return webAuthnClient.publicKeyCredentialSelectionHandler.select(publicKeyCredentials)
+        val getAssertionsResponse: GetAssertionsResponse = ctapService.getAssertions(getAssertionsRequest)
+
+        val assertion = getPublicKeyCredentialContext.publicKeyCredentialSelectionHandler.select(getAssertionsResponse.assertions)
+
+        val credentialId = assertion.credential?.id
+        val authenticatorData = assertion.authData
+        val signature = assertion.signature
+        val userHandle = assertion.user?.id
+        val clientExtensionResults: AuthenticationExtensionsClientOutputs<AuthenticationExtensionClientOutput>? = null //TODO: implement extension handling
+        return PublicKeyCredential(
+            credentialId,
+            AuthenticatorAssertionResponse(
+                clientDataJSON,
+                authenticatorData,
+                signature,
+                userHandle
+            ),
+            clientExtensionResults
+        )
     }
 }

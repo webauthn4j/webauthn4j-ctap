@@ -16,7 +16,7 @@ import com.webauthn4j.ctap.authenticator.data.credential.Credential
 import com.webauthn4j.ctap.authenticator.data.settings.*
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
-import com.webauthn4j.ctap.client.ClientProperty
+import com.webauthn4j.ctap.client.GetPublicKeyCredentialContext
 import com.webauthn4j.ctap.client.CtapAuthenticatorHandle
 import com.webauthn4j.ctap.client.CtapClient
 import com.webauthn4j.ctap.client.WebAuthnClient
@@ -256,8 +256,8 @@ abstract class IntegrationTestCaseBase {
                 )
                 private val originParameter = TestParameter { Origin("https://example.com") }
                 private val clientPINParameter = TestParameter { "clientPIN" }
-                private val clientPropertyParameter =
-                    TestParameter { ClientProperty(origin, clientPIN) }.depends(
+                private val getPublicKeyCredentialContextParameter =
+                    TestParameter { GetPublicKeyCredentialContext(origin, clientPIN) }.depends(
                         originParameter,
                         clientPINParameter
                     )
@@ -282,7 +282,7 @@ abstract class IntegrationTestCaseBase {
                 var publicKeyCredentialCreationOptions by publicKeyCredentialCreationOptionsParameter
                 var origin by originParameter
                 var clientPIN by clientPINParameter
-                var clientProperty by clientPropertyParameter
+                var clientProperty by getPublicKeyCredentialContextParameter
             }
 
             inner class Backend {
@@ -348,8 +348,8 @@ abstract class IntegrationTestCaseBase {
                 ) //this@RelyingParty.challengeParameter,
                 private val originParameter = TestParameter { Origin("https://example.com") }
                 private val clientPINParameter = TestParameter { "clientPIN" }
-                private val clientPropertyParameter =
-                    TestParameter { ClientProperty(origin, clientPIN) }.depends(
+                private val getPublicKeyCredentialContextParameter =
+                    TestParameter { GetPublicKeyCredentialContext(origin, clientPIN) }.depends(
                         originParameter,
                         clientPINParameter
                     )
@@ -362,7 +362,7 @@ abstract class IntegrationTestCaseBase {
                 var publicKeyCredentialRequestOptions by publicKeyCredentialRequestOptionsParameter
                 var origin by originParameter
                 var clientPIN by clientPINParameter
-                var clientProperty by clientPropertyParameter
+                var clientProperty by getPublicKeyCredentialContextParameter
             }
 
             inner class Backend {

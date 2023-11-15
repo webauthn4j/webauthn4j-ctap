@@ -15,19 +15,17 @@
  */
 package com.unifidokey.driver.converter.jackson
 
-import com.fasterxml.jackson.annotation.JsonCreator
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.unifidokey.driver.converter.jackson.deserializer.json.ByteArraySerializer
 import com.unifidokey.driver.converter.jackson.serializer.json.ByteArrayDeserializer
 
 /**
- * A mix-in for [com.webauthn4j.data.PublicKeyCredentialUserEntity] not to fix
+ * A mix-in for [com.webauthn4j.data.PublicKeyCredentialDescriptor] not to fix
  * how to serialize it.
  */
-abstract class PublicKeyCredentialUserEntityMixin {
-    @get:JsonSerialize(using = ByteArraySerializer::class)
+abstract class PublicKeyCredentialMixin {
     @get:JsonDeserialize(using = ByteArrayDeserializer::class)
-    abstract val id: String
+    @get:JsonSerialize(using = ByteArraySerializer::class)
+    abstract val rawId: String
 }

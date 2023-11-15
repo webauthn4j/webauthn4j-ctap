@@ -47,7 +47,7 @@ buildscript {
     ext.ossLicensesPluginVersion = "0.10.6"
 
     // WebAuthn4J
-    ext.webauthn4jVersion = "unifidokey-dev-SNAPSHOT"
+    ext.webauthn4jVersion = "exp2-SNAPSHOT"
 
     // Third party libraries
     ext.slf4jVersion = "2.0.9"

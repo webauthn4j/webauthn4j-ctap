@@ -21,44 +21,22 @@ class WebAuthnClient(
         CollectedClientDataConverter(objectConverter)
     val attestationObjectConverter: AttestationObjectConverter =
         AttestationObjectConverter(objectConverter)
-    var clientPINProvider: ClientPINProvider? = null
-    var ctapAuthenticatorSelectionHandler: CtapAuthenticatorSelectionHandler =
-        DefaultCtapAuthenticatorSelectionHandler()
-    var publicKeyCredentialSelectionHandler: PublicKeyCredentialSelectionHandler =
-        DefaultPublicKeyCredentialSelectionHandler()
 
     suspend fun create(
         publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions,
-        clientProperty: ClientProperty
+        createPublicKeyCredentialContext: CreatePublicKeyCredentialContext
     ): PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput> {
         return CreateOperation(
             this,
             publicKeyCredentialCreationOptions,
-            clientProperty
+            createPublicKeyCredentialContext
         ).execute()
     }
 
     suspend fun get(
         publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions,
-        clientProperty: ClientProperty
+        getPublicKeyCredentialContext: GetPublicKeyCredentialContext
     ): PublicKeyCredential<AuthenticatorAssertionResponse, AuthenticationExtensionClientOutput> {
-        return GetOperation(this, publicKeyCredentialRequestOptions, clientProperty).execute()
+        return GetOperation(this, publicKeyCredentialRequestOptions, getPublicKeyCredentialContext).execute()
     }
-
-    private inner class DefaultPublicKeyCredentialSelectionHandler :
-        PublicKeyCredentialSelectionHandler {
-        override fun select(list: List<PublicKeyCredential<AuthenticatorAssertionResponse, AuthenticationExtensionClientOutput>>): PublicKeyCredential<AuthenticatorAssertionResponse, AuthenticationExtensionClientOutput> {
-            return list.first()
-        }
-    }
-
-    private inner class DefaultCtapAuthenticatorSelectionHandler :
-        CtapAuthenticatorSelectionHandler {
-
-
-        override fun select(list: List<CtapAuthenticatorHandle>): CtapAuthenticatorHandle {
-            return list.first()
-        }
-    }
-
 }

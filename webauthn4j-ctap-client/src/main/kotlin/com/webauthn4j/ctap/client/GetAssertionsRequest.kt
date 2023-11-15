@@ -14,9 +14,7 @@ class GetAssertionsRequest(
     allowList: List<PublicKeyCredentialDescriptor>?,
     extensions: AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>?,
     userVerification: UserVerificationRequirement?,
-    timeout: ULong?,
-    clientPINUserVerificationHandler: com.webauthn4j.ctap.client.ClientPINUserVerificationHandler,
-    authenticatorUserVerificationHandler: com.webauthn4j.ctap.client.AuthenticatorUserVerificationHandler
+    timeout: ULong?
 ) {
 
     val rpId: String = rpId
@@ -27,10 +25,6 @@ class GetAssertionsRequest(
         extensions
     val userVerification: UserVerificationRequirement? = userVerification
     val timeout: ULong? = timeout
-    val clientPINUserVerificationHandler: com.webauthn4j.ctap.client.ClientPINUserVerificationHandler =
-        clientPINUserVerificationHandler
-    val authenticatorUserVerificationHandler: com.webauthn4j.ctap.client.AuthenticatorUserVerificationHandler =
-        authenticatorUserVerificationHandler
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -43,8 +37,6 @@ class GetAssertionsRequest(
         if (extensions != other.extensions) return false
         if (userVerification != other.userVerification) return false
         if (timeout != other.timeout) return false
-        if (clientPINUserVerificationHandler != other.clientPINUserVerificationHandler) return false
-        if (authenticatorUserVerificationHandler != other.authenticatorUserVerificationHandler) return false
 
         return true
     }
@@ -55,10 +47,7 @@ class GetAssertionsRequest(
         result = 31 * result + (extensions?.hashCode() ?: 0)
         result = 31 * result + userVerification.hashCode()
         result = 31 * result + timeout.hashCode()
-        result = 31 * result + clientPINUserVerificationHandler.hashCode()
-        result = 31 * result + authenticatorUserVerificationHandler.hashCode()
         return result
     }
-
 
 }

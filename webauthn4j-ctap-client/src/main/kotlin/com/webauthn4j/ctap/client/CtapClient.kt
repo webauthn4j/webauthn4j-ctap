@@ -64,7 +64,10 @@ class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
         )
     }
 
-    suspend fun makeCredential(makeCredentialRequest: MakeCredentialRequest): MakeCredentialResponse {
+    suspend fun makeCredential(
+        makeCredentialRequest: MakeCredentialRequest,
+        makeCredentialContext: MakeCredentialContext
+    ): MakeCredentialResponse {
         val getInfoResponse: AuthenticatorGetInfoResponse = ctapAuthenticatorHandle.getInfo()
         val getInfoResponseData = getInfoResponse.responseData ?: throw ResponseDataValidationException("authenticatorGetInfo responseData is null")
         val userVerificationStrategy = makeUserVerificationStrategy(
@@ -91,7 +94,7 @@ class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
 
         val authenticatorMakeCredentialResponse = when (userVerificationStrategy) {
             UserVerificationStrategy.AUTHENTICATOR_UV -> {
-                makeCredentialRequest.authenticatorUserVerificationHandler.onAuthenticatorUserVerificationStarted()
+                makeCredentialContext.authenticatorUserVerificationHandler.onAuthenticatorUserVerificationStarted()
                 val makeCredentialResponse = ctapAuthenticatorHandle.makeCredential(
                     AuthenticatorMakeCredentialRequest(
                         makeCredentialRequest.clientDataHash,
@@ -105,21 +108,18 @@ class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
                         null
                     )
                 )
-                makeCredentialRequest.authenticatorUserVerificationHandler.onAuthenticatorUserVerificationFinished()
+                makeCredentialContext.authenticatorUserVerificationHandler.onAuthenticatorUserVerificationFinished()
                 makeCredentialResponse
             }
             UserVerificationStrategy.CLIENT_PIN_UV -> {
-                val clientPIN: String
+                val clientPIN: ByteArray
                 try {
-                    clientPIN =
-                        makeCredentialRequest.clientPINUserVerificationHandler.onClientPINRequested()
+                    clientPIN = makeCredentialContext.clientPINUserVerificationHandler.onClientPINRequested()
                 } catch (e: ClientPINUserVerificationCanceledException) {
                     throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_REQUIRED, e)
                 }
-                val pinToken: ByteArray =
-                    requestPINToken(clientPIN.toByteArray(StandardCharsets.UTF_8))
-                val pinAuth =
-                    MACUtil.calculateHmacSHA256(makeCredentialRequest.clientDataHash, pinToken, 16)
+                val pinToken: ByteArray = requestPINToken(clientPIN)
+                val pinAuth = MACUtil.calculateHmacSHA256(makeCredentialRequest.clientDataHash, pinToken, 16)
                 ctapAuthenticatorHandle.makeCredential(
                     AuthenticatorMakeCredentialRequest(
                         makeCredentialRequest.clientDataHash,
@@ -157,7 +157,7 @@ class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
         )
     }
 
-    suspend fun getAssertions(getAssertionsRequest: GetAssertionsRequest): GetAssertionsResponse {
+    suspend fun getAssertions(getAssertionsRequest: GetAssertionsRequest, getAssertionContext: GetAssertionContext): GetAssertionsResponse {
         val getInfoResponse: AuthenticatorGetInfoResponse = ctapAuthenticatorHandle.getInfo()
         val getInfoResponseData = getInfoResponse.responseData ?: throw ResponseDataValidationException("authenticatorGetInfo responseData is null")
         val userVerificationStrategy = makeUserVerificationStrategy(
@@ -166,7 +166,7 @@ class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
         )
         val getAssertionResponse = when (userVerificationStrategy) {
             UserVerificationStrategy.AUTHENTICATOR_UV -> {
-                getAssertionsRequest.authenticatorUserVerificationHandler.onAuthenticatorUserVerificationStarted()
+                getAssertionContext.authenticatorUserVerificationHandler.onAuthenticatorUserVerificationStarted()
                 val getAssertionResponse: AuthenticatorGetAssertionResponse =
                     ctapAuthenticatorHandle.getAssertion(
                         AuthenticatorGetAssertionRequest(
@@ -179,19 +179,18 @@ class CtapClient(private val ctapAuthenticatorHandle: CtapAuthenticatorHandle) {
                             null
                         )
                     )
-                getAssertionsRequest.authenticatorUserVerificationHandler.onAuthenticatorUserVerificationFinished()
+                getAssertionContext.authenticatorUserVerificationHandler.onAuthenticatorUserVerificationFinished()
                 getAssertionResponse
             }
             UserVerificationStrategy.CLIENT_PIN_UV -> {
-                val clientPIN: String
+                val clientPIN: ByteArray
                 try {
-                    clientPIN =
-                        getAssertionsRequest.clientPINUserVerificationHandler.onClientPINRequested()
+                    clientPIN = getAssertionContext.clientPINUserVerificationHandler.onClientPINRequested()
                 } catch (e: ClientPINUserVerificationCanceledException) {
                     throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_REQUIRED, e)
                 }
                 val pinToken: ByteArray =
-                    requestPINToken(clientPIN.toByteArray(StandardCharsets.UTF_8))
+                    requestPINToken(clientPIN)
                 val pinAuth: ByteArray? =
                     MACUtil.calculateHmacSHA256(getAssertionsRequest.clientDataHash, pinToken, 16)
                 ctapAuthenticatorHandle.getAssertion(

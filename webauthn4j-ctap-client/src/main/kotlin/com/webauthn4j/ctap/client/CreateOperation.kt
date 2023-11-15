@@ -4,7 +4,9 @@ import com.webauthn4j.ctap.client.exception.WebAuthnClientException
 import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
 import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
 import com.webauthn4j.data.AttestationConveyancePreference
+import com.webauthn4j.data.AuthenticatorAttachment
 import com.webauthn4j.data.AuthenticatorAttestationResponse
+import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.data.PublicKeyCredential
 import com.webauthn4j.data.PublicKeyCredentialCreationOptions
 import com.webauthn4j.data.attestation.AttestationObject
@@ -15,25 +17,26 @@ import com.webauthn4j.data.client.TokenBinding
 import com.webauthn4j.data.client.TokenBindingStatus
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
 import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenticatorInput
+import com.webauthn4j.data.extension.client.AuthenticationExtensionsClientOutputs
 import com.webauthn4j.data.extension.client.RegistrationExtensionClientOutput
 import com.webauthn4j.util.MessageDigestUtil
 
 class CreateOperation(
-    webAuthnClient: com.webauthn4j.ctap.client.WebAuthnClient,
+    webAuthnClient: WebAuthnClient,
     private val publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions,
-    private val clientProperty: com.webauthn4j.ctap.client.ClientProperty
-) : com.webauthn4j.ctap.client.WebAuthnOperationBase(webAuthnClient) {
+    private val createPublicKeyCredentialContext: CreatePublicKeyCredentialContext
+) : WebAuthnOperationBase(webAuthnClient) {
 
     suspend fun execute(): PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput> {
         val ctapClients = webAuthnClient.ctapAuthenticatorHandles.filter { match(it) }
         if (ctapClients.isEmpty()) {
             throw WebAuthnClientException("Matching authenticator doesn't exist.")
         }
-        val ctapClient = webAuthnClient.ctapAuthenticatorSelectionHandler.select(ctapClients)
+        val ctapClient = createPublicKeyCredentialContext.ctapAuthenticatorSelectionHandler.select(ctapClients)
         return makeCredential(ctapClient)
     }
 
-    private suspend fun match(ctapAuthenticatorHandle: com.webauthn4j.ctap.client.CtapAuthenticatorHandle): Boolean {
+    private suspend fun match(ctapAuthenticatorHandle: CtapAuthenticatorHandle): Boolean {
         val criteria = publicKeyCredentialCreationOptions.authenticatorSelection
         val responseData = ctapAuthenticatorHandle.getInfo().responseData
         return matchByAuthenticatorAttachment(
@@ -53,18 +56,18 @@ class CreateOperation(
     }
 
 
-    private suspend fun makeCredential(ctapAuthenticatorHandle: com.webauthn4j.ctap.client.CtapAuthenticatorHandle): PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput> {
+    private suspend fun makeCredential(ctapAuthenticatorHandle: CtapAuthenticatorHandle): PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput> {
         // makeCredential
         val collectedClientData = CollectedClientData(
             ClientDataType.WEBAUTHN_CREATE,
             publicKeyCredentialCreationOptions.challenge,
-            clientProperty.origin,
+            createPublicKeyCredentialContext.origin,
             TokenBinding(TokenBindingStatus.NOT_SUPPORTED, null as ByteArray?)
         )
         val clientDataJSON =
             webAuthnClient.collectedClientDataConverter.convertToBytes(collectedClientData)
         val clientDataHash = MessageDigestUtil.createSHA256().digest(clientDataJSON)
-        val rpId = publicKeyCredentialCreationOptions.rp.id ?: clientProperty.origin.host
+        val rpId = publicKeyCredentialCreationOptions.rp.id ?: createPublicKeyCredentialContext.origin.host
         ?: throw WebAuthnClientException("WebAuthn client must have origin.")
         val rp =
             CtapPublicKeyCredentialRpEntity(rpId, publicKeyCredentialCreationOptions.rp.name, null)
@@ -86,12 +89,11 @@ class CreateOperation(
                 authenticatorExtensions,
                 publicKeyCredentialCreationOptions.authenticatorSelection,
                 publicKeyCredentialCreationOptions.timeout?.toULong(),
-                object : com.webauthn4j.ctap.client.ClientPINUserVerificationHandler {
-                    override suspend fun onClientPINRequested(): String {
-                        return clientProperty.clientPIN
-                    }
-                },
-                object : com.webauthn4j.ctap.client.AuthenticatorUserVerificationHandler {
+            )
+        val makeCredentialContext =
+            MakeCredentialContext(
+                { createPublicKeyCredentialContext.clientPINProvider.provide() },
+                object : AuthenticatorUserVerificationHandler {
                     override suspend fun onAuthenticatorUserVerificationStarted() {
                         //nop
                     }
@@ -104,7 +106,7 @@ class CreateOperation(
         val ctapService =
             CtapClient(ctapAuthenticatorHandle)
         val makeCredentialResponse: MakeCredentialResponse =
-            ctapService.makeCredential(makeCredentialRequest)
+            ctapService.makeCredential(makeCredentialRequest, makeCredentialContext)
         val credentialId =
             makeCredentialResponse.authenticatorData.attestedCredentialData!!.credentialId
         val attestationObject = when (publicKeyCredentialCreationOptions.attestation) {
@@ -124,12 +126,14 @@ class CreateOperation(
         }
         val attestationObjectBytes =
             webAuthnClient.attestationObjectConverter.convertToBytes(attestationObject)
+        val transports: Set<AuthenticatorTransport> = setOf(AuthenticatorTransport.INTERNAL, AuthenticatorTransport.HYBRID) //TODO: take appropriate value from somewhere
         val authenticatorAttestationResponse =
-            AuthenticatorAttestationResponse(clientDataJSON, attestationObjectBytes)
+            AuthenticatorAttestationResponse(clientDataJSON, attestationObjectBytes, transports)
         return PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput>(
             credentialId,
             authenticatorAttestationResponse,
-            null
+            AuthenticatorAttachment.PLATFORM, //TODO: take appropriate value from somewhere
+            AuthenticationExtensionsClientOutputs() //TODO: implement extension handling
         )
     }
 }

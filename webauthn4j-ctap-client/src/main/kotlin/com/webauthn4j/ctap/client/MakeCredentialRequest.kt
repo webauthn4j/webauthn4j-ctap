@@ -18,9 +18,7 @@ class MakeCredentialRequest(
     excludeList: List<PublicKeyCredentialDescriptor>?,
     extensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>?,
     authenticatorSelection: AuthenticatorSelectionCriteria?,
-    timeout: ULong?,
-    clientPINUserVerificationHandler: ClientPINUserVerificationHandler,
-    authenticatorUserVerificationHandler: AuthenticatorUserVerificationHandler
+    timeout: ULong?
 ) {
 
     val clientDataHash: ByteArray = ArrayUtil.clone(clientDataHash)
@@ -33,10 +31,6 @@ class MakeCredentialRequest(
         extensions
     val authenticatorSelection: AuthenticatorSelectionCriteria? = authenticatorSelection
     val timeout: ULong? = timeout
-    val clientPINUserVerificationHandler: ClientPINUserVerificationHandler =
-        clientPINUserVerificationHandler
-    val authenticatorUserVerificationHandler: AuthenticatorUserVerificationHandler =
-        authenticatorUserVerificationHandler
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -51,8 +45,6 @@ class MakeCredentialRequest(
         if (extensions != other.extensions) return false
         if (authenticatorSelection != other.authenticatorSelection) return false
         if (timeout != other.timeout) return false
-        if (clientPINUserVerificationHandler != other.clientPINUserVerificationHandler) return false
-        if (authenticatorUserVerificationHandler != other.authenticatorUserVerificationHandler) return false
 
         return true
     }
@@ -65,10 +57,6 @@ class MakeCredentialRequest(
         result = 31 * result + (extensions?.hashCode() ?: 0)
         result = 31 * result + authenticatorSelection.hashCode()
         result = 31 * result + timeout.hashCode()
-        result = 31 * result + clientPINUserVerificationHandler.hashCode()
-        result = 31 * result + authenticatorUserVerificationHandler.hashCode()
         return result
     }
-
-
 }
