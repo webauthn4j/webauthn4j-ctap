@@ -10,8 +10,8 @@ import androidx.credentials.provider.PendingIntentHandler
 import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.driver.provider.PasskeyCredentialProviderService.Companion.CREATE_PASSKEY
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
-import com.webauthn4j.ctap.client.GetPublicKeyCredentialContext
-import com.webauthn4j.ctap.client.CtapAuthenticatorHandle
+import com.webauthn4j.ctap.client.PublicKeyCredentialCreationContext
+import com.webauthn4j.ctap.client.PublicKeyCredentialRequestContext
 import com.webauthn4j.ctap.client.WebAuthnClient
 import com.webauthn4j.ctap.client.transport.InProcessTransportAdaptor
 import com.webauthn4j.data.PublicKeyCredentialCreationOptions
@@ -43,16 +43,15 @@ class PasskeyIntentReceiver : BroadcastReceiver() {
                 val ctapAuthenticator = CtapAuthenticator() //TODO
                 ctapAuthenticator.credentialSelectionHandler
 
-                val ctapAuthenticatorHandle = CtapAuthenticatorHandle(InProcessTransportAdaptor(ctapAuthenticator))
-                val webAuthnClient = WebAuthnClient(listOf(ctapAuthenticatorHandle), objectConverter)
+                val ctapClient = com.webauthn4j.ctap.client.CtapClient(InProcessTransportAdaptor(ctapAuthenticator))
+                val webAuthnClient = WebAuthnClient(listOf(ctapClient), objectConverter)
                 val publicKeyCredentialCreationOptions = objectConverter.jsonConverter.readValue(callingRequest.requestJson, PublicKeyCredentialCreationOptions::class.java) ?: TODO()
                 val callingAppInfoOrigin = request.callingAppInfo.origin ?: TODO()
                 val origin = Origin(callingAppInfoOrigin)
-                val clientPIN = "" //TODO: Providing ClientPIN through clientProperty is really appropriate ClientProperty design?
-                val getPublicKeyCredentialContext = GetPublicKeyCredentialContext(origin, clientPIN)
+                val publicKeyCredentialCreationContext = PublicKeyCredentialCreationContext(origin)
                 CoroutineScope(Dispatchers.Main).launch {
                     try{
-                        val publicKeyCredential = webAuthnClient.create(publicKeyCredentialCreationOptions, getPublicKeyCredentialContext)
+                        val publicKeyCredential = webAuthnClient.create(publicKeyCredentialCreationOptions, publicKeyCredentialCreationContext)
                         val registrationResponseJson = objectConverter.jsonConverter.writeValueAsString(publicKeyCredential)
                         val result = Intent()
                         val createPublicKeyCredResponse = CreatePublicKeyCredentialResponse(registrationResponseJson)

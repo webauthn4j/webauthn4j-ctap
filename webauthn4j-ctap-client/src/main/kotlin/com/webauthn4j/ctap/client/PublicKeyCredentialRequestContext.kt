@@ -1,12 +1,9 @@
 package com.webauthn4j.ctap.client
 
 import com.webauthn4j.ctap.client.exception.CtapClientException
-import com.webauthn4j.data.AuthenticatorAssertionResponse
-import com.webauthn4j.data.PublicKeyCredential
 import com.webauthn4j.data.client.Origin
-import com.webauthn4j.data.extension.client.AuthenticationExtensionClientOutput
 
-class GetPublicKeyCredentialContext @JvmOverloads constructor(
+class PublicKeyCredentialRequestContext @JvmOverloads constructor(
     val origin: Origin,
     var ctapAuthenticatorSelectionHandler: CtapAuthenticatorSelectionHandler = DefaultCtapAuthenticatorSelectionHandler(),
     var publicKeyCredentialSelectionHandler: PublicKeyCredentialSelectionHandler = DefaultPublicKeyCredentialSelectionHandler(),
@@ -14,7 +11,7 @@ class GetPublicKeyCredentialContext @JvmOverloads constructor(
 ){
 
     private class DefaultCtapAuthenticatorSelectionHandler : CtapAuthenticatorSelectionHandler {
-        override fun select(list: List<CtapAuthenticatorHandle>): CtapAuthenticatorHandle {
+        override fun select(list: List<CtapClient>): CtapClient {
             return list.first()
         }
     }

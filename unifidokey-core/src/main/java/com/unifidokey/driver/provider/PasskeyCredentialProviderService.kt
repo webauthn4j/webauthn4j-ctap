@@ -26,17 +26,14 @@ import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.GetAssertionConsentOptions
 import com.webauthn4j.ctap.authenticator.MakeCredentialConsentOptions
 import com.webauthn4j.ctap.authenticator.UserConsentHandler
-import com.webauthn4j.ctap.client.GetPublicKeyCredentialContext
-import com.webauthn4j.ctap.client.CtapAuthenticatorHandle
+import com.webauthn4j.ctap.client.PublicKeyCredentialRequestContext
+import com.webauthn4j.ctap.client.CtapClient
 import com.webauthn4j.ctap.client.GetAssertionsResponse
 import com.webauthn4j.ctap.client.PublicKeyCredentialSelectionHandler
 import com.webauthn4j.ctap.client.WebAuthnClient
 import com.webauthn4j.ctap.client.transport.InProcessTransportAdaptor
-import com.webauthn4j.data.AuthenticatorAssertionResponse
-import com.webauthn4j.data.PublicKeyCredential
 import com.webauthn4j.data.PublicKeyCredentialRequestOptions
 import com.webauthn4j.data.client.Origin
-import com.webauthn4j.data.extension.client.AuthenticationExtensionClientOutput
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 
@@ -133,8 +130,8 @@ class PasskeyCredentialProviderService : CredentialProviderService() {
                         }
                     }
                     //TODO ctapAuthenticator.credentialSelectorSetting should be PLATFORM
-                    val ctapAuthenticatorHandle = CtapAuthenticatorHandle(InProcessTransportAdaptor(ctapAuthenticator))
-                    val webAuthnClient = WebAuthnClient(listOf(ctapAuthenticatorHandle), objectConverter)
+                    val ctapClient = CtapClient(InProcessTransportAdaptor(ctapAuthenticator))
+                    val webAuthnClient = WebAuthnClient(listOf(ctapClient), objectConverter)
                     val origin = Origin(request.callingAppInfo!!.origin!!)
                     val items = mutableListOf<GetAssertionsResponse.Assertion>();
                     runBlocking {
@@ -144,8 +141,8 @@ class PasskeyCredentialProviderService : CredentialProviderService() {
 
                             return@PublicKeyCredentialSelectionHandler assertions.first()
                         }
-                        val getPublicKeyCredentialContext = GetPublicKeyCredentialContext(origin, publicKeyCredentialSelectionHandler=publicKeyCredentialSelectionHandler)
-                        webAuthnClient.get(publicKeyCredentialRequestOptions, getPublicKeyCredentialContext)
+                        val publicKeyCredentialRequestContext = PublicKeyCredentialRequestContext(origin, publicKeyCredentialSelectionHandler=publicKeyCredentialSelectionHandler)
+                        webAuthnClient.get(publicKeyCredentialRequestOptions, publicKeyCredentialRequestContext)
                     }
 
                     items.map{ item ->

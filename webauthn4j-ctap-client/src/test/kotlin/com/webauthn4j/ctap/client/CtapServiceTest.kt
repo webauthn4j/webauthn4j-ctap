@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.ExecutionException
 
-internal class CtapClientTest {
+internal class CtapServiceTest {
     private val ctapAuthenticator = CtapAuthenticator()
-    private val ctapClient = CtapAuthenticatorHandle(InProcessTransportAdaptor(ctapAuthenticator))
-    private val target = CtapClient(ctapClient)
+    private val ctapClient = CtapClient(InProcessTransportAdaptor(ctapAuthenticator))
+    private val target = CtapService(ctapClient)
 
     @ExperimentalCoroutinesApi
     @Test

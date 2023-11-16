@@ -12,9 +12,8 @@ import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.webauthn4j.ctap.authenticator.GetAssertionConsentOptions
 import com.webauthn4j.ctap.authenticator.MakeCredentialConsentOptions
 import com.webauthn4j.ctap.authenticator.UserConsentHandler
-import com.webauthn4j.ctap.client.CreatePublicKeyCredentialContext
-import com.webauthn4j.ctap.client.GetPublicKeyCredentialContext
-import com.webauthn4j.ctap.client.CtapAuthenticatorHandle
+import com.webauthn4j.ctap.client.PublicKeyCredentialCreationContext
+import com.webauthn4j.ctap.client.CtapClient
 import com.webauthn4j.ctap.client.WebAuthnClient
 import com.webauthn4j.ctap.client.transport.InProcessTransportAdaptor
 import com.webauthn4j.data.AuthenticatorAssertionResponse
@@ -61,14 +60,14 @@ object PasskeyIntentProcessor {
 
                         }
 
-                        val ctapAuthenticatorHandle = CtapAuthenticatorHandle(InProcessTransportAdaptor(ctapAuthenticator))
-                        val webAuthnClient = WebAuthnClient(listOf(ctapAuthenticatorHandle), objectConverter)
+                        val ctapClient = CtapClient(InProcessTransportAdaptor(ctapAuthenticator))
+                        val webAuthnClient = WebAuthnClient(listOf(ctapClient), objectConverter)
                         val publicKeyCredentialCreationOptions = objectConverter.jsonConverter.readValue(callingRequest.requestJson, PublicKeyCredentialCreationOptions::class.java) ?: TODO()
 
                         val callingAppInfoOrigin = request.callingAppInfo.origin ?: TODO()
                         val origin = Origin(callingAppInfoOrigin)
-                        val createPublicKeyCredentialContext = CreatePublicKeyCredentialContext(origin)
-                        val publicKeyCredential = webAuthnClient.create(publicKeyCredentialCreationOptions, createPublicKeyCredentialContext)
+                        val publicKeyCredentialCreationContext = PublicKeyCredentialCreationContext(origin)
+                        val publicKeyCredential = webAuthnClient.create(publicKeyCredentialCreationOptions, publicKeyCredentialCreationContext)
                         val publicKeyCredentialJSON = objectConverter.jsonConverter.writeValueAsString(publicKeyCredential)
                         val result = Intent()
                         val createPublicKeyCredResponse = CreatePublicKeyCredentialResponse(publicKeyCredentialJSON)

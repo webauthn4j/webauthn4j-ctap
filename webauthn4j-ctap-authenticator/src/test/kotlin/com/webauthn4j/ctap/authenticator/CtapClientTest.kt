@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
 import java.util.concurrent.ExecutionException
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-internal class CtapAuthenticatorTest {
+internal class CtapClientTest {
     private val ctapAuthenticator = CtapAuthenticator()
 
     @Test
