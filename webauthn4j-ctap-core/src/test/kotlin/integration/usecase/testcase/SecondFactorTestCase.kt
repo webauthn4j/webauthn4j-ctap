@@ -28,7 +28,7 @@ class SecondFactorTestCase : IntegrationTestCaseBase() {
         // Create a credential on an authenticator through WebAuthn Client Create API
         val registrationResponse = clientPlatform.webAuthnAPIClient.create(
             relyingParty.registration.frontend.publicKeyCredentialCreationOptions,
-            relyingParty.registration.frontend.clientProperty
+            relyingParty.registration.frontend.publicKeyCredentialCreationContext
         )
         val credentialId = registrationResponse.rawId
         val attestationAuthenticatorResponse = registrationResponse.authenticatorResponse
@@ -62,7 +62,7 @@ class SecondFactorTestCase : IntegrationTestCaseBase() {
         )
         val assertionResponse = clientPlatform.webAuthnAPIClient.get(
             relyingParty.authentication.frontend.publicKeyCredentialRequestOptions,
-            relyingParty.authentication.frontend.clientProperty
+            relyingParty.authentication.frontend.publicKeyCredentialRequestContext
         )
         val assertionAuthenticatorResponse = assertionResponse.authenticatorResponse
             ?: fail("authenticatorResponse must not be null")

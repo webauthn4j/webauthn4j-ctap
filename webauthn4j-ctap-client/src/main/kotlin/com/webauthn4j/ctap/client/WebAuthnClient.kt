@@ -167,7 +167,7 @@ class WebAuthnClient(
         val authenticatorData = assertion.authData
         val signature = assertion.signature
         val userHandle = assertion.user?.id
-        val clientExtensionResults: AuthenticationExtensionsClientOutputs<AuthenticationExtensionClientOutput>? = null //TODO: implement extension handling
+        val clientExtensionResults: AuthenticationExtensionsClientOutputs<AuthenticationExtensionClientOutput> = AuthenticationExtensionsClientOutputs() //TODO: implement extension handling
         return PublicKeyCredential(
             credentialId,
             AuthenticatorAssertionResponse(
@@ -176,6 +176,7 @@ class WebAuthnClient(
                 signature,
                 userHandle
             ),
+            AuthenticatorAttachment.PLATFORM, //TODO: take appropriate value from somewhere
             clientExtensionResults
         )
     }

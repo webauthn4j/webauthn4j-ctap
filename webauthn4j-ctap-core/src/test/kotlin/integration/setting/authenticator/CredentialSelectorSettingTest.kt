@@ -3,6 +3,7 @@ package integration.setting.authenticator
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
 import com.webauthn4j.ctap.authenticator.data.credential.Credential
 import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
+import com.webauthn4j.ctap.client.GetAssertionsResponse
 import com.webauthn4j.ctap.client.PublicKeyCredentialSelectionHandler
 import com.webauthn4j.data.AuthenticatorAssertionResponse
 import com.webauthn4j.data.AuthenticatorAttestationResponse
@@ -79,12 +80,8 @@ class CredentialSelectorSettingTest {
 
             passwordlessTestCase.authenticator.credentialSelectorSetting =
                 CredentialSelectorSetting.CLIENT_PLATFORM
-            passwordlessTestCase.clientPlatform.webAuthnAPIClient.publicKeyCredentialSelectionHandler =
-                object : PublicKeyCredentialSelectionHandler {
-                    override fun select(list: List<PublicKeyCredential<AuthenticatorAssertionResponse, AuthenticationExtensionClientOutput>>): PublicKeyCredential<AuthenticatorAssertionResponse, AuthenticationExtensionClientOutput> {
-                        return list.first { it.rawId.contentEquals(publicKeyCredential!!.rawId) }
-                    }
-                }
+            passwordlessTestCase.relyingParty.authentication.frontend.publicKeyCredentialSelectionHandler =
+                PublicKeyCredentialSelectionHandler { list -> list.first{ it.credential!!.id.contentEquals(publicKeyCredential!!.rawId)} }
 
             passwordlessTestCase.step1_createCredential() // create a credential (1st)
             publicKeyCredential =
@@ -101,12 +98,8 @@ class CredentialSelectorSettingTest {
 
             passwordlessTestCase.authenticator.credentialSelectorSetting =
                 CredentialSelectorSetting.CLIENT_PLATFORM
-            passwordlessTestCase.clientPlatform.webAuthnAPIClient.publicKeyCredentialSelectionHandler =
-                object : PublicKeyCredentialSelectionHandler {
-                    override fun select(list: List<PublicKeyCredential<AuthenticatorAssertionResponse, AuthenticationExtensionClientOutput>>): PublicKeyCredential<AuthenticatorAssertionResponse, AuthenticationExtensionClientOutput> {
-                        return list.first { it.rawId.contentEquals(publicKeyCredential!!.rawId) }
-                    }
-                }
+            passwordlessTestCase.relyingParty.authentication.frontend.publicKeyCredentialSelectionHandler =
+                PublicKeyCredentialSelectionHandler { list -> list.first { it.credential!!.id.contentEquals(publicKeyCredential!!.rawId) } }
 
             publicKeyCredential =
                 passwordlessTestCase.step1_createCredential() // create a credential (1st)

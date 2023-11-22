@@ -1,5 +1,6 @@
 package com.unifidokey.app
 
+import com.unifidokey.core.adapter.UnifidoKeyAuthenticatorPropertyStore
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.core.service.AuthenticatorService
 import com.unifidokey.core.service.BLEService
@@ -16,6 +17,7 @@ import com.webauthn4j.converter.util.ObjectConverter
 
 interface UnifidoKeyComponent {
     val authenticatorService: AuthenticatorService
+    val unifidoKeyAuthenticatorPropertyStore: UnifidoKeyAuthenticatorPropertyStore
     val userCredentialDao: UserCredentialDao
     val relyingPartyDao: RelyingPartyDao
     val eventDao: EventDao

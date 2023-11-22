@@ -16,8 +16,12 @@ import com.webauthn4j.ctap.authenticator.data.credential.Credential
 import com.webauthn4j.ctap.authenticator.data.settings.*
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
-import com.webauthn4j.ctap.client.PublicKeyCredentialRequestContext
+import com.webauthn4j.ctap.client.CtapAuthenticatorSelectionHandler
+import com.webauthn4j.ctap.client.CtapClient
 import com.webauthn4j.ctap.client.CtapService
+import com.webauthn4j.ctap.client.PublicKeyCredentialCreationContext
+import com.webauthn4j.ctap.client.PublicKeyCredentialRequestContext
+import com.webauthn4j.ctap.client.PublicKeyCredentialSelectionHandler
 import com.webauthn4j.ctap.client.WebAuthnClient
 import com.webauthn4j.ctap.client.transport.InProcessTransportAdaptor
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
@@ -254,9 +258,9 @@ abstract class IntegrationTestCaseBase {
                     extensionsParameter
                 )
                 private val originParameter = TestParameter { Origin("https://example.com") }
-                private val clientPINParameter = TestParameter { "clientPIN" }
-                private val publicKeyCredentialRequestContextParameter =
-                    TestParameter { PublicKeyCredentialRequestContext(origin, clientPIN) }.depends(
+                private val clientPINParameter = TestParameter { "clientPIN".toByteArray() }
+                private val publicKeyCredentialCreationContextParameter =
+                    TestParameter { PublicKeyCredentialCreationContext(origin, clientPINProvider =  { clientPIN }) }.depends(
                         originParameter,
                         clientPINParameter
                     )
@@ -281,7 +285,7 @@ abstract class IntegrationTestCaseBase {
                 var publicKeyCredentialCreationOptions by publicKeyCredentialCreationOptionsParameter
                 var origin by originParameter
                 var clientPIN by clientPINParameter
-                var clientProperty by publicKeyCredentialRequestContextParameter
+                var publicKeyCredentialCreationContext by publicKeyCredentialCreationContextParameter
             }
 
             inner class Backend {
@@ -346,10 +350,14 @@ abstract class IntegrationTestCaseBase {
                     extensionsParameter
                 ) //this@RelyingParty.challengeParameter,
                 private val originParameter = TestParameter { Origin("https://example.com") }
-                private val clientPINParameter = TestParameter { "clientPIN" }
+                private val ctapAuthenticatorSelectionHandlerParameter = TestParameter { CtapAuthenticatorSelectionHandler { it.first() } }
+                private val publicKeyCredentialSelectionHandlerParameter = TestParameter{ PublicKeyCredentialSelectionHandler { it.first() } }
+                private val clientPINParameter = TestParameter { "clientPIN".toByteArray(Charsets.UTF_8) }
                 private val publicKeyCredentialRequestContextParameter =
-                    TestParameter { PublicKeyCredentialRequestContext(origin, clientPIN) }.depends(
+                    TestParameter { PublicKeyCredentialRequestContext(origin, ctapAuthenticatorSelectionHandler, publicKeyCredentialSelectionHandler){ clientPIN } }.depends(
                         originParameter,
+                        ctapAuthenticatorSelectionHandlerParameter,
+                        publicKeyCredentialSelectionHandlerParameter,
                         clientPINParameter
                     )
 
@@ -360,8 +368,10 @@ abstract class IntegrationTestCaseBase {
                 var extensions by extensionsParameter
                 var publicKeyCredentialRequestOptions by publicKeyCredentialRequestOptionsParameter
                 var origin by originParameter
+                var ctapAuthenticatorSelectionHandler by ctapAuthenticatorSelectionHandlerParameter
+                var publicKeyCredentialSelectionHandler by publicKeyCredentialSelectionHandlerParameter
                 var clientPIN by clientPINParameter
-                var clientProperty by publicKeyCredentialRequestContextParameter
+                var publicKeyCredentialRequestContext by publicKeyCredentialRequestContextParameter
             }
 
             inner class Backend {

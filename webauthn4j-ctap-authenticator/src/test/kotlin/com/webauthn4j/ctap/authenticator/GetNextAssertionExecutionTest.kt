@@ -19,6 +19,7 @@ import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenti
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import java.time.Instant
@@ -106,6 +107,7 @@ class GetNextAssertionExecutionTest {
         Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_ERR_NOT_ALLOWED)
     }
 
+    @Disabled("Mockito.mockStatic doesn't work with JDK 21")
     @Test
     fun expiration_test() = runTest {
         val ctapAuthenticator =

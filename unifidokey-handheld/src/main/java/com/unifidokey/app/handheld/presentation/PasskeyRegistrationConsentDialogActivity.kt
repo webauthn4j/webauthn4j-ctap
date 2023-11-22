@@ -6,8 +6,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.unifidokey.R
 import com.unifidokey.databinding.PasskeyRegistrationConsentDialogActivityBinding
-import com.unifidokey.driver.provider.PasskeyIntentProcessor
-import kotlinx.coroutines.Dispatchers
 import org.slf4j.LoggerFactory
 
 /**

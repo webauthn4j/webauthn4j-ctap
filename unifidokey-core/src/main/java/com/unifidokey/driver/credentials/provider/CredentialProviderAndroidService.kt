@@ -1,4 +1,4 @@
-package com.unifidokey.driver.provider
+package com.unifidokey.driver.credentials.provider
 
 import android.app.PendingIntent
 import android.content.Intent
@@ -23,21 +23,11 @@ import androidx.credentials.provider.PublicKeyCredentialEntry
 import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.core.config.ConfigManager
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.GetAssertionConsentOptions
-import com.webauthn4j.ctap.authenticator.MakeCredentialConsentOptions
-import com.webauthn4j.ctap.authenticator.UserConsentHandler
-import com.webauthn4j.ctap.client.PublicKeyCredentialRequestContext
-import com.webauthn4j.ctap.client.CtapClient
-import com.webauthn4j.ctap.client.GetAssertionsResponse
-import com.webauthn4j.ctap.client.PublicKeyCredentialSelectionHandler
-import com.webauthn4j.ctap.client.WebAuthnClient
-import com.webauthn4j.ctap.client.transport.InProcessTransportAdaptor
+import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.data.PublicKeyCredentialRequestOptions
-import com.webauthn4j.data.client.Origin
-import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 
-class PasskeyCredentialProviderService : CredentialProviderService() {
+class CredentialProviderAndroidService : CredentialProviderService() {
 
     companion object{
         public val ACCOUNT_NAME = "Android Keystore"
@@ -45,15 +35,17 @@ class PasskeyCredentialProviderService : CredentialProviderService() {
         public val GET_PASSKEY = "com.unifidokey.provider.GET_PASSKEY"
     }
 
-    private val logger = LoggerFactory.getLogger(PasskeyCredentialProviderService::class.java)
+    private val logger = LoggerFactory.getLogger(CredentialProviderAndroidService::class.java)
 
     private lateinit var unifidoKeyApplication: UnifidoKeyApplicationBase<*>
     private lateinit var configManager: ConfigManager
     private lateinit var objectConverter: ObjectConverter
+    private lateinit var authenticatorPropertyStore: AuthenticatorPropertyStore
     override fun onCreate() {
         unifidoKeyApplication = this.applicationContext as UnifidoKeyApplicationBase<*>
         configManager = unifidoKeyApplication.unifidoKeyComponent.configManager
         objectConverter = unifidoKeyApplication.unifidoKeyComponent.objectConverter
+        authenticatorPropertyStore = unifidoKeyApplication.unifidoKeyComponent.unifidoKeyAuthenticatorPropertyStore
         super.onCreate()
     }
 
@@ -117,42 +109,17 @@ class PasskeyCredentialProviderService : CredentialProviderService() {
         val credentialEntries = request.beginGetCredentialOptions.flatMap {
             when(it){
                 is BeginGetPublicKeyCredentialOption -> {
+
                     val publicKeyCredentialRequestOptions = objectConverter.jsonConverter.readValue(it.requestJson, PublicKeyCredentialRequestOptions::class.java)!!
 
-                    val ctapAuthenticator = unifidoKeyApplication.unifidoKeyComponent.authenticatorService.ctapAuthenticator
-                    ctapAuthenticator.userConsentHandler = object : UserConsentHandler {
-                        override suspend fun consentMakeCredential(options: MakeCredentialConsentOptions): Boolean {
-                            return true
-                        }
+                    val userCredentials = authenticatorPropertyStore.loadUserCredentials(publicKeyCredentialRequestOptions.rpId)
 
-                        override suspend fun consentGetAssertion(options: GetAssertionConsentOptions): Boolean {
-                            return true
-                        }
-                    }
-                    //TODO ctapAuthenticator.credentialSelectorSetting should be PLATFORM
-                    val ctapClient = CtapClient(InProcessTransportAdaptor(ctapAuthenticator))
-                    val webAuthnClient = WebAuthnClient(listOf(ctapClient), objectConverter)
-                    val origin = Origin(request.callingAppInfo!!.origin!!)
-                    val items = mutableListOf<GetAssertionsResponse.Assertion>();
-                    runBlocking {
-                        val publicKeyCredentialSelectionHandler = PublicKeyCredentialSelectionHandler { assertions ->
-                            items.addAll(assertions)
-
-
-                            return@PublicKeyCredentialSelectionHandler assertions.first()
-                        }
-                        val publicKeyCredentialRequestContext = PublicKeyCredentialRequestContext(origin, publicKeyCredentialSelectionHandler=publicKeyCredentialSelectionHandler)
-                        webAuthnClient.get(publicKeyCredentialRequestOptions, publicKeyCredentialRequestContext)
-                    }
-
-                    items.map{ item ->
-                        val displayName = item.user?.displayName ?: item.user?.name ?: ""
+                    userCredentials.map{ userCredential ->
+                        val username = userCredential.displayName ?: userCredential.username ?: String(userCredential.userHandle)
                         val data = Bundle()
-                        val publicKeyCredentialJSON = objectConverter.jsonConverter.writeValueAsString(publicKeyCredential)
-                        data.putString("publicKeyCredentialJSON", publicKeyCredentialJSON)
                         PublicKeyCredentialEntry.Builder(
                             applicationContext,
-                            displayName,
+                            username,
                             createPendingIntent(GET_PASSKEY, data),
                             it
                         ).build()

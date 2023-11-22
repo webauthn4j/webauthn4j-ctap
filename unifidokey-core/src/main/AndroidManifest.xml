@@ -24,7 +24,7 @@
         android:required="true" />
 
     <application>
-        <service android:name="com.unifidokey.driver.provider.PasskeyCredentialProviderService"
+        <service android:name="com.unifidokey.driver.credentials.provider.CredentialProviderAndroidService"
             android:enabled="true"
             android:exported="true"
             android:label="UnifidoKey"

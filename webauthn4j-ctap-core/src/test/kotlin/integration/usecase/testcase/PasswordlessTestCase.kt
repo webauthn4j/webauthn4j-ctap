@@ -73,7 +73,7 @@ class PasswordlessTestCase : IntegrationTestCaseBase() {
     suspend fun step1_createCredential(): PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput> {
         step1Result = clientPlatform.webAuthnAPIClient.create(
             relyingParty.registration.frontend.publicKeyCredentialCreationOptions,
-            relyingParty.registration.frontend.clientProperty
+            relyingParty.registration.frontend.publicKeyCredentialCreationContext
         )
         return step1Result
     }
@@ -103,7 +103,7 @@ class PasswordlessTestCase : IntegrationTestCaseBase() {
         // Client gets the credential
         step3Result = clientPlatform.webAuthnAPIClient.get(
             relyingParty.authentication.frontend.publicKeyCredentialRequestOptions,
-            relyingParty.authentication.frontend.clientProperty
+            relyingParty.authentication.frontend.publicKeyCredentialRequestContext
         )
         return step3Result
     }
