@@ -7,6 +7,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.webauthn4j.WebAuthnManager
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
+import com.webauthn4j.ctap.authenticator.Connection
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSettings
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
@@ -17,7 +18,6 @@ import com.webauthn4j.ctap.authenticator.data.settings.*
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
 import com.webauthn4j.ctap.client.CtapAuthenticatorSelectionHandler
-import com.webauthn4j.ctap.client.CtapClient
 import com.webauthn4j.ctap.client.CtapService
 import com.webauthn4j.ctap.client.PublicKeyCredentialCreationContext
 import com.webauthn4j.ctap.client.PublicKeyCredentialRequestContext
@@ -58,9 +58,11 @@ abstract class IntegrationTestCaseBase {
 
 
     inner class Authenticator {
+
         private val attestationStatementGeneratorParameter = TestParameter<AttestationStatementProvider> { PackedBasicAttestationStatementProvider.createWithDemoAttestationKey() }
         private val fidoU2FAttestationStatementGeneratorParameter = TestParameter { FIDOU2FBasicAttestationStatementProvider.createWithDemoAttestationKey() }
         private val clientPINParameter = TestParameter { "clientPIN" }
+
         private val aaguidParameter = TestParameter { AAGUID(UUID.randomUUID()) }
         private val platformSettingParameter = TestParameter { PlatformSetting.CROSS_PLATFORM }
         private val residentKeySettingParameter = TestParameter { ResidentKeySetting.IF_REQUIRED }
@@ -73,27 +75,7 @@ abstract class IntegrationTestCaseBase {
         private val algorithmsParameter = TestParameter { setOf(COSEAlgorithmIdentifier.ES256) }
         private val credentialSelectorSettingParameter =
             TestParameter { CredentialSelectorSetting.CLIENT_PLATFORM }
-        private val ctapAuthenticatorSettingsParameter = TestParameter {
-            CtapAuthenticatorSettings(
-                aaguid,
-                platformSetting,
-                residentKeySetting,
-                clientPINSetting,
-                resetProtectionSetting,
-                userPresenceSetting,
-                userVerificationSetting,
-                credentialSelectorSetting
-            )
-        }.depends(
-            aaguidParameter,
-            platformSettingParameter,
-            residentKeySettingParameter,
-            clientPINParameter,
-            resetProtectionSettingParameter,
-            userPresenceSettingParameter,
-            userVerificationSettingParameter,
-            credentialSelectorSettingParameter
-        )
+
         private val credentialSelectionHandlerParameter =
             TestParameter<CredentialSelectionHandler> {
                 object : CredentialSelectionHandler {
@@ -110,27 +92,55 @@ abstract class IntegrationTestCaseBase {
             }.depends(clientPINParameter, algorithmsParameter)
         internal val ctapAuthenticatorParameter = TestParameter {
             val ctapAuthenticator = CtapAuthenticator(
+                objectConverter,
                 attestationStatementGenerator,
                 fidoU2FAttestationStatementGenerator,
                 emptyList(),
                 authenticatorPropertyStore,
-                objectConverter,
-                ctapAuthenticatorSettings
+                credentialSelectionHandler = credentialSelectionHandler
             )
-            ctapAuthenticator.credentialSelectionHandler = credentialSelectionHandler
-            ctapAuthenticator
+            ctapAuthenticator.aaguid = aaguid
+            ctapAuthenticator.platform = platformSetting
+            ctapAuthenticator.platform = platformSetting
+            ctapAuthenticator.residentKey = residentKeySetting
+            ctapAuthenticator.clientPIN = clientPINSetting
+            ctapAuthenticator.resetProtection = resetProtectionSetting
+            ctapAuthenticator.userPresence = userPresenceSetting
+            ctapAuthenticator.userVerification = userVerificationSetting
+            ctapAuthenticator.credentialSelector = credentialSelectorSetting
+
+            return@TestParameter ctapAuthenticator
         }.depends(
             attestationStatementGeneratorParameter,
+            fidoU2FAttestationStatementGeneratorParameter,
             authenticatorPropertyStoreParameter,
             objectConverterParameter,
-            ctapAuthenticatorSettingsParameter,
-            credentialSelectionHandlerParameter
+            credentialSelectionHandlerParameter,
+
+            clientPINParameter,
+
+            aaguidParameter,
+            platformSettingParameter,
+            residentKeySettingParameter,
+            clientPINParameter,
+            resetProtectionSettingParameter,
+            userPresenceSettingParameter,
+            userVerificationSettingParameter,
+            credentialSelectorSettingParameter,
+
+            algorithmsParameter
         )
 
+        val connectionParameter = TestParameter { ctapAuthenticator.connect() }.depends(ctapAuthenticatorParameter)
 
         var attestationStatementGenerator by attestationStatementGeneratorParameter
         val fidoU2FAttestationStatementGenerator by fidoU2FAttestationStatementGeneratorParameter
+        var authenticatorPropertyStore by authenticatorPropertyStoreParameter
+        var objectConverter by objectConverterParameter
+        var credentialSelectionHandler by credentialSelectionHandlerParameter
+
         var clientPIN by clientPINParameter
+
         var aaguid by aaguidParameter
         var platformSetting by platformSettingParameter
         var residentKeySetting by residentKeySettingParameter
@@ -138,18 +148,18 @@ abstract class IntegrationTestCaseBase {
         var resetProtectionSetting by resetProtectionSettingParameter
         var userPresenceSetting by userPresenceSettingParameter
         var userVerificationSetting by userVerificationSettingParameter
-        var algorithms by algorithmsParameter
         var credentialSelectorSetting by credentialSelectorSettingParameter
-        var ctapAuthenticatorSettings by ctapAuthenticatorSettingsParameter
-        var credentialSelectionHandler by credentialSelectionHandlerParameter
-        var authenticatorPropertyStore by authenticatorPropertyStoreParameter
+
+        var algorithms by algorithmsParameter
+
         val ctapAuthenticator by ctapAuthenticatorParameter
+        val connection by connectionParameter
     }
 
     inner class ClientPlatform {
         private val ctapClientParameter =
-            TestParameter { com.webauthn4j.ctap.client.CtapClient(InProcessTransportAdaptor(authenticator.ctapAuthenticator)) }.depends(
-                authenticator.ctapAuthenticatorParameter
+            TestParameter { com.webauthn4j.ctap.client.CtapClient(InProcessTransportAdaptor(authenticator.connection)) }.depends(
+                authenticator.connectionParameter
             )
         private val ctapServiceParameter =
             TestParameter { CtapService(ctapClient) }.depends(ctapClientParameter)

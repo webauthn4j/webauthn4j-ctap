@@ -1,10 +1,10 @@
 package com.webauthn4j.ctap.authenticator.transport.nfc
 
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.TransactionManager
-import com.webauthn4j.ctap.authenticator.transport.apdu.CTAPAPDUProcessor
-import com.webauthn4j.ctap.authenticator.transport.apdu.CommandAPDUProcessor
-import com.webauthn4j.ctap.authenticator.transport.apdu.U2FAPDUProcessor
+import com.webauthn4j.ctap.authenticator.CtapAuthenticator
+import com.webauthn4j.ctap.authenticator.transport.nfc.apdu.CTAPAPDUProcessor
+import com.webauthn4j.ctap.authenticator.transport.nfc.apdu.CommandAPDUProcessor
+import com.webauthn4j.ctap.authenticator.transport.nfc.apdu.U2FAPDUProcessor
 import com.webauthn4j.ctap.core.data.U2FStatusCode
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
@@ -17,8 +17,8 @@ import java.util.*
  */
 @Suppress("MemberVisibilityCanBePrivate")
 class NFCConnector(
-    transactionManager: TransactionManager,
-    objectConverter: ObjectConverter
+    private val ctapAuthenticator: CtapAuthenticator,
+    private val objectConverter: ObjectConverter
 ) {
 
     companion object {
@@ -43,8 +43,8 @@ class NFCConnector(
     internal val selectCommandAPDUProcessor = SelectCommandAPDUProcessor()
     internal val deselectCommandAPDUProcessor = DeselectCommandAPDUProcessor()
 
-    internal val ctapAPDUProcessor = CTAPAPDUProcessor(transactionManager, objectConverter)
-    internal val u2fAPDUProcessor = U2FAPDUProcessor(transactionManager)
+    internal val ctapAPDUProcessor = CTAPAPDUProcessor(objectConverter)
+    internal val u2fAPDUProcessor = U2FAPDUProcessor()
 
 
     private val commandAPDUProcessors: List<CommandAPDUProcessor> = listOf(
@@ -98,8 +98,9 @@ class NFCConnector(
 
         override suspend fun process(command: CommandAPDU): ResponseAPDU {
             logger.debug("Processing Select APDU command")
-            ctapAPDUProcessor.clear()
-            u2fAPDUProcessor.clear()
+            val connection = ctapAuthenticator.connect()
+            ctapAPDUProcessor.onConnect(connection)
+            u2fAPDUProcessor.onConnect(connection)
             val response = if (Arrays.equals(command.dataIn, FIDO_AID)) {
                 val data = "U2F_V2".toByteArray(StandardCharsets.US_ASCII)
                 val sw1 = 0x90.toByte()
@@ -121,8 +122,8 @@ class NFCConnector(
 
         override suspend fun process(command: CommandAPDU): ResponseAPDU {
             logger.debug("Processing Deselect APDU command")
-            ctapAPDUProcessor.clear()
-            u2fAPDUProcessor.clear()
+            ctapAPDUProcessor.onDisconnect()
+            u2fAPDUProcessor.onDisconnect()
             val response = ResponseAPDU(null, 0x09.toByte(), 0x00.toByte())
             aidSelected = false
             return response

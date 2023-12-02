@@ -75,7 +75,7 @@ class ClientPINTest {
             }.isInstanceOf(CtapErrorException::class.java)
                 .hasMessageContaining("CTAP2_ERR_PIN_INVALID")
 
-            clientPINTestCase.authenticator.ctapAuthenticator.clientPINService.resetVolatilePinRetryCounter() // reset volatile PIN retries
+            clientPINTestCase.authenticator.connection.clientPINService.resetVolatilePinRetryCounter() // reset volatile PIN retries
         }
         assertThatThrownBy {
             runTest {
@@ -88,16 +88,12 @@ class ClientPINTest {
 
     @Test
     fun getRetries_test() = runTest {
-        assertThat(clientPINTestCase.clientPlatform.ctapService.getRetries()).isEqualTo(
-            ClientPINService.MAX_PIN_RETRIES
-        )
+        assertThat(clientPINTestCase.clientPlatform.ctapService.getRetries()).isEqualTo(ClientPINService.MAX_PIN_RETRIES)
         try {
             clientPINTestCase.clientPlatform.ctapService.changePIN("invalid-PIN", "invalid-PIN")
         } catch (e: CtapErrorException) { /* nop */
         }
-        assertThat(clientPINTestCase.clientPlatform.ctapService.getRetries()).isEqualTo(
-            ClientPINService.MAX_PIN_RETRIES - 1u
-        )
+        assertThat(clientPINTestCase.clientPlatform.ctapService.getRetries()).isEqualTo(ClientPINService.MAX_PIN_RETRIES - 1u)
     }
 
     @Disabled

@@ -1,5 +1,9 @@
-package com.webauthn4j.ctap.authenticator
+package com.webauthn4j.ctap.authenticator.execution
 
+import com.webauthn4j.ctap.authenticator.Connection
+import com.webauthn4j.ctap.authenticator.GetAssertionConsentOptions
+import com.webauthn4j.ctap.authenticator.SignatureCalculator
+import com.webauthn4j.ctap.authenticator.U2FKeyEnvelope
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.exception.U2FCommandExecutionException
 import com.webauthn4j.ctap.core.data.U2FAuthenticationRequest
@@ -13,7 +17,7 @@ import org.slf4j.LoggerFactory
 import java.nio.ByteBuffer
 
 class U2FAuthenticationExecution(
-    private val ctapAuthenticator: CtapAuthenticator,
+    private val connection: Connection,
     private val u2fAuthenticationRequest: U2FAuthenticationRequest) {
 
     private val logger = LoggerFactory.getLogger(U2FAuthenticationExecution::class.java)
@@ -38,7 +42,7 @@ class U2FAuthenticationExecution(
         }
         catch (e: java.lang.RuntimeException){
             logger.error("Unknown error occurred while processing U2F Authentication Command.", e)
-            ctapAuthenticator.reportException(e)
+            connection.reportException(e)
             throw U2FCommandExecutionException(U2FStatusCode.WRONG_DATA, e)
         }
         logger.info("U2F Authentication Response {}", response.toString())
@@ -46,8 +50,8 @@ class U2FAuthenticationExecution(
     }
 
     suspend fun doExecute(): U2FAuthenticationResponse {
-        val encryptionKey = ctapAuthenticator.authenticatorPropertyStore.loadEncryptionKey()
-        val encryptionIV = ctapAuthenticator.authenticatorPropertyStore.loadEncryptionIV()
+        val encryptionKey = connection.authenticatorPropertyStore.loadEncryptionKey()
+        val encryptionIV = connection.authenticatorPropertyStore.loadEncryptionIV()
 
         //spec| If the key handle was not created by this U2F token, or if it was created for a different application parameter,
         //spec| the token must respond with an authentication response message:error:bad-key-handle.
@@ -58,7 +62,7 @@ class U2FAuthenticationExecution(
                 encryptionKey,
                 encryptionIV
             )
-            envelope = ctapAuthenticator.objectConverter.cborConverter.readValue(
+            envelope = connection.objectConverter.cborConverter.readValue(
                 decrypted,
                 U2FKeyEnvelope::class.java
             )!!
@@ -87,7 +91,7 @@ class U2FAuthenticationExecution(
                 //spec| or an appropriate error response (see below).
                 //spec| The signature should only be provided if user presence could be validated.
                 userPresencePlan =
-                    ctapAuthenticator.userPresenceSetting == UserPresenceSetting.SUPPORTED
+                    connection.userPresence == UserPresenceSetting.SUPPORTED
             }
             0x08.toByte() -> { //don't enforce user presence and sign
                 userPresencePlan = false
@@ -105,8 +109,8 @@ class U2FAuthenticationExecution(
             true -> 0x01.toByte()
             false -> 0x00.toByte()
         }
-        val counter = ctapAuthenticator.authenticatorPropertyStore.loadDeviceWideCounter() + 1u
-        ctapAuthenticator.authenticatorPropertyStore.saveDeviceWideCounter(counter)
+        val counter = connection.authenticatorPropertyStore.loadDeviceWideCounter() + 1u
+        connection.authenticatorPropertyStore.saveDeviceWideCounter(counter)
         val signedData =
             ByteBuffer.allocate(32 + 1 + 4 + 32).put(u2fAuthenticationRequest.applicationParameter)
                 .put(userPresence).putInt(counter.toInt())
@@ -120,6 +124,6 @@ class U2FAuthenticationExecution(
 
     private suspend fun requestUserPresence(applicationParameter: ByteArray, userPresencePlan: Boolean): Boolean{
         val options = GetAssertionConsentOptions(applicationParameter, userPresencePlan, false)
-        return ctapAuthenticator.userConsentHandler.consentGetAssertion(options)
+        return connection.userConsentHandler.consentGetAssertion(options)
     }
 }

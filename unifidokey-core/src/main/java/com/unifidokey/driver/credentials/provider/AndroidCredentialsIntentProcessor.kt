@@ -11,6 +11,7 @@ import androidx.credentials.provider.PendingIntentHandler
 import androidx.credentials.provider.ProviderCreateCredentialRequest
 import androidx.credentials.provider.ProviderGetCredentialRequest
 import com.unifidokey.core.config.ConfigManager
+import com.webauthn4j.ctap.authenticator.Connection
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.GetAssertionConsentOptions
 import com.webauthn4j.ctap.authenticator.MakeCredentialConsentOptions
@@ -27,19 +28,6 @@ class AndroidCredentialsIntentProcessor(
     private val logger = LoggerFactory.getLogger(AndroidCredentialsIntentProcessor::class.java)
     private val androidCredentialsAuthenticator = AndroidCredentialsAuthenticator(configManager, ctapAuthenticator)
     private val objectConverter = ctapAuthenticator.objectConverter
-
-    init {
-        //TODO: revisit
-        ctapAuthenticator.userConsentHandler = object : UserConsentHandler {
-            override suspend fun consentMakeCredential(options: MakeCredentialConsentOptions): Boolean {
-                return true
-            }
-
-            override suspend fun consentGetAssertion(options: GetAssertionConsentOptions): Boolean {
-                return true
-            }
-        }
-    }
 
     suspend fun processIntent(activity: Activity, intent: Intent?){
         try{

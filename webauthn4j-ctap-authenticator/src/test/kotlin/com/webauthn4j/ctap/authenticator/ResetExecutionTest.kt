@@ -1,5 +1,6 @@
 package com.webauthn4j.ctap.authenticator
 
+import com.webauthn4j.ctap.authenticator.execution.ResetExecution
 import com.webauthn4j.ctap.core.data.AuthenticatorResetRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorResetResponse
 import com.webauthn4j.ctap.core.data.CtapStatusCode
@@ -12,7 +13,7 @@ internal class ResetExecutionTest {
     @Test
     fun createErrorResponse_test() {
         val response = ResetExecution(
-            mock(CtapAuthenticator::class.java),
+            mock(Connection::class.java),
             mock(AuthenticatorResetRequest::class.java)
         ).createErrorResponse(CtapStatusCode.CTAP1_ERR_OTHER)
         assertThat(response).isInstanceOf(AuthenticatorResetResponse::class.java)

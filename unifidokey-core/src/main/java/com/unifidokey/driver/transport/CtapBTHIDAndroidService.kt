@@ -17,7 +17,8 @@ import com.unifidokey.core.service.BTHIDService
 import com.unifidokey.core.service.BTHIDStatus
 import com.unifidokey.driver.notification.UnifidoKeyNotificationController
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.TransactionManager
+import com.webauthn4j.ctap.authenticator.Connection
+import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.MAX_PACKET_SIZE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -56,11 +57,13 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
     }
 
     private val logger = LoggerFactory.getLogger(CtapBTHIDAndroidService::class.java)
-    private lateinit var transactionManager: TransactionManager
+    private lateinit var ctapAuthenticator: CtapAuthenticator
     private lateinit var bthidService: BTHIDService
     private lateinit var objectConverter: ObjectConverter
     private lateinit var unifidoKeyNotificationController: UnifidoKeyNotificationController
     private lateinit var bthidDeviceHistory: BTHIDDeviceHistoryConfigProperty
+
+    private var connection: Connection? = null
 
     private var bluetoothAdapter: BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
     private var bluetoothHidDevice: BluetoothHidDevice? = null
@@ -126,6 +129,7 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
     }
 
     fun connect(deviceHandle: BluetoothDeviceHandle) {
+        connection = ctapAuthenticator.connect()
         val remoteDevice = bluetoothAdapter.getRemoteDevice(deviceHandle.address)
         val result = bluetoothHidDevice?.connect(remoteDevice)!!
         if (result) {
@@ -139,12 +143,13 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
     fun disconnect(deviceHandle: BluetoothDeviceHandle) {
         val remoteDevice = bluetoothAdapter.getRemoteDevice(deviceHandle.address)
         bluetoothHidDevice?.disconnect(remoteDevice)
+        connection = null
     }
 
     @MainThread
     private fun initialize() {
         val unifidoKeyApplication = application as UnifidoKeyApplicationBase<*>
-        transactionManager = unifidoKeyApplication.unifidoKeyComponent.authenticatorService
+        ctapAuthenticator = unifidoKeyApplication.unifidoKeyComponent.authenticatorService.ctapAuthenticator
         bthidService = unifidoKeyApplication.unifidoKeyComponent.bthidService
         objectConverter = unifidoKeyApplication.unifidoKeyComponent.objectConverter
         unifidoKeyNotificationController =
@@ -237,13 +242,16 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
         private fun registerApp() {
             bluetoothHidDevice.let { bluetoothHidDevice ->
                 requireNotNull(bluetoothHidDevice) { "bluetoothHidDevice must not be null" }
-                bluetoothHidDevice.registerApp(
-                    bluetoothHidDeviceAppSdpSettings,
-                    null,
-                    outQosSettings,
-                    Runnable::run,
-                    Fido2BTHIDApplication(transactionManager, bluetoothHidDevice, objectConverter)
-                )
+                connection.let {
+                    requireNotNull(it) { "connection must not be null" }
+                    bluetoothHidDevice.registerApp(
+                        bluetoothHidDeviceAppSdpSettings,
+                        null,
+                        outQosSettings,
+                        Runnable::run,
+                        Fido2BTHIDApplication(it, bluetoothHidDevice, objectConverter)
+                    )
+                }
             }
         }
 

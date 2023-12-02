@@ -1,8 +1,8 @@
 package com.webauthn4j.ctap.authenticator.transport.hid
 
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.TransactionManager
-import com.webauthn4j.ctap.authenticator.transport.apdu.U2FAPDUProcessor
+import com.webauthn4j.ctap.authenticator.Connection
+import com.webauthn4j.ctap.authenticator.transport.nfc.apdu.U2FAPDUProcessor
 import com.webauthn4j.ctap.core.converter.CtapRequestConverter
 import com.webauthn4j.ctap.core.converter.CtapResponseConverter
 import com.webauthn4j.ctap.core.converter.HIDPacketConverter
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory
 import kotlin.experimental.or
 
 class HIDConnector(
-    private val transactionManager: TransactionManager,
+    private val connection: Connection,
     objectConverter: ObjectConverter
 ) {
 
@@ -42,7 +42,7 @@ class HIDConnector(
     private val ctapRequestConverter = CtapRequestConverter(objectConverter)
     private val ctapResponseConverter = CtapResponseConverter(objectConverter)
 
-    private val u2fAPDUProcessor = U2FAPDUProcessor(transactionManager)
+    private val u2fAPDUProcessor = U2FAPDUProcessor().also { it.onConnect(connection) }
 
     private val hidPacketConverter = HIDPacketConverter()
     private val hidChannels: MutableMap<HIDChannelId, HIDChannel> = HashMap()
@@ -279,7 +279,7 @@ class HIDConnector(
                     }
                 }
                 val ctapCommand = ctapRequestConverter.convert(hidMessage.data)
-                val ctapResponse: CtapResponse = transactionManager.invokeCommand(ctapCommand)
+                val ctapResponse: CtapResponse = connection.invokeCommand(ctapCommand)
                 val cbor = ctapResponseConverter.convertToResponseDataBytes(ctapResponse)
                 val responseMessage =
                     HIDCBORResponseMessage(hidMessage.channelId, ctapResponse.statusCode, cbor)
@@ -302,14 +302,14 @@ class HIDConnector(
 
         @Suppress("UNUSED_PARAMETER")
         private fun handleCancel(hidMessage: HIDCANCELRequestMessage) {
-            transactionManager.cancelOnGoingTransaction()
+            connection.cancelOnGoingTransaction()
         }
 
         private suspend fun handleWink(
             hidMessage: HIDWINKRequestMessage,
             responseCallback: ResponseCallback<HIDWINKResponseMessage>
         ) {
-            transactionManager.ctapAuthenticator.wink()
+            connection.wink()
             responseCallback.onResponse(HIDWINKResponseMessage(hidMessage.channelId))
         }
 
@@ -318,7 +318,7 @@ class HIDConnector(
             responseCallback: ResponseCallback<HIDLOCKResponseMessage>
         ) {
             val timeMillis = hidMessage.seconds.toLong() * 1000L
-            transactionManager.lock(timeMillis)
+            connection.lock(timeMillis)
             responseCallback.onResponse(HIDLOCKResponseMessage(hidMessage.channelId))
         }
 

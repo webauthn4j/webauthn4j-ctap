@@ -12,9 +12,7 @@ import com.webauthn4j.ctap.authenticator.CachingCredentialSelectionHandler
 import com.webauthn4j.ctap.authenticator.CachingUserConsentHandler
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
-import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSettings
 import com.webauthn4j.ctap.authenticator.ExceptionReporter
-import com.webauthn4j.ctap.authenticator.TransactionManager
 import com.webauthn4j.ctap.authenticator.UserConsentHandler
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementProvider
@@ -39,7 +37,7 @@ class AuthenticatorService(
     private val attestationStatementProviders: Map<Pair<AttestationTypeSetting, AttestationStatementFormatSetting>, AttestationStatementProvider>,
     val exceptionReporter: ExceptionReporter,
     val objectConverter: ObjectConverter
-) : TransactionManager() {
+) {
 
     companion object {
         @JvmField
@@ -66,6 +64,8 @@ class AuthenticatorService(
     val events: LiveData<List<Event>> = eventDao.findAllLiveData().map {
         return@map it.map { item -> eventConverter.toEvent(item) }
     }
+
+    lateinit var ctapAuthenticator: CtapAuthenticator
 
     init {
         configManager.setup()
@@ -108,16 +108,6 @@ class AuthenticatorService(
         val keyStorageSetting = configManager.keyStorage.value
         val attestationTypeSetting = configManager.attestationType.value
         val attestationStatementFormatSetting = configManager.attestationStatementFormat.value
-        val settings = CtapAuthenticatorSettings(
-            aaguid,
-            platformSetting,
-            residentKeySetting,
-            clientPINSetting,
-            resetProtectionSetting,
-            userPresenceSetting,
-            userVerificationSetting,
-            credentialSelectorSetting
-        )
         authenticatorPropertyStore.keyStorageSetting = keyStorageSetting
         authenticatorPropertyStore.algorithms = algorithms
         val attestationStatementProvider =
@@ -138,29 +128,32 @@ class AuthenticatorService(
         )] as FIDOU2FAttestationStatementProvider
         val extensionProcessors = listOf(HMACSecretExtensionProcessor())
         val ctapAuthenticator = CtapAuthenticator(
+            objectConverter,
             attestationStatementProvider,
             fidoU2FAttestationStatementProvider,
             extensionProcessors,
-            authenticatorPropertyStore,
-            objectConverter,
-            settings
+            authenticatorPropertyStore
         )
-        userConsentHandler.let {
-            if (it != null) {
-                ctapAuthenticator.userConsentHandler = when (configManager.consentCaching.value) {
-                    ConsentCachingSetting.ENABLED -> CachingUserConsentHandler(it)
-                    else -> CachingUserConsentHandler(it)
-                }
+        ctapAuthenticator.aaguid = aaguid
+        ctapAuthenticator.platform = platformSetting
+        ctapAuthenticator.residentKey = residentKeySetting
+        ctapAuthenticator.clientPIN = clientPINSetting
+        ctapAuthenticator.resetProtection = resetProtectionSetting
+        ctapAuthenticator.userPresence = userPresenceSetting
+        ctapAuthenticator.userVerification = userVerificationSetting
+        ctapAuthenticator.credentialSelector = credentialSelectorSetting
+        userConsentHandler?.let {
+            ctapAuthenticator.userConsentHandler = when (configManager.consentCaching.value) {
+                ConsentCachingSetting.ENABLED -> CachingUserConsentHandler(it)
+                else -> CachingUserConsentHandler(it)
             }
         }
-        credentialSelectionHandler.let {
-            if (it != null) {
-                ctapAuthenticator.credentialSelectionHandler =
-                    when (configManager.consentCaching.value) {
-                        ConsentCachingSetting.ENABLED -> CachingCredentialSelectionHandler(it)
-                        else -> it
-                    }
-            }
+        credentialSelectionHandler?.let {
+            ctapAuthenticator.credentialSelectionHandler =
+                when (configManager.consentCaching.value) {
+                    ConsentCachingSetting.ENABLED -> CachingCredentialSelectionHandler(it)
+                    else -> it
+                }
         }
         ctapAuthenticator.registerEventListener(this::onEvent)
         ctapAuthenticator.registerExceptionReporter(exceptionReporter)

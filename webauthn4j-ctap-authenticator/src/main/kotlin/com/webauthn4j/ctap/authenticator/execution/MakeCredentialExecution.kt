@@ -1,6 +1,9 @@
-package com.webauthn4j.ctap.authenticator
+package com.webauthn4j.ctap.authenticator.execution
 
 import com.webauthn4j.converter.util.CborConverter
+import com.webauthn4j.ctap.authenticator.Connection
+import com.webauthn4j.ctap.authenticator.MakeCredentialConsentOptions
+import com.webauthn4j.ctap.authenticator.UserCredentialBuilder
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementRequest
 import com.webauthn4j.ctap.authenticator.data.credential.CredentialKey
 import com.webauthn4j.ctap.authenticator.data.credential.NonResidentCredentialKey
@@ -52,7 +55,7 @@ internal class MakeCredentialExecution :
     private val makeCredentialRequestValidator = AuthenticatorMakeCredentialRequestValidator()
 
     @Suppress("JoinDeclarationAndAssignment")
-    private val ctapAuthenticator: CtapAuthenticator
+    private val connection: Connection
     private val authenticatorMakeCredentialRequest: AuthenticatorMakeCredentialRequest
 
     private val authenticatorPropertyStore: AuthenticatorPropertyStore
@@ -85,14 +88,14 @@ internal class MakeCredentialExecution :
     private var registrationExtensionAuthenticatorOutputs: AuthenticationExtensionsAuthenticatorOutputs<RegistrationExtensionAuthenticatorOutput> = AuthenticationExtensionsAuthenticatorOutputs()
 
     constructor(
-        ctapAuthenticator: CtapAuthenticator,
+        connection: Connection,
         authenticatorMakeCredentialCommand: AuthenticatorMakeCredentialRequest
-    ) : super(ctapAuthenticator, authenticatorMakeCredentialCommand) {
-        this.ctapAuthenticator = ctapAuthenticator
+    ) : super(connection, authenticatorMakeCredentialCommand) {
+        this.connection = connection
         this.authenticatorMakeCredentialRequest = authenticatorMakeCredentialCommand
 
-        this.authenticatorPropertyStore = ctapAuthenticator.authenticatorPropertyStore
-        this.cborConverter = ctapAuthenticator.objectConverter.cborConverter
+        this.authenticatorPropertyStore = connection.authenticatorPropertyStore
+        this.cborConverter = connection.objectConverter.cborConverter
 
         // command properties initialization and validation
         this.clientDataHash = authenticatorMakeCredentialCommand.clientDataHash
@@ -107,7 +110,7 @@ internal class MakeCredentialExecution :
         this.pinProtocol = authenticatorMakeCredentialCommand.pinProtocol
 
         // user credential builder initialization
-        this.userCredentialBuilder = UserCredentialBuilder(ctapAuthenticator.objectConverter, authenticatorPropertyStore.loadEncryptionKey(), authenticatorPropertyStore.loadEncryptionIV())
+        this.userCredentialBuilder = UserCredentialBuilder(connection.objectConverter, authenticatorPropertyStore.loadEncryptionKey(), authenticatorPropertyStore.loadEncryptionIV())
 
         userCredentialBuilder.userHandle(user.id)
         userCredentialBuilder.username(user.name)
@@ -145,7 +148,7 @@ internal class MakeCredentialExecution :
             user.displayName,
             HashMap()
         )
-        ctapAuthenticator.publishEvent(event)
+        connection.publishEvent(event)
         return response
     }
 
@@ -179,7 +182,7 @@ internal class MakeCredentialExecution :
                         isUserPresence = true,
                         isUserVerification = false
                     )
-                    ctapAuthenticator.userConsentHandler.consentMakeCredential(
+                    connection.userConsentHandler.consentMakeCredential(
                         makeCredentialConsentOptions
                     )
                     throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_CREDENTIAL_EXCLUDED)
@@ -207,22 +210,22 @@ internal class MakeCredentialExecution :
     private fun execStep3ProcessOptions() {
         when (val requestOptions = options) {
             null -> {
-                residentKeyPlan = ctapAuthenticator.residentKeySetting == ResidentKeySetting.ALWAYS
+                residentKeyPlan = connection.residentKey == ResidentKeySetting.ALWAYS
             }
             else -> {
                 if(requestOptions.up == true){
                     throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_INVALID_OPTION)
                 }
                 residentKeyPlan = when (requestOptions.rk) {
-                    true -> when (ctapAuthenticator.residentKeySetting) {
+                    true -> when (connection.residentKey) {
                         ResidentKeySetting.NEVER -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
                         else -> true
                     }
-                    else -> ctapAuthenticator.residentKeySetting == ResidentKeySetting.ALWAYS
+                    else -> connection.residentKey == ResidentKeySetting.ALWAYS
                 }
                 userVerificationPlan = when (requestOptions.uv) {
                     true -> {
-                        when (ctapAuthenticator.userVerificationSetting) {
+                        when (connection.userVerification) {
                             UserVerificationSetting.READY -> true
                             else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
                         }
@@ -231,7 +234,7 @@ internal class MakeCredentialExecution :
                 }
             }
         }
-        userPresencePlan = when (ctapAuthenticator.userPresenceSetting) {
+        userPresencePlan = when (connection.userPresence) {
             UserPresenceSetting.SUPPORTED -> true
             else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
         }
@@ -244,9 +247,9 @@ internal class MakeCredentialExecution :
         val inputs = this.registrationExtensionAuthenticatorInputs
         val outputsBuilder = AuthenticationExtensionsAuthenticatorOutputs.BuilderForRegistration()
         if(inputs != null){
-            ctapAuthenticator.extensionProcessors.filterIsInstance<RegistrationExtensionProcessor>().forEach{ processor ->
+            connection.extensionProcessors.filterIsInstance<RegistrationExtensionProcessor>().forEach{ processor ->
                 if(processor.supportsRegistrationExtension(inputs)){
-                    val context = RegistrationExtensionContext(ctapAuthenticator, authenticatorMakeCredentialRequest)
+                    val context = RegistrationExtensionContext(connection, authenticatorMakeCredentialRequest)
                     processor.processRegistrationExtension(context, userCredentialBuilder, outputsBuilder)
                 }
             }
@@ -270,13 +273,13 @@ internal class MakeCredentialExecution :
                 //spec| but the user has to select which authenticator to send the pinToken to.
                 if (it.isEmpty()) {
                     requestUserConsent()
-                    if (ctapAuthenticator.clientPINService.isClientPINReady) {
+                    if (connection.clientPINService.isClientPINReady) {
                         throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
                     } else {
                         throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_NOT_SET)
                     }
                 } else {
-                    ctapAuthenticator.clientPINService.validatePINAuth(it, clientDataHash)
+                    connection.clientPINService.validatePINAuth(it, clientDataHash)
                     userPresenceResult = true
                     userVerificationResult = true
                 }
@@ -326,7 +329,7 @@ internal class MakeCredentialExecution :
             userPresencePlan,
             userVerificationPlan
         )
-        return ctapAuthenticator.userConsentHandler.consentMakeCredential(options)
+        return connection.userConsentHandler.consentMakeCredential(options)
     }
 
     //spec| Step9-11
@@ -361,7 +364,7 @@ internal class MakeCredentialExecution :
 
         @Suppress("ConvertSecondaryConstructorToPrimary")
         val attestationStatement: AttestationStatement =
-            ctapAuthenticator.attestationStatementProvider.provide(attestationStatementRequest)
+            connection.attestationStatementProvider.provide(attestationStatementRequest)
         try {
             val responseData = AuthenticatorMakeCredentialResponseData(
                 attestationStatementRequest.authenticatorData,
@@ -436,7 +439,7 @@ internal class MakeCredentialExecution :
         if (registrationExtensionAuthenticatorOutputs.keys.isNotEmpty()) flag =
             flag or AuthenticatorData.BIT_ED
         val attestedCredentialData =
-            AttestedCredentialData(ctapAuthenticator.aaguid, credentialId, credentialPublicKey)
+            AttestedCredentialData(connection.aaguid, credentialId, credentialPublicKey)
         return AuthenticatorData(
             rpIdHash,
             flag,

@@ -1,5 +1,6 @@
 package com.webauthn4j.ctap.authenticator
 
+import com.webauthn4j.ctap.authenticator.execution.GetInfoExecution
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponse
 import com.webauthn4j.ctap.core.data.CtapStatusCode
@@ -12,7 +13,7 @@ internal class GetInfoExecutionTest {
     @Test
     fun createErrorResponse_test() {
         val response = GetInfoExecution(
-            Mockito.mock(CtapAuthenticator::class.java),
+            Mockito.mock(Connection::class.java),
             Mockito.mock(AuthenticatorGetInfoRequest::class.java)
         ).createErrorResponse(CtapStatusCode.CTAP1_ERR_OTHER)
         Assertions.assertThat(response).isInstanceOf(AuthenticatorGetInfoResponse::class.java)

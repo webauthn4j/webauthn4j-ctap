@@ -31,10 +31,12 @@ import org.mockito.kotlin.spy
 
 @ExperimentalCoroutinesApi
 internal class MakeCredentialExecutionTest {
-    private val ctapAuthenticator = CtapAuthenticator()
 
     @Test
     fun test() = runTest {
+        val ctapAuthenticator = CtapAuthenticator()
+        val connection = ctapAuthenticator.connect()
+
         val clientDataHash = ByteArray(0)
         val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
         val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
@@ -61,7 +63,7 @@ internal class MakeCredentialExecutionTest {
             pinAuth,
             pinProtocol
         )
-        val response = ctapAuthenticator.makeCredential(command)
+        val response = connection.makeCredential(command)
         assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
         assertThat(response.responseData).isNotNull
         assertThat(response.responseData!!.attestationStatement).isNotNull
@@ -70,7 +72,8 @@ internal class MakeCredentialExecutionTest {
 
     @Test
     fun store_full_test() = runTest {
-        val authenticatorPropertyStore = spy<InMemoryAuthenticatorPropertyStore> {
+        val ctapAuthenticator = CtapAuthenticator()
+        ctapAuthenticator.authenticatorPropertyStore = spy<InMemoryAuthenticatorPropertyStore> {
             onGeneric {
                 createUserCredentialKey(
                     any(),
@@ -78,8 +81,7 @@ internal class MakeCredentialExecutionTest {
                 )
             } doThrow StoreFullException("AuthenticatorPropertyStore is full")
         }
-        val ctapAuthenticator =
-            CtapAuthenticator(authenticatorPropertyStore = authenticatorPropertyStore)
+        val connection = ctapAuthenticator.connect()
 
         val clientDataHash = ByteArray(0)
         val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
@@ -107,7 +109,7 @@ internal class MakeCredentialExecutionTest {
             pinAuth,
             pinProtocol
         )
-        val response = ctapAuthenticator.makeCredential(command)
+        val response = connection.makeCredential(command)
         assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_ERR_KEY_STORE_FULL)
     }
 
@@ -149,13 +151,15 @@ internal class MakeCredentialExecutionTest {
             pinAuth,
             pinProtocol
         )
-        val ctapAuthenticator =
-            CtapAuthenticator(settings = CtapAuthenticatorSettings(residentKey = residentKeySetting))
 
-        val response = ctapAuthenticator.makeCredential(command)
+        val ctapAuthenticator = CtapAuthenticator()
+        ctapAuthenticator.residentKey = residentKeySetting
+        val connection = ctapAuthenticator.connect()
+
+        val response = connection.makeCredential(command)
         assertThat(response).isInstanceOf(AuthenticatorMakeCredentialResponse::class.java)
         assertThat(response.statusCode).isEqualTo(statusCode)
-        assertThat(ctapAuthenticator.authenticatorPropertyStore.loadUserCredentials("example.com")).hasSize(
+        assertThat(connection.authenticatorPropertyStore.loadUserCredentials("example.com")).hasSize(
             createdResidentKeyCount
         )
     }
@@ -204,13 +208,14 @@ internal class MakeCredentialExecutionTest {
             pinProtocol
         )
 
-        val ctapAuthenticator =
-            CtapAuthenticator(settings = CtapAuthenticatorSettings(residentKey = residentKeySetting))
+        val ctapAuthenticator = CtapAuthenticator()
+        ctapAuthenticator.residentKey = residentKeySetting
+        val connection = ctapAuthenticator.connect()
 
-        val response = ctapAuthenticator.makeCredential(command)
+        val response = connection.makeCredential(command)
         assertThat(response).isInstanceOf(AuthenticatorMakeCredentialResponse::class.java)
         assertThat(response.statusCode).isEqualTo(statusCode)
-        assertThat(ctapAuthenticator.authenticatorPropertyStore.loadUserCredentials("example.com")).hasSize(
+        assertThat(connection.authenticatorPropertyStore.loadUserCredentials("example.com")).hasSize(
             createdResidentKeyCount
         )
     }
@@ -258,10 +263,12 @@ internal class MakeCredentialExecutionTest {
             pinProtocol
         )
 
-        val ctapAuthenticator =
-            CtapAuthenticator(settings = CtapAuthenticatorSettings(userVerification = userVerificationSetting))
+        val ctapAuthenticator = CtapAuthenticator()
+        ctapAuthenticator.userVerification = userVerificationSetting
+        val connection = ctapAuthenticator.connect()
 
-        val response = ctapAuthenticator.makeCredential(command)
+
+        val response = connection.makeCredential(command)
         assertThat(response).isInstanceOf(AuthenticatorMakeCredentialResponse::class.java)
         assertThat(response.statusCode).isEqualTo(statusCode)
     }
@@ -302,10 +309,11 @@ internal class MakeCredentialExecutionTest {
                 pinProtocol
             )
 
-            val ctapAuthenticator =
-                CtapAuthenticator(settings = CtapAuthenticatorSettings(userPresence = userPresenceSetting))
+            val ctapAuthenticator = CtapAuthenticator()
+            ctapAuthenticator.userPresence = userPresenceSetting
+            val connection = ctapAuthenticator.connect()
 
-            val response = ctapAuthenticator.makeCredential(command)
+            val response = connection.makeCredential(command)
             assertThat(response).isInstanceOf(AuthenticatorMakeCredentialResponse::class.java)
             assertThat(response.statusCode).isEqualTo(statusCode)
         }
@@ -339,7 +347,7 @@ internal class MakeCredentialExecutionTest {
             pinProtocol
         )
 
-        val ctapAuthenticator = CtapAuthenticator(settings = CtapAuthenticatorSettings())
+        val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.userConsentHandler = object : UserConsentHandler {
             override suspend fun consentMakeCredential(options: MakeCredentialConsentOptions): Boolean =
                 false
@@ -347,8 +355,9 @@ internal class MakeCredentialExecutionTest {
             override suspend fun consentGetAssertion(options: GetAssertionConsentOptions): Boolean =
                 true
         }
+        val connection = ctapAuthenticator.connect()
 
-        val response = ctapAuthenticator.makeCredential(command)
+        val response = connection.makeCredential(command)
         assertThat(response).isInstanceOf(AuthenticatorMakeCredentialResponse::class.java)
         assertThat(response.statusCode).isEqualTo(CTAP2_ERR_OPERATION_DENIED)
     }
@@ -382,7 +391,10 @@ internal class MakeCredentialExecutionTest {
             pinProtocol
         )
 
-        val response = ctapAuthenticator.makeCredential(command)
+        val ctapAuthenticator = CtapAuthenticator()
+        val connection = ctapAuthenticator.connect()
+
+        val response = connection.makeCredential(command)
         assertThat(response).isInstanceOf(AuthenticatorMakeCredentialResponse::class.java)
         assertThat(response.statusCode).isEqualTo(CTAP2_ERR_UNSUPPORTED_ALGORITHM)
     }

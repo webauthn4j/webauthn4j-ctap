@@ -92,7 +92,7 @@ class HMACSecretExtensionProcessor : RegistrationExtensionProcessor,
         //spec| - SHA-256 is done over only the "x" curve point of "abG".
         //spec| - See [RFC6090] Section 4.1 and Appendix (C.2) of [SP800-56A] for more ECDH key agreement protocol details and key representation information.
         val sharedSecret =
-            context.ctapAuthenticator.clientPINService.generateSharedSecret(platformKeyAgreementKey)
+            context.connection.clientPINService.generateSharedSecret(platformKeyAgreementKey)
 
         //spec| The authenticator verifies saltEnc by generating LEFT(HMAC-SHA-256(sharedSecret, saltEnc), 16) and matching against the input saltAuth parameter.
         val mac = MACUtil.calculateHmacSHA256(saltEnc, sharedSecret, 16)

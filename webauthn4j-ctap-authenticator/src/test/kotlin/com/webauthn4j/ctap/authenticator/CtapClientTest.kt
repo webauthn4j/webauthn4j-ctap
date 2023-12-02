@@ -17,11 +17,11 @@ import java.util.concurrent.ExecutionException
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 internal class CtapClientTest {
-    private val ctapAuthenticator = CtapAuthenticator()
+    private val connection = CtapAuthenticator().connect()
 
     @Test
     fun getInfo_test() = runTest {
-        val response = ctapAuthenticator.getInfo()
+        val response = connection.getInfo()
         Assertions.assertThat(response.responseData).isNotNull
         Assertions.assertThat(response.responseData!!.aaguid).isEqualTo(CtapAuthenticator.AAGUID)
         Assertions.assertThat(response.responseData!!.versions)
@@ -61,7 +61,7 @@ internal class CtapClientTest {
             pinAuth,
             pinProtocol
         )
-        val response: AuthenticatorGetAssertionResponse = ctapAuthenticator.getAssertion(command)
+        val response: AuthenticatorGetAssertionResponse = connection.getAssertion(command)
         Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
         Assertions.assertThat(response.responseData).isNotNull
     }
@@ -69,12 +69,12 @@ internal class CtapClientTest {
     @Test
     fun reset_test() = runTest {
         makeCredential()
-        Assertions.assertThat(ctapAuthenticator.authenticatorPropertyStore.loadUserCredentials(RP_ID))
+        Assertions.assertThat(connection.authenticatorPropertyStore.loadUserCredentials(RP_ID))
             .hasSize(1)
-        ctapAuthenticator.reset()
-        Assertions.assertThat(ctapAuthenticator.authenticatorPropertyStore.loadUserCredentials(RP_ID))
+        connection.reset()
+        Assertions.assertThat(connection.authenticatorPropertyStore.loadUserCredentials(RP_ID))
             .isEmpty()
-        Assertions.assertThat(ctapAuthenticator.authenticatorPropertyStore.loadClientPIN()).isNull()
+        Assertions.assertThat(connection.authenticatorPropertyStore.loadClientPIN()).isNull()
     }
 
     private suspend fun makeCredential(): AuthenticatorMakeCredentialResponse {
@@ -105,7 +105,7 @@ internal class CtapClientTest {
             pinProtocol
         )
         return try {
-            ctapAuthenticator.makeCredential(command)
+            connection.makeCredential(command)
         } catch (e: InterruptedException) {
             throw UnexpectedCheckedException(e)
         } catch (e: ExecutionException) {

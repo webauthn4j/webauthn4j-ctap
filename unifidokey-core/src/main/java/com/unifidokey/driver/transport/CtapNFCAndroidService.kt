@@ -50,9 +50,9 @@ class CtapNFCAndroidService : HostApduService(), CoroutineScope {
     private fun initialize() {
         val unifidoKeyApplication = application as UnifidoKeyApplicationBase<*>
         val unifidoKeyComponent: UnifidoKeyComponent = unifidoKeyApplication.unifidoKeyComponent
-        val authenticatorService = unifidoKeyComponent.authenticatorService
+        val ctapAuthenticator = unifidoKeyComponent.authenticatorService.ctapAuthenticator
         val objectConverter = unifidoKeyComponent.objectConverter
-        nfcConnector = NFCConnector(authenticatorService, objectConverter)
+        nfcConnector = NFCConnector(ctapAuthenticator, objectConverter)
         nfcService = unifidoKeyComponent.nfcService
         logger.debug("CtapNFCAndroidService is initialized")
     }

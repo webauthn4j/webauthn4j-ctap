@@ -1,5 +1,8 @@
-package com.webauthn4j.ctap.authenticator
+package com.webauthn4j.ctap.authenticator.execution
 
+import com.webauthn4j.ctap.authenticator.Connection
+import com.webauthn4j.ctap.authenticator.CtapAuthenticator
+import com.webauthn4j.ctap.authenticator.GetAssertionSession
 import com.webauthn4j.ctap.authenticator.SignatureCalculator.calculate
 import com.webauthn4j.ctap.authenticator.data.credential.UserCredential
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionRequest
@@ -18,10 +21,10 @@ import java.nio.ByteBuffer
  * GetNextAssertion command execution
  */
 internal class GetNextAssertionExecution(
-    private val ctapAuthenticator: CtapAuthenticator,
+    private val connection: Connection,
     authenticatorGetNextAssertionRequest: AuthenticatorGetNextAssertionRequest
 ) : CtapCommandExecutionBase<AuthenticatorGetNextAssertionRequest, AuthenticatorGetNextAssertionResponse>(
-    ctapAuthenticator,
+    connection,
     authenticatorGetNextAssertionRequest
 ) {
 
@@ -36,7 +39,7 @@ internal class GetNextAssertionExecution(
 
         //spec| Step1
         //spec| If authenticator does not remember any authenticatorGetAssertion parameters, return CTAP2_ERR_NOT_ALLOWED.
-        val getAssertionSession = ctapAuthenticator.onGoingGetAssertionSession?: return AuthenticatorGetNextAssertionResponse(CtapStatusCode.CTAP2_ERR_NOT_ALLOWED)
+        val getAssertionSession = connection.onGoingGetAssertionSession?: return AuthenticatorGetNextAssertionResponse(CtapStatusCode.CTAP2_ERR_NOT_ALLOWED)
 
         //spec| Step2
         //spec| If the credentialCounter is equal to or greater than numberOfCredentials, return CTAP2_ERR_NOT_ALLOWED.
@@ -71,7 +74,7 @@ internal class GetNextAssertionExecution(
             counter,
             assertionObject.extensions
         )
-        val authData = ctapAuthenticator.authenticatorDataConverter.convert(authenticatorDataObject)
+        val authData = connection.authenticatorDataConverter.convert(authenticatorDataObject)
         val clientDataHash = getAssertionSession.clientDataHash
         val signedData = ByteBuffer.allocate(authData.size + clientDataHash.size).put(authData)
             .put(clientDataHash).array()

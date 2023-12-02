@@ -4,29 +4,31 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.webauthn4j.converter.AuthenticatorDataConverter
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FBasicAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.NoneAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.data.credential.Credential
-import com.webauthn4j.ctap.authenticator.data.event.Event
-import com.webauthn4j.ctap.authenticator.data.settings.*
+import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
+import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
+import com.webauthn4j.ctap.authenticator.data.settings.PlatformSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ResetProtectionSetting
+import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
+import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
 import com.webauthn4j.ctap.authenticator.extension.ExtensionProcessor
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
 import com.webauthn4j.ctap.core.converter.jackson.PublicKeyCredentialSourceCBORModule
-import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.ctap.core.data.PinProtocolVersion
 import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import org.slf4j.LoggerFactory
 
-/**
- * Ctap Authenticator
- */
-class CtapAuthenticator @JvmOverloads constructor(
+class CtapAuthenticator(
+    val objectConverter: ObjectConverter = createObjectConverter(),
     // Core logic delegates
     // These are final as it should not be updated on the fly for integrity. To update these, new instance should be created.
     val attestationStatementProvider: AttestationStatementProvider = NoneAttestationStatementProvider(),
@@ -34,13 +36,14 @@ class CtapAuthenticator @JvmOverloads constructor(
     val extensionProcessors: List<ExtensionProcessor> = listOf(),
     // Handlers
     var authenticatorPropertyStore: AuthenticatorPropertyStore = InMemoryAuthenticatorPropertyStore(),
-    val objectConverter: ObjectConverter = createObjectConverter(),
-    settings: CtapAuthenticatorSettings = CtapAuthenticatorSettings()
+    var userConsentHandler: UserConsentHandler = DefaultUserConsentHandler(),
+    var credentialSelectionHandler: CredentialSelectionHandler = DefaultCredentialSelectionHandler(),
+    var winkHandler: WinkHandler = DefaultWinkHandler(),
+    var eventListeners: MutableList<EventListener> = mutableListOf(),
+    var exceptionReporters: MutableList<ExceptionReporter> = mutableListOf()
 ) {
 
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    companion object {
+    companion object{
         @JvmField
         val AAGUID = AAGUID("33c1642b-b5e9-423d-9add-5a0119c2a8b8")
         const val VERSION_U2F_V2 = "U2F_V2"
@@ -57,7 +60,6 @@ class CtapAuthenticator @JvmOverloads constructor(
             AuthenticatorTransport.BLE,
             AuthenticatorTransport.USB
         )
-
         private fun createObjectConverter(): ObjectConverter {
             val jsonMapper = ObjectMapper()
             val cborMapper = ObjectMapper(CBORFactory())
@@ -69,107 +71,19 @@ class CtapAuthenticator @JvmOverloads constructor(
         }
     }
 
-    private val logger = LoggerFactory.getLogger(CtapAuthenticator::class.java)
+    var aaguid: AAGUID = AAGUID
 
-    val authenticatorDataConverter: AuthenticatorDataConverter =
-        AuthenticatorDataConverter(objectConverter)
+    var platform: PlatformSetting = PlatformSetting.CROSS_PLATFORM
+    var residentKey: ResidentKeySetting = ResidentKeySetting.ALWAYS
+    var clientPIN: ClientPINSetting = ClientPINSetting.ENABLED
+    var resetProtection: ResetProtectionSetting = ResetProtectionSetting.DISABLED
+    var userPresence: UserPresenceSetting = UserPresenceSetting.SUPPORTED
+    var userVerification: UserVerificationSetting = UserVerificationSetting.READY
+    var credentialSelector: CredentialSelectorSetting = CredentialSelectorSetting.AUTHENTICATOR
 
-    // Authenticator characteristics
-    // These are final as it should not be updated on the fly for integrity. To update these, new instance should be created.
-    @Suppress("JoinDeclarationAndAssignment")
-    val platformSetting: PlatformSetting
-    val residentKeySetting: ResidentKeySetting
-    val clientPINSetting: ClientPINSetting
-    val resetProtectionSetting: ResetProtectionSetting
-    val credentialSelectorSetting: CredentialSelectorSetting
-    val userPresenceSetting: UserPresenceSetting
-    val userVerificationSetting: UserVerificationSetting
-
-    // Authenticator properties
-    val aaguid: AAGUID = settings.aaguid
-
-    val clientPINService: ClientPINService = ClientPINService(authenticatorPropertyStore)
-    var onGoingGetAssertionSession: GetAssertionSession? = null
-    var userConsentHandler: UserConsentHandler = DefaultUserConsentHandler()
-    var credentialSelectionHandler: CredentialSelectionHandler = DefaultCredentialSelectionHandler()
-    var winkHandler: WinkHandler = DefaultWinkHandler()
-    var eventListeners: MutableList<EventListener> = mutableListOf()
-    var exceptionReporters: MutableList<ExceptionReporter> = mutableListOf()
-
-
-    init {
-        // authenticator settings
-        platformSetting = settings.platform
-        residentKeySetting = settings.residentKey
-        clientPINSetting = settings.clientPIN
-        resetProtectionSetting = settings.resetProtection
-        userPresenceSetting = settings.userPresence
-        userVerificationSetting = settings.userVerification
-        credentialSelectorSetting = settings.credentialSelector
+    fun connect() : Connection{
+        return Connection(this)
     }
-
-    suspend fun <TC : AuthenticatorRequest, TR : AuthenticatorResponse?> invokeCommand(request: TC): TR {
-        val response = when (request) {
-            is AuthenticatorMakeCredentialRequest -> makeCredential(request)
-            is AuthenticatorGetAssertionRequest -> getAssertion(request)
-            is AuthenticatorGetNextAssertionRequest -> getNextAssertion(request)
-            is AuthenticatorGetInfoRequest -> getInfo(request)
-            is AuthenticatorClientPINRequest -> clientPIN(request)
-            is AuthenticatorResetRequest -> reset(request)
-            is U2FRegistrationRequest -> u2fRegister(request)
-            is U2FAuthenticationRequest -> u2fSign(request)
-            else -> throw IllegalStateException(
-                String.format(
-                    "unknown command %s is invoked.",
-                    request::class.java.toString()
-                )
-            )
-        }
-        @Suppress("UNCHECKED_CAST")
-        return response as TR
-    }
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    suspend fun u2fRegister(u2fRegistrationRequest: U2FRegistrationRequest): U2FRegistrationResponse {
-        return U2FRegisterExecution(this, u2fRegistrationRequest).execute()
-    }
-
-    @Suppress("MemberVisibilityCanBePrivate")
-    suspend fun u2fSign(u2fAuthenticationRequest: U2FAuthenticationRequest): U2FAuthenticationResponse {
-        return U2FAuthenticationExecution(this, u2fAuthenticationRequest).execute()
-    }
-
-    suspend fun makeCredential(authenticatorMakeCredentialCommand: AuthenticatorMakeCredentialRequest): AuthenticatorMakeCredentialResponse {
-        return MakeCredentialExecution(this, authenticatorMakeCredentialCommand).execute()
-    }
-
-    suspend fun getAssertion(authenticatorGetAssertionCommand: AuthenticatorGetAssertionRequest): AuthenticatorGetAssertionResponse {
-        return GetAssertionExecution(this, authenticatorGetAssertionCommand).execute()
-    }
-
-    @JvmOverloads
-    suspend fun getNextAssertion(authenticatorGetNextAssertionCommand: AuthenticatorGetNextAssertionRequest = AuthenticatorGetNextAssertionRequest()): AuthenticatorGetNextAssertionResponse {
-        return GetNextAssertionExecution(this, authenticatorGetNextAssertionCommand).execute()
-    }
-
-    @JvmOverloads
-    suspend fun getInfo(authenticatorGetInfoCommand: AuthenticatorGetInfoRequest = AuthenticatorGetInfoRequest()): AuthenticatorGetInfoResponse {
-        return GetInfoExecution(this, authenticatorGetInfoCommand).execute()
-    }
-
-    suspend fun clientPIN(authenticatorClientPINCommand: AuthenticatorClientPINRequest): AuthenticatorClientPINResponse {
-        return ClientPINExecution(this, authenticatorClientPINCommand).execute()
-    }
-
-    @JvmOverloads
-    suspend fun reset(authenticatorResetCommand: AuthenticatorResetRequest = AuthenticatorResetRequest()): AuthenticatorResetResponse {
-        return ResetExecution(this, authenticatorResetCommand).execute()
-    }
-
-    suspend fun wink() {
-        winkHandler.wink()
-    }
-
 
     fun registerEventListener(eventListener: EventListener) {
         eventListeners.add(eventListener)
@@ -179,9 +93,6 @@ class CtapAuthenticator @JvmOverloads constructor(
         eventListeners.remove(eventListener)
     }
 
-    internal fun publishEvent(event: Event) {
-        eventListeners.forEach { it.onEvent(event) }
-    }
 
     fun registerExceptionReporter(exceptionReporter: ExceptionReporter) {
         exceptionReporters.add(exceptionReporter)
@@ -190,11 +101,6 @@ class CtapAuthenticator @JvmOverloads constructor(
     fun unregisterExceptionReporter(exceptionReporter: ExceptionReporter) {
         exceptionReporters.remove(exceptionReporter)
     }
-
-    internal fun reportException(exception: Exception) {
-        exceptionReporters.forEach { it.report(exception) }
-    }
-
 
     private class DefaultUserConsentHandler : UserConsentHandler {
         override suspend fun consentMakeCredential(options: MakeCredentialConsentOptions): Boolean {
@@ -221,6 +127,4 @@ class CtapAuthenticator @JvmOverloads constructor(
         }
 
     }
-
 }
-

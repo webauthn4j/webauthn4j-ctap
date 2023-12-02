@@ -80,7 +80,7 @@ class Fido2BLEGATTServer(
         // gattServer.addService(fido2GattService) is not called here, and is called in onServiceAdded
         // as it must be called after previous service(device information service) registration completes.
         bleConnector = BLEConnector(
-            authenticatorService,
+            authenticatorService.ctapAuthenticator.connect(), //TODO: revisit
             objectConverter
         ) { bytes: ByteArray -> notifyStatusCharacteristicChanged(bytes) }
     }

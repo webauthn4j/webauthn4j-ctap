@@ -1,6 +1,7 @@
 package com.webauthn4j.ctap.client
 
 import com.webauthn4j.ctap.authenticator.ClientPINService
+import com.webauthn4j.ctap.authenticator.Connection
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.client.transport.InProcessTransportAdaptor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,7 +13,8 @@ import java.util.concurrent.ExecutionException
 
 internal class CtapServiceTest {
     private val ctapAuthenticator = CtapAuthenticator()
-    private val ctapClient = CtapClient(InProcessTransportAdaptor(ctapAuthenticator))
+    private val connection = ctapAuthenticator.connect()
+    private val ctapClient = CtapClient(InProcessTransportAdaptor(connection))
     private val target = CtapService(ctapClient)
 
     @ExperimentalCoroutinesApi
@@ -21,7 +23,7 @@ internal class CtapServiceTest {
     fun setPIN_test() = runTest {
         target.reset()
         target.setPIN("newPIN")
-        assertThat(ctapAuthenticator.authenticatorPropertyStore.loadClientPIN()).isEqualTo(
+        assertThat(connection.authenticatorPropertyStore.loadClientPIN()).isEqualTo(
             "newPIN".toByteArray(
                 StandardCharsets.UTF_8
             )
@@ -34,13 +36,13 @@ internal class CtapServiceTest {
     fun changePIN_test() = runTest {
         target.reset()
         target.setPIN("currentPIN")
-        assertThat(ctapAuthenticator.authenticatorPropertyStore.loadClientPIN()).isEqualTo(
+        assertThat(connection.authenticatorPropertyStore.loadClientPIN()).isEqualTo(
             "currentPIN".toByteArray(
                 StandardCharsets.UTF_8
             )
         )
         target.changePIN("currentPIN", "newPIN")
-        assertThat(ctapAuthenticator.authenticatorPropertyStore.loadClientPIN()).isEqualTo(
+        assertThat(connection.authenticatorPropertyStore.loadClientPIN()).isEqualTo(
             "newPIN".toByteArray(
                 StandardCharsets.UTF_8
             )

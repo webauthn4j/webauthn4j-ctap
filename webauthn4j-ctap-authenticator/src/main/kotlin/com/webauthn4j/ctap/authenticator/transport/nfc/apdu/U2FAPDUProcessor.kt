@@ -1,8 +1,9 @@
-package com.webauthn4j.ctap.authenticator.transport.apdu
+package com.webauthn4j.ctap.authenticator.transport.nfc.apdu
 
-import com.webauthn4j.ctap.authenticator.TransactionManager
+import com.webauthn4j.ctap.authenticator.Connection
 import com.webauthn4j.ctap.authenticator.exception.U2FCommandExecutionException
 import com.webauthn4j.ctap.authenticator.transport.nfc.NFCConnector
+import com.webauthn4j.ctap.core.data.CtapRequest
 import com.webauthn4j.ctap.core.data.U2FAuthenticationRequest
 import com.webauthn4j.ctap.core.data.U2FAuthenticationResponse
 import com.webauthn4j.ctap.core.data.U2FRegistrationRequest
@@ -13,7 +14,6 @@ import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import org.slf4j.LoggerFactory
 
 class U2FAPDUProcessor(
-    private val transactionManager: TransactionManager
 ) : CommandAPDUProcessor {
     private val logger = LoggerFactory.getLogger(U2FAPDUProcessor::class.java)
 
@@ -31,6 +31,8 @@ class U2FAPDUProcessor(
         u2fVersionCommandAPDUProcessor,
         u2fContinuationAPDURequestCommandAPDUProcessor
     )
+
+    private var connection: Connection? = null
 
     override fun isTarget(command: CommandAPDU): Boolean {
         return commandAPDUProcessors.any { it.isTarget(command) }
@@ -51,7 +53,12 @@ class U2FAPDUProcessor(
         }
     }
 
-    fun clear() {
+    fun onConnect(connection: Connection) {
+        this.connection = connection
+    }
+
+    fun onDisconnect() {
+        connection = null
         u2fResponseQueue.clear()
     }
 
@@ -68,13 +75,18 @@ class U2FAPDUProcessor(
                 logger.debug("command data is missing")
                 return ResponseAPDU.createErrorResponseAPDU()
             }
-            val u2fRegistrationRequest: U2FRegistrationRequest =
-                U2FRegistrationRequest.createFromCommandAPDU(command)
+            val u2fRegistrationRequest: U2FRegistrationRequest = U2FRegistrationRequest.createFromCommandAPDU(command)
             return try {
-                val u2fRegistrationResponse: U2FRegistrationResponse =
-                    transactionManager.invokeCommand(u2fRegistrationRequest)
-                u2fResponseQueue.initialize(u2fRegistrationResponse.toBytes())
-                u2fResponseQueue.poll(command)
+                connection.let {
+                    if(it == null){
+                        throw IllegalStateException("Unexpected U2FRegistrationRequest is passed before connection is established.")
+                    }
+                    else{
+                        val u2fRegistrationResponse: U2FRegistrationResponse = it.invokeCommand(u2fRegistrationRequest)
+                        u2fResponseQueue.initialize(u2fRegistrationResponse.toBytes())
+                        u2fResponseQueue.poll(command)
+                    }
+                }
             } catch (e: U2FCommandExecutionException) {
                 logger.error("U2F registration failed", e)
                 ResponseAPDU(e.statusCode.sw1, e.statusCode.sw2)
@@ -100,10 +112,16 @@ class U2FAPDUProcessor(
             val u2fAuthenticationRequest: U2FAuthenticationRequest =
                 U2FAuthenticationRequest.createFromCommandAPDU(command)
             return try {
-                val u2fAuthenticationResponse: U2FAuthenticationResponse =
-                    transactionManager.invokeCommand(u2fAuthenticationRequest)
-                u2fResponseQueue.initialize(u2fAuthenticationResponse.toBytes())
-                u2fResponseQueue.poll(command)
+                connection.let {
+                    if(it == null){
+                        throw IllegalStateException("Unexpected U2FAuthenticationRequest is passed before connection is established.")
+                    }
+                    else{
+                        val u2fAuthenticationResponse: U2FAuthenticationResponse = it.invokeCommand(u2fAuthenticationRequest)
+                        u2fResponseQueue.initialize(u2fAuthenticationResponse.toBytes())
+                        u2fResponseQueue.poll(command)
+                    }
+                }
             } catch (e: U2FCommandExecutionException) {
                 logger.error("U2F authentication failed", e)
                 ResponseAPDU(e.statusCode.sw1, e.statusCode.sw2)

@@ -1,4 +1,4 @@
-package com.webauthn4j.ctap.authenticator.transport.apdu
+package com.webauthn4j.ctap.authenticator.transport.nfc.apdu
 
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU

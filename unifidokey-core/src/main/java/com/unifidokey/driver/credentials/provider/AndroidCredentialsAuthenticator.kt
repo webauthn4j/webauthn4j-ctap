@@ -3,6 +3,9 @@ package com.unifidokey.driver.credentials.provider
 import com.unifidokey.core.config.ConfigManager
 import com.webauthn4j.converter.AttestationObjectConverter
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
+import com.webauthn4j.ctap.authenticator.GetAssertionConsentOptions
+import com.webauthn4j.ctap.authenticator.MakeCredentialConsentOptions
+import com.webauthn4j.ctap.authenticator.UserConsentHandler
 import com.webauthn4j.ctap.client.CtapClient
 import com.webauthn4j.ctap.client.CtapService
 import com.webauthn4j.ctap.client.GetAssertionContext
@@ -28,12 +31,26 @@ import com.webauthn4j.util.MessageDigestUtil
 
 class AndroidCredentialsAuthenticator(
     private val configManager: ConfigManager,
-    ctapAuthenticator: CtapAuthenticator) {
-
-    private val ctapClient = CtapClient(InProcessTransportAdaptor(ctapAuthenticator))
-    private val ctapService = CtapService(ctapClient)
+    private val ctapAuthenticator: CtapAuthenticator) {
     private val objectConverter = ctapAuthenticator.objectConverter
     private val attestationObjectConverter = AttestationObjectConverter(ctapAuthenticator.objectConverter)
+
+    private val ctapService: CtapService
+        get() {
+            //TODO: revisit
+            ctapAuthenticator.userConsentHandler = object : UserConsentHandler {
+                override suspend fun consentMakeCredential(options: MakeCredentialConsentOptions): Boolean {
+                    return true
+                }
+
+                override suspend fun consentGetAssertion(options: GetAssertionConsentOptions): Boolean {
+                    return true
+                }
+            }
+            val connection = ctapAuthenticator.connect()
+            val ctapClient = CtapClient(InProcessTransportAdaptor(connection))
+            return CtapService(ctapClient)
+        }
 
     suspend fun create(credentialCreateRequest: AndroidCredentialsCreateRequest, credentialCreateContext: AndroidCredentialsCreateContext): AndroidCredentialsCreateResponse {
 
@@ -68,7 +85,6 @@ class AndroidCredentialsAuthenticator(
                 credentialCreateRequest.timeout?.toULong(),
             )
         val makeCredentialContext = MakeCredentialContext(clientPINUserVerificationHandler = { throw IllegalStateException("clientPIN request is not expected.") })
-        val ctapService = CtapService(ctapClient)
         val makeCredentialResponse: MakeCredentialResponse = ctapService.makeCredential(makeCredentialRequest, makeCredentialContext)
         val credentialId =
             makeCredentialResponse.authenticatorData.attestedCredentialData!!.credentialId

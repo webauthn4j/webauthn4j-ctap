@@ -1,7 +1,7 @@
-package com.webauthn4j.ctap.authenticator.transport.apdu
+package com.webauthn4j.ctap.authenticator.transport.nfc.apdu
 
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.TransactionManager
+import com.webauthn4j.ctap.authenticator.Connection
 import com.webauthn4j.ctap.authenticator.transport.nfc.NFCConnector
 import com.webauthn4j.ctap.core.converter.CtapRequestConverter
 import com.webauthn4j.ctap.core.converter.CtapResponseConverter
@@ -20,7 +20,6 @@ import java.util.LinkedList
 import java.util.Queue
 
 class CTAPAPDUProcessor(
-    private val transactionManager: TransactionManager,
     objectConverter: ObjectConverter
 ) : CommandAPDUProcessor {
 
@@ -45,6 +44,8 @@ class CTAPAPDUProcessor(
     private val ctapCommandAPDUQueue: Queue<CommandAPDU> = LinkedList()
     private val ctapResponseQueue = ResponseAPDUQueue()
 
+    private var connection: Connection? = null
+
     override fun isTarget(command: CommandAPDU): Boolean {
         return commandAPDUProcessors.any { it.isTarget(command) }
     }
@@ -64,7 +65,12 @@ class CTAPAPDUProcessor(
         }
     }
 
-    fun clear() {
+    fun onConnect(connection: Connection) {
+        this.connection = connection
+    }
+
+    fun onDisconnect() {
+        connection = null
         ctapCommandAPDUQueue.clear()
         ctapResponseQueue.clear()
     }
@@ -120,9 +126,16 @@ class CTAPAPDUProcessor(
         }
 
         private suspend fun invokeCtapCommand(ctapRequest: CtapRequest?): CtapResponse {
-            return transactionManager.invokeCommand(
-                ctapRequest as CtapRequest
-            )
+            connection.let {
+                if(it == null){
+                    throw IllegalStateException("Unexpected CtapRequest is passed before connection is established.")
+                }
+                else{
+                    return it.invokeCommand(
+                        ctapRequest as CtapRequest
+                    )
+                }
+            }
         }
 
         private fun buildCtapCommand(apduCommands: List<CommandAPDU>): CtapRequest {

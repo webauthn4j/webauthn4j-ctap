@@ -1,5 +1,6 @@
-package com.webauthn4j.ctap.authenticator
+package com.webauthn4j.ctap.authenticator.execution
 
+import com.webauthn4j.ctap.authenticator.Connection
 import com.webauthn4j.ctap.authenticator.data.event.ResetEvent
 import com.webauthn4j.ctap.authenticator.data.settings.ResetProtectionSetting
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
@@ -13,15 +14,15 @@ import java.time.Instant
  * Reset command execution
  */
 class ResetExecution internal constructor(
-    private val ctapAuthenticator: CtapAuthenticator,
+    private val connection: Connection,
     authenticatorResetRequest: AuthenticatorResetRequest
 ) : CtapCommandExecutionBase<AuthenticatorResetRequest, AuthenticatorResetResponse>(
-    ctapAuthenticator,
+    connection,
     authenticatorResetRequest
 ) {
 
     private val authenticatorPropertyStore: AuthenticatorPropertyStore =
-        ctapAuthenticator.authenticatorPropertyStore
+        connection.authenticatorPropertyStore
     private val logger = LoggerFactory.getLogger(MakeCredentialExecution::class.java)
 
     override suspend fun validate() {
@@ -30,12 +31,12 @@ class ResetExecution internal constructor(
 
     override suspend fun doExecute(): AuthenticatorResetResponse {
         logger.debug("Processing reset request")
-        return when (ctapAuthenticator.resetProtectionSetting) {
+        return when (connection.resetProtection) {
             ResetProtectionSetting.ENABLED -> AuthenticatorResetResponse(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
             else -> {
-                ctapAuthenticator.clientPINService.resetVolatilePinRetryCounter()
+                connection.clientPINService.resetVolatilePinRetryCounter()
                 authenticatorPropertyStore.clear()
-                ctapAuthenticator.publishEvent(ResetEvent(Instant.now()))
+                connection.publishEvent(ResetEvent(Instant.now()))
                 AuthenticatorResetResponse(CtapStatusCode.CTAP2_OK)
             }
         }

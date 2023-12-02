@@ -1,5 +1,6 @@
 package com.webauthn4j.ctap.authenticator
 
+import com.webauthn4j.ctap.authenticator.execution.CtapCommandExecutionBase
 import com.webauthn4j.ctap.core.data.CtapRequest
 import com.webauthn4j.ctap.core.data.CtapResponse
 import com.webauthn4j.ctap.core.data.CtapStatusCode
@@ -14,13 +15,13 @@ internal class CtapRequestExecutionBaseTest {
     @Test
     fun unexpected_execution_error_test() = runTest {
 
-        val ctapAuthenticator = CtapAuthenticator()
-        val target = TestCtapCommandExecution(ctapAuthenticator, mock(CtapRequest::class.java))
+        val connection = CtapAuthenticator().connect()
+        val target = TestCtapCommandExecution(connection, mock(CtapRequest::class.java))
         target.execute()
     }
 
-    inner class TestCtapCommandExecution(ctapAuthenticator: CtapAuthenticator, ctapRequest: CtapRequest) :
-        CtapCommandExecutionBase<CtapRequest, CtapResponse>(ctapAuthenticator, ctapRequest) {
+    inner class TestCtapCommandExecution(connection: Connection, ctapRequest: CtapRequest) :
+        CtapCommandExecutionBase<CtapRequest, CtapResponse>(connection, ctapRequest) {
 
         override val commandName: String
             get() = "TestCtapCommand"

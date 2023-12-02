@@ -1,5 +1,8 @@
-package com.webauthn4j.ctap.authenticator
+package com.webauthn4j.ctap.authenticator.execution
 
+import com.webauthn4j.ctap.authenticator.Connection
+import com.webauthn4j.ctap.authenticator.MakeCredentialConsentOptions
+import com.webauthn4j.ctap.authenticator.U2FKeyEnvelope
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementRequest
 import com.webauthn4j.ctap.authenticator.exception.U2FCommandExecutionException
 import com.webauthn4j.ctap.core.data.U2FRegistrationRequest
@@ -14,7 +17,7 @@ import java.security.interfaces.ECPublicKey
 import java.time.Instant
 
 class U2FRegisterExecution(
-    private val ctapAuthenticator: CtapAuthenticator,
+    private val connection: Connection,
     private val u2FRegistrationRequest: U2FRegistrationRequest
 ) {
 
@@ -38,7 +41,7 @@ class U2FRegisterExecution(
             throw e
         } catch (e: java.lang.RuntimeException) {
             logger.error("Unknown error occurred while processing U2F Registration Command.", e)
-            ctapAuthenticator.reportException(e)
+            connection.reportException(e)
             throw U2FCommandExecutionException(U2FStatusCode.WRONG_DATA, e)
         }
 
@@ -48,8 +51,8 @@ class U2FRegisterExecution(
 
     suspend fun doExecute(): U2FRegistrationResponse {
         val keyPair = ECUtil.createKeyPair()
-        val encryptionKey = ctapAuthenticator.authenticatorPropertyStore.loadEncryptionKey()
-        val encryptionIV = ctapAuthenticator.authenticatorPropertyStore.loadEncryptionIV()
+        val encryptionKey = connection.authenticatorPropertyStore.loadEncryptionKey()
+        val encryptionIV = connection.authenticatorPropertyStore.loadEncryptionIV()
 
         // As Android doesn't support extended APDU, keyHandle must be small enough to fit in one short APDU.
         val envelope = U2FKeyEnvelope.create(
@@ -57,7 +60,7 @@ class U2FRegisterExecution(
             u2FRegistrationRequest.applicationParameter,
             Instant.now()
         )
-        val data = ctapAuthenticator.objectConverter.cborConverter.writeValueAsBytes(envelope)
+        val data = connection.objectConverter.cborConverter.writeValueAsBytes(envelope)
 
         val userPresenceResult = requestUserPresence(u2FRegistrationRequest.applicationParameter)
         if (!userPresenceResult) {
@@ -75,7 +78,7 @@ class U2FRegisterExecution(
             u2FRegistrationRequest.challengeParameter
         )
         val attestationStatement =
-            ctapAuthenticator.fidoU2FBasicAttestationStatementGenerator.generate(
+            connection.fidoU2FBasicAttestationStatementGenerator.generate(
                 attestationStatementRequest
             )
         return U2FRegistrationResponse(
@@ -94,7 +97,7 @@ class U2FRegisterExecution(
             isUserPresence = true,
             isUserVerification = false
         )
-        return ctapAuthenticator.userConsentHandler.consentMakeCredential(options)
+        return connection.userConsentHandler.consentMakeCredential(options)
     }
 
 }

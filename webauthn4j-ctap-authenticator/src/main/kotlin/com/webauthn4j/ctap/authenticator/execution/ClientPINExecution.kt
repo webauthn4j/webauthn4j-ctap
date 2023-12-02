@@ -1,5 +1,6 @@
-package com.webauthn4j.ctap.authenticator
+package com.webauthn4j.ctap.authenticator.execution
 
+import com.webauthn4j.ctap.authenticator.Connection
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponse
 import com.webauthn4j.ctap.core.data.CtapStatusCode
@@ -11,10 +12,10 @@ import org.slf4j.LoggerFactory
  * Client PIN command execution
  */
 internal class ClientPINExecution(
-    private val ctapAuthenticator: CtapAuthenticator,
+    private val connection: Connection,
     private val authenticatorClientPINRequest: AuthenticatorClientPINRequest
 ) : CtapCommandExecutionBase<AuthenticatorClientPINRequest, AuthenticatorClientPINResponse>(
-    ctapAuthenticator,
+    connection,
     authenticatorClientPINRequest
 ) {
     private val logger = LoggerFactory.getLogger(ClientPINExecution::class.java)
@@ -26,7 +27,7 @@ internal class ClientPINExecution(
     }
 
     override suspend fun doExecute(): AuthenticatorClientPINResponse {
-        val clientPINService = ctapAuthenticator.clientPINService
+        val clientPINService = connection.clientPINService
         val platformKeyAgreementKey = authenticatorClientPINRequest.keyAgreement
         val pinAuth = authenticatorClientPINRequest.pinAuth
         val newPinEnc = authenticatorClientPINRequest.newPinEnc

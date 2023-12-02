@@ -1,7 +1,7 @@
 package com.webauthn4j.ctap.authenticator.transport.ble
 
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.TransactionManager
+import com.webauthn4j.ctap.authenticator.Connection
 import com.webauthn4j.ctap.authenticator.exception.BLEDataProcessingException
 import com.webauthn4j.ctap.core.converter.BLEFrameFragmentConverter
 import com.webauthn4j.ctap.core.converter.CtapRequestConverter
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory
  * BLE Transport Binding Connector
  */
 class BLEConnector(
-    private val transactionManager: TransactionManager,
+    private val connection: Connection,
     objectConverter: ObjectConverter,
     private val responseBLEFrameFragmentHandler: ResponseBLEFrameFragmentHandler
 ) {
@@ -78,7 +78,7 @@ class BLEConnector(
             else -> {
                 val ctapCommand = ctapRequestConverter.convert(commandData)
                 val ctapResponse =
-                    transactionManager.invokeCommand<CtapRequest, CtapResponse>(
+                    connection.invokeCommand<CtapRequest, CtapResponse>(
                         ctapCommand
                     )
                 val responseData = ctapResponseConverter.convertToBytes(ctapResponse)

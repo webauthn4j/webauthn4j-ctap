@@ -1,7 +1,12 @@
-package com.webauthn4j.ctap.authenticator
+package com.webauthn4j.ctap.authenticator.execution
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.webauthn4j.ctap.authenticator.Connection
+import com.webauthn4j.ctap.authenticator.CtapAuthenticator
+import com.webauthn4j.ctap.authenticator.GetAssertionConsentOptions
+import com.webauthn4j.ctap.authenticator.GetAssertionSession
 import com.webauthn4j.ctap.authenticator.SignatureCalculator.calculate
+import com.webauthn4j.ctap.authenticator.U2FKeyEnvelope
 import com.webauthn4j.ctap.authenticator.data.credential.*
 import com.webauthn4j.ctap.authenticator.data.event.GetAssertionEvent
 import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
@@ -38,7 +43,7 @@ internal class GetAssertionExecution :
     override val commandName: String = "GetAssertion"
 
     @Suppress("JoinDeclarationAndAssignment")
-    private val ctapAuthenticator: CtapAuthenticator
+    private val connection: Connection
 
     private val logger: Logger = LoggerFactory.getLogger(GetAssertionExecution::class.java)
     private val getAssertionRequestValidator = AuthenticatorGetAssertionRequestValidator()
@@ -72,12 +77,12 @@ internal class GetAssertionExecution :
 
 
     constructor(
-        ctapAuthenticator: CtapAuthenticator,
+        connection: Connection,
         authenticatorGetAssertionRequest: AuthenticatorGetAssertionRequest
-    ) : super(ctapAuthenticator, authenticatorGetAssertionRequest) {
+    ) : super(connection, authenticatorGetAssertionRequest) {
         this.authenticatorGetAssertionRequest = authenticatorGetAssertionRequest
-        this.ctapAuthenticator = ctapAuthenticator
-        this.authenticatorPropertyStore = ctapAuthenticator.authenticatorPropertyStore
+        this.connection = connection
+        this.authenticatorPropertyStore = connection.authenticatorPropertyStore
 
         // command properties initialization and validation
         this.rpId = authenticatorGetAssertionRequest.rpId
@@ -130,7 +135,7 @@ internal class GetAssertionExecution :
             onGoingGetAssertionSession.assertionObjects.map { (it.credential as? UserCredential)?.rpName }
                 .firstOrNull() ?: "N/A (U2F service)"
         val event = GetAssertionEvent(Instant.now(), rpId, rpName, userCredentials, mapOf())
-        ctapAuthenticator.publishEvent(event)
+        connection.publishEvent(event)
         return response
     }
 
@@ -189,7 +194,7 @@ internal class GetAssertionExecution :
         }
         try {
             val nonResidentUserCredentialEnvelope =
-                ctapAuthenticator.objectConverter.cborConverter.readValue(
+                connection.objectConverter.cborConverter.readValue(
                     decrypted,
                     object : TypeReference<NonResidentUserCredentialSource>() {})!!
             return NonResidentUserCredential(
@@ -211,7 +216,7 @@ internal class GetAssertionExecution :
         }
         try {
             val u2fKeyEnvelope =
-                ctapAuthenticator.objectConverter.cborConverter.readValue(
+                connection.objectConverter.cborConverter.readValue(
                     decrypted,
                     object : TypeReference<U2FKeyEnvelope>() {})!!
 
@@ -242,7 +247,7 @@ internal class GetAssertionExecution :
         if (pinAuth != null && pinProtocol == PinProtocolVersion.VERSION_1) {
             val clientDataHash = clientDataHash
             val pinAuth = pinAuth
-            ctapAuthenticator.clientPINService.validatePINAuth(pinAuth, clientDataHash)
+            connection.clientPINService.validatePINAuth(pinAuth, clientDataHash)
             userVerificationResult = true
         }
     }
@@ -259,7 +264,7 @@ internal class GetAssertionExecution :
     //spec| If pinAuth parameter is not present and clientPin has been set on the authenticator,
     //spec| set the "uv" bit to 0 in the response.
     private fun execStep4SetUVWhenClientPinHasBeenSet() {
-        if (pinAuth == null && ctapAuthenticator.clientPINService.isClientPINReady) {
+        if (pinAuth == null && connection.clientPINService.isClientPINReady) {
             userVerificationResult = false
         }
     }
@@ -274,13 +279,13 @@ internal class GetAssertionExecution :
     private fun execStep5ProcessOptions() {
         if (options != null) {
             if (BooleanUtil.isTrue(options.uv)) {
-                userVerificationPlan = when (ctapAuthenticator.userVerificationSetting) {
+                userVerificationPlan = when (connection.userVerification) {
                     UserVerificationSetting.READY -> true
                     else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
                 }
             }
             if (options.up != false) {
-                userPresencePlan = when (ctapAuthenticator.userPresenceSetting) {
+                userPresencePlan = when (connection.userPresence) {
                     UserPresenceSetting.SUPPORTED -> true
                     else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
                 }
@@ -298,13 +303,13 @@ internal class GetAssertionExecution :
                 AuthenticationExtensionsAuthenticatorOutputs.BuilderForAuthentication()
             if (inputs != null) {
                 val context = AuthenticationExtensionContext(
-                    ctapAuthenticator,
+                    connection,
                     authenticatorGetAssertionRequest,
                     credential,
                     userVerificationPlan,
                     userPresencePlan
                 )
-                ctapAuthenticator.extensionProcessors.filterIsInstance<AuthenticationExtensionProcessor>()
+                connection.extensionProcessors.filterIsInstance<AuthenticationExtensionProcessor>()
                     .forEach { processor ->
                         if (processor.supportsAuthenticationExtension(inputs)) {
                             processor.processAuthenticationExtension(context, outputsBuilder)
@@ -326,7 +331,7 @@ internal class GetAssertionExecution :
         //spec| - If the "up" option was specified and set to true, collect the user’s consentMakeCredential.
         //spec|   - If no consentMakeCredential is obtained and a timeout occurs, return the CTAP2_ERR_OPERATION_DENIED error.
         val options = GetAssertionConsentOptions(rpId, userPresencePlan, userVerificationPlan)
-        val consent = ctapAuthenticator.userConsentHandler.consentGetAssertion(options)
+        val consent = connection.userConsentHandler.consentGetAssertion(options)
         if (consent) {
             if (userVerificationPlan) {
                 userVerificationResult = true
@@ -395,7 +400,7 @@ internal class GetAssertionExecution :
             }
         }
         onGoingGetAssertionSession = GetAssertionSession(assertionObjects, clientDataHash)
-        ctapAuthenticator.onGoingGetAssertionSession = onGoingGetAssertionSession
+        connection.onGoingGetAssertionSession = onGoingGetAssertionSession
     }
 
     //spec| Step11
@@ -405,15 +410,15 @@ internal class GetAssertionExecution :
     //spec| - If the user declines to select a credential or takes too long (as determined by the authenticator),
     //spec|   terminate this procedure and return the CTAP2_ERR_OPERATION_DENIED error.
     private suspend fun execStep11SelectUserCredentialIfCredentialSelectorIsAuthenticator() {
-        if (ctapAuthenticator.credentialSelectorSetting == CredentialSelectorSetting.AUTHENTICATOR) {
+        if (connection.credentialSelector == CredentialSelectorSetting.AUTHENTICATOR) {
             val selectedCredential: Credential =
-                ctapAuthenticator.credentialSelectionHandler.select(credentials)
+                connection.credentialSelectionHandler.select(credentials)
             val selectedAssertionObject =
                 assertionObjects.find { it.credential.credentialId.contentEquals(selectedCredential.credentialId) }
                     ?: throw IllegalStateException("Selected Credential is not found in AssertionObject list")
             onGoingGetAssertionSession =
                 onGoingGetAssertionSession.withAssertionObjects(listOf(selectedAssertionObject))
-            ctapAuthenticator.onGoingGetAssertionSession = onGoingGetAssertionSession
+            connection.onGoingGetAssertionSession = onGoingGetAssertionSession
         }
     }
 
@@ -434,7 +439,7 @@ internal class GetAssertionExecution :
             counter,
             assertionObject.extensions
         )
-        val authData = ctapAuthenticator.authenticatorDataConverter.convert(authenticatorDataObject)
+        val authData = connection.authenticatorDataConverter.convert(authenticatorDataObject)
 
         // Let signature be the assertion signature of the concatenation authenticatorData || hash using
         // the privateKey of selectedCredential as shown in Figure 2, below. A simple, un-delimited concatenation is

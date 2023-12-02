@@ -5,7 +5,7 @@ import android.bluetooth.BluetoothHidDevice
 import android.bluetooth.BluetoothProfile
 import androidx.annotation.WorkerThread
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.TransactionManager
+import com.webauthn4j.ctap.authenticator.Connection
 import com.webauthn4j.ctap.authenticator.transport.hid.HIDConnector
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import kotlinx.coroutines.CoroutineScope
@@ -14,7 +14,7 @@ import kotlinx.coroutines.newSingleThreadContext
 import org.slf4j.LoggerFactory
 
 class Fido2BTHIDApplication(
-    transactionManager: TransactionManager,
+    connection: Connection,
     private val bluetoothHidDevice: BluetoothHidDevice,
     objectConverter: ObjectConverter
 ) : BluetoothHidDevice.Callback() {
@@ -24,7 +24,7 @@ class Fido2BTHIDApplication(
     //single thread worker to synchronize authenticator access
     private val bthidWorker = newSingleThreadContext("bthid-worker")
 
-    private val hidConnector = HIDConnector(transactionManager, objectConverter)
+    private val hidConnector = HIDConnector(connection, objectConverter)
 
     @WorkerThread
     override fun onAppStatusChanged(pluggedDevice: BluetoothDevice?, registered: Boolean) {
