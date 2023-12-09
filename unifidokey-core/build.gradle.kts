@@ -69,17 +69,17 @@ dependencies {
     // Third Party dependencies
     implementation(libs.slf4j.api)
 
-    implementation("com.fasterxml.jackson.core:jackson-databind")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.datatype.jsr310)
+    implementation(libs.jackson.dataformat.cbor)
+    implementation(libs.jackson.module.kotlin)
 
     // Android dependencies
 
     // Play services
-    implementation("com.google.android.gms:play-services-auth")
-    implementation("com.google.android.gms:play-services-fido")
-    implementation("com.google.android.gms:play-services-safetynet")
+    implementation(libs.play.services.auth)
+    implementation(libs.play.services.fido)
+    implementation(libs.play.services.safetynet)
 
     // AndroidX
     implementation(libs.androidx.core.ktx)

@@ -135,19 +135,12 @@ dependencies {
     implementation(project(":webauthn4j-ctap-authenticator"))
     implementation(project(":webauthn4j-ctap-client"))
 
-    // Third Party dependencies
-    implementation("com.github.tony19:logback-android")
-    implementation(libs.slf4j.api)
-    implementation("com.fasterxml.jackson.core:jackson-databind")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
-
     // Android dependencies
     implementation(libs.androidx.room.runtime)
 
     // Play services
-    implementation("com.google.android.gms:play-services-oss-licenses")
-    implementation("com.google.android.gms:play-services-fido")
+    implementation(libs.play.services.oss.licenses)
+    implementation(libs.play.services.fido)
 
     // AndroidX
     implementation(libs.androidx.core.ktx)
@@ -156,7 +149,7 @@ dependencies {
     implementation(libs.androidx.biometric)
     implementation(libs.androidx.legacy.support.v4)
     implementation(libs.androidx.preference)
-    implementation("androidx.recyclerview:recyclerview")
+    implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.navigation.fragment)
     implementation(libs.androidx.navigation.ui)
     implementation(libs.androidx.lifecycle.process)
@@ -178,6 +171,14 @@ dependencies {
     //Firebase
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
+
+    // Third Party dependencies
+    implementation(libs.logback.android)
+    implementation(libs.slf4j.api)
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.datatype.jsr310)
+    implementation(libs.jackson.dataformat.cbor)
+    implementation(libs.jackson.module.kotlin)
 
 
     // Annotation processor
