@@ -1,5 +1,6 @@
 plugins {
     id("kotlin-android")
+    id("com.google.devtools.ksp")
     id(libs.plugins.kotlin.kapt.get().pluginId)
 }
 
@@ -19,15 +20,13 @@ android {
             jvmTarget = JavaVersion.VERSION_11.toString()
         }
 
-        kapt{
-            arguments{
-                arg("room.schemaLocation", "$projectDir/schemas")
-            }
-        }
-
         //ProGuard
         consumerProguardFiles("consumer-rules.pro")
 
+    }
+    buildFeatures {
+        dataBinding = true
+        buildConfig = true
     }
     packaging {
         resources {
@@ -39,6 +38,10 @@ android {
     lint{
         baseline = file("lint-baseline.xml")
     }
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 description = "Provides core functionality, which is specific to UnifidoKey but independent from Android SDK"
@@ -107,7 +110,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
 
     // Annotation processor
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
     kapt(libs.dagger.compiler)
 
     // Test dependencies
@@ -120,9 +123,6 @@ dependencies {
     testImplementation("com.google.truth:truth")
     testImplementation("com.google.truth.extensions:truth-java8-extension")
     testImplementation("org.robolectric:robolectric")
-
-    kaptTest(libs.androidx.room.compiler)
-    kaptTest(libs.dagger.compiler)
 
     // Android test dependencies
     androidTestImplementation(libs.androidx.test.core)

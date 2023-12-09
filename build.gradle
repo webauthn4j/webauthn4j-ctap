@@ -67,8 +67,11 @@ buildscript {
     }
 }
 
-apply plugin: 'org.asciidoctor.jvm.convert'
-apply plugin: 'org.sonarqube'
+plugins {
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'org.sonarqube' version '4.4.1.3373'
+    id 'com.google.devtools.ksp' version '1.9.21-1.0.15' apply false
+}
 
 allprojects {
     configurations.all {
