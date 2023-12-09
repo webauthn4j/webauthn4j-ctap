@@ -1,6 +1,5 @@
 package com.webauthn4j.ctap.authenticator.store
 
-import com.webauthn4j.ctap.authenticator.store.CredentialNotFoundException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Test

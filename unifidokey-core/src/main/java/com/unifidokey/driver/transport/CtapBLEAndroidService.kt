@@ -13,7 +13,6 @@ import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.core.service.AuthenticatorService
-import com.webauthn4j.converter.util.ObjectConverter
 import org.slf4j.LoggerFactory
 
 /**

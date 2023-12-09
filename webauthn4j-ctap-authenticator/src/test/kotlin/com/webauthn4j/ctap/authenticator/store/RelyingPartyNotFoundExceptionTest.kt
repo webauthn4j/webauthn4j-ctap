@@ -1,6 +1,5 @@
 package com.webauthn4j.ctap.authenticator.store
 
-import com.webauthn4j.ctap.authenticator.store.RelyingPartyNotFoundException
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Test

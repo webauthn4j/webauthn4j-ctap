@@ -3,8 +3,8 @@ package com.webauthn4j.ctap.authenticator
 import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
-import com.webauthn4j.ctap.authenticator.store.StoreFullException
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
+import com.webauthn4j.ctap.authenticator.store.StoreFullException
 import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialResponse
 import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity

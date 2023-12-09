@@ -1,6 +1,5 @@
 package com.webauthn4j.ctap.authenticator.transport.ble
 
-import com.webauthn4j.ctap.authenticator.transport.ble.BLEDataProcessingException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Test

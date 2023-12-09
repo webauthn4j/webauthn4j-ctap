@@ -1,7 +1,6 @@
 package com.unifidokey.driver.transport
 
 import android.Manifest
-import android.app.Service
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothClass.Device
 import android.bluetooth.BluetoothDevice

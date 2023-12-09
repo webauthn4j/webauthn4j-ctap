@@ -11,10 +11,10 @@ import com.webauthn4j.ctap.authenticator.data.event.GetAssertionEvent
 import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
-import com.webauthn4j.ctap.authenticator.store.StoreFullException
 import com.webauthn4j.ctap.authenticator.extension.AuthenticationExtensionContext
 import com.webauthn4j.ctap.authenticator.extension.AuthenticationExtensionProcessor
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
+import com.webauthn4j.ctap.authenticator.store.StoreFullException
 import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.ctap.core.util.internal.BooleanUtil
 import com.webauthn4j.ctap.core.util.internal.CipherUtil

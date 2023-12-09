@@ -1,7 +1,7 @@
 package com.webauthn4j.ctap.authenticator.execution
 
-import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
+import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
 import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
 import com.webauthn4j.ctap.authenticator.data.settings.PlatformSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
