@@ -83,7 +83,7 @@ dependencies {
 
     // AndroidX
     implementation("androidx.core:core-ktx")
-    implementation("androidx.room:room-runtime")
+    implementation(libs.androidx.room.runtime)
     implementation("androidx.appcompat:appcompat")
     implementation("androidx.legacy:legacy-support-v4")
     implementation("androidx.preference:preference")

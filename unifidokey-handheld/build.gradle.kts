@@ -143,7 +143,7 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor")
 
     // Android dependencies
-    implementation("androidx.room:room-runtime")
+    implementation(libs.androidx.room.runtime)
 
     // Play services
     implementation("com.google.android.gms:play-services-oss-licenses")

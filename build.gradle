@@ -156,7 +156,7 @@ subprojects {
             implementation("androidx.navigation:navigation-fragment:$navigationVersion")
             implementation("androidx.navigation:navigation-ui:$navigationVersion")
 
-            implementation("androidx.room:room-runtime:$roomVersion")
+
             implementation("androidx.appcompat:appcompat:$appcompatVersion")
             implementation("androidx.constraintlayout:constraintlayout:$constraintlayoutVersion")
 
