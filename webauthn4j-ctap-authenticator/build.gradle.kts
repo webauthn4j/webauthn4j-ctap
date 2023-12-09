@@ -45,7 +45,7 @@ dependencies {
     // Test dependencies
     testImplementation(project(":webauthn4j-ctap-client"))
 
-    testImplementation("com.github.webauthn4j.webauthn4j:webauthn4j-test")
+    testImplementation(libs.webauthn4j.test)
     testImplementation("ch.qos.logback:logback-classic")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-inline")

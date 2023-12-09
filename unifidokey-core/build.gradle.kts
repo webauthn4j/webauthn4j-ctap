@@ -62,12 +62,12 @@ dependencies {
     implementation(libs.kotlin.stdlib.jdk8)
 
     // project dependencies
-    implementation("com.github.webauthn4j.webauthn4j:webauthn4j-core")
+    implementation(libs.webauthn4j.core)
     implementation(project(":webauthn4j-ctap-authenticator"))
     implementation(project(":webauthn4j-ctap-client"))
 
     // Third Party dependencies
-    implementation("org.slf4j:slf4j-api")
+    implementation(libs.slf4j.api)
 
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
@@ -98,9 +98,9 @@ dependencies {
 
     implementation(libs.androidx.credentials)
 
-    implementation("com.google.dagger:dagger")
-    implementation("com.google.dagger:dagger-android")
-    implementation("com.google.dagger:dagger-android-support")
+    implementation(libs.dagger)
+    implementation(libs.dagger.android)
+    implementation(libs.dagger.android.support)
 
     //Firebase
     implementation("com.google.firebase:firebase-crashlytics")

@@ -46,11 +46,8 @@ buildscript {
     ext.navigationSafeArgsGradlePluginVersion = "2.5.2"
     ext.ossLicensesPluginVersion = "0.10.6"
 
-    // WebAuthn4J
-    ext.webauthn4jVersion = "exp2-SNAPSHOT"
 
     // Third party libraries
-    ext.slf4jVersion = "2.0.9"
     ext.logbackAndroidVersion = "3.0.0"
     ext.bouncyCastleVersion = "1.77"
     ext.jacksonVersion = "2.16.0"
@@ -164,11 +161,6 @@ subprojects {
             implementation("androidx.legacy:legacy-support-v4:$legacySupportV4Version")
             implementation("androidx.preference:preference:$preferenceVersion")
 
-
-            implementation("com.google.dagger:dagger:$daggerVersion")
-            implementation("com.google.dagger:dagger-android:$daggerVersion")
-            implementation("com.google.dagger:dagger-android-support:$daggerVersion")
-
             implementation("com.google.android.material:material:$materialVersion")
 
             implementation("com.google.android.gms:play-services-auth:$googlePlayServicesAuthVersion")
@@ -177,18 +169,11 @@ subprojects {
             implementation("com.google.android.gms:play-services-oss-licenses:$googlePlayServicesOSSLicensesVersion")
 
             // third party
-            implementation("org.slf4j:slf4j-api:$slf4jVersion")
             implementation("com.github.tony19:logback-android:$logbackAndroidVersion")
             implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
             implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
             implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-cbor:$jacksonVersion")
             implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
-            implementation("org.bouncycastle:bcutil-jdk15to18:$bouncyCastleVersion")
-            implementation("org.bouncycastle:bcprov-jdk15to18:$bouncyCastleVersion")
-            implementation("org.bouncycastle:bcpkix-jdk15to18:$bouncyCastleVersion")
-            implementation("com.github.webauthn4j.webauthn4j:webauthn4j-util:$webauthn4jVersion")
-            implementation("com.github.webauthn4j.webauthn4j:webauthn4j-core:$webauthn4jVersion")
-            implementation("com.github.webauthn4j.webauthn4j:webauthn4j-test:$webauthn4jVersion")
 
             // test
             testImplementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion!!") //override BOM version

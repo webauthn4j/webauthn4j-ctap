@@ -45,7 +45,7 @@ dependencies {
     implementation(libs.bouncycastle.bcprov.jdk15to18)
 
     // Test dependencies
-    testImplementation("com.github.webauthn4j.webauthn4j:webauthn4j-test")
+    testImplementation(libs.webauthn4j.test)
     testImplementation("ch.qos.logback:logback-classic")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-inline")

@@ -29,7 +29,7 @@ tasks {
 dependencies {
 
     // Project dependencies
-    api("com.github.webauthn4j.webauthn4j:webauthn4j-core")
+    api(libs.webauthn4j.core)
 
     implementation(libs.kotlinx.coroutines.core)
 
@@ -47,11 +47,11 @@ dependencies {
     testImplementation(project(":webauthn4j-ctap-authenticator"))
     testImplementation(project(":webauthn4j-ctap-client"))
 
-    testImplementation("com.github.webauthn4j.webauthn4j:webauthn4j-test")
+    testImplementation(libs.webauthn4j.test)
     testImplementation("ch.qos.logback:logback-classic")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-inline")
-    testImplementation("org.mockito.kotlin:mockito-kotlin")
+    testImplementation(libs.mockito.kotlin)
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
