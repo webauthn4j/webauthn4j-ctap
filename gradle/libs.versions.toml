@@ -3,6 +3,9 @@ appcompat = "1.6.1"
 biometric = "1.1.0"
 constraintlayout = "2.1.4"
 dagger = "2.49"
+firebaseCrashlyticsGradle = "2.9.9"
+googleServices = "4.4.0"
+android-tools = "8.1.2"
 jackson = "2.16.0"
 kotlin = "1.9.21"
 kotlinx-coroutines = "1.7.3"
@@ -20,6 +23,7 @@ lifecycleExtensions = "2.2.0"
 logbackAndroid = "3.0.0"
 material = "1.10.0"
 navigation = "2.7.5"
+ossLicensesPlugin = "0.10.6"
 playServicesAuth = "20.7.0"
 playServicesFido = "20.1.0"
 playServicesOssLicenses = "17.0.1"
@@ -42,11 +46,17 @@ webauthn4j = "0.21.9.RELEASE"
 
 [libraries]
 # Kotlin
+firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsGradle" }
+google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
+gradle = { module = "com.android.tools.build:gradle", version.ref = "android-tools" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-stdlib-jdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-jdk8 = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk8", version.ref = "kotlinx-coroutines" }
 
 # Android
+androidx-navigation-safe-args-gradle-plugin = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
+
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
@@ -66,7 +76,6 @@ androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifec
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 
-androidx-navigation-safe-args-gradle-plugin = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
 
 logback-android = { module = "com.github.tony19:logback-android", version.ref = "logbackAndroid" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
@@ -77,6 +86,7 @@ dagger-android-support = { module = "com.google.dagger:dagger-android-support", 
 dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
 
 # WebAuthn4J
+oss-licenses-plugin = { module = "com.google.android.gms:oss-licenses-plugin", version.ref = "ossLicensesPlugin" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 play-services-fido = { module = "com.google.android.gms:play-services-fido", version.ref = "playServicesFido" }
 play-services-oss-licenses = { module = "com.google.android.gms:play-services-oss-licenses", version.ref = "playServicesOssLicenses" }
@@ -112,3 +122,6 @@ android-support-annotations = { group = "com.android.support", name = "support-a
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-plugin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
+androidx-navigation-safeargs = { id = "androidx.navigation.safeargs", version.ref = "navigation" }
+oss-licenses-plugins = { id = "com.google.android.gms.oss-licenses-plugin", version.ref = "ossLicensesPlugin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }

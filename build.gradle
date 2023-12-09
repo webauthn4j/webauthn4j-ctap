@@ -24,9 +24,6 @@ buildscript {
     ext.asmVersion = "9.6"
     ext.googleServicesVersion = "4.4.0"
     ext.firebaseBomVersion = "32.7.0"
-    ext.firebaseCrashlyticsGradleVersion = "2.9.9"
-    ext.androidGradlePluginVersion = '8.1.2'
-    ext.ossLicensesPluginVersion = "0.10.6"
 
 
     // Third party libraries
@@ -53,11 +50,11 @@ buildscript {
         }
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath "com.android.tools.build:gradle:$androidGradlePluginVersion"
-        classpath "com.google.android.gms:oss-licenses-plugin:$ossLicensesPluginVersion"
-        classpath "com.google.firebase:firebase-crashlytics-gradle:$firebaseCrashlyticsGradleVersion"
-        classpath "com.google.gms:google-services:$googleServicesVersion"
+        classpath libs.kotlin.gradle.plugin
+        classpath libs.gradle
+        classpath libs.oss.licenses.plugin
+        classpath libs.firebase.crashlytics.gradle
+        classpath libs.google.services
         classpath libs.androidx.navigation.safe.args.gradle.plugin
 
         classpath "org.asciidoctor:asciidoctor-gradle-jvm:$asciidoctorGradleVersion"
@@ -118,7 +115,6 @@ subprojects {
 
     dependencies {
         //BOM
-        implementation platform("org.jetbrains.kotlin:kotlin-bom:${kotlinVersion}")
         implementation platform("com.google.firebase:firebase-bom:${firebaseBomVersion}")
         testImplementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
 
