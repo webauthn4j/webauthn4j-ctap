@@ -1,4 +1,5 @@
 [versions]
+junit-jupiter = "5.10.1"
 kotlin = "1.9.21"
 kotlinx-coroutines = "1.7.3"
 
@@ -43,6 +44,9 @@ androidx-test = "1.5.0"
 androidx-test-ext-junit = "1.1.5"
 androidx-test-espresso = "3.5.1"
 espresso = "3.5.1"
+logbackClassic = "1.4.14"
+assertj = "3.24.2"
+mockito = "5.8.0"
 mockito-kotlin = "5.2.1"
 truth = "1.1.5"
 robolectric = "4.11.1"
@@ -57,9 +61,13 @@ asciidoctorGradleJvm = "3.3.2"
 [libraries]
 # Kotlin
 asciidoctor-gradle-jvm = { module = "org.asciidoctor:asciidoctor-gradle-jvm", version.ref = "asciidoctorGradleJvm" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsGradle" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "android-tools" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }
+junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit-jupiter" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-stdlib-jdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -88,7 +96,9 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx-room" }
 
 
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 logback-android = { module = "com.github.tony19:logback-android", version.ref = "logbackAndroid" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logbackClassic" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 
 dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
@@ -97,6 +107,8 @@ dagger-android-support = { module = "com.google.dagger:dagger-android-support", 
 dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
 
 # WebAuthn4J
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito" }
 oss-licenses-plugin = { module = "com.google.android.gms:oss-licenses-plugin", version.ref = "ossLicensesPlugin" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 play-services-fido = { module = "com.google.android.gms:play-services-fido", version.ref = "playServicesFido" }
@@ -127,7 +139,6 @@ truth = { group = "com.google.truth", name = "truth", version.ref = "truth"}
 truth-java8-extension = { group = "com.google.truth.extensions", name = "truth-java8-extension", version.ref = "truth"}
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric"}
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockito-kotlin" }
-espresso = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockito-kotlin" }
 android-support-annotations = { group = "com.android.support", name = "support-annotations", version.ref = "android-support-annotations"}
 
 [plugins]
