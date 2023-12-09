@@ -3,7 +3,7 @@ package com.webauthn4j.ctap.authenticator
 import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
-import com.webauthn4j.ctap.authenticator.exception.StoreFullException
+import com.webauthn4j.ctap.authenticator.store.StoreFullException
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
 import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialResponse
@@ -35,7 +35,7 @@ internal class MakeCredentialExecutionTest {
     @Test
     fun test() = runTest {
         val ctapAuthenticator = CtapAuthenticator()
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
 
         val clientDataHash = ByteArray(0)
         val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
@@ -81,7 +81,7 @@ internal class MakeCredentialExecutionTest {
                 )
             } doThrow StoreFullException("AuthenticatorPropertyStore is full")
         }
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
 
         val clientDataHash = ByteArray(0)
         val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
@@ -154,7 +154,7 @@ internal class MakeCredentialExecutionTest {
 
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.residentKey = residentKeySetting
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
 
         val response = connection.makeCredential(command)
         assertThat(response).isInstanceOf(AuthenticatorMakeCredentialResponse::class.java)
@@ -210,7 +210,7 @@ internal class MakeCredentialExecutionTest {
 
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.residentKey = residentKeySetting
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
 
         val response = connection.makeCredential(command)
         assertThat(response).isInstanceOf(AuthenticatorMakeCredentialResponse::class.java)
@@ -265,7 +265,7 @@ internal class MakeCredentialExecutionTest {
 
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.userVerification = userVerificationSetting
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
 
 
         val response = connection.makeCredential(command)
@@ -311,7 +311,7 @@ internal class MakeCredentialExecutionTest {
 
             val ctapAuthenticator = CtapAuthenticator()
             ctapAuthenticator.userPresence = userPresenceSetting
-            val connection = ctapAuthenticator.connect()
+            val connection = ctapAuthenticator.createSession()
 
             val response = connection.makeCredential(command)
             assertThat(response).isInstanceOf(AuthenticatorMakeCredentialResponse::class.java)
@@ -348,14 +348,10 @@ internal class MakeCredentialExecutionTest {
         )
 
         val ctapAuthenticator = CtapAuthenticator()
-        ctapAuthenticator.userConsentHandler = object : UserConsentHandler {
-            override suspend fun consentMakeCredential(options: MakeCredentialConsentOptions): Boolean =
-                false
-
-            override suspend fun consentGetAssertion(options: GetAssertionConsentOptions): Boolean =
-                true
+        ctapAuthenticator.makeCredentialConsentRequestHandler = object : MakeCredentialConsentRequestHandler {
+            override suspend fun onMakeCredentialConsentRequested(makeCredentialConsentRequest: MakeCredentialConsentRequest): Boolean = false
         }
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
 
         val response = connection.makeCredential(command)
         assertThat(response).isInstanceOf(AuthenticatorMakeCredentialResponse::class.java)
@@ -392,7 +388,7 @@ internal class MakeCredentialExecutionTest {
         )
 
         val ctapAuthenticator = CtapAuthenticator()
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
 
         val response = connection.makeCredential(command)
         assertThat(response).isInstanceOf(AuthenticatorMakeCredentialResponse::class.java)

@@ -1,10 +1,9 @@
 package com.webauthn4j.ctap.authenticator.execution
 
-import com.webauthn4j.ctap.authenticator.Connection
-import com.webauthn4j.ctap.authenticator.MakeCredentialConsentOptions
+import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
+import com.webauthn4j.ctap.authenticator.MakeCredentialConsentRequest
 import com.webauthn4j.ctap.authenticator.U2FKeyEnvelope
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementRequest
-import com.webauthn4j.ctap.authenticator.exception.U2FCommandExecutionException
 import com.webauthn4j.ctap.core.data.U2FRegistrationRequest
 import com.webauthn4j.ctap.core.data.U2FRegistrationResponse
 import com.webauthn4j.ctap.core.data.U2FStatusCode
@@ -17,7 +16,7 @@ import java.security.interfaces.ECPublicKey
 import java.time.Instant
 
 class U2FRegisterExecution(
-    private val connection: Connection,
+    private val ctapAuthenticatorSession: CtapAuthenticatorSession,
     private val u2FRegistrationRequest: U2FRegistrationRequest
 ) {
 
@@ -41,7 +40,7 @@ class U2FRegisterExecution(
             throw e
         } catch (e: java.lang.RuntimeException) {
             logger.error("Unknown error occurred while processing U2F Registration Command.", e)
-            connection.reportException(e)
+            ctapAuthenticatorSession.reportException(e)
             throw U2FCommandExecutionException(U2FStatusCode.WRONG_DATA, e)
         }
 
@@ -51,8 +50,8 @@ class U2FRegisterExecution(
 
     suspend fun doExecute(): U2FRegistrationResponse {
         val keyPair = ECUtil.createKeyPair()
-        val encryptionKey = connection.authenticatorPropertyStore.loadEncryptionKey()
-        val encryptionIV = connection.authenticatorPropertyStore.loadEncryptionIV()
+        val encryptionKey = ctapAuthenticatorSession.authenticatorPropertyStore.loadEncryptionKey()
+        val encryptionIV = ctapAuthenticatorSession.authenticatorPropertyStore.loadEncryptionIV()
 
         // As Android doesn't support extended APDU, keyHandle must be small enough to fit in one short APDU.
         val envelope = U2FKeyEnvelope.create(
@@ -60,7 +59,7 @@ class U2FRegisterExecution(
             u2FRegistrationRequest.applicationParameter,
             Instant.now()
         )
-        val data = connection.objectConverter.cborConverter.writeValueAsBytes(envelope)
+        val data = ctapAuthenticatorSession.objectConverter.cborConverter.writeValueAsBytes(envelope)
 
         val userPresenceResult = requestUserPresence(u2FRegistrationRequest.applicationParameter)
         if (!userPresenceResult) {
@@ -78,7 +77,7 @@ class U2FRegisterExecution(
             u2FRegistrationRequest.challengeParameter
         )
         val attestationStatement =
-            connection.fidoU2FBasicAttestationStatementGenerator.generate(
+            ctapAuthenticatorSession.fidoU2FBasicAttestationStatementGenerator.generate(
                 attestationStatementRequest
             )
         return U2FRegistrationResponse(
@@ -91,13 +90,13 @@ class U2FRegisterExecution(
     }
 
     private suspend fun requestUserPresence(applicationParameter: ByteArray): Boolean {
-        val options = MakeCredentialConsentOptions(
+        val makeCredentialConsentRequest = MakeCredentialConsentRequest(
             applicationParameter,
             null,
-            isUserPresence = true,
-            isUserVerification = false
+            isUserPresenceRequired = true,
+            isUserVerificationRequired = false
         )
-        return connection.userConsentHandler.consentMakeCredential(options)
+        return ctapAuthenticatorSession.makeCredentialConsentRequestHandler.onMakeCredentialConsentRequested(makeCredentialConsentRequest)
     }
 
 }

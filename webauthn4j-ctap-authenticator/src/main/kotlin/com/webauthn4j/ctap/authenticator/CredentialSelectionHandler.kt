@@ -5,6 +5,6 @@ import com.webauthn4j.ctap.authenticator.data.credential.Credential
 /**
  * Credential selection handler
  */
-interface CredentialSelectionHandler {
-    suspend fun select(list: List<Credential>): Credential
+fun interface CredentialSelectionHandler {
+    suspend fun onSelect(list: List<Credential>): Credential
 }

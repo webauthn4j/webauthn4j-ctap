@@ -1,16 +1,20 @@
 package com.unifidokey.driver.transport
 
 import android.Manifest
+import android.app.Service
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothClass.Device
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothDevice.DEVICE_TYPE_LE
+import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.content.*
 import android.content.pm.PackageManager
 import android.os.IBinder
+import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -29,8 +33,9 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
         LoggerFactory.getLogger(CtapBTHIDAndroidServiceContextualAdapter::class.java)
 
     private val packageManager: PackageManager = applicationContext.packageManager
+    private val bluetoothManager = getSystemService(applicationContext, BluetoothManager::class.java)!!
     private val bluetoothAdapter: BluetoothAdapter? by lazy {
-        BluetoothAdapter.getDefaultAdapter()
+        bluetoothManager.adapter
     }
     private var ctapBTHIDAndroidService: CtapBTHIDAndroidService? = null
     private var ctapBTHIDDroidServiceConnection: CtapBTHIDAndroidServiceContextualAdapter.CtapBTHIDDroidServiceConnection? =
@@ -61,6 +66,7 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
         }
     }
 
+    @RequiresPermission(value = "android.permission.BLUETOOTH_CONNECT")
     private fun listBluetoothDevices(): List<BluetoothDeviceHandle> {
         return if (isBTHIDAdapterEnabled.value!!) {
             (bluetoothAdapter?.bondedDevices ?: emptyList()).filter {
@@ -122,6 +128,7 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
         bthidBroadcastReceiver.unregister(applicationContext) //TODO: この順番で大丈夫か？
     }
 
+    @RequiresPermission(value = "android.permission.BLUETOOTH_CONNECT")
     override fun connect(deviceHandle: BluetoothDeviceHandle) {
         ctapBTHIDAndroidService.let {
             when (it) {
@@ -131,6 +138,7 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
         }
     }
 
+    @RequiresPermission(value = "android.permission.BLUETOOTH_CONNECT")
     override fun disconnect(deviceHandle: BluetoothDeviceHandle) {
         ctapBTHIDAndroidService.let {
             when (it) {
@@ -227,6 +235,7 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
             }
         }
 
+        @RequiresPermission(value = "android.permission.BLUETOOTH_CONNECT")
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
             if (action != null) {
@@ -237,10 +246,8 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
                             BluetoothAdapter.EXTRA_PREVIOUS_STATE,
                             BluetoothAdapter.ERROR
                         )
-                        val state =
-                            intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
-                        val bluetoothDevice =
-                            intent.getParcelableExtra<BluetoothDevice?>(BluetoothDevice.EXTRA_DEVICE)
+                        val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
+                        val bluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
                         val isBTHIDEnabled = state == BluetoothAdapter.STATE_ON
                         logger.info(
                             "State changed from {} to {}, name: {}",
@@ -263,8 +270,7 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
                             BluetoothAdapter.EXTRA_CONNECTION_STATE,
                             BluetoothAdapter.ERROR
                         )
-                        val bluetoothDevice =
-                            intent.getParcelableExtra<BluetoothDevice?>(BluetoothDevice.EXTRA_DEVICE)
+                        val bluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
                         logger.info(
                             "connectionState changed from {} to {}, name: {}",
                             resolveConnectionState(previousConnectionState),

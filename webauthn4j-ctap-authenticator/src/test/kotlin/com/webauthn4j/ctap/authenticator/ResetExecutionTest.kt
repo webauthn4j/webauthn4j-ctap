@@ -13,7 +13,7 @@ internal class ResetExecutionTest {
     @Test
     fun createErrorResponse_test() {
         val response = ResetExecution(
-            mock(Connection::class.java),
+            mock(CtapAuthenticatorSession::class.java),
             mock(AuthenticatorResetRequest::class.java)
         ).createErrorResponse(CtapStatusCode.CTAP1_ERR_OTHER)
         assertThat(response).isInstanceOf(AuthenticatorResetResponse::class.java)

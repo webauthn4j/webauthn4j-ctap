@@ -1,5 +1,5 @@
 package com.webauthn4j.ctap.client
 
 class MakeCredentialContext(
-    val clientPINUserVerificationHandler: ClientPINUserVerificationHandler,
+    val clientPINRequestHandler: ClientPINRequestHandler,
     val authenticatorUserVerificationHandler: AuthenticatorUserVerificationHandler = NoopAuthenticatorUserVerificationHandler())

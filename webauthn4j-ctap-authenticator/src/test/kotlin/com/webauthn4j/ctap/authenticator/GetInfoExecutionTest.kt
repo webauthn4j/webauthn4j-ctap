@@ -13,7 +13,7 @@ internal class GetInfoExecutionTest {
     @Test
     fun createErrorResponse_test() {
         val response = GetInfoExecution(
-            Mockito.mock(Connection::class.java),
+            Mockito.mock(CtapAuthenticatorSession::class.java),
             Mockito.mock(AuthenticatorGetInfoRequest::class.java)
         ).createErrorResponse(CtapStatusCode.CTAP1_ERR_OTHER)
         Assertions.assertThat(response).isInstanceOf(AuthenticatorGetInfoResponse::class.java)

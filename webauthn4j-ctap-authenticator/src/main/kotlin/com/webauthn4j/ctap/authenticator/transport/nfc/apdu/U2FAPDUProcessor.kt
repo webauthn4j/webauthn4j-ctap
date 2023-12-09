@@ -1,9 +1,8 @@
 package com.webauthn4j.ctap.authenticator.transport.nfc.apdu
 
-import com.webauthn4j.ctap.authenticator.Connection
-import com.webauthn4j.ctap.authenticator.exception.U2FCommandExecutionException
-import com.webauthn4j.ctap.authenticator.transport.nfc.NFCConnector
-import com.webauthn4j.ctap.core.data.CtapRequest
+import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
+import com.webauthn4j.ctap.authenticator.execution.U2FCommandExecutionException
+import com.webauthn4j.ctap.authenticator.transport.nfc.NFCTransport
 import com.webauthn4j.ctap.core.data.U2FAuthenticationRequest
 import com.webauthn4j.ctap.core.data.U2FAuthenticationResponse
 import com.webauthn4j.ctap.core.data.U2FRegistrationRequest
@@ -32,7 +31,7 @@ class U2FAPDUProcessor(
         u2fContinuationAPDURequestCommandAPDUProcessor
     )
 
-    private var connection: Connection? = null
+    private var ctapAuthenticatorSession: CtapAuthenticatorSession? = null
 
     override fun isTarget(command: CommandAPDU): Boolean {
         return commandAPDUProcessors.any { it.isTarget(command) }
@@ -48,17 +47,17 @@ class U2FAPDUProcessor(
             logger.debug("Processing Unknown APDU command")
             U2FStatusCode.INS_NOT_SUPPORTED.toResponseAPDU()
         } catch (e: RuntimeException) {
-            logger.error(NFCConnector.UNEXPECTED_EXCEPTION_MESSAGE, e)
+            logger.error(NFCTransport.UNEXPECTED_EXCEPTION_MESSAGE, e)
             ResponseAPDU.createErrorResponseAPDU()
         }
     }
 
-    fun onConnect(connection: Connection) {
-        this.connection = connection
+    fun onConnect(ctapAuthenticatorSession: CtapAuthenticatorSession) {
+        this.ctapAuthenticatorSession = ctapAuthenticatorSession
     }
 
     fun onDisconnect() {
-        connection = null
+        ctapAuthenticatorSession = null
         u2fResponseQueue.clear()
     }
 
@@ -77,7 +76,7 @@ class U2FAPDUProcessor(
             }
             val u2fRegistrationRequest: U2FRegistrationRequest = U2FRegistrationRequest.createFromCommandAPDU(command)
             return try {
-                connection.let {
+                ctapAuthenticatorSession.let {
                     if(it == null){
                         throw IllegalStateException("Unexpected U2FRegistrationRequest is passed before connection is established.")
                     }
@@ -112,7 +111,7 @@ class U2FAPDUProcessor(
             val u2fAuthenticationRequest: U2FAuthenticationRequest =
                 U2FAuthenticationRequest.createFromCommandAPDU(command)
             return try {
-                connection.let {
+                ctapAuthenticatorSession.let {
                     if(it == null){
                         throw IllegalStateException("Unexpected U2FAuthenticationRequest is passed before connection is established.")
                     }

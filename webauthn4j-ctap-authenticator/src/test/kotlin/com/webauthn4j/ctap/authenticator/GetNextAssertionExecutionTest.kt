@@ -31,7 +31,7 @@ class GetNextAssertionExecutionTest {
     @Test
     fun createErrorResponse_test() {
         val response = GetNextAssertionExecution(
-            Mockito.mock(Connection::class.java),
+            Mockito.mock(CtapAuthenticatorSession::class.java),
             Mockito.mock(AuthenticatorGetNextAssertionRequest::class.java)
         ).createErrorResponse(CtapStatusCode.CTAP1_ERR_OTHER)
         Assertions.assertThat(response)
@@ -43,7 +43,7 @@ class GetNextAssertionExecutionTest {
     fun getNextAssertion_test() = runTest {
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
         makeCredential(connection)
         makeCredential(connection)
 
@@ -73,7 +73,7 @@ class GetNextAssertionExecutionTest {
     fun getNextAssertion_when_no_session_exist_test() = runTest {
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
         makeCredential(connection)
 
         val response = connection.getNextAssertion(AuthenticatorGetNextAssertionRequest())
@@ -84,7 +84,7 @@ class GetNextAssertionExecutionTest {
     fun getNextAssertion_when_next_credential_does_not_exist_test() = runTest {
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
         makeCredential(connection)
         makeCredential(connection)
 
@@ -116,7 +116,7 @@ class GetNextAssertionExecutionTest {
     fun expiration_test() = runTest {
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
         makeCredential(connection)
         makeCredential(connection)
 
@@ -159,7 +159,7 @@ class GetNextAssertionExecutionTest {
 
     @Test
     suspend fun makeCredential(
-        connection: Connection,
+        ctapAuthenticatorSession: CtapAuthenticatorSession,
         rk: Boolean = true,
         uv: Boolean = true
     ) {
@@ -189,7 +189,7 @@ class GetNextAssertionExecutionTest {
             pinAuth,
             pinProtocol
         )
-        val response = connection.makeCredential(command)
+        val response = ctapAuthenticatorSession.makeCredential(command)
         Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
         Assertions.assertThat(response.responseData).isNotNull
         Assertions.assertThat(response.responseData!!.attestationStatement).isNotNull

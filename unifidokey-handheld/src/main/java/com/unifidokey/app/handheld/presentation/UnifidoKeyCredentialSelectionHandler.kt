@@ -7,7 +7,7 @@ import com.webauthn4j.ctap.authenticator.data.credential.UserCredential
 
 class UnifidoKeyCredentialSelectionHandler(private val context: Context) :
     CredentialSelectionHandler {
-    override suspend fun select(list: List<Credential>): Credential {
+    override suspend fun onSelect(list: List<Credential>): Credential {
         return if (list.size == 1) {
             list.first()
         } else {

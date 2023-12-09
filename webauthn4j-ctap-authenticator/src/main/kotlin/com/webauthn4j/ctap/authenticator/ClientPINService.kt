@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.authenticator
 
-import com.webauthn4j.ctap.authenticator.exception.CtapCommandExecutionException
+import com.webauthn4j.ctap.authenticator.execution.CtapCommandExecutionException
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponseData
@@ -49,7 +49,7 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
     }
 
     private var volatilePinRetryCounter = MAX_VOLATILE_PIN_RETRIES
-    var authenticatorKeyAgreementKey = ECUtil.createKeyPair() //TODO: セッションを跨いで再利用されているが大丈夫か？
+    var authenticatorKeyAgreementKey = ECUtil.createKeyPair()
     val pinToken = ByteArray(16)
 
     init {

@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutionException
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 internal class CtapClientTest {
-    private val connection = CtapAuthenticator().connect()
+    private val connection = CtapAuthenticator().createSession()
 
     @Test
     fun getInfo_test() = runTest {

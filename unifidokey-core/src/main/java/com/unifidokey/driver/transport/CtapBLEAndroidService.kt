@@ -1,5 +1,6 @@
 package com.unifidokey.driver.transport
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
@@ -8,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.core.service.AuthenticatorService
@@ -47,14 +49,10 @@ class CtapBLEAndroidService : Service() {
 
     private fun initialize() {
         val unifidoKeyApplication = application as UnifidoKeyApplicationBase<*>
-        val authenticatorService: AuthenticatorService =
-            unifidoKeyApplication.unifidoKeyComponent.authenticatorService
-        val objectConverter: ObjectConverter =
-            unifidoKeyApplication.unifidoKeyComponent.objectConverter
+        val ctapAuthenticator = unifidoKeyApplication.unifidoKeyComponent.authenticatorService.ctapAuthenticator
         val context = applicationContext
         val bluetoothManager = getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
-        fido2BLEGATTServer =
-            Fido2BLEGATTServer(context, bluetoothManager, authenticatorService, objectConverter)
+        fido2BLEGATTServer = Fido2BLEGATTServer(context, bluetoothManager, ctapAuthenticator)
         fido2Advertiser = Fido2Advertiser(bluetoothManager)
         logger.debug("CtapBLEAndroidService is initialized")
     }
@@ -79,10 +77,12 @@ class CtapBLEAndroidService : Service() {
         startForeground(NOTIFICATION_ID, notification)
     }
 
+    @RequiresPermission(Manifest.permission.BLUETOOTH_ADVERTISE)
     fun startAdvertise() {
         fido2Advertiser.startBLEAdvertise()
     }
 
+    @RequiresPermission(Manifest.permission.BLUETOOTH_ADVERTISE)
     fun stopAdvertise() {
         fido2Advertiser.stopBLEAdvertise()
     }

@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.authenticator.execution
 
-import com.webauthn4j.ctap.authenticator.Connection
+import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
 import com.webauthn4j.ctap.authenticator.data.event.ResetEvent
 import com.webauthn4j.ctap.authenticator.data.settings.ResetProtectionSetting
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
@@ -14,15 +14,15 @@ import java.time.Instant
  * Reset command execution
  */
 class ResetExecution internal constructor(
-    private val connection: Connection,
+    private val ctapAuthenticatorSession: CtapAuthenticatorSession,
     authenticatorResetRequest: AuthenticatorResetRequest
 ) : CtapCommandExecutionBase<AuthenticatorResetRequest, AuthenticatorResetResponse>(
-    connection,
+    ctapAuthenticatorSession,
     authenticatorResetRequest
 ) {
 
     private val authenticatorPropertyStore: AuthenticatorPropertyStore =
-        connection.authenticatorPropertyStore
+        ctapAuthenticatorSession.authenticatorPropertyStore
     private val logger = LoggerFactory.getLogger(MakeCredentialExecution::class.java)
 
     override suspend fun validate() {
@@ -31,12 +31,12 @@ class ResetExecution internal constructor(
 
     override suspend fun doExecute(): AuthenticatorResetResponse {
         logger.debug("Processing reset request")
-        return when (connection.resetProtection) {
+        return when (ctapAuthenticatorSession.resetProtection) {
             ResetProtectionSetting.ENABLED -> AuthenticatorResetResponse(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
             else -> {
-                connection.clientPINService.resetVolatilePinRetryCounter()
+                ctapAuthenticatorSession.clientPINService.resetVolatilePinRetryCounter()
                 authenticatorPropertyStore.clear()
-                connection.publishEvent(ResetEvent(Instant.now()))
+                ctapAuthenticatorSession.publishEvent(ResetEvent(Instant.now()))
                 AuthenticatorResetResponse(CtapStatusCode.CTAP2_OK)
             }
         }

@@ -1,7 +1,7 @@
 package com.webauthn4j.ctap.client
 
-import com.webauthn4j.ctap.authenticator.exception.ClientPINUserVerificationCanceledException
-import com.webauthn4j.ctap.authenticator.exception.CtapCommandExecutionException
+import com.webauthn4j.ctap.authenticator.ClientPINUserVerificationCanceledException
+import com.webauthn4j.ctap.authenticator.execution.CtapCommandExecutionException
 import com.webauthn4j.ctap.client.exception.ResponseDataValidationException
 import com.webauthn4j.ctap.client.exception.UPNotSupportedException
 import com.webauthn4j.ctap.client.exception.UVNotReadyException
@@ -114,7 +114,7 @@ open class CtapService(protected val ctapClient: CtapClient) {
             UserVerificationStrategy.CLIENT_PIN_UV -> {
                 val clientPIN: ByteArray
                 try {
-                    clientPIN = makeCredentialContext.clientPINUserVerificationHandler.onClientPINRequested()
+                    clientPIN = makeCredentialContext.clientPINRequestHandler.onClientPINRequested()
                 } catch (e: ClientPINUserVerificationCanceledException) {
                     throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_REQUIRED, e)
                 }
@@ -185,7 +185,7 @@ open class CtapService(protected val ctapClient: CtapClient) {
             UserVerificationStrategy.CLIENT_PIN_UV -> {
                 val clientPIN: ByteArray
                 try {
-                    clientPIN = getAssertionContext.clientPINUserVerificationHandler.onClientPINRequested()
+                    clientPIN = getAssertionContext.clientPINRequestHandler.onClientPINRequested()
                 } catch (e: ClientPINUserVerificationCanceledException) {
                     throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_REQUIRED, e)
                 }

@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.authenticator.execution
 
-import com.webauthn4j.ctap.authenticator.Connection
+import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
 import com.webauthn4j.ctap.authenticator.data.settings.PlatformSetting
@@ -22,10 +22,10 @@ import org.slf4j.LoggerFactory
  * GetInfo command execution
  */
 internal class GetInfoExecution(
-    private val connection: Connection,
+    private val ctapAuthenticatorSession: CtapAuthenticatorSession,
     authenticatorGetInfoRequest: AuthenticatorGetInfoRequest
 ) : CtapCommandExecutionBase<AuthenticatorGetInfoRequest, AuthenticatorGetInfoResponse>(
-    connection,
+    ctapAuthenticatorSession,
     authenticatorGetInfoRequest
 ) {
 
@@ -37,37 +37,37 @@ internal class GetInfoExecution(
     }
 
     override suspend fun doExecute(): AuthenticatorGetInfoResponse {
-        val plat: PlatformOption = when (connection.platform) {
+        val plat: PlatformOption = when (ctapAuthenticatorSession.platform) {
             PlatformSetting.CROSS_PLATFORM -> PlatformOption.CROSS_PLATFORM
             PlatformSetting.PLATFORM -> PlatformOption.PLATFORM
         }
-        val rk: ResidentKeyOption = when (connection.residentKey) {
+        val rk: ResidentKeyOption = when (ctapAuthenticatorSession.residentKey) {
             ResidentKeySetting.ALWAYS, ResidentKeySetting.IF_REQUIRED -> ResidentKeyOption.SUPPORTED
             ResidentKeySetting.NEVER -> ResidentKeyOption.NOT_SUPPORTED
         }
-        val clientPin: ClientPINOption? = when (connection.clientPIN) {
+        val clientPin: ClientPINOption? = when (ctapAuthenticatorSession.clientPIN) {
             ClientPINSetting.ENABLED -> when {
-                connection.clientPINService.isClientPINReady -> ClientPINOption.SET
+                ctapAuthenticatorSession.clientPINService.isClientPINReady -> ClientPINOption.SET
                 else -> ClientPINOption.NOT_SET
             }
             ClientPINSetting.DISABLED -> ClientPINOption.NOT_SUPPORTED
         }
-        val up: UserPresenceOption = when (connection.userPresence) {
+        val up: UserPresenceOption = when (ctapAuthenticatorSession.userPresence) {
             UserPresenceSetting.SUPPORTED -> UserPresenceOption.SUPPORTED
             UserPresenceSetting.NOT_SUPPORTED -> UserPresenceOption.NOT_SUPPORTED
         }
-        val uv: UserVerificationOption? = when (connection.userVerification) {
+        val uv: UserVerificationOption? = when (ctapAuthenticatorSession.userVerification) {
             UserVerificationSetting.READY -> UserVerificationOption.READY
             UserVerificationSetting.NOT_READY -> UserVerificationOption.NOT_READY
             UserVerificationSetting.NOT_SUPPORTED -> UserVerificationOption.NOT_SUPPORTED
         }
-        val extensions = connection.extensionProcessors.map { it.extensionId }
+        val extensions = ctapAuthenticatorSession.extensionProcessors.map { it.extensionId }
         return AuthenticatorGetInfoResponse(
             CtapStatusCode.CTAP2_OK,
             AuthenticatorGetInfoResponseData(
                 CtapAuthenticator.VERSIONS,
                 extensions,
-                connection.aaguid,
+                ctapAuthenticatorSession.aaguid,
                 AuthenticatorGetInfoResponseData.Options(plat, rk, clientPin, up, uv),
                 2048u,
                 CtapAuthenticator.PIN_PROTOCOLS

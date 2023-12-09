@@ -10,24 +10,30 @@ import androidx.credentials.GetPublicKeyCredentialOption
 import androidx.credentials.provider.PendingIntentHandler
 import androidx.credentials.provider.ProviderCreateCredentialRequest
 import androidx.credentials.provider.ProviderGetCredentialRequest
+import androidx.fragment.app.FragmentActivity
 import com.unifidokey.core.config.ConfigManager
-import com.webauthn4j.ctap.authenticator.Connection
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
-import com.webauthn4j.ctap.authenticator.GetAssertionConsentOptions
-import com.webauthn4j.ctap.authenticator.MakeCredentialConsentOptions
-import com.webauthn4j.ctap.authenticator.UserConsentHandler
+import com.webauthn4j.ctap.authenticator.GetAssertionConsentRequestHandler
+import com.webauthn4j.ctap.authenticator.MakeCredentialConsentRequestHandler
 import com.webauthn4j.data.client.Origin
 import org.slf4j.LoggerFactory
 
 class AndroidCredentialsIntentProcessor(
-    private val activity: Activity,
+    private val activity: FragmentActivity,
     configManager: ConfigManager,
-    ctapAuthenticator: CtapAuthenticator
+    ctapAuthenticator: CtapAuthenticator,
+    private val makeCredentialConsentRequestHandler: MakeCredentialConsentRequestHandler,
+    private val getAssertionConsentRequestHandler: GetAssertionConsentRequestHandler
 ) {
 
     private val logger = LoggerFactory.getLogger(AndroidCredentialsIntentProcessor::class.java)
-    private val androidCredentialsAuthenticator = AndroidCredentialsAuthenticator(configManager, ctapAuthenticator)
-    private val objectConverter = ctapAuthenticator.objectConverter
+
+    private val ctapAuthenticator = ctapAuthenticator.also {
+        it.makeCredentialConsentRequestHandler = this.makeCredentialConsentRequestHandler
+        it.getAssertionConsentRequestHandler = this.getAssertionConsentRequestHandler
+    }
+    private val androidCredentialsAuthenticator = AndroidCredentialsAuthenticator(configManager, this.ctapAuthenticator)
+    private val objectConverter = this.ctapAuthenticator.objectConverter
 
     suspend fun processIntent(activity: Activity, intent: Intent?){
         try{

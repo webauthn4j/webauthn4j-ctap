@@ -4,7 +4,8 @@ import com.unifidokey.BuildConfig
 import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.app.handheld.presentation.UnifidoKeyCredentialSelectionHandler
-import com.unifidokey.app.handheld.presentation.UnifidoKeyUserConsentHandler
+import com.unifidokey.app.handheld.presentation.UnifidoKeyGetAssertionConsentRequestHandler
+import com.unifidokey.app.handheld.presentation.UnifidoKeyMakeCredentialConsentRequestHandler
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.core.service.AuthenticatorService
 
@@ -35,9 +36,8 @@ class UnifidoKeyHandHeldApplication : UnifidoKeyApplicationBase<UnifidoKeyHandHe
         val unifidoKeyComponent: UnifidoKeyComponent = this.unifidoKeyComponent
         val authenticatorService: AuthenticatorService = unifidoKeyComponent.authenticatorService
         val configManager: ConfigManager = unifidoKeyComponent.configManager
-        authenticatorService.userConsentHandler = UnifidoKeyUserConsentHandler(this, configManager)
+        authenticatorService.makeCredentialConsentRequestHandler = UnifidoKeyMakeCredentialConsentRequestHandler(this, configManager)
+        authenticatorService.getAssertionConsentRequestHandler = UnifidoKeyGetAssertionConsentRequestHandler(this, configManager)
         authenticatorService.credentialSelectionHandler = UnifidoKeyCredentialSelectionHandler(this)
     }
-
-
 }

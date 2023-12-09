@@ -9,11 +9,13 @@ import com.unifidokey.driver.persistence.converter.EventConverter
 import com.unifidokey.driver.persistence.dao.EventDao
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.CachingCredentialSelectionHandler
-import com.webauthn4j.ctap.authenticator.CachingUserConsentHandler
+import com.webauthn4j.ctap.authenticator.CachingGetAssertionConsentRequestHandler
+import com.webauthn4j.ctap.authenticator.CachingMakeCredentialConsentRequestHandler
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.ExceptionReporter
-import com.webauthn4j.ctap.authenticator.UserConsentHandler
+import com.webauthn4j.ctap.authenticator.GetAssertionConsentRequestHandler
+import com.webauthn4j.ctap.authenticator.MakeCredentialConsentRequestHandler
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.data.event.Event
@@ -21,8 +23,9 @@ import com.webauthn4j.ctap.authenticator.data.settings.AttestationStatementForma
 import com.webauthn4j.ctap.authenticator.data.settings.AttestationTypeSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ConsentCachingSetting
 import com.webauthn4j.ctap.authenticator.extension.HMACSecretExtensionProcessor
+import com.webauthn4j.ctap.authenticator.transport.nfc.NFCTransport
+import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.data.attestation.authenticator.AAGUID
-import kotlinx.coroutines.runBlocking
 
 /**
  * Domain service for authenticator
@@ -46,56 +49,42 @@ class AuthenticatorService(
 
     private val eventConverter = EventConverter(objectConverter)
 
-    var userConsentHandler: UserConsentHandler? = null
+    val ctapAuthenticator: CtapAuthenticator
+    val nfcTransport: NFCTransport
+
+    init {
+        ctapAuthenticator = createCtapAuthenticator()
+        nfcTransport = NFCTransport(ctapAuthenticator)
+        configManager.setup()
+    }
+
+    var makeCredentialConsentRequestHandler: MakeCredentialConsentRequestHandler = this.ctapAuthenticator.makeCredentialConsentRequestHandler
         set(value) {
             field = value
-            runBlocking {
-                renewCtapAuthenticator()
-            }
+            configureCtapAuthenticatorMakeCredentialConsentRequestHandler()
         }
-    var credentialSelectionHandler: CredentialSelectionHandler? = null
+    var getAssertionConsentRequestHandler: GetAssertionConsentRequestHandler = this.ctapAuthenticator.getAssertionConsentRequestHandler
         set(value) {
             field = value
-            runBlocking {
-                renewCtapAuthenticator()
-            }
+            configureCtapAuthenticatorGetAssertionConsentRequestHandler()
+        }
+
+    var credentialSelectionHandler: CredentialSelectionHandler = this.ctapAuthenticator.credentialSelectionHandler
+        set(value) {
+            field = value
+            configureCtapAuthenticatorCredentialSelectionHandler()
         }
 
     val events: LiveData<List<Event>> = eventDao.findAllLiveData().map {
         return@map it.map { item -> eventConverter.toEvent(item) }
     }
 
-    lateinit var ctapAuthenticator: CtapAuthenticator
-
     init {
-        configManager.setup()
-        renewCtapAuthenticator()
+        //setupConfigChangeListeners must be called after fields are initialized
         setupConfigChangeListeners()
     }
 
-    @UiThread
-    private fun setupConfigChangeListeners() {
-        configManager.aaguid.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.caCertificates.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.isNFCTransportEnabled.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.isBTHIDTransportEnabled.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.isBLETransportEnabled.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.userConsent.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.consentCaching.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.resetProtection.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.credentialSelector.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.platform.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.clientPIN.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.userVerification.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.userPresence.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.algorithms.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.attestationStatementFormat.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.residentKey.liveData.observeForever { renewCtapAuthenticator() }
-        configManager.keyStorage.liveData.observeForever { renewCtapAuthenticator() }
-    }
-
-    @UiThread
-    private fun renewCtapAuthenticator() {
+    private fun createCtapAuthenticator() : CtapAuthenticator {
         val aaguid = configManager.aaguid.value
         val platformSetting = configManager.platform.value
         val residentKeySetting = configManager.residentKey.value
@@ -131,6 +120,7 @@ class AuthenticatorService(
             objectConverter,
             attestationStatementProvider,
             fidoU2FAttestationStatementProvider,
+            setOf(AuthenticatorTransport.USB, AuthenticatorTransport.NFC, AuthenticatorTransport.BLE, AuthenticatorTransport.INTERNAL),
             extensionProcessors,
             authenticatorPropertyStore
         )
@@ -142,23 +132,77 @@ class AuthenticatorService(
         ctapAuthenticator.userPresence = userPresenceSetting
         ctapAuthenticator.userVerification = userVerificationSetting
         ctapAuthenticator.credentialSelector = credentialSelectorSetting
-        userConsentHandler?.let {
-            ctapAuthenticator.userConsentHandler = when (configManager.consentCaching.value) {
-                ConsentCachingSetting.ENABLED -> CachingUserConsentHandler(it)
-                else -> CachingUserConsentHandler(it)
-            }
-        }
-        credentialSelectionHandler?.let {
-            ctapAuthenticator.credentialSelectionHandler =
-                when (configManager.consentCaching.value) {
-                    ConsentCachingSetting.ENABLED -> CachingCredentialSelectionHandler(it)
-                    else -> it
-                }
-        }
+
         ctapAuthenticator.registerEventListener(this::onEvent)
         ctapAuthenticator.registerExceptionReporter(exceptionReporter)
-        this@AuthenticatorService.ctapAuthenticator = ctapAuthenticator
+        return ctapAuthenticator
     }
+
+    @UiThread
+    private fun setupConfigChangeListeners() {
+        configManager.aaguid.liveData.observeForever { ctapAuthenticator.aaguid = configManager.aaguid.value }
+//        configManager.isNFCTransportEnabled.liveData.observeForever { ctapAuthenticator.isNFCTransportEnabled = configManager.aaguid.value }
+//        configManager.isBTHIDTransportEnabled.liveData.observeForever { ctapAuthenticator.isBTHIDTransportEnabled = configManager.aaguid.value }
+//        configManager.isBLETransportEnabled.liveData.observeForever { ctapAuthenticator.isBLETransportEnabled = configManager.aaguid.value }
+        configManager.consentCaching.liveData.observeForever {
+            configureCtapAuthenticatorMakeCredentialConsentRequestHandler()
+            configureCtapAuthenticatorGetAssertionConsentRequestHandler()
+        }
+        configManager.resetProtection.liveData.observeForever { ctapAuthenticator.resetProtection = configManager.resetProtection.value }
+        configManager.credentialSelector.liveData.observeForever { ctapAuthenticator.credentialSelector = configManager.credentialSelector.value }
+        configManager.platform.liveData.observeForever { ctapAuthenticator.platform = configManager.platform.value }
+        configManager.clientPIN.liveData.observeForever { ctapAuthenticator.clientPIN = configManager.clientPIN.value }
+        configManager.userVerification.liveData.observeForever { ctapAuthenticator.userVerification = configManager.userVerification.value }
+        configManager.userPresence.liveData.observeForever { ctapAuthenticator.userPresence = configManager.userPresence.value }
+        configManager.algorithms.liveData.observeForever { ctapAuthenticator.authenticatorPropertyStore.algorithms = configManager.algorithms.value }
+        configManager.keyStorage.liveData.observeForever { (ctapAuthenticator.authenticatorPropertyStore as UnifidoKeyAuthenticatorPropertyStore).keyStorageSetting = configManager.keyStorage.value }
+        configManager.attestationType.liveData.observeForever {
+            ctapAuthenticator.attestationStatementProvider = getAttestationStatementProvider(configManager.attestationType.value, configManager.attestationStatementFormat.value)
+            ctapAuthenticator.fidoU2FBasicAttestationStatementGenerator = attestationStatementProviders[Pair(
+                configManager.attestationType.value,
+                AttestationStatementFormatSetting.FIDO_U2F
+            )] as FIDOU2FAttestationStatementProvider
+        }
+        configManager.attestationStatementFormat.liveData.observeForever {
+            ctapAuthenticator.attestationStatementProvider = getAttestationStatementProvider(configManager.attestationType.value, configManager.attestationStatementFormat.value)
+            ctapAuthenticator.fidoU2FBasicAttestationStatementGenerator = attestationStatementProviders[Pair(
+                configManager.attestationType.value,
+                AttestationStatementFormatSetting.FIDO_U2F
+            )] as FIDOU2FAttestationStatementProvider
+        }
+        configManager.residentKey.liveData.observeForever { ctapAuthenticator.residentKey = configManager.residentKey.value }
+    }
+
+    private fun configureCtapAuthenticatorMakeCredentialConsentRequestHandler(){
+        ctapAuthenticator.makeCredentialConsentRequestHandler = when (configManager.consentCaching.value) {
+            ConsentCachingSetting.ENABLED -> CachingMakeCredentialConsentRequestHandler(this.makeCredentialConsentRequestHandler)
+            else -> this.makeCredentialConsentRequestHandler
+        }
+    }
+
+    private fun configureCtapAuthenticatorGetAssertionConsentRequestHandler(){
+        ctapAuthenticator.getAssertionConsentRequestHandler = when (configManager.consentCaching.value) {
+            ConsentCachingSetting.ENABLED -> CachingGetAssertionConsentRequestHandler(this.getAssertionConsentRequestHandler)
+            else -> this.getAssertionConsentRequestHandler
+        }
+    }
+
+    private fun configureCtapAuthenticatorCredentialSelectionHandler() {
+        ctapAuthenticator.credentialSelectionHandler = when (configManager.consentCaching.value) {
+            ConsentCachingSetting.ENABLED -> CachingCredentialSelectionHandler(this.credentialSelectionHandler)
+            else -> this.credentialSelectionHandler
+        }
+    }
+
+    private fun getAttestationStatementProvider(type: AttestationTypeSetting, format: AttestationStatementFormatSetting) =
+        (attestationStatementProviders[Pair(type, format)]
+            ?: throw IllegalArgumentException(
+                String.format(
+                    "Attestation type: '%s' format:'%s' is not registered.",
+                    type,
+                    format
+                )
+            ))
 
     private fun onEvent(event: Event) {
         val eventEntity = eventConverter.toEventEntity(event)

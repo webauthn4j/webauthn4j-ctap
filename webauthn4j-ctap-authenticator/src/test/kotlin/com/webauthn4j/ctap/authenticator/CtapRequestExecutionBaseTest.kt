@@ -15,13 +15,13 @@ internal class CtapRequestExecutionBaseTest {
     @Test
     fun unexpected_execution_error_test() = runTest {
 
-        val connection = CtapAuthenticator().connect()
+        val connection = CtapAuthenticator().createSession()
         val target = TestCtapCommandExecution(connection, mock(CtapRequest::class.java))
         target.execute()
     }
 
-    inner class TestCtapCommandExecution(connection: Connection, ctapRequest: CtapRequest) :
-        CtapCommandExecutionBase<CtapRequest, CtapResponse>(connection, ctapRequest) {
+    inner class TestCtapCommandExecution(ctapAuthenticatorSession: CtapAuthenticatorSession, ctapRequest: CtapRequest) :
+        CtapCommandExecutionBase<CtapRequest, CtapResponse>(ctapAuthenticatorSession, ctapRequest) {
 
         override val commandName: String
             get() = "TestCtapCommand"

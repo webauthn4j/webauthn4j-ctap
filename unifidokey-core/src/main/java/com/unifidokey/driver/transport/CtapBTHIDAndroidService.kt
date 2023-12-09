@@ -1,5 +1,6 @@
 package com.unifidokey.driver.transport
 
+import android.Manifest
 import android.app.*
 import android.bluetooth.*
 import android.bluetooth.BluetoothProfile.*
@@ -7,6 +8,7 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import androidx.annotation.MainThread
+import androidx.annotation.RequiresPermission
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.*
 import com.unifidokey.app.UnifidoKeyApplicationBase
@@ -17,11 +19,12 @@ import com.unifidokey.core.service.BTHIDService
 import com.unifidokey.core.service.BTHIDStatus
 import com.unifidokey.driver.notification.UnifidoKeyNotificationController
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.Connection
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
+import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
 import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.MAX_PACKET_SIZE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import java.time.Instant
@@ -63,9 +66,10 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
     private lateinit var unifidoKeyNotificationController: UnifidoKeyNotificationController
     private lateinit var bthidDeviceHistory: BTHIDDeviceHistoryConfigProperty
 
-    private var connection: Connection? = null
+    private var ctapAuthenticatorSession: CtapAuthenticatorSession? = null
 
-    private var bluetoothAdapter: BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+    private val bluetoothManager = getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
+    private var bluetoothAdapter: BluetoothAdapter = bluetoothManager.adapter
     private var bluetoothHidDevice: BluetoothHidDevice? = null
     private val ctapBLEDroidServiceBinder = CtapBTHIDAndroidServiceBinder()
     private val hidProfileServiceListener = HIDProfileServiceListener()
@@ -90,6 +94,7 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     fun onResume() {
         logger.debug("onResume")
         hidProfileServiceListener.configureApp() // As the App is unregistered on pause, re-register on resume.
@@ -128,8 +133,9 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
         hidProfileServiceListener.isAppEnabled = bthidStatus == BTHIDStatus.ON
     }
 
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     fun connect(deviceHandle: BluetoothDeviceHandle) {
-        connection = ctapAuthenticator.connect()
+        ctapAuthenticatorSession = ctapAuthenticator.createSession()
         val remoteDevice = bluetoothAdapter.getRemoteDevice(deviceHandle.address)
         val result = bluetoothHidDevice?.connect(remoteDevice)!!
         if (result) {
@@ -140,10 +146,12 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
         }
     }
 
+    // Permission check should be done in caller activity
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     fun disconnect(deviceHandle: BluetoothDeviceHandle) {
         val remoteDevice = bluetoothAdapter.getRemoteDevice(deviceHandle.address)
         bluetoothHidDevice?.disconnect(remoteDevice)
-        connection = null
+        ctapAuthenticatorSession = null
     }
 
     @MainThread
@@ -207,11 +215,13 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
         )
 
         var isAppEnabled = false
+            @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
             set(value) {
                 field = value
                 configureApp()
             }
 
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onServiceConnected(profile: Int, proxy: BluetoothProfile?) {
             CoroutineScope(Dispatchers.IO).launch {
                 bluetoothHidDevice = proxy as BluetoothHidDevice
@@ -222,6 +232,7 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
             }
         }
 
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onServiceDisconnected(profile: Int) {
             CoroutineScope(Dispatchers.IO).launch {
                 logger.debug("onServiceDisconnected")
@@ -229,6 +240,7 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
             }
         }
 
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         fun configureApp() {
             if (bluetoothHidDevice != null) {
                 if (isAppEnabled) {
@@ -239,22 +251,24 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
             }
         }
 
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         private fun registerApp() {
             bluetoothHidDevice.let { bluetoothHidDevice ->
                 requireNotNull(bluetoothHidDevice) { "bluetoothHidDevice must not be null" }
-                connection.let {
-                    requireNotNull(it) { "connection must not be null" }
+                ctapAuthenticator.let {
+                    requireNotNull(it) { "ctapAuthenticator must not be null" }
                     bluetoothHidDevice.registerApp(
                         bluetoothHidDeviceAppSdpSettings,
                         null,
                         outQosSettings,
                         Runnable::run,
-                        Fido2BTHIDApplication(it, bluetoothHidDevice, objectConverter)
+                        Fido2BTHIDApplication(ctapAuthenticator, bluetoothHidDevice)
                     )
                 }
             }
         }
 
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         private fun unregisterApp() {
             bluetoothHidDevice.let { bluetoothHidDevice ->
                 requireNotNull(bluetoothHidDevice) { "bluetoothHidDevice must not be null" }

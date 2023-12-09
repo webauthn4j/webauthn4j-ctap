@@ -31,16 +31,16 @@ class CtapAuthenticator(
     val objectConverter: ObjectConverter = createObjectConverter(),
     // Core logic delegates
     // These are final as it should not be updated on the fly for integrity. To update these, new instance should be created.
-    val attestationStatementProvider: AttestationStatementProvider = NoneAttestationStatementProvider(),
-    val fidoU2FBasicAttestationStatementGenerator: FIDOU2FAttestationStatementProvider = FIDOU2FBasicAttestationStatementProvider.createWithDemoAttestationKey(),
+    var attestationStatementProvider: AttestationStatementProvider = NoneAttestationStatementProvider(),
+    var fidoU2FBasicAttestationStatementGenerator: FIDOU2FAttestationStatementProvider = FIDOU2FBasicAttestationStatementProvider.createWithDemoAttestationKey(),
+    transports: Set<AuthenticatorTransport> = setOf(),
     val extensionProcessors: List<ExtensionProcessor> = listOf(),
     // Handlers
     var authenticatorPropertyStore: AuthenticatorPropertyStore = InMemoryAuthenticatorPropertyStore(),
-    var userConsentHandler: UserConsentHandler = DefaultUserConsentHandler(),
+    var makeCredentialConsentRequestHandler: MakeCredentialConsentRequestHandler = MakeCredentialConsentRequestHandler { true },
+    var getAssertionConsentRequestHandler: GetAssertionConsentRequestHandler = GetAssertionConsentRequestHandler { true },
     var credentialSelectionHandler: CredentialSelectionHandler = DefaultCredentialSelectionHandler(),
-    var winkHandler: WinkHandler = DefaultWinkHandler(),
-    var eventListeners: MutableList<EventListener> = mutableListOf(),
-    var exceptionReporters: MutableList<ExceptionReporter> = mutableListOf()
+    var winkHandler: WinkHandler = NoopWinkHandler()
 ) {
 
     companion object{
@@ -55,11 +55,6 @@ class CtapAuthenticator(
 
         @JvmField
         val PIN_PROTOCOLS = listOf(PinProtocolVersion.VERSION_1)
-        val TRANSPORTS = setOf(
-            AuthenticatorTransport.NFC,
-            AuthenticatorTransport.BLE,
-            AuthenticatorTransport.USB
-        )
         private fun createObjectConverter(): ObjectConverter {
             val jsonMapper = ObjectMapper()
             val cborMapper = ObjectMapper(CBORFactory())
@@ -71,6 +66,10 @@ class CtapAuthenticator(
         }
     }
 
+    val transports: MutableSet<AuthenticatorTransport> = transports.toMutableSet()
+    internal val eventListeners: MutableList<EventListener> = mutableListOf()
+    internal val exceptionReporters: MutableList<ExceptionReporter> = mutableListOf()
+
     var aaguid: AAGUID = AAGUID
 
     var platform: PlatformSetting = PlatformSetting.CROSS_PLATFORM
@@ -81,8 +80,8 @@ class CtapAuthenticator(
     var userVerification: UserVerificationSetting = UserVerificationSetting.READY
     var credentialSelector: CredentialSelectorSetting = CredentialSelectorSetting.AUTHENTICATOR
 
-    fun connect() : Connection{
-        return Connection(this)
+    fun createSession() : CtapAuthenticatorSession{
+        return CtapAuthenticatorSession(this)
     }
 
     fun registerEventListener(eventListener: EventListener) {
@@ -93,7 +92,6 @@ class CtapAuthenticator(
         eventListeners.remove(eventListener)
     }
 
-
     fun registerExceptionReporter(exceptionReporter: ExceptionReporter) {
         exceptionReporters.add(exceptionReporter)
     }
@@ -102,27 +100,17 @@ class CtapAuthenticator(
         exceptionReporters.remove(exceptionReporter)
     }
 
-    private class DefaultUserConsentHandler : UserConsentHandler {
-        override suspend fun consentMakeCredential(options: MakeCredentialConsentOptions): Boolean {
-            return true
-        }
-
-        override suspend fun consentGetAssertion(options: GetAssertionConsentOptions): Boolean {
-            return true
-        }
-    }
-
     private class DefaultCredentialSelectionHandler : CredentialSelectionHandler {
-        override suspend fun select(list: List<Credential>): Credential {
+        override suspend fun onSelect(list: List<Credential>): Credential {
             return list.first()
         }
     }
 
-    private class DefaultWinkHandler : WinkHandler {
+    private class NoopWinkHandler : WinkHandler {
 
-        private val logger = LoggerFactory.getLogger(DefaultWinkHandler::class.java)
+        private val logger = LoggerFactory.getLogger(NoopWinkHandler::class.java)
 
-        override suspend fun wink() {
+        override suspend fun onWink() {
             logger.debug("wink requested")
         }
 

@@ -1,8 +1,8 @@
 package com.webauthn4j.ctap.authenticator.transport.nfc.apdu
 
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.Connection
-import com.webauthn4j.ctap.authenticator.transport.nfc.NFCConnector
+import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
+import com.webauthn4j.ctap.authenticator.transport.nfc.NFCTransport
 import com.webauthn4j.ctap.core.converter.CtapRequestConverter
 import com.webauthn4j.ctap.core.converter.CtapResponseConverter
 import com.webauthn4j.ctap.core.data.AuthenticatorGenericErrorResponse
@@ -44,7 +44,7 @@ class CTAPAPDUProcessor(
     private val ctapCommandAPDUQueue: Queue<CommandAPDU> = LinkedList()
     private val ctapResponseQueue = ResponseAPDUQueue()
 
-    private var connection: Connection? = null
+    private var ctapAuthenticatorSession: CtapAuthenticatorSession? = null
 
     override fun isTarget(command: CommandAPDU): Boolean {
         return commandAPDUProcessors.any { it.isTarget(command) }
@@ -60,17 +60,17 @@ class CTAPAPDUProcessor(
             logger.debug("Processing Unknown APDU command")
             U2FStatusCode.INS_NOT_SUPPORTED.toResponseAPDU()
         } catch (e: RuntimeException) {
-            logger.error(NFCConnector.UNEXPECTED_EXCEPTION_MESSAGE, e)
+            logger.error(NFCTransport.UNEXPECTED_EXCEPTION_MESSAGE, e)
             ResponseAPDU.createErrorResponseAPDU()
         }
     }
 
-    fun onConnect(connection: Connection) {
-        this.connection = connection
+    fun onConnect(ctapAuthenticatorSession: CtapAuthenticatorSession) {
+        this.ctapAuthenticatorSession = ctapAuthenticatorSession
     }
 
     fun onDisconnect() {
-        connection = null
+        ctapAuthenticatorSession = null
         ctapCommandAPDUQueue.clear()
         ctapResponseQueue.clear()
     }
@@ -81,7 +81,7 @@ class CTAPAPDUProcessor(
             LoggerFactory.getLogger(CtapCommandFragmentCommandAPDUProcessor::class.java)
 
         override fun isTarget(command: CommandAPDU): Boolean {
-            return command.cla == 0x90.toByte() && command.ins == NFCConnector.NFC_CTAP_MSG
+            return command.cla == 0x90.toByte() && command.ins == NFCTransport.NFC_CTAP_MSG
             // won't check P1, P2 byte as it may contain flag for NFCCTAP_GETRESPONSE support
         }
 
@@ -101,7 +101,7 @@ class CTAPAPDUProcessor(
             LoggerFactory.getLogger(CtapRequestFinalFragmentCommandAPDUProcessor::class.java)
 
         override fun isTarget(command: CommandAPDU): Boolean {
-            return command.cla == 0x80.toByte() && command.ins == NFCConnector.NFC_CTAP_MSG
+            return command.cla == 0x80.toByte() && command.ins == NFCTransport.NFC_CTAP_MSG
             // won't check P1, P2 byte as it may contain flag for NFCCTAP_GETRESPONSE support
         }
 
@@ -126,7 +126,7 @@ class CTAPAPDUProcessor(
         }
 
         private suspend fun invokeCtapCommand(ctapRequest: CtapRequest?): CtapResponse {
-            connection.let {
+            ctapAuthenticatorSession.let {
                 if(it == null){
                     throw IllegalStateException("Unexpected CtapRequest is passed before connection is established.")
                 }

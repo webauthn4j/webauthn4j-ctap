@@ -17,7 +17,7 @@ class CachingCredentialSelectionHandler(private val credentialSelectionHandler: 
     private var previousSelection: Credential? = null
     private var cachedAt: Instant? = null
 
-    override suspend fun select(list: List<Credential>): Credential {
+    override suspend fun onSelect(list: List<Credential>): Credential {
         val idList = list.stream()
             .map { item -> Base64UrlUtil.encodeToString(item.credentialId) }
             .collect(Collectors.toList())
@@ -28,7 +28,7 @@ class CachingCredentialSelectionHandler(private val credentialSelectionHandler: 
             logger.info("Cached selected credential is used.")
             previousSelection!!
         } else {
-            val selection = credentialSelectionHandler.select(list)
+            val selection = credentialSelectionHandler.onSelect(list)
             previousList = list
             previousSelection = selection
             cachedAt = Instant.now()

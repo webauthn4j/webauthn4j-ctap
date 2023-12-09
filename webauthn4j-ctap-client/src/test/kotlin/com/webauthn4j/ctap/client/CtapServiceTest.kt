@@ -1,7 +1,6 @@
 package com.webauthn4j.ctap.client
 
 import com.webauthn4j.ctap.authenticator.ClientPINService
-import com.webauthn4j.ctap.authenticator.Connection
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.client.transport.InProcessTransportAdaptor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,7 +12,7 @@ import java.util.concurrent.ExecutionException
 
 internal class CtapServiceTest {
     private val ctapAuthenticator = CtapAuthenticator()
-    private val connection = ctapAuthenticator.connect()
+    private val connection = ctapAuthenticator.createSession()
     private val ctapClient = CtapClient(InProcessTransportAdaptor(connection))
     private val target = CtapService(ctapClient)
 

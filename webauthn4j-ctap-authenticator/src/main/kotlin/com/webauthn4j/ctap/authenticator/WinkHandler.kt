@@ -3,7 +3,7 @@ package com.webauthn4j.ctap.authenticator
 /**
  * Handler interface to process wink request
  */
-interface WinkHandler {
+fun interface WinkHandler {
 
-    suspend fun wink()
+    suspend fun onWink()
 }

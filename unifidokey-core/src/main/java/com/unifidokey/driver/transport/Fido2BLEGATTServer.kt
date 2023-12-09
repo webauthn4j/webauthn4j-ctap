@@ -1,5 +1,6 @@
 package com.unifidokey.driver.transport
 
+import android.Manifest
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
@@ -10,10 +11,10 @@ import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.content.Context
-import com.unifidokey.core.service.AuthenticatorService
-import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.exception.BLEDataProcessingException
-import com.webauthn4j.ctap.authenticator.transport.ble.BLEConnector
+import androidx.annotation.RequiresPermission
+import com.webauthn4j.ctap.authenticator.CtapAuthenticator
+import com.webauthn4j.ctap.authenticator.transport.ble.BLEDataProcessingException
+import com.webauthn4j.ctap.authenticator.transport.ble.BLETransport
 import com.webauthn4j.ctap.core.util.internal.ArrayUtil.toHexString
 import com.webauthn4j.util.UnsignedNumberUtil
 import kotlinx.coroutines.CoroutineScope
@@ -26,8 +27,7 @@ import kotlin.experimental.and
 class Fido2BLEGATTServer(
     context: Context,
     bluetoothManager: BluetoothManager,
-    authenticatorService: AuthenticatorService,
-    objectConverter: ObjectConverter
+    ctapAuthenticator: CtapAuthenticator
 ) {
 
 
@@ -71,7 +71,7 @@ class Fido2BLEGATTServer(
 
     private val gattServer: BluetoothGattServer
     private var bluetoothDevice: BluetoothDevice? = null
-    private val bleConnector: BLEConnector
+    private val bleTransport: BLETransport
 
     init {
         val callback = GattServerCallbackHandler()
@@ -79,12 +79,10 @@ class Fido2BLEGATTServer(
         gattServer.addService(deviceInformationService)
         // gattServer.addService(fido2GattService) is not called here, and is called in onServiceAdded
         // as it must be called after previous service(device information service) registration completes.
-        bleConnector = BLEConnector(
-            authenticatorService.ctapAuthenticator.connect(), //TODO: revisit
-            objectConverter
-        ) { bytes: ByteArray -> notifyStatusCharacteristicChanged(bytes) }
+        bleTransport = BLETransport(ctapAuthenticator)
     }
 
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     private fun notifyStatusCharacteristicChanged(bytes: ByteArray) {
         statusCharacteristic.value = bytes
         gattServer.notifyCharacteristicChanged(bluetoothDevice, statusCharacteristic, true)
@@ -148,6 +146,7 @@ class Fido2BLEGATTServer(
 
     private inner class GattServerCallbackHandler : BluetoothGattServerCallback() {
         private val logger = LoggerFactory.getLogger(GattServerCallbackHandler::class.java)
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onServiceAdded(status: Int, service: BluetoothGattService) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 if (service.uuid == DEVICE_INFORMATION_SERVICE_UUID) {
@@ -158,6 +157,7 @@ class Fido2BLEGATTServer(
             }
         }
 
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onDescriptorReadRequest(
             device: BluetoothDevice,
             requestId: Int,
@@ -191,6 +191,7 @@ class Fido2BLEGATTServer(
             }
         }
 
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onDescriptorWriteRequest(
             device: BluetoothDevice, requestId: Int,
             descriptor: BluetoothGattDescriptor,
@@ -211,6 +212,7 @@ class Fido2BLEGATTServer(
             }
         }
 
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onCharacteristicWriteRequest(
             device: BluetoothDevice,
             requestId: Int,
@@ -234,7 +236,7 @@ class Fido2BLEGATTServer(
                 val uuid = characteristic.uuid
                 if (uuid == FIDO_CONTROL_POINT_UUID) {
                     logger.debug("FIDO 2.0 Control Point is written")
-                    bleConnector.handle(value)
+                    bleTransport.onBLEFrameFragmentBytesReceived(value){ bytes: ByteArray -> notifyStatusCharacteristicChanged(bytes) }
                 } else if (uuid == FIDO_SERVICE_REVISION_BITFIELD_UUID) {
                     logger.debug("FIDO 2.0 Service Revision Bitfield is written")
                     if (value.isEmpty()) {
@@ -261,6 +263,7 @@ class Fido2BLEGATTServer(
             }
         }
 
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onCharacteristicReadRequest(
             device: BluetoothDevice,
             requestId: Int,
@@ -339,6 +342,7 @@ class Fido2BLEGATTServer(
             }
         }
 
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onConnectionStateChange(device: BluetoothDevice, status: Int, newState: Int) {
             super.onConnectionStateChange(device, status, newState)
             when (newState) {

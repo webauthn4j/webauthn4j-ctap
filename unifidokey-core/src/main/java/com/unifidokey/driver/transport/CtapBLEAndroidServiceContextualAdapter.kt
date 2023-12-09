@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.os.IBinder
+import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
@@ -25,9 +26,6 @@ class CtapBLEAndroidServiceContextualAdapter(private val context: Context) : Cta
     private val packageManager = context.packageManager
     private val bluetoothManager =
         context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-    private val bluetoothAdapter: BluetoothAdapter? by lazy {
-        BluetoothAdapter.getDefaultAdapter()
-    }
     private var ctapBLEAndroidService: CtapBLEAndroidService? = null
     private var ctapBLEAndroidServiceConnection: CtapBLEAndroidServiceConnection? = null
     private val bleBroadcastReceiver = BLEBroadcastReceiver()
@@ -143,6 +141,7 @@ class CtapBLEAndroidServiceContextualAdapter(private val context: Context) : Cta
             }
         }
 
+        @RequiresPermission(value = "android.permission.BLUETOOTH_CONNECT")
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
             if (action != null) {
@@ -157,7 +156,7 @@ class CtapBLEAndroidServiceContextualAdapter(private val context: Context) : Cta
                             BluetoothDevice.ERROR
                         )
                         val bluetoothDevice =
-                            intent.getParcelableExtra<BluetoothDevice?>(BluetoothDevice.EXTRA_DEVICE)
+                            intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
                         logger.info(
                             "Bond state changed from {} to {}, name: {}",
                             resolveBondState(previousState),
@@ -179,8 +178,7 @@ class CtapBLEAndroidServiceContextualAdapter(private val context: Context) : Cta
                         )
                         val state =
                             intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
-                        val bluetoothDevice =
-                            intent.getParcelableExtra<BluetoothDevice?>(BluetoothDevice.EXTRA_DEVICE)
+                        val bluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
                         val isBLEEnabled = state == BluetoothAdapter.STATE_ON
                         logger.info(
                             "State changed from {} to {}, name: {}",

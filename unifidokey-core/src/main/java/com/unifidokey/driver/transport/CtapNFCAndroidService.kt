@@ -7,12 +7,13 @@ import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.core.service.NFCService
 import com.unifidokey.core.service.NFCStatus
-import com.webauthn4j.ctap.authenticator.transport.nfc.NFCConnector
+import com.webauthn4j.ctap.authenticator.transport.nfc.NFCTransport
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import com.webauthn4j.ctap.core.exception.APDUProcessingException
 import com.webauthn4j.ctap.core.util.internal.ArrayUtil
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -27,10 +28,11 @@ class CtapNFCAndroidService : HostApduService(), CoroutineScope {
     private lateinit var job: Job
     override val coroutineContext: CoroutineContext
         get() = job
-    private lateinit var nfcConnector: NFCConnector
+    private lateinit var nfcTransport: NFCTransport
     private lateinit var nfcService: NFCService
 
     //single thread worker to synchronize authenticator access
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val nfcWorker = newSingleThreadContext("nfc-worker")
 
     @WorkerThread
@@ -50,9 +52,7 @@ class CtapNFCAndroidService : HostApduService(), CoroutineScope {
     private fun initialize() {
         val unifidoKeyApplication = application as UnifidoKeyApplicationBase<*>
         val unifidoKeyComponent: UnifidoKeyComponent = unifidoKeyApplication.unifidoKeyComponent
-        val ctapAuthenticator = unifidoKeyComponent.authenticatorService.ctapAuthenticator
-        val objectConverter = unifidoKeyComponent.objectConverter
-        nfcConnector = NFCConnector(ctapAuthenticator, objectConverter)
+        nfcTransport = unifidoKeyComponent.authenticatorService.nfcTransport
         nfcService = unifidoKeyComponent.nfcService
         logger.debug("CtapNFCAndroidService is initialized")
     }
@@ -64,7 +64,7 @@ class CtapNFCAndroidService : HostApduService(), CoroutineScope {
             if (nfcService.nfcStatus.value == NFCStatus.ON) {
                 try {
                     val commandAPDU = CommandAPDU.parse(apdu)
-                    val responseAPDU = nfcConnector.handleCommandAPDU(commandAPDU)
+                    val responseAPDU = nfcTransport.onCommandAPDUReceived(commandAPDU)
                     sendResponseApdu(responseAPDU.toBytes())
                     logger.debug(
                         "Sent response APDU: {}",

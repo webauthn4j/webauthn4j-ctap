@@ -90,6 +90,8 @@ dependencies {
     implementation("androidx.appcompat:appcompat")
     implementation("androidx.legacy:legacy-support-v4")
     implementation("androidx.preference:preference")
+    implementation("androidx.biometric:biometric")
+
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.lifecycle.livedata)
     implementation(libs.androidx.lifecycle.viewmodel)

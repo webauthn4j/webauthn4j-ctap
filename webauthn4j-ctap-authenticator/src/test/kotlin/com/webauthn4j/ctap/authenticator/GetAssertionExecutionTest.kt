@@ -3,7 +3,7 @@ package com.webauthn4j.ctap.authenticator
 import com.webauthn4j.ctap.authenticator.data.credential.ResidentUserCredential
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
-import com.webauthn4j.ctap.authenticator.exception.StoreFullException
+import com.webauthn4j.ctap.authenticator.store.StoreFullException
 import com.webauthn4j.ctap.authenticator.execution.GetAssertionExecution
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
 import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionRequest
@@ -35,7 +35,7 @@ internal class GetAssertionExecutionTest {
     @Disabled
     @Test
     fun createErrorResponse_test() {
-        val connection = CtapAuthenticator().connect()
+        val connection = CtapAuthenticator().createSession()
         val response = GetAssertionExecution(
             connection,
             mock(AuthenticatorGetAssertionRequest::class.java),
@@ -46,7 +46,7 @@ internal class GetAssertionExecutionTest {
 
     @Test
     fun getAssertion_test() = runTest {
-        val connection = CtapAuthenticator().connect()
+        val connection = CtapAuthenticator().createSession()
         makeCredential(connection)
 
         val clientDataHash = ByteArray(0)
@@ -73,14 +73,10 @@ internal class GetAssertionExecutionTest {
     @Test
     fun userConsent_false_test() = runTest {
         val ctapAuthenticator = CtapAuthenticator()
-        ctapAuthenticator.userConsentHandler = object : UserConsentHandler {
-            override suspend fun consentMakeCredential(options: MakeCredentialConsentOptions): Boolean =
-                true
-
-            override suspend fun consentGetAssertion(options: GetAssertionConsentOptions): Boolean =
-                false
+        ctapAuthenticator.getAssertionConsentRequestHandler = object : GetAssertionConsentRequestHandler {
+            override suspend fun onGetAssertionConsentRequested(getAssertionConsentRequest: GetAssertionConsentRequest): Boolean = false
         }
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
         makeCredential(connection)
 
         val clientDataHash = ByteArray(0)
@@ -106,7 +102,7 @@ internal class GetAssertionExecutionTest {
     @Test
     fun no_credentials_test() = runTest {
         val ctapAuthenticator = CtapAuthenticator()
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
 
         val clientDataHash = ByteArray(0)
         val allowList: List<PublicKeyCredentialDescriptor> = emptyList()
@@ -131,7 +127,7 @@ internal class GetAssertionExecutionTest {
     @Test
     fun options_null_test() = runTest {
         val ctapAuthenticator = CtapAuthenticator()
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
         makeCredential(connection)
 
         val clientDataHash = ByteArray(0)
@@ -168,7 +164,7 @@ internal class GetAssertionExecutionTest {
                 }
             }
         val ctapAuthenticator = CtapAuthenticator(authenticatorPropertyStore = authenticatorPropertyStoreSpy)
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
         makeCredential(connection)
         isFull = true
 
@@ -207,7 +203,7 @@ internal class GetAssertionExecutionTest {
         statusCode: CtapStatusCode
     ) = runTest {
         val ctapAuthenticator = CtapAuthenticator()
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
         makeCredential(connection)
 
 
@@ -229,7 +225,7 @@ internal class GetAssertionExecutionTest {
         )
 
         ctapAuthenticator.userPresence = userPresenceSetting
-        val connectionWithUpdatedSetting = ctapAuthenticator.connect()
+        val connectionWithUpdatedSetting = ctapAuthenticator.createSession()
         val response: AuthenticatorGetAssertionResponse = connectionWithUpdatedSetting.getAssertion(command)
         Assertions.assertThat(response.statusCode).isEqualTo(statusCode)
     }
@@ -253,7 +249,7 @@ internal class GetAssertionExecutionTest {
     ) = runTest {
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.userVerification = userVerificationSetting
-        val connection = ctapAuthenticator.connect()
+        val connection = ctapAuthenticator.createSession()
         makeCredential(connection, uv = false)
 
         val clientDataHash = ByteArray(0)
@@ -279,7 +275,7 @@ internal class GetAssertionExecutionTest {
 
     @Test
     suspend fun makeCredential(
-        connection: Connection,
+        ctapAuthenticatorSession: CtapAuthenticatorSession,
         rk: Boolean = true,
         uv: Boolean = true
     ) {
@@ -309,7 +305,7 @@ internal class GetAssertionExecutionTest {
             pinAuth,
             pinProtocol
         )
-        val response = connection.makeCredential(command)
+        val response = ctapAuthenticatorSession.makeCredential(command)
         Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
         Assertions.assertThat(response.responseData).isNotNull
         Assertions.assertThat(response.responseData!!.attestationStatement).isNotNull

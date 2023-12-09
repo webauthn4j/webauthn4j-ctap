@@ -7,9 +7,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.webauthn4j.WebAuthnManager
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
-import com.webauthn4j.ctap.authenticator.Connection
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
-import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSettings
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FBasicAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.PackedBasicAttestationStatementProvider
@@ -79,7 +77,7 @@ abstract class IntegrationTestCaseBase {
         private val credentialSelectionHandlerParameter =
             TestParameter<CredentialSelectionHandler> {
                 object : CredentialSelectionHandler {
-                    override suspend fun select(list: List<Credential>): Credential =
+                    override suspend fun onSelect(list: List<Credential>): Credential =
                         list.first()
                 }
             }
@@ -95,6 +93,7 @@ abstract class IntegrationTestCaseBase {
                 objectConverter,
                 attestationStatementGenerator,
                 fidoU2FAttestationStatementGenerator,
+                emptySet(),
                 emptyList(),
                 authenticatorPropertyStore,
                 credentialSelectionHandler = credentialSelectionHandler
@@ -131,7 +130,7 @@ abstract class IntegrationTestCaseBase {
             algorithmsParameter
         )
 
-        val connectionParameter = TestParameter { ctapAuthenticator.connect() }.depends(ctapAuthenticatorParameter)
+        val connectionParameter = TestParameter { ctapAuthenticator.createSession() }.depends(ctapAuthenticatorParameter)
 
         var attestationStatementGenerator by attestationStatementGeneratorParameter
         val fidoU2FAttestationStatementGenerator by fidoU2FAttestationStatementGeneratorParameter

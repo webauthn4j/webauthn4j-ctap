@@ -2,7 +2,6 @@ package com.webauthn4j.ctap.authenticator.store
 
 import com.webauthn4j.ctap.authenticator.data.credential.ResidentCredentialKey
 import com.webauthn4j.ctap.authenticator.data.credential.ResidentUserCredential
-import com.webauthn4j.ctap.authenticator.exception.StoreFullException
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import javax.crypto.SecretKey
 

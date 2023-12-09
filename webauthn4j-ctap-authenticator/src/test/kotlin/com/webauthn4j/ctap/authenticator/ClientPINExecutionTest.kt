@@ -13,7 +13,7 @@ internal class ClientPINExecutionTest {
     @Test
     fun createErrorResponse_test() {
         val response = ClientPINExecution(
-            Mockito.mock(Connection::class.java),
+            Mockito.mock(CtapAuthenticatorSession::class.java),
             Mockito.mock(AuthenticatorClientPINRequest::class.java)
         ).createErrorResponse(CtapStatusCode.CTAP1_ERR_OTHER)
         Assertions.assertThat(response).isInstanceOf(AuthenticatorClientPINResponse::class.java)

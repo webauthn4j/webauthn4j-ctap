@@ -3,12 +3,9 @@ package integration.setting.authenticator
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
 import com.webauthn4j.ctap.authenticator.data.credential.Credential
 import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
-import com.webauthn4j.ctap.client.GetAssertionsResponse
 import com.webauthn4j.ctap.client.PublicKeyCredentialSelectionHandler
-import com.webauthn4j.data.AuthenticatorAssertionResponse
 import com.webauthn4j.data.AuthenticatorAttestationResponse
 import com.webauthn4j.data.PublicKeyCredential
-import com.webauthn4j.data.extension.client.AuthenticationExtensionClientOutput
 import com.webauthn4j.data.extension.client.RegistrationExtensionClientOutput
 import com.webauthn4j.validator.exception.BadSignatureException
 import integration.usecase.testcase.PasswordlessTestCase
@@ -31,7 +28,7 @@ class CredentialSelectorSettingTest {
             passwordlessTestCase.authenticator.credentialSelectorSetting =
                 CredentialSelectorSetting.AUTHENTICATOR
             passwordlessTestCase.authenticator.credentialSelectionHandler = object : CredentialSelectionHandler { // This credentialSelectionHandler selects 2nd (correct) credential
-                override suspend fun select(list: List<Credential>): Credential {
+                override suspend fun onSelect(list: List<Credential>): Credential {
                     return list.first { it.credentialId.contentEquals(publicKeyCredential!!.rawId) }
                 }
             }
@@ -52,7 +49,7 @@ class CredentialSelectorSettingTest {
                 CredentialSelectorSetting.AUTHENTICATOR
             passwordlessTestCase.authenticator.credentialSelectionHandler = object :
                 CredentialSelectionHandler { // This credentialSelectionHandler selects 1st (incorrect) credential
-                override suspend fun select(list: List<Credential>): Credential {
+                override suspend fun onSelect(list: List<Credential>): Credential {
                     return list.first { it.credentialId.contentEquals(publicKeyCredential!!.rawId) }
                 }
             }

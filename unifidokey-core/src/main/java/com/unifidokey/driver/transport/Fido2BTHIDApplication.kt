@@ -1,12 +1,13 @@
 package com.unifidokey.driver.transport
 
+import android.Manifest
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothHidDevice
 import android.bluetooth.BluetoothProfile
+import androidx.annotation.RequiresPermission
 import androidx.annotation.WorkerThread
-import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.Connection
-import com.webauthn4j.ctap.authenticator.transport.hid.HIDConnector
+import com.webauthn4j.ctap.authenticator.CtapAuthenticator
+import com.webauthn4j.ctap.authenticator.transport.hid.HIDTransport
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -14,9 +15,8 @@ import kotlinx.coroutines.newSingleThreadContext
 import org.slf4j.LoggerFactory
 
 class Fido2BTHIDApplication(
-    connection: Connection,
-    private val bluetoothHidDevice: BluetoothHidDevice,
-    objectConverter: ObjectConverter
+    ctapAuthenticator: CtapAuthenticator,
+    private val bluetoothHidDevice: BluetoothHidDevice
 ) : BluetoothHidDevice.Callback() {
 
     private val logger = LoggerFactory.getLogger(Fido2BTHIDApplication::class.java)
@@ -24,9 +24,10 @@ class Fido2BTHIDApplication(
     //single thread worker to synchronize authenticator access
     private val bthidWorker = newSingleThreadContext("bthid-worker")
 
-    private val hidConnector = HIDConnector(connection, objectConverter)
+    private val hidTransport = HIDTransport(ctapAuthenticator)
 
     @WorkerThread
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     override fun onAppStatusChanged(pluggedDevice: BluetoothDevice?, registered: Boolean) {
         when (registered) {
             true -> logger.debug(
@@ -70,6 +71,7 @@ class Fido2BTHIDApplication(
     }
 
     @WorkerThread
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     override fun onGetReport(device: BluetoothDevice, type: Byte, id: Byte, bufferSize: Int) {
         super.onGetReport(device, type, id, bufferSize)
         logger.debug("onSetProtocol: device=${device.name}, type=${type}, id=${id}, bufferSize=${bufferSize}")
@@ -77,6 +79,7 @@ class Fido2BTHIDApplication(
     }
 
     @WorkerThread
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     override fun onSetReport(device: BluetoothDevice, type: Byte, id: Byte, data: ByteArray?) {
         super.onSetReport(device, type, id, data)
         logger.debug(
@@ -90,12 +93,14 @@ class Fido2BTHIDApplication(
     }
 
     @WorkerThread
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     override fun onSetProtocol(device: BluetoothDevice, protocol: Byte) {
         super.onSetProtocol(device, protocol)
         logger.debug("onSetProtocol: device=${device.name}, protocol=${protocol}")
     }
 
     @WorkerThread
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     override fun onInterruptData(device: BluetoothDevice, reportId: Byte, data: ByteArray?) {
         CoroutineScope(bthidWorker).launch {
             logger.debug(
@@ -108,7 +113,7 @@ class Fido2BTHIDApplication(
             if (data == null) {
                 throw RuntimeException("data must not be null")
             }
-            hidConnector.handle(data) { response ->
+            hidTransport.onHIDDataReceived(data) { response ->
                 CoroutineScope(bthidWorker).launch {
                     val result = bluetoothHidDevice.sendReport(device, reportId.toInt(), response)
                     if (!result) {
