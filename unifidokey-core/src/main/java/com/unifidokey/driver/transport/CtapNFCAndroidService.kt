@@ -13,6 +13,7 @@ import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import com.webauthn4j.ctap.core.exception.APDUProcessingException
 import com.webauthn4j.ctap.core.util.internal.ArrayUtil
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -32,7 +33,7 @@ class CtapNFCAndroidService : HostApduService(), CoroutineScope {
     private lateinit var nfcService: NFCService
 
     //single thread worker to synchronize authenticator access
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
     private val nfcWorker = newSingleThreadContext("nfc-worker")
 
     @WorkerThread

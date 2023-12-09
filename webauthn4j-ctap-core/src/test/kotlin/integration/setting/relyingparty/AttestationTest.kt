@@ -25,7 +25,7 @@ class AttestationTest {
         passwordlessTestCase.step1_createCredential()
         val attestationObject =
             AttestationObjectConverter(passwordlessTestCase.objectConverter).convert(
-                passwordlessTestCase.step1Result.authenticatorResponse?.attestationObject
+                passwordlessTestCase.step1Result.response?.attestationObject
             )
         assertThat(attestationObject!!.format).isEqualTo(NoneAttestationStatement.FORMAT)
     }
@@ -39,7 +39,7 @@ class AttestationTest {
         passwordlessTestCase.step1_createCredential()
         val attestationObject =
             AttestationObjectConverter(passwordlessTestCase.objectConverter).convert(
-                passwordlessTestCase.step1Result.authenticatorResponse?.attestationObject
+                passwordlessTestCase.step1Result.response?.attestationObject
             )
         assertThat(attestationObject!!.format).isEqualTo(NoneAttestationStatement.FORMAT)
     }
@@ -52,7 +52,7 @@ class AttestationTest {
         passwordlessTestCase.step1_createCredential()
         val attestationObject =
             AttestationObjectConverter(passwordlessTestCase.objectConverter).convert(
-                passwordlessTestCase.step1Result.authenticatorResponse?.attestationObject
+                passwordlessTestCase.step1Result.response?.attestationObject
             )
         assertThat(attestationObject!!.format).isEqualTo(PackedAttestationStatement.FORMAT)
     }

@@ -18,6 +18,7 @@ import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.data.attestation.authenticator.AAGUID
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.slf4j.LoggerFactory
@@ -160,8 +161,10 @@ class CtapAuthenticatorSession internal constructor(
         exceptionReporters.forEach { it.onException(exception) }
     }
 
-    fun lock(timeMillis: Long) {
-        TODO("Not yet implemented")
+    suspend fun lock(timeMillis: Long) {
+        mutex.withLock {
+            delay(timeMillis)
+        }
     }
 
 }

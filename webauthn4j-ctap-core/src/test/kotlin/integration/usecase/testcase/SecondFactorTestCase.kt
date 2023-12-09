@@ -31,7 +31,7 @@ class SecondFactorTestCase : IntegrationTestCaseBase() {
             relyingParty.registration.frontend.publicKeyCredentialCreationContext
         )
         val credentialId = registrationResponse.rawId
-        val attestationAuthenticatorResponse = registrationResponse.authenticatorResponse
+        val attestationAuthenticatorResponse = registrationResponse.response
             ?: fail("authenticatorResponse must not be null")
 
         // Validate the credential on a relying party server
@@ -64,7 +64,7 @@ class SecondFactorTestCase : IntegrationTestCaseBase() {
             relyingParty.authentication.frontend.publicKeyCredentialRequestOptions,
             relyingParty.authentication.frontend.publicKeyCredentialRequestContext
         )
-        val assertionAuthenticatorResponse = assertionResponse.authenticatorResponse
+        val assertionAuthenticatorResponse = assertionResponse.response
             ?: fail("authenticatorResponse must not be null")
 
         // Validate the credential on a relying party server

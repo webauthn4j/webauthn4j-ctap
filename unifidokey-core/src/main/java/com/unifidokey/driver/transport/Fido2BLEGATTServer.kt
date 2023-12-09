@@ -84,8 +84,7 @@ class Fido2BLEGATTServer(
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     private fun notifyStatusCharacteristicChanged(bytes: ByteArray) {
-        statusCharacteristic.value = bytes
-        gattServer.notifyCharacteristicChanged(bluetoothDevice, statusCharacteristic, true)
+        gattServer.notifyCharacteristicChanged(bluetoothDevice!!, statusCharacteristic, true, bytes)
     }
 
     private fun createFido2GattService(): BluetoothGattService {

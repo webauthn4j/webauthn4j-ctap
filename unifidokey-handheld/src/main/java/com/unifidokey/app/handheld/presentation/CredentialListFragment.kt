@@ -8,8 +8,11 @@ import android.widget.AdapterView.OnItemLongClickListener
 import android.widget.ExpandableListView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.unifidokey.R
@@ -31,7 +34,6 @@ class CredentialListFragment : Fragment(), SearchView.OnQueryTextListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        initializeToolbar()
 
         // Setup data binding
         viewModel = ViewModelProvider(this).get(CredentialListViewModel::class.java)
@@ -39,11 +41,7 @@ class CredentialListFragment : Fragment(), SearchView.OnQueryTextListener {
             DataBindingUtil.inflate(inflater, R.layout.credential_list_fragment, container, false)
         root = binding.root
         binding.viewModel = viewModel
-        viewModel.relyingParties.observe(
-            viewLifecycleOwner,
-            { relyingParties: List<RelyingPartyAndUserCredentialsDto> ->
-                onRelyingPartiesChanged(relyingParties)
-            })
+        viewModel.relyingParties.observe(viewLifecycleOwner) { relyingParties: List<RelyingPartyAndUserCredentialsDto> -> onRelyingPartiesChanged(relyingParties) }
 
         return binding.root
     }
@@ -62,27 +60,27 @@ class CredentialListFragment : Fragment(), SearchView.OnQueryTextListener {
 
         // initialize views
         initializeCredentialListView()
+
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.credential_list, menu)
+                val searchItem = menu.findItem(R.id.action_search)
+                val searchView = searchItem.actionView as SearchView
+                searchView.setOnQueryTextListener(this@CredentialListFragment)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                when (menuItem.itemId) {
+                    R.id.action_search -> return true
+                }
+                return true
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     //endregion
     //## User action event handlers ##
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-
-        // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.credential_list, menu)
-        val searchItem = menu.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as SearchView
-        searchView.setOnQueryTextListener(this)
-    }
-
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_search -> return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
 
     override fun onQueryTextSubmit(query: String): Boolean {
         return false
@@ -160,10 +158,6 @@ class CredentialListFragment : Fragment(), SearchView.OnQueryTextListener {
         val userCredentialEntity = adapter.getChild(index, childIndex)
         navigateToCredentialDetailsFragment(view, userCredentialEntity)
         return true
-    }
-
-    private fun initializeToolbar() {
-        this.setHasOptionsMenu(true)
     }
 
     private fun initializeCredentialListView() {

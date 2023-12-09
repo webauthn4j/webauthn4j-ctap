@@ -312,7 +312,7 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
             responseCallback.onResponse(HIDWINKResponseMessage(hidMessage.channelId))
         }
 
-        private fun handleLock(
+        private suspend fun handleLock(
             hidMessage: HIDLOCKRequestMessage,
             responseCallback: ResponseCallback<HIDLOCKResponseMessage>
         ) {

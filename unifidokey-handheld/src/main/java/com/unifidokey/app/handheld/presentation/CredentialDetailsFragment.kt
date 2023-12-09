@@ -9,8 +9,12 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SearchView
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.unifidokey.R
@@ -27,7 +31,6 @@ class CredentialDetailsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        initializeToolbar()
 
         // Setup data binding
         viewModel = ViewModelProvider(this).get(CredentialDetailsViewModel::class.java)
@@ -45,43 +48,45 @@ class CredentialDetailsFragment : Fragment() {
         return binding.root
     }
 
-    //endregion
-    //region ## user action event handlers
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.credential_details, menu)
-    }
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.credential_details, menu)
+            }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        when (item.itemId) {
-            R.id.action_delete -> {
-                return try {
-                    AlertDialog.Builder(requireActivity())
-                        .setTitle("UnifidoKey")
-                        .setMessage("Are you sure to delete the user \"" + viewModel.displayName + "\"")
-                        .setPositiveButton("OK") { _: DialogInterface?, _: Int ->
-                            viewModel.deleteUserCredential()
-                            Navigation.findNavController(root).popBackStack()
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                // Handle action bar item clicks here. The action bar will
+                // automatically handle clicks on the Home/Up button, so long
+                // as you specify a parent activity in AndroidManifest.xml.
+                when (menuItem.itemId) {
+                    R.id.action_delete -> {
+                        return try {
+                            AlertDialog.Builder(requireActivity())
+                                .setTitle("UnifidoKey")
+                                .setMessage("Are you sure to delete the user \"" + viewModel.displayName + "\"")
+                                .setPositiveButton("OK") { _: DialogInterface?, _: Int ->
+                                    viewModel.deleteUserCredential()
+                                    Navigation.findNavController(root).popBackStack()
+                                }
+                                .setNegativeButton("Cancel", null)
+                                .show()
+                            true
+                        } catch (e: RuntimeException) {
+                            logger.error("Unexpected exception is thrown", e)
+                            false
                         }
-                        .setNegativeButton("Cancel", null)
-                        .show()
-                    true
-                } catch (e: RuntimeException) {
-                    logger.error("Unexpected exception is thrown", e)
-                    false
+                    }
+                    else -> throw IllegalStateException()
                 }
             }
-            else -> throw IllegalStateException()
-        }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     //endregion
-    private fun initializeToolbar() {
-        setHasOptionsMenu(true)
-    }
+    //region ## user action event handlers
+
+    //endregion
 }

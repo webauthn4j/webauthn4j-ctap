@@ -80,10 +80,10 @@ class PasswordlessTestCase : IntegrationTestCaseBase() {
 
     fun step2_validateCredentialForRegistration(): RegistrationData {
         val registrationRequest = RegistrationRequest(
-            step1Result.authenticatorResponse!!.attestationObject,
-            step1Result.authenticatorResponse!!.clientDataJSON,
+            step1Result.response!!.attestationObject,
+            step1Result.response!!.clientDataJSON,
             objectConverter.jsonConverter.writeValueAsString(step1Result.clientExtensionResults),
-            step1Result.authenticatorResponse!!.transports.map { obj: AuthenticatorTransport -> obj.value }
+            step1Result.response!!.transports.map { obj: AuthenticatorTransport -> obj.value }
                 .toSet()
         )
         val registrationParameters = RegistrationParameters(
@@ -112,10 +112,10 @@ class PasswordlessTestCase : IntegrationTestCaseBase() {
         val authenticationRequest = AuthenticationRequest(
             step3Result.rawId,
             relyingParty.registration.frontend.userId,
-            step3Result.authenticatorResponse!!.authenticatorData,
-            step3Result.authenticatorResponse!!.clientDataJSON,
+            step3Result.response!!.authenticatorData,
+            step3Result.response!!.clientDataJSON,
             objectConverter.jsonConverter.writeValueAsString(step3Result.clientExtensionResults),
-            step3Result.authenticatorResponse!!.signature
+            step3Result.response!!.signature
         )
         val authenticatorImpl = AuthenticatorImpl(
             step2Result.attestationObject!!.authenticatorData.attestedCredentialData!!,

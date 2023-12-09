@@ -10,6 +10,8 @@ import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.transport.hid.HIDTransport
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import org.slf4j.LoggerFactory
@@ -22,6 +24,7 @@ class Fido2BTHIDApplication(
     private val logger = LoggerFactory.getLogger(Fido2BTHIDApplication::class.java)
 
     //single thread worker to synchronize authenticator access
+    @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
     private val bthidWorker = newSingleThreadContext("bthid-worker")
 
     private val hidTransport = HIDTransport(ctapAuthenticator)

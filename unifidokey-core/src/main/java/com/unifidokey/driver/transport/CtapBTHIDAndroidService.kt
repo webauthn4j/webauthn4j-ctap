@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import java.time.Instant
 
-class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObserver {
+class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, DefaultLifecycleObserver {
 
     companion object {
         private const val ACTION_START_ADVERTISE = "ACTION_START_ADVERTISE"
@@ -77,7 +77,7 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
     @MainThread
     override fun onCreate() {
         logger.debug("onCreate")
-        super.onCreate()
+        super<Service>.onCreate()
         registerServiceListener()
         initialize()
         bthidService.bthidStatus.observeForever(this)
@@ -87,23 +87,21 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
     @MainThread
     override fun onDestroy() {
         logger.debug("onDestroy")
-        super.onDestroy()
+        super<Service>.onDestroy()
         unregisterServiceListener()
         bthidService.bthidStatus.removeObserver(this)
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
-    fun onResume() {
+    override fun onResume(owner: LifecycleOwner) {
         logger.debug("onResume")
         hidProfileServiceListener.configureApp() // As the App is unregistered on pause, re-register on resume.
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    fun onPause() {
+    @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+    override fun onPause(owner: LifecycleOwner) {
         logger.debug("onPause")
-
     }
 
     @MainThread
@@ -129,8 +127,8 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
         return true
     }
 
-    override fun onChanged(bthidStatus: BTHIDStatus) {
-        hidProfileServiceListener.isAppEnabled = bthidStatus == BTHIDStatus.ON
+    override fun onChanged(value: BTHIDStatus) {
+        hidProfileServiceListener.isAppEnabled = value == BTHIDStatus.ON
     }
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
@@ -167,7 +165,7 @@ class CtapBTHIDAndroidService : Service(), Observer<BTHIDStatus>, LifecycleObser
         bthidService.isBTHIDBackgroundServiceModeEnabled.observeForever {
             when {
                 it -> startForeground()
-                else -> stopForeground(true)
+                else -> stopForeground(STOP_FOREGROUND_REMOVE)
             }
         }
         logger.debug("CtapBTHIDAndroidService is initialized")

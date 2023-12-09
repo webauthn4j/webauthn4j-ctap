@@ -88,13 +88,13 @@ class CredentialProviderAndroidService : CredentialProviderService() {
     private fun processCreateCredentialRequest(request: BeginCreateCredentialRequest): BeginCreateCredentialResponse {
         when (request) {
             is BeginCreatePublicKeyCredentialRequest -> {
-                return processCreatePublicKeyCredentialRequest(request)
+                return processCreatePublicKeyCredentialRequest()
             }
             else -> throw IllegalStateException("Unexpected ${request.type} is provided.")
         }
     }
 
-    private fun processCreatePublicKeyCredentialRequest(request: BeginCreatePublicKeyCredentialRequest): BeginCreateCredentialResponse {
+    private fun processCreatePublicKeyCredentialRequest(): BeginCreateCredentialResponse {
         // Adding two create entries - one for storing credentials to the 'Personal'
         // account, and one for storing them to the 'Family' account. These
         // accounts are local to this sample app only.

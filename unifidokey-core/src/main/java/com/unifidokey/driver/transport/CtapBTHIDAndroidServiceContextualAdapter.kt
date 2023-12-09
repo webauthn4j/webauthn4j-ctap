@@ -1,6 +1,7 @@
 package com.unifidokey.driver.transport
 
 import android.Manifest
+import android.app.Service
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothClass.Device
 import android.bluetooth.BluetoothDevice
@@ -160,7 +161,7 @@ class CtapBTHIDAndroidServiceContextualAdapter(private val applicationContext: C
         ctapBTHIDAndroidService.let {
             when (it) {
                 null -> throw IllegalStateException("Service is not bound.")
-                else -> it.stopForeground(true)
+                else -> it.stopForeground(Service.STOP_FOREGROUND_REMOVE)
             }
         }
     }
