@@ -26,12 +26,6 @@ buildscript {
 
     // Android libraries
     ext.asmVersion = "9.6"
-    ext.appcompatVersion = "1.6.1"
-    ext.constraintlayoutVersion = "2.1.4"
-    ext.biometricVersion = "1.1.0"
-    ext.legacySupportV4Version = "1.0.0"
-    ext.preferenceVersion = "1.2.1"
-    ext.navigationVersion = "2.5.3"
     ext.lifecycleVersion = "2.5.1"
     ext.lifecycleExtensionsVersion = "2.2.0"
     ext.materialVersion = "1.6.1"
@@ -144,25 +138,7 @@ subprojects {
         testImplementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
 
         constraints {
-            // kotlin
-
-            implementation("androidx.core:core-ktx:$coreKtxVersion")
-            implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleExtensionsVersion")
-
             // google
-            implementation("androidx.navigation:navigation-fragment:$navigationVersion")
-            implementation("androidx.navigation:navigation-ui:$navigationVersion")
-
-
-            implementation("androidx.appcompat:appcompat:$appcompatVersion")
-            implementation("androidx.constraintlayout:constraintlayout:$constraintlayoutVersion")
-
-            implementation("androidx.biometric:biometric:$biometricVersion")
-            implementation("androidx.legacy:legacy-support-v4:$legacySupportV4Version")
-            implementation("androidx.preference:preference:$preferenceVersion")
-
-            implementation("com.google.android.material:material:$materialVersion")
-
             implementation("com.google.android.gms:play-services-auth:$googlePlayServicesAuthVersion")
             implementation("com.google.android.gms:play-services-fido:$googlePlayServicesFidoVersion")
             implementation("com.google.android.gms:play-services-safetynet:$googlePlayServicesSafetyNetVersion")

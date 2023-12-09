@@ -82,19 +82,19 @@ dependencies {
     implementation("com.google.android.gms:play-services-safetynet")
 
     // AndroidX
-    implementation("androidx.core:core-ktx")
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.room.runtime)
-    implementation("androidx.appcompat:appcompat")
-    implementation("androidx.legacy:legacy-support-v4")
-    implementation("androidx.preference:preference")
-    implementation("androidx.biometric:biometric")
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.legacy.support.v4)
+    implementation(libs.androidx.preference)
+    implementation(libs.androidx.biometric)
 
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.lifecycle.livedata)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation("androidx.lifecycle:lifecycle-extensions")
+    implementation(libs.androidx.lifecycle.extensions)
 
     implementation(libs.androidx.credentials)
 
