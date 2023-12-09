@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.com.intellij.openapi.util.text.StringUtil
 
 plugins {
     id("kotlin-android")
-    id("kotlin-kapt")
+    alias(libs.plugins.kotlin.kapt)
     id("androidx.navigation.safeargs")
     id("com.google.android.gms.oss-licenses-plugin")
     id("com.google.gms.google-services")

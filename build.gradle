@@ -26,7 +26,6 @@ buildscript {
     ext.firebaseBomVersion = "32.7.0"
     ext.firebaseCrashlyticsGradleVersion = "2.9.9"
     ext.androidGradlePluginVersion = '8.1.2'
-    ext.navigationSafeArgsGradlePluginVersion = "2.5.2"
     ext.ossLicensesPluginVersion = "0.10.6"
 
 
@@ -59,7 +58,7 @@ buildscript {
         classpath "com.google.android.gms:oss-licenses-plugin:$ossLicensesPluginVersion"
         classpath "com.google.firebase:firebase-crashlytics-gradle:$firebaseCrashlyticsGradleVersion"
         classpath "com.google.gms:google-services:$googleServicesVersion"
-        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationSafeArgsGradlePluginVersion"
+        classpath libs.androidx.navigation.safe.args.gradle.plugin
 
         classpath "org.asciidoctor:asciidoctor-gradle-jvm:$asciidoctorGradleVersion"
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:$sonarqubeVersion"

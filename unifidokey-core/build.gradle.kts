@@ -1,6 +1,6 @@
 plugins {
     id("kotlin-android")
-    id("kotlin-kapt")
+    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
