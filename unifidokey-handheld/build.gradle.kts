@@ -136,7 +136,6 @@ dependencies {
     implementation(project(":webauthn4j-ctap-client"))
 
     // Android dependencies
-    implementation(libs.androidx.room.runtime)
 
     // Play services
     implementation(libs.play.services.oss.licenses)
@@ -183,7 +182,6 @@ dependencies {
 
     // Annotation processor
     kapt(libs.dagger.compiler)
-    kapt(libs.androidx.room.compiler)
 
     // test dependencies
     testImplementation("junit:junit")
@@ -196,7 +194,6 @@ dependencies {
     testImplementation("org.robolectric:robolectric")
 
     kaptTest(libs.dagger.compiler)
-    kaptTest(libs.androidx.room.compiler)
 
     // Android test dependencies
     androidTestImplementation(libs.androidx.test.core)

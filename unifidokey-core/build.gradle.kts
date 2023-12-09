@@ -19,12 +19,12 @@ android {
             jvmTarget = JavaVersion.VERSION_11.toString()
         }
 
-
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments["room.schemaLocation"] = "$projectDir/schemas"
+        kapt{
+            arguments{
+                arg("room.schemaLocation", "$projectDir/schemas")
             }
         }
+
         //ProGuard
         consumerProguardFiles("consumer-rules.pro")
 
@@ -107,8 +107,8 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
 
     // Annotation processor
-    kapt(libs.dagger.compiler)
     kapt(libs.androidx.room.compiler)
+    kapt(libs.dagger.compiler)
 
     // Test dependencies
     testImplementation("ch.qos.logback:logback-classic")
@@ -121,8 +121,8 @@ dependencies {
     testImplementation("com.google.truth.extensions:truth-java8-extension")
     testImplementation("org.robolectric:robolectric")
 
-    kaptTest(libs.dagger.compiler)
     kaptTest(libs.androidx.room.compiler)
+    kaptTest(libs.dagger.compiler)
 
     // Android test dependencies
     androidTestImplementation(libs.androidx.test.core)

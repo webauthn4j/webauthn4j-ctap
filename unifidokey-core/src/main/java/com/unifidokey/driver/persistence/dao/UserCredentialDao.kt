@@ -13,31 +13,27 @@ interface UserCredentialDao {
      */
     fun save(userCredentialEntity: UserCredentialEntity) {
         val credentialId = userCredentialEntity.credentialId
-        val fetched = findOne(credentialId)
-        if (fetched == null) {
-            create(userCredentialEntity)
-        } else {
-            update(userCredentialEntity)
-        }
+        findOne(credentialId)
+        update(userCredentialEntity)
     }
 
     @Query("SELECT * FROM user_credential WHERE credential_id = :credentialId")
     fun findOne(credentialId: ByteArray?): UserCredentialEntity?
 
     @Query("SELECT * FROM user_credential")
-    fun findAll(): List<UserCredentialEntity?>?
+    fun findAll(): List<UserCredentialEntity>
 
     @Insert
-    fun create(userCredential: UserCredentialEntity?): Long
+    fun create(userCredential: UserCredentialEntity): Long
 
     @Update
-    fun update(userCredential: UserCredentialEntity?)
+    fun update(userCredential: UserCredentialEntity)
 
     @Delete
-    fun delete(userCredential: UserCredentialEntity?)
+    fun delete(userCredential: UserCredentialEntity)
 
     @Query("DELETE FROM user_credential WHERE credential_id = :credentialId")
-    fun delete(credentialId: ByteArray?)
+    fun delete(credentialId: ByteArray)
 
     @Query("DELETE FROM user_credential")
     fun deleteAll()

@@ -29,7 +29,7 @@ class CredentialListViewModel(application: Application) : AndroidViewModel(appli
         relyingPartyDao.delete(rpId)
     }
 
-    fun deleteUserCredential(credentialId: ByteArray?) {
+    fun deleteUserCredential(credentialId: ByteArray) {
         userCredentialDao.delete(credentialId)
     }
 
