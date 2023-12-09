@@ -125,9 +125,6 @@ tasks {
 
 
 dependencies {
-    //TODO
-    val daggerVersion = "2.48.1"
-    val roomVersion = "2.4.3"
 
     // Kotlin
     implementation(libs.kotlin.stdlib.jdk8)
@@ -183,8 +180,8 @@ dependencies {
 
 
     // Annotation processor
-    kapt("com.google.dagger:dagger-compiler:$daggerVersion")
-    kapt("androidx.room:room-compiler:$roomVersion")
+    kapt(libs.dagger.compiler)
+    kapt(libs.androidx.room.compiler)
 
     // test dependencies
     testImplementation("junit:junit")
@@ -196,8 +193,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
     testImplementation("org.robolectric:robolectric")
 
-    kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
-    kaptTest("androidx.room:room-compiler:$roomVersion")
+    kaptTest(libs.dagger.compiler)
+    kaptTest(libs.androidx.room.compiler)
 
     // Android test dependencies
     androidTestImplementation(libs.androidx.test.core)

@@ -170,7 +170,8 @@ class Fido2BLEGATTServer(
             if (uuid == CLIENT_CHARACTERISTIC_CONFIGURATION_UUID) {
                 logger.debug("Client Characteristic Configuration is read")
                 val value = UnsignedNumberUtil.toBytes(NOTIFY_OFF.toInt())
-                descriptor.value = value
+                //TODO: If BLE stop working, check this comment out
+//                descriptor.value = value
                 gattServer.sendResponse(
                     device,
                     requestId,

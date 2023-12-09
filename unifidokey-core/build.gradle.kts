@@ -1,7 +1,6 @@
 plugins {
     id("kotlin-android")
     id("kotlin-kapt")
-    kotlin("plugin.serialization") version "1.9.0"
 }
 
 android {
@@ -58,8 +57,6 @@ tasks {
 
 
 dependencies {
-    val daggerVersion = "2.48.1"
-    val roomVersion = "2.5.2"
 
     // Kotlin
     implementation(libs.kotlin.stdlib.jdk8)
@@ -109,12 +106,9 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
 
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
-
     // Annotation processor
-    kapt("com.google.dagger:dagger-compiler:$daggerVersion")
-    kapt("androidx.room:room-compiler:$roomVersion")
+    kapt(libs.dagger.compiler)
+    kapt(libs.androidx.room.compiler)
 
     // Test dependencies
     testImplementation("ch.qos.logback:logback-classic")
@@ -127,8 +121,8 @@ dependencies {
     testImplementation("com.google.truth.extensions:truth-java8-extension")
     testImplementation("org.robolectric:robolectric")
 
-    kaptTest("com.google.dagger:dagger-compiler")
-    kaptTest("androidx.room:room-compiler")
+    kaptTest(libs.dagger.compiler)
+    kaptTest(libs.androidx.room.compiler)
 
     // Android test dependencies
     androidTestImplementation(libs.androidx.test.core)
