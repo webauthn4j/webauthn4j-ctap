@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.com.intellij.openapi.util.text.StringUtil
 
 plugins {
     id("kotlin-android")
+    id("com.google.devtools.ksp")
     id(libs.plugins.kotlin.kapt.get().pluginId)
     id(libs.plugins.androidx.navigation.safeargs.get().pluginId)
     id("com.google.android.gms.oss-licenses-plugin")
@@ -181,6 +182,7 @@ dependencies {
 
 
     // Annotation processor
+    ksp(libs.androidx.room.compiler)
     kapt(libs.dagger.compiler)
 
     // test dependencies

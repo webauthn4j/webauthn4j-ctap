@@ -13,8 +13,12 @@ interface UserCredentialDao {
      */
     fun save(userCredentialEntity: UserCredentialEntity) {
         val credentialId = userCredentialEntity.credentialId
-        findOne(credentialId)
-        update(userCredentialEntity)
+        val fetched = findOne(credentialId)
+        if (fetched == null) {
+            create(userCredentialEntity)
+        } else {
+            update(userCredentialEntity)
+        }
     }
 
     @Query("SELECT * FROM user_credential WHERE credential_id = :credentialId")

@@ -33,9 +33,9 @@ import com.unifidokey.driver.persistence.migration.V1ToV2Migration
     DateConverter::class,
     ByteArrayConverter::class,
     InstantConverter::class,
+    EventTypeConverter::class,
     SerializableConverter::class,
     UUIDConverter::class,
-    EventTypeConverter::class
 )
 abstract class UnifidoKeyDatabase : RoomDatabase() {
 

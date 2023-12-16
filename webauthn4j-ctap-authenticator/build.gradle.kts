@@ -48,7 +48,7 @@ dependencies {
     testImplementation(libs.webauthn4j.test)
     testImplementation(libs.logback.classic)
     testImplementation(libs.mockito.core)
-    testImplementation(libs.mockito.inline)
+//    testImplementation(libs.mockito.inline)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.assertj.core)
     testImplementation(libs.junit.jupiter.api)
