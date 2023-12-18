@@ -16,29 +16,6 @@
 
 buildscript {
 
-    //kotlin
-    ext.kotlinVersion = '1.9.21'
-
-
-    // Android libraries
-    ext.asmVersion = "9.6"
-    ext.googleServicesVersion = "4.4.0"
-    ext.firebaseBomVersion = "32.7.0"
-
-
-    // Third party libraries
-
-    // Test libraries
-    ext.springBootVersion = "2.7.18"
-    ext.truthVersion = "1.1.5"
-    ext.mockitoKotlinVersion = "5.2.1"
-    ext.androidxTestVersion = "1.5.0"
-    ext.androidxTestExtJUnitVersion = "1.1.5"
-    ext.espressoVersion = "3.5.1"
-    ext.androidSupportVersion = "28.0.0"
-    ext.robolectricVersion = "4.11.1"
-
-
     repositories {
         google()
         mavenCentral()
@@ -58,9 +35,9 @@ buildscript {
         classpath libs.sonarqube.gradle.plugin
 
         // workaround from https://issuetracker.google.com/issues/159151549
-        classpath "org.ow2.asm:asm:$asmVersion"
-        classpath "org.ow2.asm:asm-util:$asmVersion"
-        classpath "org.ow2.asm:asm-commons:$asmVersion"
+        classpath libs.asm
+        classpath libs.asm.util
+        classpath libs.asm.commons
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -115,24 +92,7 @@ subprojects {
 
     dependencies {
         //BOM
-        implementation platform("com.google.firebase:firebase-bom:${firebaseBomVersion}")
-        testImplementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
-
-        constraints {
-            // test
-            testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
-            testImplementation("com.google.truth:truth:$truthVersion")
-            testImplementation("com.google.truth.extensions:truth-java8-extension:$truthVersion")
-            testImplementation("androidx.test:core:$androidxTestVersion")
-            testImplementation("androidx.test.ext:junit:$androidxTestExtJUnitVersion")
-            testImplementation("androidx.test:runner:$androidxTestVersion")
-            testImplementation("androidx.test.espresso:espresso-core:$espressoVersion")
-            testImplementation("com.android.support:support-annotations:$androidSupportVersion")
-            testImplementation("org.robolectric:robolectric:$robolectricVersion")
-            testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion")
-
-        }
-
+        implementation platform("com.google.firebase:firebase-bom:32.7.0")
     }
 }
 

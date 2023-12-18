@@ -1,4 +1,6 @@
 [versions]
+asm = "9.6"
+junit = "4.13.2"
 kotlin = "1.9.21"
 kotlinx-coroutines = "1.7.3"
 
@@ -117,6 +119,10 @@ webauthn4j-core = { module = "com.webauthn4j:webauthn4j-core", version.ref = "we
 webauthn4j-test = { module = "com.webauthn4j:webauthn4j-test", version.ref = "webauthn4j" }
 
 # Third-party libraries
+asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
+asm-commons = { module = "org.ow2.asm:asm-commons", version.ref = "asm" }
+asm-util = { module = "org.ow2.asm:asm-util", version.ref = "asm" }
+
 slf4j-api = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j"}
 logback-android = { module = "com.github.tony19:logback-android", version.ref = "logbackAndroid" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logbackClassic" }
@@ -135,6 +141,7 @@ sonarqube-gradle-plugin = { module = "org.sonarsource.scanner.gradle:sonarqube-g
 asciidoctor-gradle-jvm = { module = "org.asciidoctor:asciidoctor-gradle-jvm", version.ref = "asciidoctorGradleJvm" }
 
 # test
+junit = { module = "junit:junit", version.ref = "junit" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }
 junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit-jupiter" }

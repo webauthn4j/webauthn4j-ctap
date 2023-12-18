@@ -114,15 +114,15 @@ dependencies {
     kapt(libs.dagger.compiler)
 
     // Test dependencies
-    testImplementation("ch.qos.logback:logback-classic")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
-    testImplementation("junit:junit")
-    testImplementation("org.mockito:mockito-core")
-    testImplementation("androidx.test:core:")
-    testImplementation("androidx.test.ext:junit")
-    testImplementation("com.google.truth:truth")
-    testImplementation("com.google.truth.extensions:truth-java8-extension")
-    testImplementation("org.robolectric:robolectric")
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.androidx.test.ext.junit)
+    testImplementation(libs.truth)
+    testImplementation(libs.truth.java8.extension)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.logback.classic)
 
     // Android test dependencies
     androidTestImplementation(libs.androidx.test.core)
