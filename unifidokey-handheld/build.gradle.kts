@@ -8,8 +8,8 @@ plugins {
     id("com.google.devtools.ksp")
     id(libs.plugins.kotlin.kapt.get().pluginId)
     id(libs.plugins.androidx.navigation.safeargs.get().pluginId)
-    id("com.google.android.gms.oss-licenses-plugin")
-    id("com.google.gms.google-services")
+    id(libs.plugins.oss.licenses.plugins.get().pluginId)
+    id(libs.plugins.google.services.get().pluginId)
     id("com.google.firebase.crashlytics")
 }
 //TODO

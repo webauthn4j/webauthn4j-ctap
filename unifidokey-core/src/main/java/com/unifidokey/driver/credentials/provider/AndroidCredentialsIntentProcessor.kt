@@ -35,21 +35,18 @@ class AndroidCredentialsIntentProcessor(
     private val androidCredentialsAuthenticator = AndroidCredentialsAuthenticator(configManager, this.ctapAuthenticator)
     private val objectConverter = this.ctapAuthenticator.objectConverter
 
-    suspend fun processIntent(activity: Activity, intent: Intent?){
+    suspend fun processIntent(activity: Activity, intent: Intent){
         try{
-            if(intent == null){
-                TODO()
-            }
             when (intent.action) {
                 CredentialProviderAndroidService.CREATE_PASSKEY -> {
-                    val request = PendingIntentHandler.retrieveProviderCreateCredentialRequest(intent) ?: TODO()
+                    val request = PendingIntentHandler.retrieveProviderCreateCredentialRequest(intent) ?: throw IllegalStateException("Failed to retrieve ProviderCreateCredentialRequest")
                     processProviderCreateCredentialRequest(request)
                 }
                 CredentialProviderAndroidService.GET_PASSKEY -> {
-                    val request = PendingIntentHandler.retrieveProviderGetCredentialRequest(intent) ?: TODO()
+                    val request = PendingIntentHandler.retrieveProviderGetCredentialRequest(intent) ?: throw IllegalStateException("Failed to retrieve ProviderGetCredentialRequest")
                     processProviderGetCredentialRequest(request)
                 }
-                else -> TODO()
+                else -> throw IllegalStateException("Unexpected intent action supplied.")
             }
         }
         catch (e: RuntimeException){
@@ -84,7 +81,7 @@ class AndroidCredentialsIntentProcessor(
             when (it) {
                 is GetPublicKeyCredentialOption -> {
 
-                    val androidCredentialsGetRequest = objectConverter.jsonConverter.readValue(it.requestJson, AndroidCredentialsGetRequest::class.java)!!
+                    val androidCredentialsGetRequest = objectConverter.jsonConverter.readValue(it.requestJson, AndroidCredentialsGetRequest::class.java) ?: TODO()
                     val clientDataHash = it.clientDataHash ?: TODO()
                     val origin = request.callingAppInfo.origin?.let { origin -> Origin(origin) } ?: TODO()
                     val androidCredentialsGetContext = AndroidCredentialsGetContext(clientDataHash, origin)
@@ -98,7 +95,7 @@ class AndroidCredentialsIntentProcessor(
                     activity.setResult(AppCompatActivity.RESULT_OK, result)
                     activity.finish()
                 }
-                else -> TODO()
+                else -> throw IllegalStateException("Unexpected CredentialOption is supplied")
             }
         }
     }

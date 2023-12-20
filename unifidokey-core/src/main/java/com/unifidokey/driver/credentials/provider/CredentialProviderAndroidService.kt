@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory
 class CredentialProviderAndroidService : CredentialProviderService() {
 
     companion object{
-        public val ACCOUNT_NAME = "Android Keystore"
-        public val CREATE_PASSKEY = "com.unifidokey.provider.CREATE_PASSKEY"
-        public val GET_PASSKEY = "com.unifidokey.provider.GET_PASSKEY"
+        val ACCOUNT_NAME = "Android Keystore"
+        val CREATE_PASSKEY = "com.unifidokey.provider.CREATE_PASSKEY"
+        val GET_PASSKEY = "com.unifidokey.provider.GET_PASSKEY"
     }
 
     private val logger = LoggerFactory.getLogger(CredentialProviderAndroidService::class.java)
