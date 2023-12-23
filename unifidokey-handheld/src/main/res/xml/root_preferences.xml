@@ -16,7 +16,7 @@
 
 <androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="@string/header_transport_options">
+    <PreferenceCategory app:title="@string/header_transport_options" app:key="transport">
         <SwitchPreferenceCompat
             app:key="nfcTransportEnabled"
             app:title="@string/title_nfc_support" />
@@ -35,28 +35,17 @@
     <PreferenceCategory app:title="@string/header_consent">
 
         <ListPreference
-            app:defaultValue="if_required"
+            app:defaultValue="ask_if_required"
             app:entries="@array/user_consent_entries"
             app:entryValues="@array/user_consent_values"
             app:key="userConsent"
             app:title="@string/title_user_consent"
             app:useSimpleSummaryProvider="true" />
 
-        <ListPreference
-            app:defaultValue="enabled"
-            app:entries="@array/client_pin_entries"
-            app:entryValues="@array/client_pin_values"
-            app:key="clientPIN"
-            app:title="@string/title_client_pin"
-            app:useSimpleSummaryProvider="true" />
-
-        <ListPreference
-            app:defaultValue="ready"
-            app:entries="@array/user_verification_entries"
-            app:entryValues="@array/user_verification_values"
-            app:key="userVerification"
-            app:title="@string/title_user_verification"
-            app:useSimpleSummaryProvider="true" />
+        <SwitchPreferenceCompat
+            app:key="biometricAuthentication"
+            app:summary="@string/summary_biometric_authentication"
+            app:title="@string/title_biometric_authentication" />
 
         <SwitchPreferenceCompat
             app:key="consentCaching"
@@ -70,7 +59,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/header_user_interface">
+    <PreferenceCategory app:title="@string/header_user_interface" app:key="userInterface">
 
         <ListPreference
             app:defaultValue="authenticator"
@@ -84,6 +73,18 @@
             app:key="keepScreenOn"
             app:summary="@string/summary_keep_screen_on"
             app:title="@string/keep_screen_on" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/header_external_integration" app:key="externalIntegration">
+
+        <ListPreference
+            app:defaultValue="standard"
+            app:entries="@array/allowed_app_list_entries"
+            app:entryValues="@array/allowed_app_list_values"
+            app:key="allowedAppList"
+            app:title="@string/title_allowed_app_list"
+            app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
 
@@ -101,6 +102,22 @@
             app:entryValues="@array/platform_values"
             app:key="platform"
             app:title="@string/title_platform"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="enabled"
+            app:entries="@array/client_pin_entries"
+            app:entryValues="@array/client_pin_values"
+            app:key="clientPIN"
+            app:title="@string/title_client_pin"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="ready"
+            app:entries="@array/user_verification_entries"
+            app:entryValues="@array/user_verification_values"
+            app:key="userVerification"
+            app:title="@string/title_user_verification"
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
@@ -153,7 +170,11 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/header_config_reset">
+    <PreferenceCategory app:title="@string/header_config">
+        <SwitchPreferenceCompat
+            app:key="experimentalMode"
+            app:summary="@string/summary_experimental_mode"
+            app:title="@string/title_experimental_mode" />
         <Preference
             app:key="configReset"
             app:summary="@string/summary_config_reset"

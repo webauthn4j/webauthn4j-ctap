@@ -181,7 +181,7 @@ internal class MakeCredentialExecution :
                         isUserPresence = true,
                         isUserVerification = false
                     )
-                    ctapAuthenticatorSession.makeCredentialConsentRequestHandler.onMakeCredentialConsentRequested(
+                    ctapAuthenticatorSession.userVerificationHandler.onMakeCredentialConsentRequested(
                         makeCredentialConsentRequest
                     )
                     throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_CREDENTIAL_EXCLUDED)
@@ -328,7 +328,7 @@ internal class MakeCredentialExecution :
             userPresencePlan,
             userVerificationPlan
         )
-        return ctapAuthenticatorSession.makeCredentialConsentRequestHandler.onMakeCredentialConsentRequested(makeCredentialConsentRequest)
+        return ctapAuthenticatorSession.userVerificationHandler.onMakeCredentialConsentRequested(makeCredentialConsentRequest)
     }
 
     //spec| Step9-11

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
+import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricPrompt.*
 import androidx.databinding.DataBindingUtil
@@ -15,10 +16,6 @@ import com.unifidokey.app.handheld.presentation.util.KeepScreenOnUtil
 import com.unifidokey.app.handheld.presentation.util.WakeLockUtil
 import com.unifidokey.databinding.RegistrationConsentDialogActivityBinding
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
 class RegistrationConsentDialogActivity : AppCompatActivity(),
     RegistrationConsentDialogViewModel.Callbacks {
     private lateinit var biometricPrompt: BiometricPrompt
@@ -85,7 +82,7 @@ class RegistrationConsentDialogActivity : AppCompatActivity(),
         val promptInfo = PromptInfo.Builder()
             .setTitle("Authenticate to continue")
             .setSubtitle(subtitle)
-            .setNegativeButtonText("Cancel")
+            .setAllowedAuthenticators(viewModel.request.allowedAuthenticator)
             .build()
         biometricPrompt.authenticate(promptInfo)
     }

@@ -40,7 +40,11 @@ internal class AuthenticatorGetInfoResponseDataSerializerTest {
                 UserPresenceOption.SUPPORTED,
                 UserVerificationOption.READY
             ),
-            2048u, listOf(PinProtocolVersion.VERSION_1)
+            2048u,
+            listOf(PinProtocolVersion.VERSION_1),
+            null,
+            null,
+            null
         )
         val encoded = converter.writeValueAsBytes(original)
         val decoded = converter.readValue(encoded, AuthenticatorGetInfoResponseData::class.java)

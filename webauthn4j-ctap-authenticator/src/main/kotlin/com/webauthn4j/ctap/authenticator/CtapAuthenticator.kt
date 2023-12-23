@@ -12,7 +12,7 @@ import com.webauthn4j.ctap.authenticator.attestation.NoneAttestationStatementPro
 import com.webauthn4j.ctap.authenticator.data.credential.Credential
 import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
 import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
-import com.webauthn4j.ctap.authenticator.data.settings.PlatformSetting
+import com.webauthn4j.ctap.authenticator.data.settings.AttachmentSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ResetProtectionSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
@@ -23,6 +23,7 @@ import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStor
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
 import com.webauthn4j.ctap.core.converter.jackson.PublicKeyCredentialSourceCBORModule
 import com.webauthn4j.ctap.core.data.PinProtocolVersion
+import com.webauthn4j.ctap.core.data.options.UserVerificationOption
 import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import org.slf4j.LoggerFactory
@@ -37,8 +38,17 @@ class CtapAuthenticator(
     val extensionProcessors: List<ExtensionProcessor> = listOf(),
     // Handlers
     var authenticatorPropertyStore: AuthenticatorPropertyStore = InMemoryAuthenticatorPropertyStore(),
-    var makeCredentialConsentRequestHandler: MakeCredentialConsentRequestHandler = MakeCredentialConsentRequestHandler { true },
-    var getAssertionConsentRequestHandler: GetAssertionConsentRequestHandler = GetAssertionConsentRequestHandler { true },
+    var userVerificationHandler: UserVerificationHandler = object : UserVerificationHandler {
+        override fun getUserVerificationOption(rpId: String?): UserVerificationOption = UserVerificationOption.READY
+
+        override suspend fun onMakeCredentialConsentRequested(makeCredentialConsentRequest: MakeCredentialConsentRequest): Boolean {
+            return true
+        }
+
+        override suspend fun onGetAssertionConsentRequested(getAssertionConsentRequest: GetAssertionConsentRequest): Boolean {
+            return true
+        }
+    },
     var credentialSelectionHandler: CredentialSelectionHandler = DefaultCredentialSelectionHandler(),
     var winkHandler: WinkHandler = NoopWinkHandler()
 ) {
@@ -72,7 +82,7 @@ class CtapAuthenticator(
 
     var aaguid: AAGUID = AAGUID
 
-    var platform: PlatformSetting = PlatformSetting.CROSS_PLATFORM
+    var platform: AttachmentSetting = AttachmentSetting.CROSS_PLATFORM
     var residentKey: ResidentKeySetting = ResidentKeySetting.ALWAYS
     var clientPIN: ClientPINSetting = ClientPINSetting.ENABLED
     var resetProtection: ResetProtectionSetting = ResetProtectionSetting.DISABLED
@@ -80,8 +90,10 @@ class CtapAuthenticator(
     var userVerification: UserVerificationSetting = UserVerificationSetting.READY
     var credentialSelector: CredentialSelectorSetting = CredentialSelectorSetting.AUTHENTICATOR
 
-    fun createSession() : CtapAuthenticatorSession{
-        return CtapAuthenticatorSession(this)
+    fun createSession(
+        userVerificationHandler: UserVerificationHandler = this.userVerificationHandler
+    ) : CtapAuthenticatorSession{
+        return CtapAuthenticatorSession(this, userVerificationHandler)
     }
 
     fun registerEventListener(eventListener: EventListener) {

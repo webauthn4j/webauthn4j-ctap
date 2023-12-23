@@ -3,9 +3,9 @@ package com.webauthn4j.ctap.core.data
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.webauthn4j.ctap.core.data.options.*
+import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 
-@Suppress("CanBePrimaryConstructorProperty")
 class AuthenticatorGetInfoResponseData : CtapResponseData {
 
     companion object {
@@ -18,7 +18,10 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
             @JsonProperty("3") aaguid: AAGUID,
             @JsonProperty("4") options: Options?,
             @JsonProperty("5") maxMsgSize: Long?,
-            @JsonProperty("6") pinProtocols: List<PinProtocolVersion>?
+            @JsonProperty("6") pinProtocols: List<PinProtocolVersion>?,
+            @JsonProperty("7") maxCredentialCountInList: Long?,
+            @JsonProperty("8") maxCredentialIdLength: Long?,
+            @JsonProperty("9") transports: List<AuthenticatorTransport>?
         ): AuthenticatorGetInfoResponseData {
             return AuthenticatorGetInfoResponseData(
                 versions,
@@ -26,7 +29,10 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
                 aaguid,
                 options,
                 maxMsgSize?.toUInt(),
-                pinProtocols
+                pinProtocols,
+                maxCredentialCountInList?.toUInt(),
+                maxCredentialIdLength?.toUInt(),
+                transports
             )
         }
     }
@@ -37,7 +43,10 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
         aaguid: AAGUID,
         options: Options?,
         maxMsgSize: UInt?,
-        pinProtocols: List<PinProtocolVersion>?
+        pinProtocols: List<PinProtocolVersion>?,
+        maxCredentialCountInList: UInt?,
+        maxCredentialIdLength: UInt?,
+        transports: List<AuthenticatorTransport>?
     ) {
         this.versions = versions.toList()
         this.extensions = extensions?.toList()
@@ -45,6 +54,9 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
         this.options = options
         this.maxMsgSize = maxMsgSize
         this.pinProtocols = pinProtocols?.toList()
+        this.maxCredentialCountInList= maxCredentialCountInList
+        this.maxCredentialIdLength = maxCredentialIdLength
+        this.transports = transports
     }
 
     val versions: List<String>
@@ -53,6 +65,9 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
     val options: Options?
     val maxMsgSize: UInt?
     val pinProtocols: List<PinProtocolVersion>?
+    val maxCredentialCountInList: UInt?
+    val maxCredentialIdLength: UInt?
+    val transports: List<AuthenticatorTransport>?
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -66,6 +81,9 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
         if (options != other.options) return false
         if (maxMsgSize != other.maxMsgSize) return false
         if (pinProtocols != other.pinProtocols) return false
+        if (maxCredentialCountInList != other.maxCredentialCountInList) return false
+        if (maxCredentialIdLength != other.maxCredentialIdLength) return false
+        if (transports != other.transports) return false
 
         return true
     }
@@ -77,11 +95,14 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
         result = 31 * result + (options?.hashCode() ?: 0)
         result = 31 * result + (maxMsgSize?.hashCode() ?: 0)
         result = 31 * result + (pinProtocols?.hashCode() ?: 0)
+        result = 31 * result + (maxCredentialCountInList?.hashCode() ?: 0)
+        result = 31 * result + (maxCredentialIdLength?.hashCode() ?: 0)
+        result = 31 * result + (transports?.hashCode() ?: 0)
         return result
     }
 
     override fun toString(): String {
-        return "AuthenticatorGetInfoResponseData(versions=$versions, extensions=$extensions, aaguid=$aaguid, options=$options, maxMsgSize=$maxMsgSize, pinProtocols=$pinProtocols)"
+        return "AuthenticatorGetInfoResponseData(versions=$versions, extensions=$extensions, aaguid=$aaguid, options=$options, maxMsgSize=$maxMsgSize, pinProtocols=$pinProtocols, maxCredentialCountInList=$maxCredentialCountInList, maxCredentialIdLength=$maxCredentialIdLength, transports=$transports)"
     }
 
     class Options @JsonCreator constructor(

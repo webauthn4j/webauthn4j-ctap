@@ -1,7 +1,7 @@
 package com.unifidokey.core.config
 
 class BTHIDBackgroundServiceModeEnabledConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<Boolean>(configManager, KEY, true) {
+    ConfigPropertyBase<Boolean>(configManager, KEY, true, true, false, true) {
 
     override fun save(value: Boolean) {
         configManager.persistenceAdaptor.savePrimitiveBoolean(KEY, value)

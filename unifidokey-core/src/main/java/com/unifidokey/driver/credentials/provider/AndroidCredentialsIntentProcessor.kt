@@ -11,28 +11,27 @@ import androidx.credentials.provider.PendingIntentHandler
 import androidx.credentials.provider.ProviderCreateCredentialRequest
 import androidx.credentials.provider.ProviderGetCredentialRequest
 import androidx.fragment.app.FragmentActivity
+import com.unifidokey.core.R
 import com.unifidokey.core.config.ConfigManager
+import com.unifidokey.core.setting.AllowedAppListSetting
+import com.unifidokey.driver.persistence.dao.RelyingPartyDao
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
-import com.webauthn4j.ctap.authenticator.GetAssertionConsentRequestHandler
-import com.webauthn4j.ctap.authenticator.MakeCredentialConsentRequestHandler
 import com.webauthn4j.data.client.Origin
 import org.slf4j.LoggerFactory
+import java.nio.charset.StandardCharsets
+
+
+
 
 class AndroidCredentialsIntentProcessor(
     private val activity: FragmentActivity,
-    configManager: ConfigManager,
-    ctapAuthenticator: CtapAuthenticator,
-    private val makeCredentialConsentRequestHandler: MakeCredentialConsentRequestHandler,
-    private val getAssertionConsentRequestHandler: GetAssertionConsentRequestHandler
+    private val configManager: ConfigManager,
+    private val relyingPartyDao: RelyingPartyDao,
+    private val ctapAuthenticator: CtapAuthenticator
 ) {
 
     private val logger = LoggerFactory.getLogger(AndroidCredentialsIntentProcessor::class.java)
-
-    private val ctapAuthenticator = ctapAuthenticator.also {
-        it.makeCredentialConsentRequestHandler = this.makeCredentialConsentRequestHandler
-        it.getAssertionConsentRequestHandler = this.getAssertionConsentRequestHandler
-    }
-    private val androidCredentialsAuthenticator = AndroidCredentialsAuthenticator(configManager, this.ctapAuthenticator)
+    private val androidCredentialsAuthenticator = AndroidCredentialsAuthenticator(this.ctapAuthenticator, activity, configManager, relyingPartyDao)
     private val objectConverter = this.ctapAuthenticator.objectConverter
 
     suspend fun processIntent(activity: Activity, intent: Intent){
@@ -61,12 +60,12 @@ class AndroidCredentialsIntentProcessor(
 
             val credentialCreateRequest = objectConverter.jsonConverter.readValue(callingRequest.requestJson, AndroidCredentialsCreateRequest::class.java) ?: TODO()
 
-            val origin = request.callingAppInfo.origin?.let { Origin(it) } ?: TODO()
+            val origin = request.callingAppInfo.getOrigin(allowList)?.let { Origin(it) } ?: TODO()
             val packageName = request.callingAppInfo.packageName
-            val credentialCreateContext = AndroidCredentialsCreateContext(origin, packageName)
+            val androidCredentialsCreateContext = AndroidCredentialsCreateContext(origin, packageName)
 
-            val credentialCreateResponse = androidCredentialsAuthenticator.create(credentialCreateRequest, credentialCreateContext)
-            val publicKeyCredentialJSON = objectConverter.jsonConverter.writeValueAsString(credentialCreateResponse)
+            val androidCredentialsCreateResponse = androidCredentialsAuthenticator.create(credentialCreateRequest, androidCredentialsCreateContext)
+            val publicKeyCredentialJSON = objectConverter.jsonConverter.writeValueAsString(androidCredentialsCreateResponse)
             val result = Intent()
             val createPublicKeyCredResponse = CreatePublicKeyCredentialResponse(publicKeyCredentialJSON)
             PendingIntentHandler.setCreateCredentialResponse(result, createPublicKeyCredResponse)
@@ -83,11 +82,11 @@ class AndroidCredentialsIntentProcessor(
 
                     val androidCredentialsGetRequest = objectConverter.jsonConverter.readValue(it.requestJson, AndroidCredentialsGetRequest::class.java) ?: TODO()
                     val clientDataHash = it.clientDataHash ?: TODO()
-                    val origin = request.callingAppInfo.origin?.let { origin -> Origin(origin) } ?: TODO()
+                    val origin = request.callingAppInfo.getOrigin(allowList)?.let { origin -> Origin(origin) } ?: TODO()
                     val androidCredentialsGetContext = AndroidCredentialsGetContext(clientDataHash, origin)
-                    val response = androidCredentialsAuthenticator.get(androidCredentialsGetRequest, androidCredentialsGetContext)
+                    val androidCredentialsGetResponse = androidCredentialsAuthenticator.get(androidCredentialsGetRequest, androidCredentialsGetContext)
 
-                    val publicKeyCredentialJSON = objectConverter.jsonConverter.writeValueAsString(response)
+                    val publicKeyCredentialJSON = objectConverter.jsonConverter.writeValueAsString(androidCredentialsGetResponse)
 
                     val result = Intent()
                     val passkeyCredential = androidx.credentials.PublicKeyCredential(publicKeyCredentialJSON)
@@ -99,5 +98,16 @@ class AndroidCredentialsIntentProcessor(
             }
         }
     }
+
+
+    private val allowList: String
+        get() {
+            val resourceId = when(configManager.allowedAppList.value){
+                AllowedAppListSetting.STANDARD -> R.raw.gpm_allow_list
+                AllowedAppListSetting.LIMITED -> R.raw.limited_allow_list
+            }
+            val inputStream = activity.resources.openRawResource(resourceId)
+            return String(inputStream.readAllBytes(), StandardCharsets.UTF_8)
+        }
 
 }

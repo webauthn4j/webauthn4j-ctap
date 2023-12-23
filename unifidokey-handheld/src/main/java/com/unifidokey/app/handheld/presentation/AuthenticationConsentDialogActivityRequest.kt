@@ -5,5 +5,6 @@ import java.io.Serializable
 data class AuthenticationConsentDialogActivityRequest(
     val rpId: String?,
     val isUserPresence: Boolean,
-    val isUserVerification: Boolean
+    val isUserVerification: Boolean,
+    val allowedAuthenticator: Int
 ) : Serializable

@@ -92,11 +92,10 @@ class U2FRegisterExecution(
     private suspend fun requestUserPresence(applicationParameter: ByteArray): Boolean {
         val makeCredentialConsentRequest = MakeCredentialConsentRequest(
             applicationParameter,
-            null,
             isUserPresenceRequired = true,
             isUserVerificationRequired = false
         )
-        return ctapAuthenticatorSession.makeCredentialConsentRequestHandler.onMakeCredentialConsentRequested(makeCredentialConsentRequest)
+        return ctapAuthenticatorSession.userVerificationHandler.onMakeCredentialConsentRequested(makeCredentialConsentRequest)
     }
 
 }

@@ -8,20 +8,19 @@ import java.io.Serializable
 class MakeCredentialConsentRequest : Serializable{
 
     val applicationParameter: ByteArray
-    val rp: CtapPublicKeyCredentialRpEntity?
-    val user: CtapPublicKeyCredentialUserEntity?
+    val rp: CtapPublicKeyCredentialRpEntity? // rp can be null while processing FIDO-U2F request
+    val user: CtapPublicKeyCredentialUserEntity? //user can be null while processing FIDO-U2F request
     val isUserPresenceRequired: Boolean
     val isUserVerificationRequired: Boolean
 
     constructor(
         applicationParameter: ByteArray,
-        user: CtapPublicKeyCredentialUserEntity?,
         isUserPresenceRequired: Boolean,
         isUserVerificationRequired: Boolean
     ) {
         this.applicationParameter = applicationParameter
         this.rp = null
-        this.user = user
+        this.user = null
         this.isUserPresenceRequired = isUserPresenceRequired
         this.isUserVerificationRequired = isUserVerificationRequired
     }

@@ -1,5 +1,6 @@
 package com.unifidokey.driver.persistence.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.unifidokey.driver.persistence.entity.UserCredentialEntity
 
@@ -22,7 +23,14 @@ interface UserCredentialDao {
     }
 
     @Query("SELECT * FROM user_credential WHERE credential_id = :credentialId")
-    fun findOne(credentialId: ByteArray?): UserCredentialEntity?
+    fun findOne(credentialId: ByteArray): UserCredentialEntity?
+
+    @Query("SELECT * FROM user_credential WHERE rp_id = :rpId")
+    fun findByRpId(rpId: String): List<UserCredentialEntity>
+
+    @Query("SELECT * FROM user_credential WHERE rp_id = :rpId")
+    fun findLiveDataByRpId(rpId: String): LiveData<List<UserCredentialEntity>>
+
 
     @Query("SELECT * FROM user_credential")
     fun findAll(): List<UserCredentialEntity>
@@ -31,7 +39,7 @@ interface UserCredentialDao {
     fun create(userCredential: UserCredentialEntity): Long
 
     @Update
-    fun update(userCredential: UserCredentialEntity)
+    fun update(userCredential: UserCredentialEntity): Int
 
     @Delete
     fun delete(userCredential: UserCredentialEntity)

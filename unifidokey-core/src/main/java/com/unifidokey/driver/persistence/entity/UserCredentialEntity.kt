@@ -28,7 +28,7 @@ class UserCredentialEntity(
     val keyPair: KeyPair?,
     val keyAlias: String?,
     @field:ColumnInfo(name = "user_handle") val userHandle: ByteArray,
-    val username: String?,
+    @field:ColumnInfo(name = "username") val username: String?,
     @field:ColumnInfo(name = "display_name") val displayName: String?,
     @field:ColumnInfo(name = "icon") val icon: String?,
     @field:ColumnInfo(name = "rp_id") val rpId: String,

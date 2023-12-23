@@ -3,7 +3,7 @@ package com.unifidokey.core.config
 import com.unifidokey.core.setting.KeepScreenOnSetting
 
 class KeepScreenOnConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<KeepScreenOnSetting>(configManager, KEY, KeepScreenOnSetting.ENABLED) {
+    ConfigPropertyBase<KeepScreenOnSetting>(configManager, KEY, KeepScreenOnSetting.ENABLED, true, false, true) {
 
     override fun save(value: KeepScreenOnSetting) {
         configManager.persistenceAdaptor.savePrimitiveBoolean(KEY, value.value)

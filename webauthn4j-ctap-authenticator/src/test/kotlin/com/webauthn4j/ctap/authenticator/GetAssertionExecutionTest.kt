@@ -13,6 +13,7 @@ import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
 import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
 import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.ctap.core.data.PinProtocolVersion
+import com.webauthn4j.ctap.core.data.options.UserVerificationOption
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialParameters
 import com.webauthn4j.data.PublicKeyCredentialType
@@ -73,7 +74,13 @@ internal class GetAssertionExecutionTest {
     @Test
     fun userConsent_false_test() = runTest {
         val ctapAuthenticator = CtapAuthenticator()
-        ctapAuthenticator.getAssertionConsentRequestHandler = object : GetAssertionConsentRequestHandler {
+        ctapAuthenticator.userVerificationHandler = object : UserVerificationHandler {
+            override fun getUserVerificationOption(rpId: String?): UserVerificationOption? {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun onMakeCredentialConsentRequested(makeCredentialConsentRequest: MakeCredentialConsentRequest): Boolean = true
+
             override suspend fun onGetAssertionConsentRequested(getAssertionConsentRequest: GetAssertionConsentRequest): Boolean = false
         }
         val connection = ctapAuthenticator.createSession()

@@ -65,6 +65,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     val isBTHIDBackgroundServiceModeEnabled: LiveData<Boolean>
         get() = bthidService.isBTHIDBackgroundServiceModeEnabled
 
+    val hybridInternalStatusMessage = "Hybrid/Internal transport is Supported" //TODO: check OS version
+
     val nfcStatusMessage = nfcService.nfcStatus.map {
         when (it) {
             NFCStatus.ON -> "NFC transport is ON"

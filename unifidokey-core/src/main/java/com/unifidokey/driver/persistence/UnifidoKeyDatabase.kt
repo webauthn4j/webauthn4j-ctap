@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.unifidokey.driver.persistence.UnifidoKeyDatabase.Companion.DB_VERSION_2
+import com.unifidokey.driver.persistence.UnifidoKeyDatabase.Companion.DB_VERSION_1
 import com.unifidokey.driver.persistence.converter.room.ByteArrayConverter
 import com.unifidokey.driver.persistence.converter.room.DateConverter
 import com.unifidokey.driver.persistence.converter.room.EventTypeConverter
@@ -20,11 +20,10 @@ import com.unifidokey.driver.persistence.dto.SerializableConverter
 import com.unifidokey.driver.persistence.entity.EventEntity
 import com.unifidokey.driver.persistence.entity.RelyingPartyEntity
 import com.unifidokey.driver.persistence.entity.UserCredentialEntity
-import com.unifidokey.driver.persistence.migration.V1ToV2Migration
 
 @Database(
     entities = [RelyingPartyEntity::class, UserCredentialEntity::class, EventEntity::class],
-    version = DB_VERSION_2,
+    version = DB_VERSION_1,
     exportSchema = true
 )
 @TypeConverters(
@@ -41,7 +40,6 @@ abstract class UnifidoKeyDatabase : RoomDatabase() {
 
     companion object {
         const val DB_VERSION_1 = 1
-        const val DB_VERSION_2 = 2
 
         fun createInstance(context: Context): UnifidoKeyDatabase {
             return Room.databaseBuilder(
@@ -50,7 +48,7 @@ abstract class UnifidoKeyDatabase : RoomDatabase() {
                 "UnifidoKey"
             )
                 .allowMainThreadQueries()
-                .addMigrations(V1ToV2Migration())
+                .addMigrations(/**/)
                 .build()
         }
     }

@@ -34,7 +34,10 @@ internal class HIDMessageTest {
                         UserVerificationOption.READY
                     ),
                     1024u,
-                    listOf()
+                    listOf(),
+                    null,
+                    null,
+                    null
                 )
             )
         )

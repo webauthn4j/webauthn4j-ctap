@@ -17,17 +17,20 @@
         <activity
             android:name=".app.handheld.presentation.LockScreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:theme="@style/AppTheme.FullscreenTheme" />
+            android:theme="@style/AppTheme.FullscreenTheme"
+            android:exported="true"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".app.handheld.presentation.MainActivity"
             android:label="@string/title_activity_credential_list"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            >
         </activity>
         <activity
             android:name=".app.handheld.presentation.SettingsActivity"

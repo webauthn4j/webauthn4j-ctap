@@ -4,7 +4,7 @@ import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
 import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting.Companion.create
 
 class ResidentKeyConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<ResidentKeySetting>(configManager, KEY, ResidentKeySetting.ALWAYS) {
+    ConfigPropertyBase<ResidentKeySetting>(configManager, KEY, ResidentKeySetting.IF_REQUIRED, false, false, true) {
 
     override fun save(value: ResidentKeySetting) {
         configManager.persistenceAdaptor.saveString(KEY, value.value)

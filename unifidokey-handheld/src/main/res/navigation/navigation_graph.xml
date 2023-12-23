@@ -17,7 +17,7 @@
     </fragment>
     <fragment
         android:id="@+id/credentialListFragment"
-        android:name="com.unifidokey.app.handheld.presentation.CredentialListFragment"
+        android:name="com.unifidokey.app.handheld.presentation.CredentialsFragment"
         android:label="Credentials">
         <action
             android:id="@+id/action_credentialListFragment_to_homeFragment"

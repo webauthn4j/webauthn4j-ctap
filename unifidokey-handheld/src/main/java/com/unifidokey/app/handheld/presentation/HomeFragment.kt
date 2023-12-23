@@ -84,9 +84,7 @@ class HomeFragment : Fragment() {
             BluetoothDeviceHandleRecyclerViewAdapter(this.requireContext(), bthidService)
         bthidDeviceRecyclerView.adapter = bthidDeviceRecyclerViewAdapter
         bthidDeviceRecyclerViewAdapter.submitList(viewModel.bthidDevices.value)
-        viewModel.bthidDevices.observe(
-            this.requireActivity(),
-            { bthidDevices -> bthidDeviceRecyclerViewAdapter.submitList(bthidDevices) })
+        viewModel.bthidDevices.observe(this.requireActivity()) { bthidDevices -> bthidDeviceRecyclerViewAdapter.submitList(bthidDevices) }
     }
 
     private fun initializeRecentHistoryRecyclerView(binding: HomeFragmentBinding) {
@@ -95,9 +93,7 @@ class HomeFragment : Fragment() {
         val recentHistoryRecyclerViewAdapter = HistoryItemRecyclerViewAdapter()
         recentHistoryRecyclerView.adapter = recentHistoryRecyclerViewAdapter
         recentHistoryRecyclerViewAdapter.submitList(viewModel.recentEvents.value)
-        viewModel.recentEvents.observe(
-            this.requireActivity(),
-            { events -> recentHistoryRecyclerViewAdapter.submitList(events) })
+        viewModel.recentEvents.observe(this.requireActivity()) { events -> recentHistoryRecyclerViewAdapter.submitList(events) }
     }
 
 }

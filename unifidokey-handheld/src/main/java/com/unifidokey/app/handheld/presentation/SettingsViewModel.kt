@@ -6,14 +6,17 @@ import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication
 import com.unifidokey.core.config.BTHIDDeviceHistoryEntry
 import com.unifidokey.core.config.ConfigManager
+import com.unifidokey.core.setting.AllowedAppListSetting
+import com.unifidokey.core.setting.BiometricAuthenticationSetting
 import com.unifidokey.core.setting.KeepScreenOnSetting
 import com.unifidokey.core.setting.KeyStorageSetting
+import com.unifidokey.core.setting.UserConsentSetting
 import com.webauthn4j.ctap.authenticator.data.settings.AttestationStatementFormatSetting
 import com.webauthn4j.ctap.authenticator.data.settings.AttestationTypeSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ConsentCachingSetting
 import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
-import com.webauthn4j.ctap.authenticator.data.settings.PlatformSetting
+import com.webauthn4j.ctap.authenticator.data.settings.AttachmentSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ResetProtectionSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
@@ -66,6 +69,26 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun setBTHIDeviceHistory(value: List<BTHIDDeviceHistoryEntry>): Boolean {
         return try {
             configManager.bthidDeviceHistory.value = value
+            true
+        } catch (e: RuntimeException) {
+            logger.error("Unexpected exception is thrown", e)
+            false
+        }
+    }
+
+    fun setUserConsentSetting(userConsentSetting: UserConsentSetting): Boolean {
+        return try {
+            configManager.userConsent.value = userConsentSetting
+            true
+        } catch (e: RuntimeException) {
+            logger.error("Unexpected exception is thrown", e)
+            false
+        }
+    }
+
+    fun setBiometricAuthenticationSetting(biometricAuthenticationSetting: BiometricAuthenticationSetting): Boolean {
+        return try {
+            configManager.biometricAuthentication.value = biometricAuthenticationSetting
             true
         } catch (e: RuntimeException) {
             logger.error("Unexpected exception is thrown", e)
@@ -143,6 +166,16 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun setAllowedAppList(allowedAppListSetting: AllowedAppListSetting): Boolean {
+        return try {
+            configManager.allowedAppList.value = allowedAppListSetting
+            true
+        } catch (e: RuntimeException) {
+            logger.error("Unexpected exception is thrown", e)
+            false
+        }
+    }
+
     fun setAaguid(aaguid: AAGUID): Boolean {
         return try {
             configManager.aaguid.value = aaguid
@@ -153,9 +186,9 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun setPlatformSetting(platformSetting: PlatformSetting): Boolean {
+    fun setPlatformSetting(attachmentSetting: AttachmentSetting): Boolean {
         return try {
-            configManager.platform.value = platformSetting
+            configManager.attachment.value = attachmentSetting
             true
         } catch (e: RuntimeException) {
             logger.error("Unexpected exception is thrown", e)
@@ -213,6 +246,15 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun setExperimentalMode(experimentalMode: Boolean): Boolean {
+        return try {
+            configManager.experimentalMode.value = experimentalMode
+            true
+        } catch (e: RuntimeException) {
+            logger.error("Unexpected exception is thrown", e)
+            false
+        }
+    }
 
 
 }

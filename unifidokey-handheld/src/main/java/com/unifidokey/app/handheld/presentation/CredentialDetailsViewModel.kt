@@ -1,23 +1,25 @@
 package com.unifidokey.app.handheld.presentation
 
 import android.app.Application
-import android.view.View
 import androidx.lifecycle.AndroidViewModel
-import androidx.navigation.Navigation
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
 import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication
+import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.driver.persistence.dao.UserCredentialDao
 import com.unifidokey.driver.persistence.entity.UserCredentialEntity
 
 class CredentialDetailsViewModel(application: Application) : AndroidViewModel(application) {
     private val userCredentialDao: UserCredentialDao
+    private val configManager: ConfigManager
     lateinit var userCredentialEntity: UserCredentialEntity
 
     init {
         val unifidoKeyHandHeldApplication = application as UnifidoKeyHandHeldApplication
-        val unifidoKeyComponent: UnifidoKeyComponent =
-            unifidoKeyHandHeldApplication.unifidoKeyComponent
+        val unifidoKeyComponent: UnifidoKeyComponent = unifidoKeyHandHeldApplication.unifidoKeyComponent
         userCredentialDao = unifidoKeyComponent.userCredentialDao
+        configManager = unifidoKeyComponent.configManager
     }
 
     val username: String?
@@ -26,12 +28,8 @@ class CredentialDetailsViewModel(application: Application) : AndroidViewModel(ap
         get() = userCredentialEntity.displayName
     val createdAt: String
         get() = userCredentialEntity.createdAt.toString()
-    val keyStorage: String
+    val credentialStorage: String
         get() = if (userCredentialEntity.keyAlias == null) "Database" else "KeyStore"
-
-    fun onOkButtonClick(view: View) {
-        Navigation.findNavController(view).popBackStack()
-    }
 
     fun deleteUserCredential() {
         userCredentialDao.delete(userCredentialEntity.credentialId)

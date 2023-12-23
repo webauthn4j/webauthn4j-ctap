@@ -1,13 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string-array name="user_consent_entries">
-        <item>Prompt Anytime</item>
-        <item>If Required</item>
+        <item>Ask If Required</item>
         <item>Consent Automatically</item>
     </string-array>
     <string-array name="user_consent_values">
-        <item>prompt_anytime</item>
-        <item>if_required</item>
+        <item>ask_if_required</item>
         <item>consent_automatically</item>
     </string-array>
 
@@ -27,6 +25,15 @@
     <string-array name="credential_selector_values">
         <item>authenticator</item>
         <item>client-platform</item>
+    </string-array>
+
+    <string-array name="allowed_app_list_entries">
+        <item>Standard</item>
+        <item>Limited</item>
+    </string-array>
+    <string-array name="allowed_app_list_values" >
+        <item>standard</item>
+        <item>limited</item>
     </string-array>
 
     <string-array name="user_verification_entries">
@@ -89,6 +96,7 @@
     </string-array>
 
     <string-array name="attestation_statement_format_entries">
+        <item>Compound(Android Key+Safetynet)</item>
         <item>Android Key</item>
         <item>Android SafetyNet</item>
         <item>Packed</item>
@@ -97,6 +105,7 @@
     </string-array>
 
     <string-array name="attestation_statement_format_values">
+        <item>compound</item>
         <item>android-key</item>
         <item>android-safetynet</item>
         <item>packed</item>
@@ -134,5 +143,10 @@
         <item>platform</item>
         <item>cross-platform</item>
     </string-array>
+    <string-array name="biometric_authentication_items">
+        <item>ON</item>
+        <item>OFF</item>
+    </string-array>
+
 
 </resources>

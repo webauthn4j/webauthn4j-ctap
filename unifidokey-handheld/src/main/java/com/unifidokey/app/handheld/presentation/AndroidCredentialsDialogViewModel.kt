@@ -7,9 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication
-import com.unifidokey.driver.credentials.provider.AndroidCredentialsGetAssertionConsentRequestHandler
 import com.unifidokey.driver.credentials.provider.AndroidCredentialsIntentProcessor
-import com.unifidokey.driver.credentials.provider.AndroidCredentialsMakeCredentialConsentRequestHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -23,9 +21,8 @@ class AndroidCredentialsDialogViewModel(application: Application) : AndroidViewM
             AndroidCredentialsIntentProcessor(
                 activity,
                 unifidoKeyComponent.configManager,
-                unifidoKeyComponent.authenticatorService.ctapAuthenticator,
-                AndroidCredentialsMakeCredentialConsentRequestHandler(activity, unifidoKeyComponent.configManager),
-                AndroidCredentialsGetAssertionConsentRequestHandler(activity, unifidoKeyComponent.configManager)
+                unifidoKeyComponent.relyingPartyDao,
+                unifidoKeyComponent.authenticatorService.ctapAuthenticator
             ).processIntent(activity, intent)
         }
     }

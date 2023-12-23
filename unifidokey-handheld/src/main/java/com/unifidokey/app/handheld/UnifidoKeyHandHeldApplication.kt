@@ -4,10 +4,11 @@ import com.unifidokey.BuildConfig
 import com.unifidokey.app.UnifidoKeyApplicationBase
 import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.app.handheld.presentation.UnifidoKeyCredentialSelectionHandler
-import com.unifidokey.app.handheld.presentation.UnifidoKeyGetAssertionConsentRequestHandler
-import com.unifidokey.app.handheld.presentation.UnifidoKeyMakeCredentialConsentRequestHandler
+import com.unifidokey.app.handheld.presentation.CtapAuthenticatorUserVerificationHandler
 import com.unifidokey.core.config.ConfigManager
+import com.unifidokey.core.handler.SettingBasedUserVerificationHandler
 import com.unifidokey.core.service.AuthenticatorService
+import com.webauthn4j.ctap.authenticator.CachingUserVerificationHandler
 
 class UnifidoKeyHandHeldApplication : UnifidoKeyApplicationBase<UnifidoKeyHandHeldComponent>() {
 
@@ -36,8 +37,8 @@ class UnifidoKeyHandHeldApplication : UnifidoKeyApplicationBase<UnifidoKeyHandHe
         val unifidoKeyComponent: UnifidoKeyComponent = this.unifidoKeyComponent
         val authenticatorService: AuthenticatorService = unifidoKeyComponent.authenticatorService
         val configManager: ConfigManager = unifidoKeyComponent.configManager
-        authenticatorService.makeCredentialConsentRequestHandler = UnifidoKeyMakeCredentialConsentRequestHandler(this, configManager)
-        authenticatorService.getAssertionConsentRequestHandler = UnifidoKeyGetAssertionConsentRequestHandler(this, configManager)
+        authenticatorService.userVerificationHandler =
+            CachingUserVerificationHandler(SettingBasedUserVerificationHandler(CtapAuthenticatorUserVerificationHandler(this, configManager, unifidoKeyComponent.relyingPartyDao), configManager))
         authenticatorService.credentialSelectionHandler = UnifidoKeyCredentialSelectionHandler(this)
     }
 }

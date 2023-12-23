@@ -16,8 +16,9 @@ class ConfigManager(
     val bleFeatureFlag: Boolean = true,
     val bthidFeatureFlag: Boolean = true
 ) {
-    // pro mode
-    val proMode = ProModeConfigProperty(this)
+    // modes
+    val developerMode = DeveloperModeConfigProperty(this)
+    val experimentalMode = ExperimentalModeConfigProperty(this)
 
     // characteristics
     val aaguid = AAGUIDConfigProperty(this)
@@ -40,11 +41,13 @@ class ConfigManager(
 
     // settings
     val userConsent = UserConsentConfigProperty(this)
+    val biometricAuthentication = BiometricAuthenticationConfigProperty(this)
     val consentCaching = ConsentCachingConfigProperty(this)
     val resetProtection = ResetProtectionConfigProperty(this)
     val credentialSelector = CredentialSelectorConfigProperty(this)
     val keepScreenOn = KeepScreenOnConfigProperty(this)
-    val platform = PlatformConfigProperty(this)
+    val allowedAppList = AllowedAppListConfigProperty(this)
+    val attachment = PlatformConfigProperty(this)
     val clientPIN = ClientPINConfigProperty(this)
     val userVerification = UserVerificationConfigProperty(this)
     val userPresence = UserPresenceConfigProperty(this)
@@ -54,8 +57,9 @@ class ConfigManager(
     val residentKey = ResidentKeyConfigProperty(this)
     val keyStorage = KeyStorageConfigProperty(this)
 
-    private val properties = listOf(
-        proMode,
+    val properties = listOf(
+        developerMode,
+        experimentalMode,
         aaguid,
         credentialSourceEncryptionIV,
         caCertificates,
@@ -68,11 +72,13 @@ class ConfigManager(
         bthidDeviceHistory,
         isBTHIDBackgroundServiceModeEnabled,
         userConsent,
+        biometricAuthentication,
         consentCaching,
         resetProtection,
         credentialSelector,
         keepScreenOn,
-        platform,
+        allowedAppList,
+        attachment,
         clientPIN,
         userVerification,
         userPresence,
@@ -83,29 +89,9 @@ class ConfigManager(
         keyStorage
     )
 
-    private val resetTargetProperties = listOf(
-        proMode,
-        aaguid,
-        isNFCTransportEnabled,
-        isBLETransportEnabled,
-        isBTHIDTransportEnabled,
-        isBTHIDBackgroundServiceModeEnabled,
-        userConsent,
-        consentCaching,
-        resetProtection,
-        credentialSelector,
-        keepScreenOn,
-        platform,
-        clientPIN,
-        userVerification,
-        userPresence,
-        algorithms,
-        attestationType,
-        attestationStatementFormat,
-        residentKey,
-        keyStorage
-    ) // credentialSourceEncryptionIV, caCertificates, clientPINEnc, pinRetries, deviceWideCounter, bthidDeviceHistory are excluded by design
-
+    val developerProperties = properties.filter { it.developerFeature }
+    val experimentalProperties = properties.filter { it.experimentalFeature }
+    private val resetTargetProperties = properties.filter { it.resetTarget }
 
     companion object {
 
@@ -117,7 +103,6 @@ class ConfigManager(
     }
 
     init {
-        properties.forEach { it.initialize() }
         setupCorrelationRules()
     }
 
@@ -133,6 +118,9 @@ class ConfigManager(
     @UiThread
     private fun setupCorrelationRules() {
         keyStorage.liveData.observeForever { value ->
+            if (value != KeyStorageSetting.KEYSTORE && attestationStatementFormat.value == AttestationStatementFormatSetting.COMPOUND) {
+                attestationStatementFormat.value = AttestationStatementFormatSetting.PACKED
+            }
             if (value != KeyStorageSetting.KEYSTORE && attestationStatementFormat.value == AttestationStatementFormatSetting.ANDROID_KEY) {
                 attestationStatementFormat.value = AttestationStatementFormatSetting.PACKED
             }
@@ -163,6 +151,11 @@ class ConfigManager(
         }
         attestationStatementFormat.liveData.observeForever { value ->
             when (value) {
+                AttestationStatementFormatSetting.COMPOUND -> {
+                    residentKey.value = ResidentKeySetting.ALWAYS
+                    keyStorage.value = KeyStorageSetting.KEYSTORE
+                    attestationType.value = AttestationTypeSetting.BASIC
+                }
                 AttestationStatementFormatSetting.ANDROID_KEY -> {
                     residentKey.value = ResidentKeySetting.ALWAYS
                     keyStorage.value = KeyStorageSetting.KEYSTORE
@@ -191,10 +184,14 @@ class ConfigManager(
             }
         }
         residentKey.liveData.observeForever { value: ResidentKeySetting ->
+            if (value !== ResidentKeySetting.ALWAYS && attestationStatementFormat.value == AttestationStatementFormatSetting.COMPOUND) {
+                attestationStatementFormat.value = AttestationStatementFormatSetting.PACKED
+            }
             if (value !== ResidentKeySetting.ALWAYS && attestationStatementFormat.value == AttestationStatementFormatSetting.ANDROID_KEY) {
                 attestationStatementFormat.value = AttestationStatementFormatSetting.PACKED
             }
         }
+        biometricAuthentication.liveData.observeForever{ /*nop*/ } //necessary for .map method call
     }
 
 }

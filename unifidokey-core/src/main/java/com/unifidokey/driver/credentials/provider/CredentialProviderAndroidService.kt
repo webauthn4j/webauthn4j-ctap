@@ -82,7 +82,7 @@ class CredentialProviderAndroidService : CredentialProviderService() {
         cancellationSignal: CancellationSignal,
         callback: OutcomeReceiver<Void?, ClearCredentialException>
     ) {
-        TODO("Not yet implemented")
+        //nop
     }
 
     private fun processCreateCredentialRequest(request: BeginCreateCredentialRequest): BeginCreateCredentialResponse {
@@ -115,14 +115,16 @@ class CredentialProviderAndroidService : CredentialProviderService() {
                     val userCredentials = authenticatorPropertyStore.loadUserCredentials(publicKeyCredentialRequestOptions.rpId)
 
                     userCredentials.map{ userCredential ->
-                        val username = userCredential.displayName ?: userCredential.username ?: String(userCredential.userHandle)
+                        val username = userCredential.username ?: TODO()
                         val data = Bundle()
                         PublicKeyCredentialEntry.Builder(
                             applicationContext,
                             username,
                             createPendingIntent(GET_PASSKEY, data),
                             it
-                        ).build()
+                        ).apply {
+                            setAutoSelectAllowed(true)
+                        }.build()
                     }
 
                 }

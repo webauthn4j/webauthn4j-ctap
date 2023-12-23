@@ -3,7 +3,7 @@ package com.unifidokey.core.config
 import com.unifidokey.core.setting.UserConsentSetting
 
 class UserConsentConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<UserConsentSetting>(configManager, KEY, UserConsentSetting.IF_REQUIRED) {
+    ConfigPropertyBase<UserConsentSetting>(configManager, KEY, UserConsentSetting.ASK_IF_REQUIRED, false, false, true) {
 
     override fun save(value: UserConsentSetting) {
         configManager.persistenceAdaptor.saveString(KEY, value.value)

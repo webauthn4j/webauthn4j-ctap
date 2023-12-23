@@ -1,6 +1,7 @@
 package com.webauthn4j.ctap.authenticator.transport.nfc
 
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
+import com.webauthn4j.ctap.authenticator.UserVerificationHandler
 import com.webauthn4j.ctap.authenticator.transport.Transport
 import com.webauthn4j.ctap.authenticator.transport.nfc.apdu.CTAPAPDUProcessor
 import com.webauthn4j.ctap.authenticator.transport.nfc.apdu.CommandAPDUProcessor
@@ -16,7 +17,10 @@ import java.util.*
  * NFC Transport Binding
  */
 @Suppress("MemberVisibilityCanBePrivate")
-class NFCTransport(private val ctapAuthenticator: CtapAuthenticator) : Transport {
+class NFCTransport(
+    private val ctapAuthenticator: CtapAuthenticator,
+    private val userVerificationHandler: UserVerificationHandler
+) : Transport {
 
     companion object {
         private val FIDO_AID = byteArrayOf(
@@ -95,7 +99,7 @@ class NFCTransport(private val ctapAuthenticator: CtapAuthenticator) : Transport
 
         override suspend fun process(command: CommandAPDU): ResponseAPDU {
             logger.debug("Processing Select APDU command")
-            val connection = ctapAuthenticator.createSession()
+            val connection = ctapAuthenticator.createSession(userVerificationHandler)
             ctapAPDUProcessor.onConnect(connection)
             u2fAPDUProcessor.onConnect(connection)
             val response = if (Arrays.equals(command.dataIn, FIDO_AID)) {

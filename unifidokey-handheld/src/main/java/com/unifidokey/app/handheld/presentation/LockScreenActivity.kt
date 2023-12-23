@@ -1,59 +1,57 @@
 package com.unifidokey.app.handheld.presentation
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
-import androidx.biometric.BiometricPrompt.AuthenticationResult
-import androidx.biometric.BiometricPrompt.ERROR_CANCELED
-import androidx.biometric.BiometricPrompt.ERROR_HW_NOT_PRESENT
-import androidx.biometric.BiometricPrompt.ERROR_HW_UNAVAILABLE
-import androidx.biometric.BiometricPrompt.ERROR_LOCKOUT
-import androidx.biometric.BiometricPrompt.ERROR_LOCKOUT_PERMANENT
-import androidx.biometric.BiometricPrompt.ERROR_NEGATIVE_BUTTON
-import androidx.biometric.BiometricPrompt.ERROR_NO_BIOMETRICS
-import androidx.biometric.BiometricPrompt.ERROR_NO_DEVICE_CREDENTIAL
-import androidx.biometric.BiometricPrompt.ERROR_NO_SPACE
-import androidx.biometric.BiometricPrompt.ERROR_TIMEOUT
-import androidx.biometric.BiometricPrompt.ERROR_UNABLE_TO_PROCESS
-import androidx.biometric.BiometricPrompt.ERROR_USER_CANCELED
-import androidx.biometric.BiometricPrompt.ERROR_VENDOR
 import androidx.biometric.BiometricPrompt.PromptInfo
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.button.MaterialButton
 import com.unifidokey.R
-import com.unifidokey.app.handheld.presentation.util.KeepScreenOnUtil
+import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication
+import com.unifidokey.core.config.ConfigManager
+import com.unifidokey.core.setting.BiometricAuthenticationSetting
 import com.unifidokey.databinding.LockScreenActivityBinding
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
-class LockScreenActivity : AppCompatActivity(), LockScreenViewModel.EventHandlers {
-    private var biometricPrompt: BiometricPrompt? = null
-    private var isPromptShownBefore = false
-    private lateinit var request: RegistrationConsentDialogActivityRequest
+class LockScreenActivity : AppCompatActivity() {
+    private lateinit var viewModel: LockScreenViewModel
+    lateinit var lockScreenAuthenticationManager: LockScreenAuthenticationManager
 
     //region## Lifecycle event handlers ##
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.lock_screen_activity)
-        val binding: LockScreenActivityBinding =
-            DataBindingUtil.setContentView(this, R.layout.lock_screen_activity)
-        val viewModel = ViewModelProvider(this).get(LockScreenViewModel::class.java)
+        val binding: LockScreenActivityBinding = DataBindingUtil.setContentView(this, R.layout.lock_screen_activity)
+        viewModel = ViewModelProvider(this)[LockScreenViewModel::class.java]
+        val unifidoKeyHandHeldApplication = application as UnifidoKeyHandHeldApplication
+        val unifidoKeyComponent = unifidoKeyHandHeldApplication.unifidoKeyComponent
+        lockScreenAuthenticationManager = LockScreenAuthenticationManager(unifidoKeyComponent.configManager)
+
         binding.viewModel = viewModel
-        binding.handlers = this
-        biometricPrompt = BiometricPrompt(this, this.mainExecutor, AuthenticationCallback())
+        binding.activity = this
         hideActionBar()
     }
 
     override fun onResume() {
         super.onResume()
-        if (!isPromptShownBefore) {
-            showBiometricPrompt()
+        if (!lockScreenAuthenticationManager.isPromptShownBefore) {
+            lockScreenAuthenticationManager.tryUnlockApp()
         }
-        KeepScreenOnUtil.configureKeepScreenOnFlag(this)
     }
     //endregion
+
+    @Suppress("UNUSED_PARAMETER")
+    fun onUnlockButtonClick(view: View) {
+        lockScreenAuthenticationManager.tryUnlockApp()
+    }
 
     private fun hideActionBar() {
         // Hide UI first
@@ -61,56 +59,58 @@ class LockScreenActivity : AppCompatActivity(), LockScreenViewModel.EventHandler
         actionBar?.hide()
     }
 
-    private fun showBiometricPrompt() {
-        val builder = PromptInfo.Builder()
-            .setTitle("Authenticate to continue")
-            .setNegativeButtonText("Cancel")
-        val rp = request.rp
-        val user = request.user
-        if (rp != null) {
-            val serviceString = String.format("Service %s (%s)", rp.name, rp.id)
-            builder.setSubtitle(String.format("%s requires user verification.", serviceString))
-        } else {
-            builder.setSubtitle("Service requires user verification.")
-        }
-        if (user != null) {
-            val userString = String.format("User %s", user.displayName)
-            builder.setDescription(String.format("%s is your account", userString))
-        }
-        val promptInfo = builder.build()
-        biometricPrompt!!.authenticate(promptInfo)
-        isPromptShownBefore = true
-    }
+    inner class LockScreenAuthenticationManager(private val configManager: ConfigManager) {
 
-    private fun dismissLockScreen() {
-        finish()
-    }
+        private val allowedAuthenticators: Int
+            get() {
+                return when (configManager.biometricAuthentication.value) {
+                    BiometricAuthenticationSetting.ENABLED -> BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                    else -> BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                }
+            }
 
-    private inner class AuthenticationCallback : BiometricPrompt.AuthenticationCallback() {
-        override fun onAuthenticationError(
-            errorCode: Int,
-            errString: CharSequence
-        ) {
-            when (errorCode) {
-                ERROR_HW_UNAVAILABLE, ERROR_UNABLE_TO_PROCESS, ERROR_TIMEOUT, ERROR_NO_SPACE, ERROR_CANCELED, ERROR_LOCKOUT, ERROR_VENDOR, ERROR_LOCKOUT_PERMANENT, ERROR_USER_CANCELED, ERROR_NO_BIOMETRICS, ERROR_HW_NOT_PRESENT, ERROR_NEGATIVE_BUTTON, ERROR_NO_DEVICE_CREDENTIAL -> {
-                    dismissLockScreen()
+        var isPromptShownBefore = false
+            private set
+        fun tryUnlockApp(){
+            this@LockScreenActivity.lifecycleScope.launch {
+                if(authenticate(this@LockScreenActivity)){
+                    val intent = Intent(this@LockScreenActivity, MainActivity::class.java)
+                    startActivity(intent)
                     finish()
                 }
-                else -> {
-                    dismissLockScreen()
-                    finish()
+                else{
+                    findViewById<MaterialButton>(R.id.unlockButton).visibility = View.VISIBLE
+                    isPromptShownBefore = true
                 }
             }
         }
 
-        override fun onAuthenticationSucceeded(result: AuthenticationResult) {
-            dismissLockScreen()
-            finish()
-        }
+        private suspend fun authenticate(fragmentActivity: FragmentActivity): Boolean{
+            val deferred = CompletableDeferred<Boolean>()
+            fragmentActivity.lifecycleScope.launch(Dispatchers.Main) {
+                val biometricPrompt = BiometricPrompt(fragmentActivity, fragmentActivity.mainExecutor, object : BiometricPrompt.AuthenticationCallback() {
+                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                        super.onAuthenticationError(errorCode, errString)
+                        deferred.complete(false)
+                    }
 
-        override fun onAuthenticationFailed() {
-            dismissLockScreen()
-            finish()
+                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                        deferred.complete(true)
+                    }
+
+                    override fun onAuthenticationFailed() {
+                        deferred.complete(false)
+                    }
+                })
+                val builder = PromptInfo.Builder()
+                    .setTitle("Authenticate to continue")
+                    .setSubtitle(String.format("UnifidoKey requires user verification."))
+                    .setAllowedAuthenticators(allowedAuthenticators)
+                val promptInfo = builder.build()
+                biometricPrompt.authenticate(promptInfo)
+            }
+            return deferred.await()
         }
     }
+
 }

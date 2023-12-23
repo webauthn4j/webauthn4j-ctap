@@ -36,14 +36,6 @@
                 android:name="android.credentials.provider"
                 android:resource="@xml/provider"/>
         </service>
-<!--        <receiver-->
-<!--            android:name="com.unifidokey.driver.provider.PasskeyIntentReceiver"-->
-<!--            android:exported="false">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="com.unifidokey.provider.CREATE_PASSKEY" />-->
-<!--                <category android:name="android.intent.category.DEFAULT" />-->
-<!--            </intent-filter>-->
-<!--        </receiver>-->
 
         <service
             android:name="com.unifidokey.driver.transport.CtapNFCAndroidService"

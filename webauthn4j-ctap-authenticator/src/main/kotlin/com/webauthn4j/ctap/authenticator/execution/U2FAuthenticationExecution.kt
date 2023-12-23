@@ -123,6 +123,6 @@ class U2FAuthenticationExecution(
 
     private suspend fun requestUserPresence(applicationParameter: ByteArray, userPresencePlan: Boolean): Boolean{
         val options = GetAssertionConsentRequest(applicationParameter, userPresencePlan, false)
-        return ctapAuthenticatorSession.getAssertionConsentRequestHandler.onGetAssertionConsentRequested(options)
+        return ctapAuthenticatorSession.userVerificationHandler.onGetAssertionConsentRequested(options)
     }
 }

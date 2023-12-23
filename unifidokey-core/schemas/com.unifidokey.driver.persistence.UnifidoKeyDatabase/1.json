@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "9ef8c0b5bd1a1d83d6c54f22402d273a",
+    "identityHash": "9fb842ef1239063f2347f1b35d00761a",
     "entities": [
       {
         "tableName": "relying_party",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`sid` INTEGER PRIMARY KEY AUTOINCREMENT, `id` TEXT NOT NULL, `name` TEXT, `icon` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`sid` INTEGER PRIMARY KEY AUTOINCREMENT, `id` TEXT NOT NULL, `name` TEXT, `icon` TEXT, `biometric_authentication` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "sid",
@@ -31,13 +31,19 @@
             "columnName": "icon",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "biometricAuthentication",
+            "columnName": "biometric_authentication",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
+          "autoGenerate": true,
           "columnNames": [
             "sid"
-          ],
-          "autoGenerate": true
+          ]
         },
         "indices": [
           {
@@ -46,6 +52,7 @@
             "columnNames": [
               "id"
             ],
+            "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_relying_party_id` ON `${TABLE_NAME}` (`id`)"
           }
         ],
@@ -141,10 +148,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": true,
           "columnNames": [
             "sid"
-          ],
-          "autoGenerate": true
+          ]
         },
         "indices": [
           {
@@ -153,6 +160,7 @@
             "columnNames": [
               "credential_id"
             ],
+            "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_user_credential_credential_id` ON `${TABLE_NAME}` (`credential_id`)"
           },
           {
@@ -161,6 +169,7 @@
             "columnNames": [
               "rp_id"
             ],
+            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_user_credential_rp_id` ON `${TABLE_NAME}` (`rp_id`)"
           }
         ],
@@ -208,10 +217,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": true,
           "columnNames": [
             "id"
-          ],
-          "autoGenerate": true
+          ]
         },
         "indices": [
           {
@@ -220,6 +229,7 @@
             "columnNames": [
               "id"
             ],
+            "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_event_id` ON `${TABLE_NAME}` (`id`)"
           }
         ],
@@ -229,7 +239,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9ef8c0b5bd1a1d83d6c54f22402d273a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9fb842ef1239063f2347f1b35d00761a')"
     ]
   }
 }

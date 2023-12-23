@@ -45,7 +45,11 @@ internal class CtapResponseConverterTest {
                 UserPresenceOption.SUPPORTED,
                 UserVerificationOption.READY
             ),
-            2048u, listOf(PinProtocolVersion.VERSION_1)
+            2048u,
+            listOf(PinProtocolVersion.VERSION_1),
+            null,
+            null,
+            null
         )
         val original = AuthenticatorGetInfoResponse(CtapStatusCode.CTAP2_OK, responseData)
         val encoded = converter.convertToBytes(original)

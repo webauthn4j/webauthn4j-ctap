@@ -33,18 +33,17 @@ class CredentialDetailsFragment : Fragment() {
     ): View {
 
         // Setup data binding
-        viewModel = ViewModelProvider(this).get(CredentialDetailsViewModel::class.java)
+        viewModel = ViewModelProvider(this)[CredentialDetailsViewModel::class.java]
         val binding: CredentialDetailsFragmentBinding = DataBindingUtil.inflate(
             inflater,
             R.layout.credential_details_fragment,
             container,
             false
         )
-        root = binding.root
+        viewModel.userCredentialEntity = CredentialDetailsFragmentArgs.fromBundle(requireArguments()).userCredential
         binding.viewModel = viewModel
-        val userCredentialEntity =
-            CredentialDetailsFragmentArgs.fromBundle(requireArguments()).userCredential
-        viewModel.userCredentialEntity = userCredentialEntity
+        binding.lifecycleOwner = this
+        root = binding.root
         return binding.root
     }
 

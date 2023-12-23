@@ -24,6 +24,8 @@ class AndroidCredentialsGetResponse(
     val type: PublicKeyCredentialType = PublicKeyCredentialType.PUBLIC_KEY
 
     class AuthenticatorAssertionResponse(
+        @JsonDeserialize(using= ByteArrayDeserializer::class)
+        clientDataJSON: ByteArray,
         @JsonDeserialize(using = ByteArrayDeserializer::class)
         authenticatorData: ByteArray,
         @JsonDeserialize(using = ByteArrayDeserializer::class)
@@ -31,6 +33,8 @@ class AndroidCredentialsGetResponse(
         @JsonDeserialize(using = ByteArrayDeserializer::class)
         userHandle: ByteArray
     ) {
+        @JsonSerialize(using = ByteArraySerializer::class)
+        val clientDataJSON = clientDataJSON
         @JsonSerialize(using = ByteArraySerializer::class)
         val userHandle = userHandle
         @JsonSerialize(using = ByteArraySerializer::class)
@@ -43,17 +47,19 @@ class AndroidCredentialsGetResponse(
 
             other as AuthenticatorAssertionResponse
 
-            if (!authenticatorData.contentEquals(other.authenticatorData)) return false
-            if (!signature.contentEquals(other.signature)) return false
+            if (!clientDataJSON.contentEquals(other.clientDataJSON)) return false
             if (!userHandle.contentEquals(other.userHandle)) return false
+            if (!signature.contentEquals(other.signature)) return false
+            if (!authenticatorData.contentEquals(other.authenticatorData)) return false
 
             return true
         }
 
         override fun hashCode(): Int {
-            var result = authenticatorData.contentHashCode()
-            result = 31 * result + signature.contentHashCode()
+            var result = clientDataJSON.contentHashCode()
             result = 31 * result + userHandle.contentHashCode()
+            result = 31 * result + signature.contentHashCode()
+            result = 31 * result + authenticatorData.contentHashCode()
             return result
         }
     }

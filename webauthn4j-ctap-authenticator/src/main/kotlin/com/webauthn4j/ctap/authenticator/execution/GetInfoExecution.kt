@@ -2,11 +2,10 @@ package com.webauthn4j.ctap.authenticator.execution
 
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
+import com.webauthn4j.ctap.authenticator.data.settings.AttachmentSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
-import com.webauthn4j.ctap.authenticator.data.settings.PlatformSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
-import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
@@ -38,8 +37,8 @@ internal class GetInfoExecution(
 
     override suspend fun doExecute(): AuthenticatorGetInfoResponse {
         val plat: PlatformOption = when (ctapAuthenticatorSession.platform) {
-            PlatformSetting.CROSS_PLATFORM -> PlatformOption.CROSS_PLATFORM
-            PlatformSetting.PLATFORM -> PlatformOption.PLATFORM
+            AttachmentSetting.CROSS_PLATFORM -> PlatformOption.CROSS_PLATFORM
+            AttachmentSetting.PLATFORM -> PlatformOption.PLATFORM
         }
         val rk: ResidentKeyOption = when (ctapAuthenticatorSession.residentKey) {
             ResidentKeySetting.ALWAYS, ResidentKeySetting.IF_REQUIRED -> ResidentKeyOption.SUPPORTED
@@ -56,11 +55,7 @@ internal class GetInfoExecution(
             UserPresenceSetting.SUPPORTED -> UserPresenceOption.SUPPORTED
             UserPresenceSetting.NOT_SUPPORTED -> UserPresenceOption.NOT_SUPPORTED
         }
-        val uv: UserVerificationOption? = when (ctapAuthenticatorSession.userVerification) {
-            UserVerificationSetting.READY -> UserVerificationOption.READY
-            UserVerificationSetting.NOT_READY -> UserVerificationOption.NOT_READY
-            UserVerificationSetting.NOT_SUPPORTED -> UserVerificationOption.NOT_SUPPORTED
-        }
+        val uv: UserVerificationOption? = ctapAuthenticatorSession.userVerificationHandler.getUserVerificationOption(null)
         val extensions = ctapAuthenticatorSession.extensionProcessors.map { it.extensionId }
         return AuthenticatorGetInfoResponse(
             CtapStatusCode.CTAP2_OK,
@@ -70,7 +65,10 @@ internal class GetInfoExecution(
                 ctapAuthenticatorSession.aaguid,
                 AuthenticatorGetInfoResponseData.Options(plat, rk, clientPin, up, uv),
                 2048u,
-                CtapAuthenticator.PIN_PROTOCOLS
+                CtapAuthenticator.PIN_PROTOCOLS,
+                null,
+                null,
+                ctapAuthenticatorSession.transports.toList()
             )
         )
     }

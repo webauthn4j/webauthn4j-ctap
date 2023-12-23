@@ -13,6 +13,7 @@ import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.ctap.core.data.CtapStatusCode.Companion.CTAP2_ERR_OPERATION_DENIED
 import com.webauthn4j.ctap.core.data.CtapStatusCode.Companion.CTAP2_ERR_UNSUPPORTED_ALGORITHM
 import com.webauthn4j.ctap.core.data.PinProtocolVersion
+import com.webauthn4j.ctap.core.data.options.UserVerificationOption
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialParameters
 import com.webauthn4j.data.PublicKeyCredentialType
@@ -348,8 +349,10 @@ internal class MakeCredentialExecutionTest {
         )
 
         val ctapAuthenticator = CtapAuthenticator()
-        ctapAuthenticator.makeCredentialConsentRequestHandler = object : MakeCredentialConsentRequestHandler {
+        ctapAuthenticator.userVerificationHandler = object : UserVerificationHandler {
+            override fun getUserVerificationOption(rpId: String?): UserVerificationOption = UserVerificationOption.READY
             override suspend fun onMakeCredentialConsentRequested(makeCredentialConsentRequest: MakeCredentialConsentRequest): Boolean = false
+            override suspend fun onGetAssertionConsentRequested(getAssertionConsentRequest: GetAssertionConsentRequest): Boolean = false
         }
         val connection = ctapAuthenticator.createSession()
 

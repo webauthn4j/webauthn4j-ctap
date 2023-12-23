@@ -4,14 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="viewModel"
             type="com.unifidokey.app.handheld.presentation.LockScreenViewModel" />
 
         <variable
-            name="handlers"
-            type="com.unifidokey.app.handheld.presentation.LockScreenViewModel.EventHandlers" />
+            name="activity"
+            type="com.unifidokey.app.handheld.presentation.LockScreenActivity" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -48,6 +47,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/logoImageView"
             tools:ignore="SpUsage" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/unlockButton"
+            android:layout_width="200sp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="60dp"
+            android:onClick="@{activity::onUnlockButtonClick}"
+            android:text="@string/button_text_unlock"
+            android:visibility="invisible"
+            tools:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

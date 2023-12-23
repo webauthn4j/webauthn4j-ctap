@@ -1,7 +1,7 @@
 package com.unifidokey.core.config
 
-class ProModeConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<Boolean>(configManager, KEY, true) {
+class DeveloperModeConfigProperty internal constructor(configManager: ConfigManager) :
+    ConfigPropertyBase<Boolean>(configManager, KEY, false, true, false, true) {
 
     override fun save(value: Boolean) {
         configManager.persistenceAdaptor.savePrimitiveBoolean(KEY, value)
@@ -13,6 +13,6 @@ class ProModeConfigProperty internal constructor(configManager: ConfigManager) :
     }
 
     companion object {
-        const val KEY = "proMode"
+        const val KEY = "developerMode"
     }
 }

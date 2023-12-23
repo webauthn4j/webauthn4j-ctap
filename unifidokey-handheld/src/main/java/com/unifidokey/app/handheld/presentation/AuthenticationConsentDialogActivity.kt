@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.biometric.BiometricPrompt.*
 import androidx.databinding.DataBindingUtil
@@ -14,10 +15,6 @@ import com.unifidokey.app.handheld.presentation.util.KeepScreenOnUtil
 import com.unifidokey.app.handheld.presentation.util.WakeLockUtil
 import com.unifidokey.databinding.AuthenticationConsentDialogActivityBinding
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
 class AuthenticationConsentDialogActivity : AppCompatActivity(),
     AuthenticationConsentDialogViewModel.Callbacks {
     private lateinit var viewModel: AuthenticationConsentDialogViewModel
@@ -34,7 +31,7 @@ class AuthenticationConsentDialogActivity : AppCompatActivity(),
             intent.getSerializableExtra(EXTRA_REQUEST) as AuthenticationConsentDialogActivityRequest
         val binding: AuthenticationConsentDialogActivityBinding =
             DataBindingUtil.setContentView(this, R.layout.authentication_consent_dialog_activity)
-        viewModel = ViewModelProvider(this).get(AuthenticationConsentDialogViewModel::class.java)
+        viewModel = ViewModelProvider(this)[AuthenticationConsentDialogViewModel::class.java]
         viewModel.request = request
         viewModel.callbacks = this
         binding.viewModel = viewModel
@@ -68,7 +65,7 @@ class AuthenticationConsentDialogActivity : AppCompatActivity(),
                     viewModel.request.rpId
                 )
             )
-            .setNegativeButtonText("Cancel")
+            .setAllowedAuthenticators(viewModel.request.allowedAuthenticator)
             .build()
         val biometricPrompt = BiometricPrompt(
             this,

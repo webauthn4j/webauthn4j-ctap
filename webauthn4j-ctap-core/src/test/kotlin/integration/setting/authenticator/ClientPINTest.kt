@@ -2,7 +2,10 @@ package integration.setting.authenticator
 
 import com.webauthn4j.ctap.authenticator.ClientPINService
 import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
+import com.webauthn4j.ctap.authenticator.transport.internal.InternalTransport
+import com.webauthn4j.ctap.client.CtapClient
 import com.webauthn4j.ctap.client.exception.CtapErrorException
+import com.webauthn4j.ctap.client.transport.InProcessAdaptor
 import integration.usecase.testcase.ClientPINTestCase
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
@@ -72,10 +75,9 @@ class ClientPINTest {
                         "invalid-PIN"
                     )
                 }
-            }.isInstanceOf(CtapErrorException::class.java)
-                .hasMessageContaining("CTAP2_ERR_PIN_INVALID")
+            }.isInstanceOf(CtapErrorException::class.java).hasMessageContaining("CTAP2_ERR_PIN_INVALID")
 
-            clientPINTestCase.authenticator.connection.clientPINService.resetVolatilePinRetryCounter() // reset volatile PIN retries
+            clientPINTestCase.authenticator.transport = InternalTransport(clientPINTestCase.authenticator.ctapAuthenticator, clientPINTestCase.authenticator.userVerificationHandler) //renew transport to reset session and reset volatile PIN retries
         }
         assertThatThrownBy {
             runTest {

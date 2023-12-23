@@ -12,10 +12,11 @@ data class RelyingPartyEntity(
     @field:PrimaryKey(autoGenerate = true) val sid: Long?, // surrogate id
     val id: String, // rpId
     @field:ColumnInfo val name: String?,
-    @field:ColumnInfo val icon: String?
+    @field:ColumnInfo val icon: String?,
+    @field:ColumnInfo(name= "biometric_authentication") val biometricAuthentication: Boolean,
 ) : Serializable {
 
     @Ignore
-    constructor(id: String, name: String?, icon: String?) : this(null, id, name, icon)
+    constructor(id: String, name: String?, icon: String?, biometricAuthentication: Boolean) : this(null, id, name, icon, biometricAuthentication)
 
 }

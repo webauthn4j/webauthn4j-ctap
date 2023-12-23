@@ -1,5 +1,7 @@
 [versions]
 asm = "9.6"
+ktor = "2.3.7"
+zxing = "3.2.1"
 junit = "4.13.2"
 kotlin = "1.9.21"
 kotlinx-coroutines = "1.7.3"
@@ -23,7 +25,7 @@ androidSupport = "28.0.0"
 
 googleApiServicesAndroidpublisher = "v3-rev20231115-2.0.0"
 googleAuthLibraryOauth2Http = "1.20.0"
-guava = "32.1.3-jre"
+guava = "33.0.0-jre"
 junit-jupiter = "5.10.1"
 
 ossLicensesPlugin = "0.10.6"
@@ -38,7 +40,7 @@ googleServices = "4.4.0"
 
 android-tools = "8.1.2"
 
-webauthn4j = "0.21.9.RELEASE"
+webauthn4j = "321b379c5a"
 jackson = "2.16.0"
 bouncycastle = "1.77"
 slf4j = "2.0.9"
@@ -60,11 +62,17 @@ robolectric = "4.11.1"
 sonarqubeGradlePlugin = "4.4.1.3373"
 
 asciidoctorGradleJvm = "3.3.2"
+org-jetbrains-kotlin-android = "1.9.21"
+agp = "8.1.2"
 
 
 
 [libraries]
 # Kotlin
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
+zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-stdlib-jdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -115,8 +123,8 @@ play-services-oss-licenses = { module = "com.google.android.gms:play-services-os
 play-services-safetynet = { module = "com.google.android.gms:play-services-safetynet", version.ref = "playServicesSafetynet" }
 
 # WebAuthn4J
-webauthn4j-core = { module = "com.webauthn4j:webauthn4j-core", version.ref = "webauthn4j" }
-webauthn4j-test = { module = "com.webauthn4j:webauthn4j-test", version.ref = "webauthn4j" }
+webauthn4j-core = { module = "com.github.webauthn4j.webauthn4j:webauthn4j-core", version.ref = "webauthn4j" }
+webauthn4j-test = { module = "com.github.webauthn4j.webauthn4j:webauthn4j-test", version.ref = "webauthn4j" }
 
 # Third-party libraries
 asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
@@ -168,3 +176,5 @@ kotlin-plugin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.re
 androidx-navigation-safeargs = { id = "androidx.navigation.safeargs", version.ref = "androidx-navigation" }
 oss-licenses-plugins = { id = "com.google.android.gms.oss-licenses-plugin", version.ref = "ossLicensesPlugin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }
+com-android-application = { id = "com.android.application", version.ref = "agp" }

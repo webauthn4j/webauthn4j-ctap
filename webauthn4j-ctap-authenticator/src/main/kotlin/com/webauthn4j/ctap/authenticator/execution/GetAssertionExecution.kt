@@ -329,7 +329,7 @@ internal class GetAssertionExecution :
         //spec| - If the "up" option was specified and set to true, collect the user’s consentMakeCredential.
         //spec|   - If no consentMakeCredential is obtained and a timeout occurs, return the CTAP2_ERR_OPERATION_DENIED error.
         val options = GetAssertionConsentRequest(rpId, userPresencePlan, userVerificationPlan)
-        val consent = ctapAuthenticatorSession.getAssertionConsentRequestHandler.onGetAssertionConsentRequested(options)
+        val consent = ctapAuthenticatorSession.userVerificationHandler.onGetAssertionConsentRequested(options)
         if (consent) {
             if (userVerificationPlan) {
                 userVerificationResult = true

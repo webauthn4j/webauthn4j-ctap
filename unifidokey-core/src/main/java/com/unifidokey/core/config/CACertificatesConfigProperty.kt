@@ -6,7 +6,7 @@ import com.webauthn4j.converter.util.ObjectConverter
 import java.security.cert.X509Certificate
 
 class CACertificatesConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<List<X509Certificate>?>(configManager, KEY, null) {
+    ConfigPropertyBase<List<X509Certificate>?>(configManager, KEY, null, true, false, false) {
 
     private val cborConverter: CborConverter = ObjectConverter().cborConverter
 

@@ -83,7 +83,8 @@ class UnifidoKeyAuthenticatorPropertyStoreImpl(
             val relyingPartyEntity = RelyingPartyEntity(
                 userCredential.rpId,
                 userCredential.rpName,
-                userCredential.rpIcon
+                userCredential.rpIcon,
+                true
             )
             relyingPartyDao.create(relyingPartyEntity)
         }

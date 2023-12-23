@@ -7,7 +7,10 @@ class CredentialSelectorConfigProperty internal constructor(configManager: Confi
     ConfigPropertyBase<CredentialSelectorSetting>(
         configManager,
         KEY,
-        CredentialSelectorSetting.CLIENT_PLATFORM
+        CredentialSelectorSetting.CLIENT_PLATFORM,
+        true,
+        false,
+        true
     ) {
 
     override fun save(value: CredentialSelectorSetting) {

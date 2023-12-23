@@ -7,12 +7,24 @@ import androidx.lifecycle.MutableLiveData
 
 abstract class ConfigPropertyBase<T> internal constructor(
     protected val configManager: ConfigManager,
-    private val key: String,
-    private val seedValue: T
+    val key: String,
+    private val seedValue: T,
+    val experimentalFeature: Boolean,
+    val developerFeature: Boolean,
+    val resetTarget: Boolean
 ) {
-
-    private var loaded = false
-    private val mutableLiveData: MutableLiveData<T> = MutableLiveData()
+    private val mutableLiveData: MutableLiveData<T> by lazy {
+        val initialValue = when (configManager.persistenceAdaptor.contains(key)) {
+            true -> load()
+            false -> {
+                save(seedValue)
+                seedValue
+            }
+        }
+        val mutableLiveData = MutableLiveData(initialValue)
+        mutableLiveData.observeForever { value -> save(value) }
+        return@lazy mutableLiveData
+    }
     val liveData: LiveData<T> by lazy { mutableLiveData }
 
     var value: T
@@ -27,26 +39,28 @@ abstract class ConfigPropertyBase<T> internal constructor(
             }
         }
 
+    val enabled: Boolean
+        get(){
+            val developerModeEvaluationResult = when(developerFeature){
+                true -> when(configManager.developerMode.value){
+                    true -> true
+                    false -> false
+                }
+                false -> true
+            }
+            val experimentalModeEvaluationResult = when(experimentalFeature){
+                true -> when(configManager.experimentalMode.value){
+                    true -> true
+                    false -> false
+                }
+                false -> true
+            }
+            return developerModeEvaluationResult && experimentalModeEvaluationResult
+        }
+
     @WorkerThread
     fun postValue(value: T) {
         this.mutableLiveData.postValue(value)
-    }
-
-    @UiThread
-    fun initialize() {
-        val initialValue = when (configManager.persistenceAdaptor.contains(key)) {
-            true -> load()
-            false -> {
-                save(seedValue)
-                seedValue
-            }
-        }
-        @Suppress("USELESS_CAST")
-        mutableLiveData.value = initialValue as T
-        mutableLiveData.observeForever { value ->
-            save(value)
-        }
-        liveData.value //initialize lazy mutableLiveData
     }
 
     fun reset() {

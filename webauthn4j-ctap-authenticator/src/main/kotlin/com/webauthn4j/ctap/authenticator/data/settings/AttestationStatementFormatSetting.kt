@@ -3,6 +3,7 @@ package com.webauthn4j.ctap.authenticator.data.settings
 import com.fasterxml.jackson.annotation.JsonValue
 
 enum class AttestationStatementFormatSetting(@get:JsonValue val value: String) {
+    COMPOUND("compound"),
     ANDROID_KEY("android-key"),
     ANDROID_SAFETYNET("android-safetynet"),
     PACKED("packed"),
@@ -13,6 +14,7 @@ enum class AttestationStatementFormatSetting(@get:JsonValue val value: String) {
         @JvmStatic
         fun create(value: String): AttestationStatementFormatSetting {
             return when (value) {
+                "compound" -> COMPOUND
                 "android-key" -> ANDROID_KEY
                 "android-safetynet" -> ANDROID_SAFETYNET
                 "packed" -> PACKED

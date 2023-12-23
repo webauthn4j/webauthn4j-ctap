@@ -9,6 +9,7 @@ import com.webauthn4j.ctap.core.data.AuthenticatorClientPINRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionResponse
+import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponse
@@ -62,6 +63,10 @@ open class CtapService(protected val ctapClient: CtapClient) {
             0x00,
             0x00
         )
+    }
+
+    suspend fun getInfo(): AuthenticatorGetInfoResponse{
+        return ctapClient.getInfo(AuthenticatorGetInfoRequest())
     }
 
     suspend fun makeCredential(

@@ -8,5 +8,6 @@ data class RegistrationConsentDialogActivityRequest(
     val user: CtapPublicKeyCredentialUserEntity?,
     val rp: CtapPublicKeyCredentialRpEntity?,
     val isUserPresence: Boolean,
-    val isUserVerification: Boolean
+    val isUserVerification: Boolean,
+    val allowedAuthenticator: Int
 ) : Serializable

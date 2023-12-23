@@ -5,15 +5,15 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Test
 
-internal class PlatformSettingTest {
+internal class AttachmentSettingTest {
 
     @Test
     fun create_test() {
         assertAll(
-            { assertThat(PlatformSetting.create("cross-platform")).isEqualTo(PlatformSetting.CROSS_PLATFORM) },
-            { assertThat(PlatformSetting.create("platform")).isEqualTo(PlatformSetting.PLATFORM) },
+            { assertThat(AttachmentSetting.create("cross-platform")).isEqualTo(AttachmentSetting.CROSS_PLATFORM) },
+            { assertThat(AttachmentSetting.create("platform")).isEqualTo(AttachmentSetting.PLATFORM) },
             {
-                assertThatThrownBy { PlatformSetting.create("invalid") }.isInstanceOf(
+                assertThatThrownBy { AttachmentSetting.create("invalid") }.isInstanceOf(
                     IllegalArgumentException::class.java
                 )
             },

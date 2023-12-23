@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreference
 import androidx.preference.SwitchPreferenceCompat
 import com.unifidokey.R
 import com.unifidokey.app.UnifidoKeyComponent
@@ -21,8 +22,11 @@ import com.unifidokey.core.service.BLEService
 import com.unifidokey.core.service.BLEStatus
 import com.unifidokey.core.service.BTHIDService
 import com.unifidokey.core.service.NFCService
+import com.unifidokey.core.setting.AllowedAppListSetting
+import com.unifidokey.core.setting.BiometricAuthenticationSetting
 import com.unifidokey.core.setting.KeepScreenOnSetting
 import com.unifidokey.core.setting.KeyStorageSetting
+import com.unifidokey.core.setting.UserConsentSetting
 import com.webauthn4j.ctap.authenticator.data.settings.*
 import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting.Companion.create
 import com.webauthn4j.data.attestation.authenticator.AAGUID
@@ -64,8 +68,10 @@ class SettingsFragment internal constructor(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        this.onProModeChanged(configManager.proMode.value)
-        configManager.proMode.liveData.observe(this.viewLifecycleOwner, this@SettingsFragment::onProModeChanged)
+        this.onDeveloperModeChanged(configManager.developerMode.value)
+        this.onExperimentalModeChanged(configManager.experimentalMode.value)
+        configManager.developerMode.liveData.observe(this.viewLifecycleOwner, this@SettingsFragment::onDeveloperModeChanged)
+        configManager.experimentalMode.liveData.observe(this.viewLifecycleOwner, this@SettingsFragment::onExperimentalModeChanged)
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
@@ -74,8 +80,8 @@ class SettingsFragment internal constructor(
         setupNFCAdapterEnabledListener()
         setupBLEAdapterEnabledListener()
         bleService.bleStatus.observe(
-            viewLifecycleOwner,
-            { bleStatus: BLEStatus -> onBLEStatusChanged(bleStatus) })
+            viewLifecycleOwner
+        ) { bleStatus: BLEStatus -> onBLEStatusChanged(bleStatus) }
     }
 
     override fun onPause() {
@@ -94,11 +100,19 @@ class SettingsFragment internal constructor(
             return
         }
         // Update the value index of ListPreference to reflect the change to the user interface
-        val preference = findPreference<Preference>(key)
-        if (preference is ListPreference) {
-            val newValue = sharedPreferences?.getString(key, null)
-            preference.setValueIndex(preference.findIndexOfValue(newValue))
+        when (val preference = findPreference<Preference>(key)) {
+            is ListPreference -> {
+                val newValue = sharedPreferences?.getString(key, null)
+                preference.setValueIndex(preference.findIndexOfValue(newValue))
+            }
+            is SwitchPreferenceCompat -> {
+                val newValue = sharedPreferences?.getBoolean(key, false)
+                newValue?.let {
+                    preference.isChecked = newValue
+                }
+            }
         }
+
     }
 
     private fun configurePreferences(rootKey: String?) {
@@ -189,7 +203,36 @@ class SettingsFragment internal constructor(
             }
             it.isVisible = configManager.bthidFeatureFlag
         }
-
+        findPreference<Preference>(UserConsentConfigProperty.KEY)!!.onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any? ->
+                try {
+                    val userConsentSetting = UserConsentSetting.create((newValue as String))
+                    return@OnPreferenceChangeListener viewModel.setUserConsentSetting(userConsentSetting)
+                } catch (e: RuntimeException) {
+                    logger.error("Unexpected exception is thrown", e)
+                    Toast.makeText(
+                        settingsActivity,
+                        "Unexpected error has occurred.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@OnPreferenceChangeListener false
+                }
+            }
+        findPreference<Preference>(BiometricAuthenticationConfigProperty.KEY)!!.onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any? ->
+                try {
+                    val biometricAuthenticationSetting = BiometricAuthenticationSetting.create((newValue as Boolean))
+                    return@OnPreferenceChangeListener viewModel.setBiometricAuthenticationSetting(biometricAuthenticationSetting)
+                } catch (e: RuntimeException) {
+                    logger.error("Unexpected exception is thrown", e)
+                    Toast.makeText(
+                        settingsActivity,
+                        "Unexpected error has occurred.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@OnPreferenceChangeListener false
+                }
+            }
         findPreference<Preference>(ClientPINConfigProperty.KEY)!!.onPreferenceChangeListener =
             Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any? ->
                 try {
@@ -272,6 +315,23 @@ class SettingsFragment internal constructor(
                     return@OnPreferenceChangeListener false
                 }
             }
+        findPreference<Preference>(AllowedAppListConfigProperty.KEY)!!.onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any ->
+                try {
+                    val allowedAppListSetting = AllowedAppListSetting.create(newValue as String)
+                    return@OnPreferenceChangeListener viewModel.setAllowedAppList(
+                        allowedAppListSetting
+                    )
+                } catch (e: RuntimeException) {
+                    logger.error("Unexpected exception is thrown", e)
+                    Toast.makeText(
+                        settingsActivity,
+                        "Unexpected error has occurred.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@OnPreferenceChangeListener false
+                }
+            }
         findPreference<Preference>(AAGUIDConfigProperty.KEY)!!.onPreferenceChangeListener =
             Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any? ->
                 try {
@@ -300,8 +360,8 @@ class SettingsFragment internal constructor(
         findPreference<Preference>(PlatformConfigProperty.KEY)!!.onPreferenceChangeListener =
             Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any? ->
                 try {
-                    val platformSetting = PlatformSetting.create((newValue as String?)!!)
-                    return@OnPreferenceChangeListener viewModel.setPlatformSetting(platformSetting)
+                    val attachmentSetting = AttachmentSetting.create((newValue as String?)!!)
+                    return@OnPreferenceChangeListener viewModel.setPlatformSetting(attachmentSetting)
                 } catch (e: RuntimeException) {
                     logger.error("Unexpected exception is thrown", e)
                     Toast.makeText(
@@ -435,7 +495,23 @@ class SettingsFragment internal constructor(
                     return@OnPreferenceChangeListener false
                 }
             }
-
+        findPreference<Preference>(ExperimentalModeConfigProperty.KEY)!!.onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any ->
+                try {
+                    val experimentalMode = newValue as Boolean
+                    return@OnPreferenceChangeListener viewModel.setExperimentalMode(
+                        experimentalMode
+                    )
+                } catch (e: RuntimeException) {
+                    logger.error("Unexpected exception is thrown", e)
+                    Toast.makeText(
+                        settingsActivity,
+                        "Unexpected error has occurred.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@OnPreferenceChangeListener false
+                }
+            }
         findPreference<Preference>(CONFIG_RESET_KEY)!!.let {
             it.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 ConfigurationsResetConfirmationDialogUtil.confirm(requireContext()){ confirmed ->
@@ -496,15 +572,26 @@ class SettingsFragment internal constructor(
         findPreference<Preference>(BTHID_PAIRING_KEY)!!.isEnabled = bleStatus == BLEStatus.ON
     }
 
-    private fun onProModeChanged(proMode: Boolean){
-        findPreference<Preference>(UserConsentConfigProperty.KEY)!!.isVisible = proMode
-        findPreference<Preference>(CredentialSelectorConfigProperty.KEY)!!.isVisible = proMode
-        findPreference<Preference>(DEVELOPER_OPTIONS_KEY)!!.isVisible = proMode
+    private fun onDeveloperModeChanged(developerMode: Boolean){
+        configManager.developerProperties.map {
+            findPreference<Preference>(it.key)!!.isVisible = it.enabled
+        }
+        findPreference<Preference>(DEVELOPER_OPTIONS_KEY)?.isVisible = developerMode
+    }
+
+    private fun onExperimentalModeChanged(experimentalMode: Boolean){
+        configManager.experimentalProperties.map {
+            findPreference<Preference>(it.key)?.isVisible = it.enabled
+        }
+        findPreference<Preference>(USER_INTERFACE_KEY)?.isVisible = experimentalMode
+        findPreference<Preference>(TRANSPORT_KEY)?.isVisible = experimentalMode
     }
 
     companion object {
         const val BTHID_PAIRING_KEY = "bthidPairing"
         const val CONFIG_RESET_KEY = "configReset"
+        const val TRANSPORT_KEY = "transport"
+        const val USER_INTERFACE_KEY = "userInterface"
         const val DEVELOPER_OPTIONS_KEY = "developerOptions"
     }
 

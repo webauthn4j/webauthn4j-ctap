@@ -7,7 +7,10 @@ class UserVerificationConfigProperty internal constructor(configManager: ConfigM
     ConfigPropertyBase<UserVerificationSetting>(
         configManager,
         KEY,
-        UserVerificationSetting.NOT_SUPPORTED
+        UserVerificationSetting.READY,
+        false,
+        true,
+        true
     ) {
 
     override fun save(value: UserVerificationSetting) {

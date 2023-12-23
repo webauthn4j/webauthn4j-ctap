@@ -27,7 +27,8 @@ import org.slf4j.LoggerFactory
  * Ctap Authenticator
  */
 class CtapAuthenticatorSession internal constructor(
-    ctapAuthenticator: CtapAuthenticator
+    ctapAuthenticator: CtapAuthenticator,
+    userVerificationHandler: UserVerificationHandler?
 ) {
 
     private val logger = LoggerFactory.getLogger(CtapAuthenticatorSession::class.java)
@@ -40,8 +41,7 @@ class CtapAuthenticatorSession internal constructor(
     val transports: Set<AuthenticatorTransport> = ctapAuthenticator.transports
     val extensionProcessors: List<ExtensionProcessor> = ctapAuthenticator.extensionProcessors
     val authenticatorPropertyStore: AuthenticatorPropertyStore = ctapAuthenticator.authenticatorPropertyStore
-    val makeCredentialConsentRequestHandler: MakeCredentialConsentRequestHandler = ctapAuthenticator.makeCredentialConsentRequestHandler
-    val getAssertionConsentRequestHandler: GetAssertionConsentRequestHandler = ctapAuthenticator.getAssertionConsentRequestHandler
+    val userVerificationHandler: UserVerificationHandler = userVerificationHandler ?: ctapAuthenticator.userVerificationHandler
     val credentialSelectionHandler: CredentialSelectionHandler = ctapAuthenticator.credentialSelectionHandler
     val winkHandler: WinkHandler = ctapAuthenticator.winkHandler
     val eventListeners: List<EventListener> = ctapAuthenticator.eventListeners.toList()
@@ -52,7 +52,7 @@ class CtapAuthenticatorSession internal constructor(
     val clientPINService: ClientPINService = ClientPINService(authenticatorPropertyStore)
 
     // Authenticator characteristics
-    val platform: PlatformSetting = ctapAuthenticator.platform
+    val platform: AttachmentSetting = ctapAuthenticator.platform
     val residentKey: ResidentKeySetting = ctapAuthenticator.residentKey
     val clientPIN: ClientPINSetting = ctapAuthenticator.clientPIN
     val resetProtection: ResetProtectionSetting = ctapAuthenticator.resetProtection

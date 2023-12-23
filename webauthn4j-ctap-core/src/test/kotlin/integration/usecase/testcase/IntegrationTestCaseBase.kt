@@ -8,6 +8,9 @@ import com.webauthn4j.WebAuthnManager
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
+import com.webauthn4j.ctap.authenticator.GetAssertionConsentRequest
+import com.webauthn4j.ctap.authenticator.MakeCredentialConsentRequest
+import com.webauthn4j.ctap.authenticator.UserVerificationHandler
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FBasicAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.PackedBasicAttestationStatementProvider
@@ -21,9 +24,11 @@ import com.webauthn4j.ctap.client.PublicKeyCredentialCreationContext
 import com.webauthn4j.ctap.client.PublicKeyCredentialRequestContext
 import com.webauthn4j.ctap.client.PublicKeyCredentialSelectionHandler
 import com.webauthn4j.ctap.client.WebAuthnClient
-import com.webauthn4j.ctap.client.transport.InProcessTransportAdaptor
+import com.webauthn4j.ctap.authenticator.transport.internal.InternalTransport
+import com.webauthn4j.ctap.client.transport.InProcessAdaptor
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
 import com.webauthn4j.ctap.core.converter.jackson.PublicKeyCredentialSourceCBORModule
+import com.webauthn4j.ctap.core.data.options.UserVerificationOption
 import com.webauthn4j.data.*
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
@@ -34,6 +39,7 @@ import com.webauthn4j.data.extension.client.AuthenticationExtensionsClientInputs
 import com.webauthn4j.data.extension.client.RegistrationExtensionClientInput
 import com.webauthn4j.server.ServerProperty
 import java.util.*
+import java.util.function.Consumer
 import java.util.function.Supplier
 import kotlin.reflect.KProperty
 
@@ -62,7 +68,7 @@ abstract class IntegrationTestCaseBase {
         private val clientPINParameter = TestParameter { "clientPIN" }
 
         private val aaguidParameter = TestParameter { AAGUID(UUID.randomUUID()) }
-        private val platformSettingParameter = TestParameter { PlatformSetting.CROSS_PLATFORM }
+        private val attachmentSettingParameter = TestParameter { AttachmentSetting.CROSS_PLATFORM }
         private val residentKeySettingParameter = TestParameter { ResidentKeySetting.IF_REQUIRED }
         private val clientPINSettingParameter = TestParameter { ClientPINSetting.ENABLED }
         private val resetProtectionSettingParameter =
@@ -119,7 +125,7 @@ abstract class IntegrationTestCaseBase {
             clientPINParameter,
 
             aaguidParameter,
-            platformSettingParameter,
+            attachmentSettingParameter,
             residentKeySettingParameter,
             clientPINParameter,
             resetProtectionSettingParameter,
@@ -130,7 +136,28 @@ abstract class IntegrationTestCaseBase {
             algorithmsParameter
         )
 
-        val connectionParameter = TestParameter { ctapAuthenticator.createSession() }.depends(ctapAuthenticatorParameter)
+        private val sessionParameter = TestParameter { ctapAuthenticator.createSession() }.depends(ctapAuthenticatorParameter)
+
+        val transportParameter = TestParameter{
+            InternalTransport(authenticator.ctapAuthenticator, userVerificationHandler)
+        }
+
+        private val userVerificationHandlerParameter = TestParameter{
+            object : UserVerificationHandler {
+                override fun getUserVerificationOption(rpId: String?): UserVerificationOption? {
+                    return userVerificationSetting.toUserVerificationOption()
+                }
+
+                override suspend fun onMakeCredentialConsentRequested(makeCredentialConsentRequest: MakeCredentialConsentRequest): Boolean {
+                    return true
+                }
+
+                override suspend fun onGetAssertionConsentRequested(getAssertionConsentRequest: GetAssertionConsentRequest): Boolean {
+                    return true
+                }
+
+            }
+        }
 
         var attestationStatementGenerator by attestationStatementGeneratorParameter
         val fidoU2FAttestationStatementGenerator by fidoU2FAttestationStatementGeneratorParameter
@@ -141,7 +168,7 @@ abstract class IntegrationTestCaseBase {
         var clientPIN by clientPINParameter
 
         var aaguid by aaguidParameter
-        var platformSetting by platformSettingParameter
+        var platformSetting by attachmentSettingParameter
         var residentKeySetting by residentKeySettingParameter
         var clientPINSetting by clientPINSettingParameter
         var resetProtectionSetting by resetProtectionSettingParameter
@@ -151,15 +178,17 @@ abstract class IntegrationTestCaseBase {
 
         var algorithms by algorithmsParameter
 
-        val ctapAuthenticator by ctapAuthenticatorParameter
-        val connection by connectionParameter
+        var ctapAuthenticator by ctapAuthenticatorParameter
+        var session by sessionParameter
+        var transport by transportParameter
+        val userVerificationHandler by userVerificationHandlerParameter
     }
 
     inner class ClientPlatform {
+
         private val ctapClientParameter =
-            TestParameter { com.webauthn4j.ctap.client.CtapClient(InProcessTransportAdaptor(authenticator.connection)) }.depends(
-                authenticator.connectionParameter
-            )
+            TestParameter { com.webauthn4j.ctap.client.CtapClient(InProcessAdaptor(authenticator.transport)) }
+                .depends(authenticator.transportParameter)
         private val ctapServiceParameter =
             TestParameter { CtapService(ctapClient) }.depends(ctapClientParameter)
         private val webAuthnAPIClientParameter =
@@ -171,7 +200,6 @@ abstract class IntegrationTestCaseBase {
         var ctapClient by ctapClientParameter
         var ctapService by ctapServiceParameter
         var webAuthnAPIClient by webAuthnAPIClientParameter
-
 
     }
 
@@ -431,7 +459,9 @@ abstract class IntegrationTestCaseBase {
             isDefault = false
             supplier = Supplier { value }
             needsSupplierReevaluation = true
-            dependants.forEach { it.needsSupplierReevaluation = true }
+            propagateToDependants(this){
+                it.needsSupplierReevaluation = true
+            }
         }
 
         fun depends(vararg parameters: TestParameter<out Any?>): TestParameter<T> {
@@ -441,6 +471,13 @@ abstract class IntegrationTestCaseBase {
 
         private fun dependedBy(parameter: TestParameter<out Any?>) {
             dependants.add(parameter)
+        }
+
+        private fun propagateToDependants(parameter: TestParameter<out Any?>, action: Consumer<TestParameter<out Any?>>){
+            parameter.dependants.forEach{
+                action.accept(it)
+                propagateToDependants(it, action)
+            }
         }
     }
 }

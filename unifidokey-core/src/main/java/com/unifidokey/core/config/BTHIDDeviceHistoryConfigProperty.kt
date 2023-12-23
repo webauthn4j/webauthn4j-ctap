@@ -8,7 +8,7 @@ import com.webauthn4j.converter.util.JsonConverter
 import com.webauthn4j.converter.util.ObjectConverter
 
 class BTHIDDeviceHistoryConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<List<BTHIDDeviceHistoryEntry>?>(configManager, KEY, null) {
+    ConfigPropertyBase<List<BTHIDDeviceHistoryEntry>?>(configManager, KEY, null, true, false, false) {
 
     companion object {
         const val KEY = "bthidDeviceHistory"

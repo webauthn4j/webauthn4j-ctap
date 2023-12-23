@@ -6,7 +6,10 @@ class AttestationTypeConfigProperty internal constructor(configManager: ConfigMa
     ConfigPropertyBase<AttestationTypeSetting>(
         configManager,
         KEY,
-        AttestationTypeSetting.SELF
+        AttestationTypeSetting.BASIC,
+        false,
+        true,
+        true
     ) {
 
     override fun save(value: AttestationTypeSetting) {

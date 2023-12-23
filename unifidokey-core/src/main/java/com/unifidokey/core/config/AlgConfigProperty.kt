@@ -6,7 +6,10 @@ class AlgConfigProperty internal constructor(configManager: ConfigManager) :
     ConfigPropertyBase<Set<COSEAlgorithmIdentifier>>(
         configManager,
         KEY,
-        setOf(COSEAlgorithmIdentifier.ES256)
+        setOf(COSEAlgorithmIdentifier.ES256),
+        false,
+        true,
+        true
     ) {
 
     override fun save(value: Set<COSEAlgorithmIdentifier>) {
