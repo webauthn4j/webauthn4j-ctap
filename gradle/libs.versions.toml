@@ -34,7 +34,7 @@ playServicesFido = "20.1.0"
 playServicesOssLicenses = "17.0.1"
 playServicesSafetynet = "18.0.1"
 
-dagger = "2.49"
+dagger = "2.50"
 firebaseCrashlyticsGradle = "2.9.9"
 googleServices = "4.4.0"
 
