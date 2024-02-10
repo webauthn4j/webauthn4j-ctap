@@ -41,7 +41,7 @@ googleServices = "4.4.0"
 android-tools = "8.1.2"
 
 webauthn4j = "321b379c5a"
-jackson = "2.16.0"
+jackson = "2.16.1"
 bouncycastle = "1.77"
 slf4j = "2.0.9"
 logbackAndroid = "3.0.0"
