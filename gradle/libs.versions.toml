@@ -3,7 +3,7 @@ asm = "9.6"
 ktor = "2.3.7"
 zxing = "3.2.1"
 junit = "4.13.2"
-kotlin = "1.9.21"
+kotlin = "1.9.22"
 kotlinx-coroutines = "1.7.3"
 
 androidx-core-ktx = "1.12.0"
