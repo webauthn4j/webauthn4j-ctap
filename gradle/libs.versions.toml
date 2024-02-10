@@ -61,7 +61,7 @@ robolectric = "4.11.1"
 
 sonarqubeGradlePlugin = "4.4.1.3373"
 
-asciidoctorGradleJvm = "3.3.2"
+asciidoctorGradleJvm = "4.0.2"
 org-jetbrains-kotlin-android = "1.9.21"
 agp = "8.1.2"
 
