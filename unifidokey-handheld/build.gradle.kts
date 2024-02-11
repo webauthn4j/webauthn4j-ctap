@@ -13,7 +13,7 @@ plugins {
     id("com.google.firebase.crashlytics")
 }
 //TODO
-val unifidoKeyVersion = "0.8.2-SNAPSHOT"
+val unifidoKeyVersion = "0.9.0.RELEASE"
 
 val unifidoKeyVersionCode = VersionCodeUtil.getVersionCodeFromVersionString(unifidoKeyVersion)
 
