@@ -38,13 +38,13 @@ android {
 
     }
     signingConfigs {
-//        create("playstore") {
-//            PropertyUtil.load(rootProject, "secret.properties")
-//            storeFile = rootProject.file("unifidokey-upload-key.jks")
-//            storePassword = (System.getenv("KEYSTORE_PASS") ?: project.findProperty("unifidokey.keystorePass")) as String
-//            keyAlias = (System.getenv("KEY_ALIAS") ?: project.findProperty("unifidokey.keyAlias")) as String
-//            keyPassword = (System.getenv("KEY_PASS") ?: project.findProperty("unifidokey.keyPass")) as String
-//        }
+        create("playstore") {
+            PropertyUtil.load(rootProject, "secret.properties")
+            storeFile = rootProject.file("unifidokey-upload-key.jks")
+            storePassword = (System.getenv("KEYSTORE_PASS") ?: project.findProperty("unifidokey.keystorePass")) as String?
+            keyAlias = (System.getenv("KEY_ALIAS") ?: project.findProperty("unifidokey.keyAlias")) as String?
+            keyPassword = (System.getenv("KEY_PASS") ?: project.findProperty("unifidokey.keyPass")) as String?
+        }
     }
     buildFeatures {
         dataBinding = true
@@ -83,9 +83,9 @@ android {
             applicationId = "com.unifidokey"
             PropertyUtil.load(project, "src/playstore/unifidokey.properties")
             buildConfigField("String", "ANDROID_SAFETY_NET_API_KEY", "${project.property("unifidokey.androidSafetyNetApiKey")}")
-//            if (rootProject.file("unifidokey-upload-key.jks").exists()) {
-//                signingConfig = signingConfigs.getByName("playstore")
-//            }
+            if (rootProject.file("unifidokey-upload-key.jks").exists()) {
+                signingConfig = signingConfigs.getByName("playstore")
+            }
         }
     }
     testOptions {
