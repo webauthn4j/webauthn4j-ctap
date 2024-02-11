@@ -23,7 +23,7 @@ import java.io.File
 import java.io.IOException
 import java.security.GeneralSecurityException
 
-class PublishAppBundleTask : DefaultTask() {
+open class PublishAppBundleTask : DefaultTask() {
     @Input
     var applicationName: String? = null
 

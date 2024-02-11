@@ -20,7 +20,7 @@ jobs:
       - name: Build/Unit test with Gradle
         run: |
           echo $KEYSTORE_BASE64 | base64 -d > unifidokey-upload-key.jks
-          ./gradlew build assemblePlaystoreRelease bundlePlaystoreRelease
+          ./gradlew build assemblePlaystoreRelease bundlePlaystoreRelease --stacktrace
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64  }}
           KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS  }}
@@ -62,7 +62,7 @@ jobs:
         run: |
           echo $GOOGLE_SERVICE_ACCOUNT_BASE64 | base64 -d > google-service-account.json
           export GOOGLE_APPLICATION_CREDENTIALS=./google-service-account.json
-          ./gradlew publishAppBundle
+          ./gradlew publishAppBundle --stacktrace
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64  }}
           KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS  }}
