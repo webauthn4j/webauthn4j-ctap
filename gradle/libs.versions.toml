@@ -36,7 +36,7 @@ playServicesSafetynet = "18.0.1"
 
 dagger = "2.50"
 firebaseCrashlyticsGradle = "2.9.9"
-googleServices = "4.4.0"
+googleServices = "4.4.1"
 
 android-tools = "8.1.2"
 
