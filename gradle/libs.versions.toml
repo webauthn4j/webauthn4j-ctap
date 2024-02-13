@@ -1,6 +1,6 @@
 [versions]
 asm = "9.6"
-ktor = "2.3.7"
+ktor = "2.3.8"
 zxing = "3.5.3"
 junit = "4.13.2"
 kotlin = "1.9.22"
