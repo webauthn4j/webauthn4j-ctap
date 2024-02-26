@@ -4,7 +4,7 @@ import com.webauthn4j.ctap.authenticator.data.settings.AttachmentSetting
 import com.webauthn4j.ctap.authenticator.data.settings.AttachmentSetting.Companion.create
 
 class PlatformConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<AttachmentSetting>(configManager, KEY, AttachmentSetting.CROSS_PLATFORM, false, true, true) {
+    ConfigPropertyBase<AttachmentSetting>(configManager, KEY, AttachmentSetting.CROSS_PLATFORM, ReleaseLevel.GA, true, true) {
 
     override fun save(value: AttachmentSetting) {
         configManager.persistenceAdaptor.saveString(KEY, value.value)

@@ -3,9 +3,6 @@ package com.unifidokey.app.handheld
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.unifidokey.BuildConfig
 import com.unifidokey.app.UnifidoKeyModuleBase
-import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication.Companion.BLE_FEATURE_FLAG
-import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication.Companion.BTHID_FEATURE_FLAG
-import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication.Companion.NFC_FEATURE_FLAG
 import com.unifidokey.app.handheld.presentation.UnifidoKeyHandHeldNotificationController
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.driver.notification.UnifidoKeyNotificationController
@@ -36,10 +33,7 @@ class UnifidoKeyHandHeldModule(private val unifidoKeyHandHeldApplication: Unifid
     @Provides
     fun provideConfigurationService(preferenceDao: PreferenceDao): ConfigManager {
         return ConfigManager(
-            preferenceDao,
-            nfcFeatureFlag = NFC_FEATURE_FLAG,
-            bleFeatureFlag = BLE_FEATURE_FLAG,
-            bthidFeatureFlag = BTHID_FEATURE_FLAG
+            preferenceDao
         )
     }
 

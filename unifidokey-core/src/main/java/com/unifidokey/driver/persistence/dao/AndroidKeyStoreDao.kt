@@ -59,6 +59,7 @@ class AndroidKeyStoreDao : KeyStoreDaoBase(createKeyStore(), "") {
             )
                 .setDigests(signatureAlgorithm.messageDigestAlgorithm.jcaName)
                 .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1) //TODO: support PSS alg
+                .setIsStrongBoxBacked(true)
                 .setAttestationChallenge(attestationChallenge)
             if (algorithmParameterSpec != null) {
                 builder.setAlgorithmParameterSpec(algorithmParameterSpec)

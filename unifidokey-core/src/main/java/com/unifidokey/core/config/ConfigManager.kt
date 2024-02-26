@@ -12,10 +12,14 @@ import java.security.SecureRandom
 
 class ConfigManager(
     val persistenceAdaptor: PersistenceAdaptor,
-    val nfcFeatureFlag: Boolean = true,
-    val bleFeatureFlag: Boolean = true,
-    val bthidFeatureFlag: Boolean = true
 ) {
+    val nfcFeatureFlag: Boolean
+        get() = isNFCTransportEnabled.releaseLevel != ReleaseLevel.PRIVATE
+    val bleFeatureFlag: Boolean
+        get() = isBLETransportEnabled.releaseLevel != ReleaseLevel.PRIVATE
+    val bthidFeatureFlag: Boolean
+        get() = isBTHIDTransportEnabled.releaseLevel != ReleaseLevel.PRIVATE
+
     // modes
     val developerMode = DeveloperModeConfigProperty(this)
     val experimentalMode = ExperimentalModeConfigProperty(this)
@@ -90,7 +94,7 @@ class ConfigManager(
     )
 
     val developerProperties = properties.filter { it.developerFeature }
-    val experimentalProperties = properties.filter { it.experimentalFeature }
+    val experimentalProperties = properties.filter { it.releaseLevel == ReleaseLevel.EXPERIMENTAL }
     private val resetTargetProperties = properties.filter { it.resetTarget }
 
     companion object {

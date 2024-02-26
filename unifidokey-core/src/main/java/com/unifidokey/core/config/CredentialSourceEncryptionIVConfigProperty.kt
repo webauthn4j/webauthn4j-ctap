@@ -1,7 +1,7 @@
 package com.unifidokey.core.config
 
 class CredentialSourceEncryptionIVConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<ByteArray>(configManager, KEY, ConfigManager.generateIV(), true, false, false) {
+    ConfigPropertyBase<ByteArray>(configManager, KEY, ConfigManager.generateIV(), ReleaseLevel.PRIVATE, false, false) {
 
     override fun save(value: ByteArray) {
         configManager.persistenceAdaptor.saveBytes(KEY, value)

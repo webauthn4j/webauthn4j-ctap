@@ -51,14 +51,4 @@ class NFCService constructor(
         }
     }
 
-    @UiThread
-    fun enableNFCTransport() {
-        configManager.isNFCTransportEnabled.value = true
-    }
-
-    @UiThread
-    fun disableNFCTransport() {
-        configManager.isNFCTransportEnabled.value = false
-    }
-
 }

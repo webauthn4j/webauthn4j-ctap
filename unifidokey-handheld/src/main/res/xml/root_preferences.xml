@@ -22,14 +22,18 @@
             app:title="@string/title_nfc_support" />
         <SwitchPreferenceCompat
             app:key="bleTransportEnabled"
-            app:title="@string/title_ble_support" />
+            app:title="@string/title_ble_support"
+            />
         <SwitchPreferenceCompat
             app:key="bthidTransportEnabled"
-            app:title="@string/title_bthid_support" />
+            app:title="@string/title_bthid_support"
+            />
         <Preference
             app:key="bthidPairing"
             app:summary="@string/summary_bthid_pairing"
-            app:title="@string/title_bthid_pairing" />
+            app:title="@string/title_bthid_pairing"
+            app:isPreferenceVisible="false"
+            />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/header_consent">
@@ -175,6 +179,10 @@
             app:key="experimentalMode"
             app:summary="@string/summary_experimental_mode"
             app:title="@string/title_experimental_mode" />
+        <SwitchPreferenceCompat
+            app:key="developerMode"
+            app:summary="@string/summary_developer_mode"
+            app:title="@string/title_developer_mode" />
         <Preference
             app:key="configReset"
             app:summary="@string/summary_config_reset"

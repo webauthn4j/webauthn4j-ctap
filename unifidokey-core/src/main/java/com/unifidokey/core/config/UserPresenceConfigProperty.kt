@@ -4,7 +4,7 @@ import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting.Companion.create
 
 class UserPresenceConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<UserPresenceSetting>(configManager, KEY, UserPresenceSetting.SUPPORTED, false, true, true) {
+    ConfigPropertyBase<UserPresenceSetting>(configManager, KEY, UserPresenceSetting.SUPPORTED, ReleaseLevel.GA, true, true) {
 
     override fun save(value: UserPresenceSetting) {
         configManager.persistenceAdaptor.saveString(KEY, value.value)

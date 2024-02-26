@@ -8,7 +8,7 @@ class CredentialSelectorConfigProperty internal constructor(configManager: Confi
         configManager,
         KEY,
         CredentialSelectorSetting.CLIENT_PLATFORM,
-        true,
+        ReleaseLevel.GA,
         false,
         true
     ) {

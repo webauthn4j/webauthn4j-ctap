@@ -2,27 +2,20 @@
 
 === WebAuthn4J UnifidoKeyとは
 
-https://github.com/webauthn4j/UnifidoKey[WebAuthn4J UnifidoKey] は、スマートフォンをセキュリティキーとして利用することを可能にする Androidアプリです。 高価な物理セキュリティキーを購入し、持ち歩く必要はもうありません。スマートフォンにUnifidoKey アプリをインストールすれば、 スマートフォンがBluetooth接続あるいはNFC接続のセキュリティキーとして利用出来るようになります。
+https://github.com/webauthn4j/UnifidoKey[WebAuthn4J UnifidoKey] は、スマートフォンをセキュリティキーとして利用することを可能にする Androidアプリです。
+高価な物理セキュリティキーを購入し、持ち歩く必要はもうありません。スマートフォンにUnifidoKey アプリをインストールすれば、 スマートフォン内のブラウザ、あるいはQRコードでペアリングしたPasskeyに対応した端末でスマートフォンをセキュリティキーとして利用出来るようになります。
 
-image::../images/home.png[Home screen,40%]
+Google Password Manager等、他のPasskey Providerと異なり、UnifidoKeyは端末間でデータの同期は行いません。その代わり、鍵は端末内のエクスポート不可能な領域に安全に保管され、鍵の構成証明を要求するエンタープライズな用途にも耐えうるセキュリティを提供します。
+
+image::../images/home-with-nfc.png[Home screen,40%]
 
 === インストール
 
 Google Play Storeからインストール
 
-==== テスト済の構成
-
-以下のOSとの組み合わせで動作することをテスト済です。但し、デバイスのBluetooth/NFCスタックの影響により、動作しない場合もございます。
-
-|==================================================================
-| OS                    | Bluetooth HID   |    NFC    | Note
-
-| Windows PC            | OK              |    OK     |
-| Mac                   | OK              |    -      |
-| Linux                 | OK              |    -      |
-|==================================================================
-
 === 使用上の注意
 
-UnifidoKeyに保存された鍵のバックアップ方法は提供していません。 端末の紛失や、予期せぬUnifidoKeyのバグに備え、UnifidoKey以外にもサービスへの代替認証手段を登録し、 UnifidoKeyが利用出来なくなってもアカウントリカバリ出来るようにしてご利用下さい。
+セキュリティのため、UnifidoKeyに保存された鍵のバックアップ方法は提供していません。
+端末の紛失や、予期せぬUnifidoKeyのトラブルに備え、UnifidoKey以外にもサービスへの代替認証手段を登録し、 UnifidoKeyが利用出来なくなってもアカウントリカバリ出来るようにしてご利用下さい。
+高度なセキュリティが必要なサービスでのみUnifidoKeyを利用し、通常のサービスに対しては、Google Password Managerなど、同期に対応した他のPasskey Providerをご利用されることをお勧めします。
 

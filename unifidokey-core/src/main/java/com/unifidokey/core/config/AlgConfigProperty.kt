@@ -7,7 +7,7 @@ class AlgConfigProperty internal constructor(configManager: ConfigManager) :
         configManager,
         KEY,
         setOf(COSEAlgorithmIdentifier.ES256),
-        false,
+        ReleaseLevel.GA,
         true,
         true
     ) {

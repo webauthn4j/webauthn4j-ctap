@@ -8,7 +8,7 @@ class AttestationStatementFormatConfigProperty internal constructor(configManage
         configManager,
         KEY,
         AttestationStatementFormatSetting.ANDROID_KEY,
-        false,
+        ReleaseLevel.GA,
         true,
         true
     ) {

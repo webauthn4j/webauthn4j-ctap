@@ -38,12 +38,14 @@ android {
 
     }
     signingConfigs {
-        create("playstore") {
-            PropertyUtil.load(rootProject, "secret.properties")
-            storeFile = rootProject.file("unifidokey-upload-key.jks")
-            storePassword = (System.getenv("KEYSTORE_PASS") ?: project.findProperty("unifidokey.keystorePass")) as String?
-            keyAlias = (System.getenv("KEY_ALIAS") ?: project.findProperty("unifidokey.keyAlias")) as String?
-            keyPassword = (System.getenv("KEY_PASS") ?: project.findProperty("unifidokey.keyPass")) as String?
+        if (rootProject.file("unifidokey-upload-key.jks").exists()) {
+            create("playstore") {
+                PropertyUtil.load(rootProject, "secret.properties")
+                storeFile = rootProject.file("unifidokey-upload-key.jks")
+                storePassword = (System.getenv("KEYSTORE_PASS") ?: project.findProperty("unifidokey.keystorePass")) as String?
+                keyAlias = (System.getenv("KEY_ALIAS") ?: project.findProperty("unifidokey.keyAlias")) as String?
+                keyPassword = (System.getenv("KEY_PASS") ?: project.findProperty("unifidokey.keyPass")) as String?
+            }
         }
     }
     buildFeatures {

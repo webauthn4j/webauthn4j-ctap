@@ -256,5 +256,15 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    fun setDeveloperMode(developerMode: Boolean): Boolean {
+        return try {
+            configManager.developerMode.value = developerMode
+            true
+        } catch (e: RuntimeException) {
+            logger.error("Unexpected exception is thrown", e)
+            false
+        }
+    }
+
 
 }

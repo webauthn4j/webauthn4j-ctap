@@ -7,7 +7,6 @@ import com.unifidokey.core.adapter.UnifidoKeyAuthenticatorPropertyStore
 import com.unifidokey.core.config.ConfigManager
 import com.unifidokey.driver.persistence.converter.EventConverter
 import com.unifidokey.driver.persistence.dao.EventDao
-import com.unifidokey.driver.persistence.entity.RelyingPartyEntity
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.CachingCredentialSelectionHandler
 import com.webauthn4j.ctap.authenticator.CachingUserVerificationHandler
@@ -32,9 +31,6 @@ import com.webauthn4j.data.attestation.authenticator.AAGUID
 class AuthenticatorService(
     private val authenticatorPropertyStore: UnifidoKeyAuthenticatorPropertyStore,
     private val configManager: ConfigManager,
-    val nfcService: NFCService,
-    val bleService: BLEService,
-    val bthidService: BTHIDService,
     private val eventDao: EventDao,
     private val attestationStatementProviders: Map<Pair<AttestationTypeSetting, AttestationStatementFormatSetting>, AttestationStatementProvider>,
     val exceptionReporter: ExceptionReporter,
@@ -43,7 +39,7 @@ class AuthenticatorService(
 
     companion object {
         @JvmField
-        val AAGUID: AAGUID = com.webauthn4j.data.attestation.authenticator.AAGUID.ZERO //AAGUID("62b0f4c6-5a10-4eba-b094-b44529d77bb0")
+        val AAGUID: AAGUID = AAGUID("62b0f4c6-5a10-4eba-b094-b44529d77bb0")
     }
 
     private val eventConverter = EventConverter(objectConverter)

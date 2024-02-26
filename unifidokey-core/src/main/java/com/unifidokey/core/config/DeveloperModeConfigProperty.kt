@@ -1,7 +1,7 @@
 package com.unifidokey.core.config
 
 class DeveloperModeConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<Boolean>(configManager, KEY, false, true, false, true) {
+    ConfigPropertyBase<Boolean>(configManager, KEY, false, ReleaseLevel.PRIVATE, false, true) {
 
     override fun save(value: Boolean) {
         configManager.persistenceAdaptor.savePrimitiveBoolean(KEY, value)

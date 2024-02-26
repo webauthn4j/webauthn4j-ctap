@@ -1,7 +1,7 @@
 package com.unifidokey.core.config
 
 class ExperimentalModeConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<Boolean>(configManager, KEY, false, false, false, true) {
+    ConfigPropertyBase<Boolean>(configManager, KEY, false, ReleaseLevel.GA, false, true) {
 
     override fun save(value: Boolean) {
         configManager.persistenceAdaptor.savePrimitiveBoolean(KEY, value)

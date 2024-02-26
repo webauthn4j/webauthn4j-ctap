@@ -1,14 +1,18 @@
 package com.unifidokey.app.handheld.presentation
 
 import android.app.Application
+import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import android.view.View
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.credentials.CredentialManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.navigation.Navigation
 import com.google.android.material.checkbox.MaterialCheckBox
@@ -17,6 +21,7 @@ import com.unifidokey.app.UnifidoKeyComponent
 import com.unifidokey.app.handheld.UnifidoKeyHandHeldApplication
 import com.unifidokey.core.adapter.BluetoothDeviceHandle
 import com.unifidokey.core.config.ConfigManager
+import com.unifidokey.core.config.ReleaseLevel
 import com.unifidokey.core.service.AuthenticatorService
 import com.unifidokey.core.service.BTHIDService
 import com.unifidokey.core.service.BTHIDStatus
@@ -47,14 +52,19 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         it.value == AndroidSafetyNetAttestationStatement.FORMAT
     }
 
-    val nfcFeatureFlag: Boolean
-        get() = configManager.nfcFeatureFlag
+    val nfcCardVisibility : LiveData<Boolean> = configManager.experimentalMode.liveData.map {
+        if(configManager.isNFCTransportEnabled.releaseLevel == ReleaseLevel.PRIVATE){
+           return@map false
+        }
+        return@map it
+    }
 
-    val bleFeatureFlag: Boolean
-        get() = configManager.bleFeatureFlag
-
-    val bthidFeatureFlag: Boolean
-        get() = configManager.bthidFeatureFlag
+    val bthidCardVisibility : LiveData<Boolean> = configManager.experimentalMode.liveData.map {
+        if(configManager.isBTHIDTransportEnabled.releaseLevel == ReleaseLevel.PRIVATE){
+            return@map false
+        }
+        return@map it
+    }
 
     val bthidDevices: LiveData<List<BluetoothDeviceHandle>>
         get() = bthidService.bluetoothDevices
@@ -106,26 +116,27 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         get() = bthidService.isBTHIDAdapterAvailable
 
     @UiThread
+    fun onHybridInternalButtonClick(view: View) {
+        showPasskeyProviderSetting(view.context)
+    }
+
+    @UiThread
     fun onNFCToggleButtonClick(view: View) {
-        if (!nfcService.isNFCAdapterEnabled.value!!) {
-            enableNFCAdapter(view.context as AppCompatActivity)
+        if (nfcService.isNFCAdapterEnabled.value != true) {
+            showNFCAdapterActivationGuideDialog(view.context)
         }
-        if (nfcService.isNFCTransportEnabled.value!!) {
-            nfcService.disableNFCTransport()
-        } else {
-            nfcService.enableNFCTransport()
+        if (nfcService.isNFCAdapterEnabled.value == true) {
+            configManager.isNFCTransportEnabled.value = !configManager.isNFCTransportEnabled.value
         }
     }
 
     @UiThread
     fun onBTHIDToggleButtonClick(view: View) {
-        if (!bthidService.isBTHIDAdapterEnabled.value!!) {
-            enableBTHIDAdapter(view.context as AppCompatActivity)
+        if (bthidService.isBTHIDAdapterEnabled.value != true) {
+            showBTHIDAdapterActivationGuideDialog(view.context)
         }
-        if (bthidService.isBTHIDTransportEnabled.value!!) {
-            bthidService.disableBTHIDTransport()
-        } else {
-            bthidService.enableBTHIDTransport()
+        if (bthidService.isBTHIDAdapterEnabled.value == true) {
+            configManager.isBTHIDTransportEnabled.value = !configManager.isBTHIDTransportEnabled.value
         }
     }
 
@@ -140,27 +151,32 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         Navigation.findNavController(view).navigate(R.id.historyFragment)
     }
 
+    private fun showPasskeyProviderSetting(context: Context) {
+        val intent = CredentialManager.create(context).createSettingsPendingIntent()
+        intent.send()
+    }
+
     @UiThread
-    private fun enableNFCAdapter(activity: AppCompatActivity) {
-        AlertDialog.Builder(activity)
+    private fun showNFCAdapterActivationGuideDialog(context: Context) {
+        AlertDialog.Builder(context)
             .setTitle("UnifidoKey")
             .setMessage("NFC adapter is not enabled. Please enable it from configuration.")
             .setPositiveButton("OK") { _, _ ->
                 val intent = Intent(Settings.ACTION_NFC_SETTINGS)
-                activity.startActivity(intent)
+                context.startActivity(intent)
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
     @UiThread
-    private fun enableBTHIDAdapter(activity: AppCompatActivity) {
-        AlertDialog.Builder(activity)
+    private fun showBTHIDAdapterActivationGuideDialog(context: Context) {
+        AlertDialog.Builder(context)
             .setTitle("UnifidoKey")
             .setMessage("Bluetooth adapter is not enabled. Please enable it from configuration.")
             .setPositiveButton("OK") { _, _ ->
                 val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
-                activity.startActivity(intent)
+                context.startActivity(intent)
             }
             .setNegativeButton("Cancel", null)
             .show()

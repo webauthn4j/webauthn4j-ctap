@@ -8,7 +8,7 @@ class UserVerificationConfigProperty internal constructor(configManager: ConfigM
         configManager,
         KEY,
         UserVerificationSetting.READY,
-        false,
+        ReleaseLevel.GA,
         true,
         true
     ) {

@@ -47,6 +47,16 @@ class BTHIDService constructor(
         _bthidStatus.addSource(isBTHIDAdapterEnabled) {
             _bthidStatus.value = currentStatus
         }
+        _bthidStatus.observeForever{
+            when(it){
+                BTHIDStatus.ON -> {
+                    enableBTHIDTransport()
+                }
+                else -> {
+                    disableBTHIDTransport()
+                }
+            }
+        }
     }
 
     @UiThread

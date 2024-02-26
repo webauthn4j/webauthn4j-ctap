@@ -4,7 +4,7 @@ import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting.Companion.create
 
 class ClientPINConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<ClientPINSetting>(configManager, KEY, ClientPINSetting.ENABLED, true, false, true) {
+    ConfigPropertyBase<ClientPINSetting>(configManager, KEY, ClientPINSetting.ENABLED, ReleaseLevel.PRIVATE, false, true) {
 
     override fun save(value: ClientPINSetting) {
         configManager.persistenceAdaptor.saveString(KEY, value.value)

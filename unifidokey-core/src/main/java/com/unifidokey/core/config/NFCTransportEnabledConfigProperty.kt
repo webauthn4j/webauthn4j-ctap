@@ -1,7 +1,7 @@
 package com.unifidokey.core.config
 
 class NFCTransportEnabledConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<Boolean>(configManager, KEY, true, true, false, true) {
+    ConfigPropertyBase<Boolean>(configManager, KEY, false, ReleaseLevel.EXPERIMENTAL, false, true) {
 
     override fun save(value: Boolean) {
         configManager.persistenceAdaptor.savePrimitiveBoolean(KEY, value)

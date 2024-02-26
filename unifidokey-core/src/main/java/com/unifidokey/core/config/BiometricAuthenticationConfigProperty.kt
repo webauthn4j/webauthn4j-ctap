@@ -3,7 +3,7 @@ package com.unifidokey.core.config
 import com.unifidokey.core.setting.BiometricAuthenticationSetting
 
 class BiometricAuthenticationConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<BiometricAuthenticationSetting>(configManager, KEY, BiometricAuthenticationSetting.ENABLED, false, false, true) {
+    ConfigPropertyBase<BiometricAuthenticationSetting>(configManager, KEY, BiometricAuthenticationSetting.ENABLED, ReleaseLevel.GA, false, true) {
 
     override fun save(value: BiometricAuthenticationSetting) {
         configManager.persistenceAdaptor.savePrimitiveBoolean(KEY, value.value)

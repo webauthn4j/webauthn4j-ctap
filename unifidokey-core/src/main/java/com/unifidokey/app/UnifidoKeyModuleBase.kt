@@ -47,9 +47,6 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
     fun provideUnifidoKeyAuthenticatorService(
         authenticatorPropertyStore: UnifidoKeyAuthenticatorPropertyStore,
         configManager: ConfigManager,
-        nfcService: NFCService,
-        bleService: BLEService,
-        bthidService: BTHIDService,
         eventDao: EventDao,
         compoundAttestationStatementProvider: CompoundAttestationStatementProvider,
         androidKeyAttestationStatementGenerator: AndroidKeyAttestationStatementProvider,
@@ -98,9 +95,6 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
         return AuthenticatorService(
             authenticatorPropertyStore,
             configManager,
-            nfcService,
-            bleService,
-            bthidService,
             eventDao,
             attestationStatementGenerators,
             exceptionReporter,

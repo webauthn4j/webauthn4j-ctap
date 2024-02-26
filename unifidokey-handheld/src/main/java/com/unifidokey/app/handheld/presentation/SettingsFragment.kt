@@ -68,6 +68,9 @@ class SettingsFragment internal constructor(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        configManager.properties.map {
+            findPreference<Preference>(it.key)?.isVisible = it.enabled
+        }
         this.onDeveloperModeChanged(configManager.developerMode.value)
         this.onExperimentalModeChanged(configManager.experimentalMode.value)
         configManager.developerMode.liveData.observe(this.viewLifecycleOwner, this@SettingsFragment::onDeveloperModeChanged)
@@ -142,7 +145,6 @@ class SettingsFragment internal constructor(
                         return@OnPreferenceChangeListener false
                     }
                 }
-            it.isVisible = configManager.nfcFeatureFlag
         }
         findPreference<Preference>(BLETransportEnabledConfigProperty.KEY)!!.let {
             it.summaryProvider = BLEPreferenceSummaryProvider()
@@ -168,7 +170,6 @@ class SettingsFragment internal constructor(
                         return@OnPreferenceChangeListener false
                     }
                 }
-            it.isVisible = configManager.bleFeatureFlag
         }
         findPreference<Preference>(BTHIDTransportEnabledConfigProperty.KEY)!!.let {
             it.summaryProvider = BTHIDPreferenceSummaryProvider()
@@ -194,7 +195,6 @@ class SettingsFragment internal constructor(
                         return@OnPreferenceChangeListener false
                     }
                 }
-            it.isVisible = configManager.bthidFeatureFlag
         }
         findPreference<Preference>(BTHID_PAIRING_KEY)!!.let {
             it.onPreferenceClickListener = Preference.OnPreferenceClickListener {
@@ -512,6 +512,23 @@ class SettingsFragment internal constructor(
                     return@OnPreferenceChangeListener false
                 }
             }
+        findPreference<Preference>(DeveloperModeConfigProperty.KEY)!!.onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { _: Preference?, newValue: Any ->
+                try {
+                    val developerMode = newValue as Boolean
+                    return@OnPreferenceChangeListener viewModel.setDeveloperMode(
+                        developerMode
+                    )
+                } catch (e: RuntimeException) {
+                    logger.error("Unexpected exception is thrown", e)
+                    Toast.makeText(
+                        settingsActivity,
+                        "Unexpected error has occurred.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@OnPreferenceChangeListener false
+                }
+            }
         findPreference<Preference>(CONFIG_RESET_KEY)!!.let {
             it.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                 ConfigurationsResetConfirmationDialogUtil.confirm(requireContext()){ confirmed ->
@@ -545,14 +562,6 @@ class SettingsFragment internal constructor(
     private fun onNFCAdapterEnabledChanged(enabled: Boolean) {
         val nfcTransportEnabledPreference =
             findPreference<SwitchPreferenceCompat>(NFCTransportEnabledConfigProperty.KEY)!!
-        val isActive = nfcTransportEnabledPreference.isEnabled && enabled
-
-        //TODO: make event listener and move to CtapNFCAndroidServiceAdapter
-        if (isActive) { //Since BLE adaptor cannot be enabled in background, it is explicitly enabled.
-            nfcService.enableNFCTransport()
-        } else {
-            nfcService.disableNFCTransport()
-        }
         nfcTransportEnabledPreference.isEnabled = enabled
     }
 

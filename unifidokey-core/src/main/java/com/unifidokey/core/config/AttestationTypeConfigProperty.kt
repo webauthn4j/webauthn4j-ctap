@@ -7,7 +7,7 @@ class AttestationTypeConfigProperty internal constructor(configManager: ConfigMa
         configManager,
         KEY,
         AttestationTypeSetting.BASIC,
-        false,
+        ReleaseLevel.GA,
         true,
         true
     ) {

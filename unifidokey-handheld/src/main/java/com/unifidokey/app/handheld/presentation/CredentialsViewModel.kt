@@ -19,4 +19,7 @@ class CredentialsViewModel(application: Application) : AndroidViewModel(applicat
 
     val relyingParties: LiveData<List<RelyingPartyViewModel>> = relyingPartyDao.findAllLiveData().map { it.map { relyingPartyAndUserCredentialsDto -> RelyingPartyViewModel(unifidoKeyHandHeldApplication, relyingPartyAndUserCredentialsDto)  } }
 
+    fun hasCredentials(): LiveData<Boolean>{
+        return relyingParties.map { it.isNotEmpty() }
+    }
 }

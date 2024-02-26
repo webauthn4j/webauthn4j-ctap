@@ -7,7 +7,7 @@ link:../ja/index.html[Japanese]
 
 include::ja/introduction.adoc[]
 include::ja/quick-tour.adoc[]
-include::ja/credential-management.adoc[]
+include::ja/account-management.adoc[]
 include::ja/history.adoc[]
 include::ja/settings.adoc[]
 include::ja/advanced-usage.adoc[]

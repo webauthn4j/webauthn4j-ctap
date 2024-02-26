@@ -4,7 +4,7 @@ import com.unifidokey.core.service.AuthenticatorService
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 
 class AAGUIDConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<AAGUID>(configManager, KEY, AuthenticatorService.AAGUID, false, true, true) {
+    ConfigPropertyBase<AAGUID>(configManager, KEY, AuthenticatorService.AAGUID, ReleaseLevel.GA, true, true) {
 
     public override fun save(value: AAGUID) {
         configManager.persistenceAdaptor.saveString(KEY, value.toString())

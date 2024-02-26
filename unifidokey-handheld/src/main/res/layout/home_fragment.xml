@@ -88,7 +88,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
-                android:visibility="@{viewModel.nfcFeatureFlag ? View.VISIBLE : View.GONE}"
                 tools:ignore="MissingConstraints">
 
                 <LinearLayout
@@ -134,6 +133,21 @@
                             app:tint="@color/bgGray" />
                     </LinearLayout>
 
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            style="?attr/borderlessButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:onClick="@{viewModel::onHybridInternalButtonClick}"
+                            android:text="@string/button_text_passkey_provider_settings"
+                            />
+                    </LinearLayout>
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -142,7 +156,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
-                android:visibility="@{viewModel.nfcFeatureFlag ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.nfcCardVisibility ? View.VISIBLE : View.GONE}"
                 tools:ignore="MissingConstraints">
 
                 <LinearLayout
@@ -211,7 +225,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="12dp"
-                android:visibility="@{viewModel.bthidFeatureFlag ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.bthidCardVisibility ? View.VISIBLE : View.GONE}"
                 tools:ignore="MissingConstraints">
 
                 <LinearLayout

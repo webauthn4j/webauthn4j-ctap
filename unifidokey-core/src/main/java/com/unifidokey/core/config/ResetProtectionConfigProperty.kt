@@ -4,7 +4,7 @@ import com.webauthn4j.ctap.authenticator.data.settings.ResetProtectionSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ResetProtectionSetting.Companion.create
 
 class ResetProtectionConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<ResetProtectionSetting>(configManager, KEY, ResetProtectionSetting.ENABLED, true, false, true) {
+    ConfigPropertyBase<ResetProtectionSetting>(configManager, KEY, ResetProtectionSetting.DISABLED, ReleaseLevel.EXPERIMENTAL, false, true) {
 
     override fun save(value: ResetProtectionSetting) {
         configManager.persistenceAdaptor.savePrimitiveBoolean(KEY, value.value)

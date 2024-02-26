@@ -3,7 +3,7 @@ package com.unifidokey.core.config
 import com.unifidokey.core.setting.AllowedAppListSetting
 
 class AllowedAppListConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<AllowedAppListSetting>(configManager, KEY, AllowedAppListSetting.STANDARD, false, false, true) {
+    ConfigPropertyBase<AllowedAppListSetting>(configManager, KEY, AllowedAppListSetting.STANDARD, ReleaseLevel.GA, false, true) {
 
     override fun save(value: AllowedAppListSetting) {
         configManager.persistenceAdaptor.saveString(KEY, value.value)

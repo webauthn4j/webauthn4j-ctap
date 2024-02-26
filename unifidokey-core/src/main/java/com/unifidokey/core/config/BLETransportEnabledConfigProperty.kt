@@ -1,7 +1,7 @@
 package com.unifidokey.core.config
 
 class BLETransportEnabledConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<Boolean>(configManager, KEY, true, true, false, true) {
+    ConfigPropertyBase<Boolean>(configManager, KEY, true, ReleaseLevel.PRIVATE, true, true) {
 
     override fun save(value: Boolean) {
         configManager.persistenceAdaptor.savePrimitiveBoolean(KEY, value)

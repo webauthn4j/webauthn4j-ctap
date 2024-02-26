@@ -9,7 +9,7 @@ abstract class ConfigPropertyBase<T> internal constructor(
     protected val configManager: ConfigManager,
     val key: String,
     private val seedValue: T,
-    val experimentalFeature: Boolean,
+    val releaseLevel: ReleaseLevel,
     val developerFeature: Boolean,
     val resetTarget: Boolean
 ) {
@@ -41,21 +41,14 @@ abstract class ConfigPropertyBase<T> internal constructor(
 
     val enabled: Boolean
         get(){
-            val developerModeEvaluationResult = when(developerFeature){
-                true -> when(configManager.developerMode.value){
-                    true -> true
-                    false -> false
-                }
-                false -> true
+            if(developerFeature && !configManager.developerMode.value){
+                return false
             }
-            val experimentalModeEvaluationResult = when(experimentalFeature){
-                true -> when(configManager.experimentalMode.value){
-                    true -> true
-                    false -> false
-                }
-                false -> true
+            return when(releaseLevel){
+                ReleaseLevel.PRIVATE -> false
+                ReleaseLevel.EXPERIMENTAL -> return configManager.experimentalMode.value
+                ReleaseLevel.GA -> true
             }
-            return developerModeEvaluationResult && experimentalModeEvaluationResult
         }
 
     @WorkerThread

@@ -37,7 +37,7 @@
     <string name="nav_drawer_open">Open navigation drawer</string>
     <string name="nav_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">UnifidoKey</string>
-    <string name="nav_header_subtitle">Passkey manager for Developers</string>
+    <string name="nav_header_subtitle">Strong attested passkey manager</string>
     <string name="nav_header_desc">Navigation header</string>
 
     <string name="menu_home">Home</string>
@@ -163,6 +163,9 @@
     <string name="biometric_authentication_text">Biometric Authentication</string>
     <string name="summary_experimental_mode">Experimental Mode</string>
     <string name="title_experimental_mode">Experimental Mode</string>
+    <string name="summary_developer_mode">Developer Mode</string>
+    <string name="title_developer_mode">Developer Mode</string>
+    <string name="button_text_passkey_provider_settings">Provider Settings</string>
 
 
 </resources>
