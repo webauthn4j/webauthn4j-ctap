@@ -1,46 +1,56 @@
 == Quick tour
 
-=== Set up
+UnifidoKey can be used as a Passkey provider on the smartphone, or other devices paired via the QR code.
+As an experimental feature, it is also possible to use UnifidoKey as a FIDO2 security key through NFC connection.
 
-UnifidoKey offers two types of transport methods.
-NFC transport and Bluetooth HID transport.
+=== Use UnifidoKey within the installed smartphone
+
+==== Set up
+
+Android 14以降、UnifidoKeyのようなPasskeyの保管処理を提供するアプリケーション（Passkey Provider）が利用できるようになりました。
+UnifidoKeyをPasskey Providerとして利用するためには、Androidの設定画面で、Passkeyの追加のプロバイダーとしてUnifidoKeyを有効化する必要がございます。
+設定画面は、UnifidoKeyのホーム画面の「Provider Settings」ボタンから遷移出来ます。
+
+image::../images/provider-settings.png[Passkey Provider Settings,40%]
+
+==== Registration
+
+Please perform the passkey registration on a site that supports Passkeys.
+For example, how to register a Passkey on GitHub is described in this documentation: https://docs.github.com/en/authentication/authenticating-with-a-passkey/managing-your-passkeys#adding-a-passkey-to-your-account["Adding a passkey to your account - GitHub"]
+When a prompt is show to register a Passkey, the following screen will appear:
+
+image::../images/passkey-registration.png[Passkey Registration screen,40%]
+
+If the UnifidoKey is not displayed, tap "Save another way" and select UnifidoKey.
+
+Then, press the "Continue" button, authenticate, and complete the registration.
+
+==== Authentication
+
+Please perform passkey authentication on a site that supports Passkeys. When passkey authentication is requested, UnifidoKey will display the following screen:
+
+image::../images/passkey-authentication.png[Passkey Authentication screen,40%]
+
+Press "Continue" and authenticate using biometric authentication or a PIN.
+
+=== Use UnifidoKey as a security key via NFC transport
+
+If your smartphone, where UnifidoKey is installed, supports NFC and your Windows PC is equipped with an NFC reader,
+you can use UnifidoKey as a FIDO2 NFC security key as an experimental feature. For normal use cases, pairing via QR code is sufficient, and there is no need to use NFC connection.
 
 ==== NFC transport
 
 If your smartphone on which Unifido Key is installed has the NFC feature and the NFC reader is connected to your PC, you can use the UnifidoKey with NFC transport.
 
-===== Enable NFC transport
+==== Enable NFC transport
 
-Enable NFC transport of the UnifidoKey app, and place your smartphone to the NFC reader.
-The reader must support NFC.
-The reader which only supports Felica and MIFARE doesn't work.
-We tested with https://www.amazon.co.jp/-/en/gp/product/B00VR1WARC/[Sony NFC Reader "PaSoRi " RC-S380/S].
+To activate UnifidoKey NFC transport, first enable the Experimental Mode from the UnifidoKey settings screen.
+Then, enable the NFC transport from the transports section.
+Now you can use UnifidoKey as a FIDO2 NFC security key by placing your smartphone on the NFC reader of your PC.
+The reader must support NFC. It cannot be used with readers that only support FeliCa or MIFARE.
+https://www.amazon.co.jp/-/en/gp/product/B00VR1WARC/[Sony NFC Reader "PaSoRi " RC-S380/S] has been tested to work.
 
-==== Bluetooth HID transport
-
-If Bluetooth is available on your PC, you can use the UnifidoKey with Bluetooth HID transport.
-
-===== Enable Bluetooth HID transport
-
-Enable UnifidoKey's Bluetooth HID transport and pair it with your PC before using it.
-
-====== Pairing
-
-Press "PAIRING" button in the home screen, and "ALLOW" to make your smart phone visible to other Bluetooth devices.
-Then, search for your smart phone from your PC bluetooth pairing wizard and complete the pairing.
-
-====== Troubleshooting Bluetooth HID transport
-
-If the status of the Bluetooth HID device does not become "connected" even though Bluetooth is enabled on both the PC and smartphone, disable the Bluetooth transport once and then enable it again, or turn off the Bluetooth adaptor of the smartphone and then turn it on again., then, please try again.
-
-===== Keep running Bluetooth HID transport in background
-
-The Bluetooth HID transport is normally only available when the app is open, but by enabling the "Stay Background" checkbox, you can keep running the Bluetooth HID transport even when the app is not open.
-Please note that it will affect the battery consumption.
-During standby, "Unifido Key Bluetooth HID Service" will appear in the Android notification menu.
-You can disable the background mode with the "Turn Off" menu there.
-
-=== Registration
+==== Registration
 
 Please execute a security key registration procedure on the site that supports WebAuthn.
 For example the procedure for GitHub is https://docs.github.com/en/github/authenticating-to-github/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication#configuring-two-factor-authentication-using-a-security-key["Configuring two-factor authentication using a security key - GitHub"].
@@ -51,7 +61,7 @@ image::../images/registration.png[Registration screen,40%]
 Check if the information matches the site you are registering, press "PROCEED" button to confirm registration.
 If the site requests user verification, PIN input is requested on your PC or Biometrics authentication is requested on your smart phone.
 
-=== Authentication
+==== Authentication
 
 Please execute a security key authentication procedure on the site that supports WebAuthn.
 When security key authentication is requested, UnifidoKey will pop-up the following screen.
@@ -65,5 +75,28 @@ If the "user verification" feature is enabled, biometrics authentication process
 Please follow the instruction on the screen to complete the authentication.
 
 
+// ==== Bluetooth HID transport
+//
+// If Bluetooth is available on your PC, you can use the UnifidoKey with Bluetooth HID transport.
+//
+// ===== Enable Bluetooth HID transport
+//
+// Enable UnifidoKey's Bluetooth HID transport and pair it with your PC before using it.
+//
+// ====== Pairing
+//
+// Press "PAIRING" button in the home screen, and "ALLOW" to make your smart phone visible to other Bluetooth devices.
+// Then, search for your smart phone from your PC bluetooth pairing wizard and complete the pairing.
+//
+// ====== Troubleshooting Bluetooth HID transport
+//
+// If the status of the Bluetooth HID device does not become "connected" even though Bluetooth is enabled on both the PC and smartphone, disable the Bluetooth transport once and then enable it again, or turn off the Bluetooth adaptor of the smartphone and then turn it on again., then, please try again.
+//
+// ===== Keep running Bluetooth HID transport in background
+//
+// The Bluetooth HID transport is normally only available when the app is open, but by enabling the "Stay Background" checkbox, you can keep running the Bluetooth HID transport even when the app is not open.
+// Please note that it will affect the battery consumption.
+// During standby, "Unifido Key Bluetooth HID Service" will appear in the Android notification menu.
+// You can disable the background mode with the "Turn Off" menu there.
 
 

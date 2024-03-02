@@ -1,0 +1,16 @@
+== Account management
+
+image::../images/accounts.png[Accounts screen,40%]
+
+You can manage registered accounts from "Accounts" tab.
+The accounts are grouped by services (Relying Parties).
+
+// === Account search
+//
+// You can search from the search box on the top right.
+
+=== Delete an account
+
+To delete an account, long press the credential menu item.
+It shows you a confirmation dialog, then press "OK".
+

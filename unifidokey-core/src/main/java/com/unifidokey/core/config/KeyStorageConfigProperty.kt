@@ -3,7 +3,7 @@ package com.unifidokey.core.config
 import com.unifidokey.core.setting.KeyStorageSetting
 
 class KeyStorageConfigProperty internal constructor(configManager: ConfigManager) :
-    ConfigPropertyBase<KeyStorageSetting>(configManager, KEY, KeyStorageSetting.KEYSTORE, ReleaseLevel.PRIVATE, true, true) {
+    ConfigPropertyBase<KeyStorageSetting>(configManager, KEY, KeyStorageSetting.KEYSTORE, ReleaseLevel.GA, true, true) {
 
     override fun save(value: KeyStorageSetting) {
         configManager.persistenceAdaptor.saveString(KEY, value.value)

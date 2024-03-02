@@ -20,26 +20,27 @@ WebAuthn Relying Party開発者が開発時に様々な構成のセキュリテ�
 
 ==== ClientPIN
 
-Setting for enabling / disabling PIN authentication.
+Client PIN認証の有効化、無効化を設定するオプションです。
+ここでいうClient PIN認証は、FIDO2プロトコル上のClient PIN認証であり、AndroidデバイスのPIN認証とは異なる点にご注意ください。
 
 |==================================================================
 | Option                | Description
 
-| Enabled               | Enables PIN authentication
-| Disabled              | Disables PIN authentication
+| Enabled               | Client PIN認証を有効化します。
+| Disabled              | Client PIN認証を無効化します。
 |==================================================================
 
 ==== User Verification
 
-Setting for local authentication(biometrics authentication) support.
-If you want to use local authentication(biometrics authentication) when user verification is requrested, set it to "Ready".
+デバイスによるユーザー検証の有効化・無効化を設定するオプションです。生体認証やPIN認証など、Androidデバイスの認証が利用されます。
+ユーザーの検証が要求された場合にAndroidデバイスの認証を使用したい場合は、Readyを設定してください。
 
 |==================================================================
 | Option                 | Description
 
-| Ready                  | Claims that local authentication is available.
-| Not Ready              | Claims that local authentication is implemented, but not set up
-| Not Supported          | Claims that local authentication is not implemented
+| Ready                  | デバイスによるユーザー検証が利用できると主張します。
+| Not Ready              | デバイスによるユーザー検証機能は存在するが、セットアップされていないと主張します。
+| Not Supported          | デバイスによるユーザー検証がサポートされていないと主張します。
 |==================================================================
 
 ==== User Presence
@@ -72,14 +73,14 @@ Assertion Signatureで利用出来るアルゴリズムの選択肢です。多�
 
 ==== Attestation Type
 
-
+Attestationのタイプに関するオプションです。
 
 |==================================================================
 | Option                | Description
 
-| Basic Attestation     |
-| Self Attestation      |
-| None                  |
+| Basic Attestation     | Basic Attestationを返却します。
+| Self Attestation      | Self Attestationを返却します。
+| None                  | None Attestationを返却します。
 |==================================================================
 
 

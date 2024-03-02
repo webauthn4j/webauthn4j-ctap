@@ -3,30 +3,23 @@
 === What's WebAuthn4J UnifidoKey
 
 https://github.com/webauthn4j/UnifidoKey[WebAuthn4J UnifidoKey] is an Android app, which turns your smart phone to a security key.
-You no longer need to purchase an expensive physical security key.
-Installing UnifidoKey app makes your smartphone a Bluetooth/NFC connected security key.
+You no longer need to purchase and carry around an expensive physical security key.
+By installing the UnifidoKey app on your smartphone, you can use your smartphone as a security key in the smartphone's browser or the other devices that support passkey.
 
-image::../images/home.png[Home screen,40%]
+Unlike other Passkey Providers such as Google Password Manager, UnifidoKey does not synchronize data between devices.
+Instead, keys are securely stored in non-exportable storage within the device, providing security suitable for enterprise applications that require key attestation.
+
+image::../images/home-with-nfc.png[Home screen,40%]
 
 === Install
 
 Install from Google Play Store
 
-==== Tested Configuration
-
-It is tested in the following environment.
-However, it may not work due to the Bluetooth/NFC stack configuration.
-
-|==================================================================
-| OS                    | Bluetooth HID   |    NFC    | Note
-
-| Windows PC            | OK              |    OK     |
-| Mac                   | OK              |    -      |
-| Linux                 | OK              |    -      |
-|==================================================================
-
 === Precautions for use
 
-UnifidoKey doesn't provide a backup method for keys stored in UnifidoKey.
-In case of device lost or unexpected UnifidoKey bug, please prepare an alternative authentication method to the service other than UnifidoKey so that you can recover your account even if UnifidoKey becomes unavailable.
+For security reasons, UnifidoKey does not provide a method to back up keys stored within it.
+In case of device lost or unexpected issues with UnifidoKey, please prepare alternative authentication methods to the service other than UnifidoKey so that you can recover your account even if UnifidoKey becomes unavailable.
+
+We advise using UnifidoKey only for services with stringent security requirements.
+For standard services, we suggest using other Passkey Providers like Google Password Manager, which supports synchronization.
 
