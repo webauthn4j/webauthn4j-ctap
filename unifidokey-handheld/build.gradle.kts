@@ -12,8 +12,8 @@ plugins {
     id(libs.plugins.google.services.get().pluginId)
     id("com.google.firebase.crashlytics")
 }
-//TODO
-val unifidoKeyVersion = "0.9.0.RELEASE"
+
+val unifidoKeyVersion = project.findProperty("unifidoKeyVersion") as String
 
 val unifidoKeyVersionCode = VersionCodeUtil.getVersionCodeFromVersionString(unifidoKeyVersion)
 
