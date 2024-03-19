@@ -23,7 +23,7 @@ material = "1.11.0"
 
 androidSupport = "28.0.0"
 
-googleApiServicesAndroidpublisher = "v3-rev20240306-2.0.0"
+googleApiServicesAndroidpublisher = "v3-rev20240318-2.0.0"
 googleAuthLibraryOauth2Http = "1.23.0"
 guava = "33.0.0-jre"
 junit-jupiter = "5.10.2"
