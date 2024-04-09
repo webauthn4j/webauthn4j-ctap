@@ -57,7 +57,7 @@ assertj = "3.25.3"
 mockito = "5.8.0"
 mockito-kotlin = "5.2.1"
 truth = "1.4.2"
-robolectric = "4.12"
+robolectric = "4.12.1"
 
 sonarqubeGradlePlugin = "5.0.0.4638"
 
