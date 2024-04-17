@@ -30,7 +30,7 @@ junit-jupiter = "5.10.2"
 
 ossLicensesPlugin = "0.10.6"
 playServicesAuth = "21.0.0"
-playServicesFido = "20.1.0"
+playServicesFido = "21.0.0"
 playServicesOssLicenses = "17.0.1"
 playServicesSafetynet = "18.0.1"
 
