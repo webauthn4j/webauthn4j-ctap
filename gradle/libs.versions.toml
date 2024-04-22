@@ -43,7 +43,7 @@ android-tools = "8.1.2"
 webauthn4j = "321b379c5a"
 jackson = "2.17.0"
 bouncycastle = "1.78"
-slf4j = "2.0.12"
+slf4j = "2.0.13"
 logbackAndroid = "3.0.0"
 
 springBoot = "2.7.17"
