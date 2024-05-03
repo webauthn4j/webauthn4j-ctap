@@ -15,7 +15,6 @@ import com.unifidokey.core.service.BTHIDService
 import com.unifidokey.core.service.NFCService
 import com.unifidokey.driver.attestation.AndroidKeyAttestationStatementProvider
 import com.unifidokey.driver.attestation.AndroidSafetyNetAttestationStatementProvider
-import com.unifidokey.driver.attestation.CompoundAttestationStatementProvider
 import com.unifidokey.driver.converter.jackson.Base64UrlRepresentationModule
 import com.unifidokey.driver.persistence.UnifidoKeyAuthenticatorPropertyStoreImpl
 import com.unifidokey.driver.persistence.UnifidoKeyDatabase
@@ -48,7 +47,6 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
         authenticatorPropertyStore: UnifidoKeyAuthenticatorPropertyStore,
         configManager: ConfigManager,
         eventDao: EventDao,
-        compoundAttestationStatementProvider: CompoundAttestationStatementProvider,
         androidKeyAttestationStatementGenerator: AndroidKeyAttestationStatementProvider,
         androidSafetyNetAttestationStatementGenerator: AndroidSafetyNetAttestationStatementProvider,
         packedBasicAttestationStatementGenerator: PackedBasicAttestationStatementProvider,
@@ -60,10 +58,6 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
     ): AuthenticatorService {
         val attestationStatementGenerators: MutableMap<Pair<AttestationTypeSetting, AttestationStatementFormatSetting>, AttestationStatementProvider> =
             HashMap()
-        attestationStatementGenerators[Pair(
-            AttestationTypeSetting.BASIC,
-            AttestationStatementFormatSetting.COMPOUND
-        )] = compoundAttestationStatementProvider
         attestationStatementGenerators[Pair(
             AttestationTypeSetting.BASIC,
             AttestationStatementFormatSetting.ANDROID_KEY
@@ -120,12 +114,6 @@ abstract class UnifidoKeyModuleBase<TA : UnifidoKeyApplicationBase<TC>, TC : Uni
             unifidoKeyApplication,
             objectConverter
         )
-    }
-
-    @Singleton
-    @Provides
-    fun provideCompoundAttestationStatementGenerator(androidKeyAttestationStatementProvider: AndroidKeyAttestationStatementProvider, androidSafetyNetAttestationStatementProvider: AndroidSafetyNetAttestationStatementProvider): CompoundAttestationStatementProvider{
-        return CompoundAttestationStatementProvider(androidKeyAttestationStatementProvider, androidSafetyNetAttestationStatementProvider)
     }
 
     @Singleton
