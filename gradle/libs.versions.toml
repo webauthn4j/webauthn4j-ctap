@@ -25,7 +25,7 @@ androidSupport = "28.0.0"
 
 googleApiServicesAndroidpublisher = "v3-rev20240418-2.0.0"
 googleAuthLibraryOauth2Http = "1.23.0"
-guava = "33.1.0-jre"
+guava = "33.2.0-jre"
 junit-jupiter = "5.10.2"
 
 ossLicensesPlugin = "0.10.6"
