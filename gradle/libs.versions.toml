@@ -63,7 +63,7 @@ sonarqubeGradlePlugin = "5.0.0.4638"
 
 asciidoctorGradleJvm = "4.0.2"
 org-jetbrains-kotlin-android = "1.9.23"
-agp = "8.3.2"
+agp = "8.4.0"
 
 
 
