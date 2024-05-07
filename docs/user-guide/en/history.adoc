@@ -1,7 +1,0 @@
-== History
-
-image::../images/history.png[History screen,40%]
-
-Operation history can be checked from "History" tab.
-Individual History entry cannot be deleted.
-

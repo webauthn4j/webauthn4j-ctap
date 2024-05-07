@@ -1,7 +1,0 @@
-// == 高度な利用法
-//
-// === Azure AD参加 Windows 10 デバイスにUnifidoKeyでログイン
-//
-// https://docs.microsoft.com/en-us/azure/active-directory/authentication/howto-authentication-passwordless-security-key-windows[Azure AD参加 Windows 10 デバイスは、セキュリティキーを利用したログインをサポートしています]が、 UnifidoKeyはこのセキュリティキーとして利用することが可能です。
-//
-// Azure ADのドキュメントに従い、Azure ADテナントをセットアップし、セキュリティキーとしてUnifidoKeyを登録して下さい。 一点注意が必要な点として、 https://docs.microsoft.com/en-us/azure/active-directory/authentication/howto-authentication-passwordless-security-key#fido-security-key-optional-settings[Azure ADのFIDO Security Key optional settingsのEnforce attestationはNoに設定が必要] です。 UnifidoKeyはFIDO Alliance Metadata Serviceに登録されていない為です。

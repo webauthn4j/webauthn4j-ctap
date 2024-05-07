@@ -1,6 +1,0 @@
-== 利用履歴
-
-image::../images/history.png[History screen,40%]
-
-"History"タブで、アプリの利用履歴が確認出来ます。利用履歴を個別に削除することは出来ません。
-
