@@ -33,10 +33,7 @@ WebAuthn4J CTAP is Open Source software released under the
 
 ## Sample App
 
-WebAuthn4J UnifidoKey is an Android app which act as a WebAuthn security key.
-
-![Home screen](docs/images/home.png)
-![Registration screen](./docs/images/registration.png)
+WebAuthn4J UnifidoKey is an Android app which act as a Passkey credential provider(webauthn authenticator).
 
 
 ## Contributing
