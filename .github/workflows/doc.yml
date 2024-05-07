@@ -31,10 +31,12 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          ./gradlew javadoc generateUserGuide
-      - name: Deploy to surge
+          ./gradlew javadoc generateReferenceJA generateReferenceEN
+      - name: Commit & Push pages
         run: |
-          surge build/docs/asciidoc/html5 docs.unifidokey.com
-        env:
-          SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
-          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
+          rm -rf docs
+          mv build/docs/asciidoc/html5 docs
+          git add docs
+          git commit -m "Update docs"
+          git checkout -b gh-pages
+          git push origin gh-pages -f

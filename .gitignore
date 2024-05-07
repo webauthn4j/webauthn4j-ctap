@@ -25,14 +25,5 @@ dist/
 nbdist/
 .nb-gradle/
 
-### Android Project ###
-release
-debug
-
 ### Project Files ###
-sample/node_modules
-sample/src/main/resources/application-local-with-services.yml
-local.properties
-unifidokey-handheld/src/webauthn4j/google-services.json
-unifidokey-upload-key.jks
-secret.properties
+

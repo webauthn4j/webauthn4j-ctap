@@ -6,66 +6,35 @@ on:
       - '*.RELEASE'
 
 jobs:
-  release:
-    name: Release
-    runs-on: ubuntu-latest
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        java_version: [17]
+        os: [ubuntu-20.04]
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - name: set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/checkout@v2
+
+      - name: Set up JDK ${{ matrix.java_version }}
+        uses: actions/setup-java@v2
         with:
           distribution: 'temurin'
-          java-version: 17
-      - name: Build/Unit test with Gradle
+          java-version: ${{ matrix.java_version }}
+          cache: 'gradle'
+
+      - name: Build with Gradle
         run: |
-          echo $KEYSTORE_BASE64 | base64 -d > unifidokey-upload-key.jks
-          ./gradlew build assemblePlaystoreRelease bundlePlaystoreRelease --stacktrace
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64  }}
-          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS  }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS  }}
-          KEY_PASS: ${{ secrets.KEY_PASS  }}
+          ./gradlew build javadoc generateReferenceEN generateReferenceJA -PfailBuildOnCVSS=4
 
-      - name: Create GitHub release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Publish to Maven Central
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: true
-          prerelease: false
-
-      - name: Upload release apk
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./unifidokey-handheld/build/outputs/apk/playstore/release/unifidokey-handheld-playstore-release.apk
-          asset_name: unifidokey-handheld-playstore-release.apk
-          asset_content_type: application/octet-stream
-
-      - name: Upload release bundle
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./unifidokey-handheld/build/outputs/bundle/playstoreRelease/unifidokey-handheld-playstore-release.aab
-          asset_name: unifidokey-handheld-playstore-release.aab
-          asset_content_type: application/octet-stream
-
-      - name: Publish App bundle to Google Play Console
+          MAVEN_CENTRAL_USER: ${{ secrets.MAVEN_CENTRAL_USER }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          PGP_SIGNING_KEY: ${{ secrets.PGP_SIGNING_KEY }}
+          PGP_SIGNING_KEY_PASSPHRASE: ${{ secrets.PGP_SIGNING_KEY_PASSPHRASE }}
         run: |
-          echo $GOOGLE_SERVICE_ACCOUNT_BASE64 | base64 -d > google-service-account.json
-          export GOOGLE_APPLICATION_CREDENTIALS=./google-service-account.json
-          ./gradlew publishAppBundle --stacktrace
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64  }}
-          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS  }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS  }}
-          KEY_PASS: ${{ secrets.KEY_PASS  }}
-          GOOGLE_SERVICE_ACCOUNT_BASE64: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_BASE64  }}
+          ./gradlew publishStandardPublicationToMavenCentralRepository
+

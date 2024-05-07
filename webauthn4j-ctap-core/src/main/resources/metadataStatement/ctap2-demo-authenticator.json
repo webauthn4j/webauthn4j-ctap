@@ -1,5 +1,5 @@
 {
-  "description": "UnifidoKey Ctap2 Demo Authenticator",
+  "description": "WebAuthn4J Ctap2 Demo Authenticator",
   "aaguid": "62b0f4c6-5a10-4eba-b094-b44529d77bb0",
   "protocolFamily": "fido2",
   "authenticatorVersion": 2,

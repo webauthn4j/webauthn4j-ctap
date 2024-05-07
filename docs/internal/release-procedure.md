@@ -1,6 +1,6 @@
 # Release procedure
 
-This document describes UnifidoKey release procedure.
+This document describes WebAuthn4J CTAP release procedure.
 
 ### Prepare a release commit
 
@@ -13,9 +13,15 @@ git checkout -b release-<version>
 ##### Update version variables in build.gradle
 
 gradle.properties
+```
+webAuthn4JCtapVersion=<version>.RELEASE
+latestReleasedWebAuthn4JCtapVersion=<version>.RELEASE
+```
+
+##### Update versions in documents
 
 ```
-unifidoKeyVersion=<version>.RELEASE
+./gradlew updateVersionsInDocuments
 ```
 
 ##### Create a release commit
@@ -64,6 +70,10 @@ git tag <version>.RELEASE
 git push origin <version>.RELEASE
 ```
 
+##### Close and Release Staging Repository
+
+Close and release the staging repository by following [OSSRH manual](https://central.sonatype.org/pages/releasing-the-deployment.html#close-and-drop-or-release-your-staging-repository).
+
 ##### Update the release note on GitHub
 
 Update the release note on GitHub
@@ -79,9 +89,9 @@ git checkout -b <new version>-development
 ##### Update version variables in build.gradle
 
 gradle.properties
-
 ```
-unifidoKeyVersion=<new version>-SNAPSHOT
+webAuthn4JCtapVersion=<new version>-SNAPSHOT
+latestReleasedWebAuthn4JCtapVersion=<version>.RELEASE
 ```
 
 ##### Commit the change

@@ -1,5 +1,5 @@
 {
-  "description": "UnifidoKey U2F Demo Authenticator",
+  "description": "WebAuthn4J U2F Demo Authenticator",
   "attestationCertificateKeyIdentifiers": [
     "4ef8478107bdef0401d81dee615c8a7993c60e72"
   ],
