@@ -4,6 +4,37 @@
 
 WebAuthn4J CTAP is a pure Kotlin library implementing FIDO CTAP2
 
+## Getting from Maven Central
+
+If you are using Maven, just add the webauthn4j-ctap as a dependency:
+
+```xml
+<properties>
+  ...
+  <!-- Use the latest version whenever possible. -->
+  <webauthn4jctap.version>0.1.0.RELEASE</webauthn4jctap.version>
+  ...
+</properties>
+
+<dependencies>
+  ...
+  <!-- Ctap Authenticator -->
+  <dependency>
+    <groupId>com.webauthn4j</groupId>
+    <artifactId>webauthn4j-ctap-authenticator</artifactId>
+    <version>${webauthn4jctap.version}</version>
+  </dependency>
+
+  <!-- Ctap Client -->
+  <dependency>
+      <groupId>com.webauthn4j</groupId>
+      <artifactId>webauthn4j-ctap-client</artifactId>
+      <version>${webauthn4jctap.version}</version>
+  </dependency>
+  ...
+</dependencies>
+```
+
 ## Build from source
 
 WebAuthn4J uses a Gradle based build system.
@@ -12,7 +43,7 @@ self-contained bootstrap mechanism for the build.
 
 ### Prerequisites
 
-- Java8 or later
+- Java11 or later
 
 ### Checkout sources
 
