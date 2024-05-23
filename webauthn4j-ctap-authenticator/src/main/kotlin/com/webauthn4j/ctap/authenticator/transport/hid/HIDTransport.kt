@@ -37,6 +37,8 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
 
     private val logger = LoggerFactory.getLogger(HIDTransport::class.java)
 
+    private var ctapAuthenticatorSession: CtapAuthenticatorSession = ctapAuthenticator.createSession() //TODO: revisit
+
     private val ctapRequestConverter = CtapRequestConverter(ctapAuthenticator.objectConverter)
     private val ctapResponseConverter = CtapResponseConverter(ctapAuthenticator.objectConverter)
 
@@ -49,7 +51,6 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
     @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
     private val u2fConfirmationWorker = newSingleThreadContext("u2f-confirmation-worker")
 
-    private var ctapAuthenticatorSession: CtapAuthenticatorSession = ctapAuthenticator.createSession() //TODO: revisit
 
     suspend fun onHIDDataReceived(bytes: ByteArray, hidPacketHandler: HIDPacketHandler) {
         try {
