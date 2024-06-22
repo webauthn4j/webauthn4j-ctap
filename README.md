@@ -2,7 +2,7 @@
 
 [![Actions Status](https://github.com/webauthn4j/webauthn4j-ctap/workflows/CI/badge.svg)](https://github.com/webauthn4j/webauthn4j-ctap/actions)
 
-WebAuthn4J CTAP is a pure Kotlin library implementing FIDO CTAP2
+WebAuthn4J CTAP is a Kotlin library implementing FIDO CTAP2. It can be run on OpenJDK and Android.
 
 ## Getting from Maven Central
 
