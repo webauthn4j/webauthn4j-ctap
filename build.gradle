@@ -184,3 +184,4 @@ sonarqube {
         property 'sonar.issue.ignore.multicriteria.e3.resourceKey', '**/*.java'
     }
 }
+
