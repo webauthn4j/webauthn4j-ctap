@@ -2,7 +2,7 @@
 
 package integration.setting.relyingparty
 
-import com.webauthn4j.validator.exception.BadRpIdException
+import com.webauthn4j.verifier.exception.BadRpIdException
 import integration.usecase.testcase.PasswordlessTestCase
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions

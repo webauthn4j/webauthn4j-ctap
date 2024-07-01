@@ -4,7 +4,7 @@ import com.webauthn4j.data.AuthenticatorAttestationResponse
 import com.webauthn4j.data.PublicKeyCredential
 import com.webauthn4j.data.client.Origin
 import com.webauthn4j.data.extension.client.RegistrationExtensionClientOutput
-import com.webauthn4j.validator.exception.BadOriginException
+import com.webauthn4j.verifier.exception.BadOriginException
 import integration.usecase.testcase.PasswordlessTestCase
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions

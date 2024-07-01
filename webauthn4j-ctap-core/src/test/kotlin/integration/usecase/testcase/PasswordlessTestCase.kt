@@ -1,6 +1,6 @@
 package integration.usecase.testcase
 
-import com.webauthn4j.authenticator.AuthenticatorImpl
+import com.webauthn4j.credential.CredentialRecordImpl
 import com.webauthn4j.data.*
 import com.webauthn4j.data.extension.client.AuthenticationExtensionClientOutput
 import com.webauthn4j.data.extension.client.RegistrationExtensionClientOutput
@@ -95,7 +95,7 @@ class PasswordlessTestCase : IntegrationTestCaseBase() {
 
         // Relying Party Server validates the credential for registration
         step2Result =
-            relyingParty.webAuthnManager.validate(registrationRequest, registrationParameters)
+            relyingParty.webAuthnManager.verify(registrationRequest, registrationParameters)
         return step2Result
     }
 
@@ -117,22 +117,22 @@ class PasswordlessTestCase : IntegrationTestCaseBase() {
             objectConverter.jsonConverter.writeValueAsString(step3Result.clientExtensionResults),
             step3Result.response!!.signature
         )
-        val authenticatorImpl = AuthenticatorImpl(
-            step2Result.attestationObject!!.authenticatorData.attestedCredentialData!!,
-            step2Result.attestationObject!!.attestationStatement,
-            step2Result.attestationObject!!.authenticatorData.signCount,
+        val credentialRecord = CredentialRecordImpl(
+            step2Result.attestationObject!!,
+            step2Result.collectedClientData,
+            step2Result.clientExtensions,
             step2Result.transports
         )
         val authenticationParameters = AuthenticationParameters(
             relyingParty.authentication.backend.serverProperty,
-            authenticatorImpl,
+            credentialRecord,
             null,
             relyingParty.authentication.backend.userVerificationRequired,
             relyingParty.authentication.backend.userPresenceRequired
         )
 
         // Relying Party Server validate the credential for registration
-        step4Result = relyingParty.webAuthnManager.validate(authenticationRequest, authenticationParameters)
+        step4Result = relyingParty.webAuthnManager.verify(authenticationRequest, authenticationParameters)
         return step4Result
     }
 }
