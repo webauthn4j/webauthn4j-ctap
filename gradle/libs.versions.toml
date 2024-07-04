@@ -17,7 +17,7 @@ mockito-kotlin = "5.3.1"
 logbackClassic = "1.5.6"
 springBoot = "2.7.17"
 
-sonarqubeGradlePlugin = "5.0.0.4638"
+sonarqubeGradlePlugin = "5.1.0.4882"
 asciidoctorGradleJvm = "4.0.2"
 
 
