@@ -11,6 +11,9 @@ on:
 #    # everyday 11AM (UTC)
 #    - cron: '* 9 * * *'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
