@@ -1,6 +1,6 @@
 package integration.usecase.testcase
 
-import com.webauthn4j.authenticator.AuthenticatorImpl
+import com.webauthn4j.credential.CredentialRecordImpl
 import com.webauthn4j.data.AuthenticationParameters
 import com.webauthn4j.data.AuthenticationRequest
 import com.webauthn4j.data.AuthenticatorTransport
@@ -49,7 +49,7 @@ class SecondFactorTestCase : IntegrationTestCaseBase() {
             relyingParty.registration.backend.userPresenceRequired
         )
         val registrationData =
-            relyingParty.webAuthnManager.validate(registrationRequest, registrationParameters)
+            relyingParty.webAuthnManager.verify(registrationRequest, registrationParameters)
 
 
         // Get a credential from the authenticator through WebAuthn Client Get API
@@ -78,20 +78,20 @@ class SecondFactorTestCase : IntegrationTestCaseBase() {
         )
         val attestationObject =
             registrationData.attestationObject ?: fail("attestationObject must not be null")
-        val authenticatorImpl = AuthenticatorImpl(
-            attestationObject.authenticatorData.attestedCredentialData!!,
-            attestationObject.attestationStatement,
-            attestationObject.authenticatorData.signCount,
+        val credentialRecord = CredentialRecordImpl(
+            attestationObject,
+            registrationData.collectedClientData,
+            registrationData.clientExtensions,
             registrationData.transports
         )
         val authenticationParameters = AuthenticationParameters(
             relyingParty.authentication.backend.serverProperty,
-            authenticatorImpl,
+            credentialRecord,
             null,
             relyingParty.authentication.backend.userVerificationRequired,
             relyingParty.authentication.backend.userPresenceRequired
         )
-        relyingParty.webAuthnManager.validate(authenticationRequest, authenticationParameters)
+        relyingParty.webAuthnManager.verify(authenticationRequest, authenticationParameters)
     }
 
 }

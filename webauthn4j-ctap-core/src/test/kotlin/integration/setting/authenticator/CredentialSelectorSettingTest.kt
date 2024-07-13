@@ -7,7 +7,7 @@ import com.webauthn4j.ctap.client.PublicKeyCredentialSelectionHandler
 import com.webauthn4j.data.AuthenticatorAttestationResponse
 import com.webauthn4j.data.PublicKeyCredential
 import com.webauthn4j.data.extension.client.RegistrationExtensionClientOutput
-import com.webauthn4j.validator.exception.BadSignatureException
+import com.webauthn4j.verifier.exception.BadSignatureException
 import integration.usecase.testcase.PasswordlessTestCase
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
