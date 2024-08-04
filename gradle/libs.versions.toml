@@ -3,7 +3,7 @@ ktor = "2.3.12"
 kotlin = "2.0.0"
 kotlinx-coroutines = "1.8.1"
 
-webauthn4j = "0.25.0.RELEASE"
+webauthn4j = "0.25.1.RELEASE"
 
 jackson = "2.17.2"
 bouncycastle = "1.78.1"
