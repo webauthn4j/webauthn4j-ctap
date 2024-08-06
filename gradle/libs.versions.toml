@@ -1,6 +1,6 @@
 [versions]
 ktor = "2.3.12"
-kotlin = "2.0.0"
+kotlin = "2.0.10"
 kotlinx-coroutines = "1.8.1"
 
 webauthn4j = "0.25.1.RELEASE"
