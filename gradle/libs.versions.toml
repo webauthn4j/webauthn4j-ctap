@@ -7,7 +7,7 @@ webauthn4j = "0.25.1.RELEASE"
 
 jackson = "2.17.2"
 bouncycastle = "1.78.1"
-slf4j = "2.0.13"
+slf4j = "2.0.14"
 
 
 junit-jupiter = "5.10.3"
