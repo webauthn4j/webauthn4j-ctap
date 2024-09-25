@@ -10,7 +10,7 @@ bouncycastle = "1.78.1"
 slf4j = "2.0.13"
 
 
-junit-jupiter = "5.10.3"
+junit-jupiter = "5.11.1"
 assertj = "3.26.3"
 mockito = "5.8.0"
 mockito-kotlin = "5.4.0"
