@@ -14,7 +14,7 @@ junit-jupiter = "5.11.1"
 assertj = "3.26.3"
 mockito = "5.8.0"
 mockito-kotlin = "5.4.0"
-logbackClassic = "1.5.8"
+logbackClassic = "1.5.9"
 springBoot = "2.7.17"
 
 sonarqubeGradlePlugin = "5.1.0.4882"
