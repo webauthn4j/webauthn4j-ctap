@@ -1,35 +1,38 @@
 [versions]
-ktor = "3.0.0"
 kotlin = "2.0.21"
+
 kotlinx-coroutines = "1.9.0"
 
 webauthn4j = "0.27.0.RELEASE"
 
-jackson = "2.18.0"
-bouncycastle = "1.78.1"
 slf4j = "2.0.16"
 
+jackson = "2.18.0"
 
+bouncycastle = "1.78.1"
+
+
+# Build dependencies
+ksp = "2.0.21-1.0.25"
+
+asciidoctor = "4.0.3"
+
+# Test dependencies
 junit-jupiter = "5.11.2"
+
 assertj = "3.26.3"
+
 mockito = "5.8.0"
+
 mockito-kotlin = "5.4.0"
+
 logbackClassic = "1.5.9"
-springBoot = "2.7.17"
 
-sonarqubeGradlePlugin = "5.1.0.4882"
-asciidoctorGradleJvm = "4.0.3"
-
+sonarqube = "5.1.0.4882"
 
 [libraries]
 # Kotlin
-ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-kotlin-stdlib-jdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
-kotlinx-coroutines-jdk8 = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-jdk8", version.ref = "kotlinx-coroutines" }
 
 # WebAuthn4J
 webauthn4j-core = { module = "com.github.webauthn4j.webauthn4j:webauthn4j-core", version.ref = "webauthn4j" }
@@ -48,9 +51,6 @@ jackson-module-kotlin = { group = "com.fasterxml.jackson.module", name = "jackso
 bouncycastle-bcpkix-jdk15to18 = { group = "org.bouncycastle", name = "bcpkix-jdk15to18", version.ref = "bouncycastle"}
 bouncycastle-bcprov-jdk15to18 = { group = "org.bouncycastle", name = "bcprov-jdk15to18", version.ref = "bouncycastle"}
 
-# build
-sonarqube-gradle-plugin = { module = "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin", version.ref = "sonarqubeGradlePlugin" }
-asciidoctor-gradle-jvm = { module = "org.asciidoctor:asciidoctor-gradle-jvm", version.ref = "asciidoctorGradleJvm" }
 
 # test
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
@@ -67,5 +67,7 @@ mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", versio
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-plugin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
+asciidoctor = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctor"}
+sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
