@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id(libs.plugins.kotlin.jvm.get().pluginId)
 }
@@ -10,8 +12,10 @@ java {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
-    kotlinOptions.javaParameters = true
+    compilerOptions{
+        jvmTarget = JvmTarget.JVM_11
+        javaParameters = true
+    }
 }
 
 tasks {
