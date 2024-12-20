@@ -15,7 +15,7 @@ bouncycastle = "1.78.1"
 # Build dependencies
 ksp = "2.0.21-1.0.25"
 
-asciidoctor = "4.0.3"
+asciidoctor = "4.0.4"
 
 # Test dependencies
 junit-jupiter = "5.11.2"
