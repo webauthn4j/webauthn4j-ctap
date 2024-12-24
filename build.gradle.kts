@@ -153,27 +153,13 @@ subprojects {
 
     }
 
-
-    tasks.register("updateVersionsInDocuments"){
-        group = "documentation"
-
-        val regex = "<webauthn4jctap\\.version>.*</webauthn4jctap\\.version>"
-        val replacement = "<webauthn4jctap\\.version>" + lastReleasedWebAuthn4JCTAPVersion + "</webauthn4jctap.version>"
-
-        val files = arrayOf(file("README.md"))
-        files.forEach { file ->
-            val updated = file.readText(StandardCharsets.UTF_8).replaceFirst(regex, replacement)
-            file.writeText(updated, StandardCharsets.UTF_8)
-        }
-    }
-
 }
 
 tasks.register("updateVersionsInDocuments"){
     group = "documentation"
 
-    val regex = "<webauthn4jctap\\.version>.*</webauthn4jctap\\.version>"
-    val replacement = "<webauthn4jctap\\.version>" + lastReleasedWebAuthn4JCTAPVersion + "</webauthn4jctap.version>"
+    val regex = Regex("""<webauthn4jctap.version>.*</webauthn4jctap.version>""")
+    val replacement = "<webauthn4jctap.version>$lastReleasedWebAuthn4JCTAPVersion</webauthn4jctap.version>"
 
     val files = arrayOf(file("README.md"))
     files.forEach { file ->
