@@ -3,7 +3,7 @@ kotlin = "2.1.0"
 
 kotlinx-coroutines = "1.10.1"
 
-webauthn4j = "0.28.3.RELEASE"
+webauthn4j = "0.28.4.RELEASE"
 
 slf4j = "2.0.16"
 
