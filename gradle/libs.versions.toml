@@ -1,0 +1,73 @@
+[versions]
+kotlin = "2.1.0"
+
+kotlinx-coroutines = "1.10.1"
+
+webauthn4j = "0.28.4.RELEASE"
+
+slf4j = "2.0.16"
+
+jackson = "2.18.2"
+
+bouncycastle = "1.79"
+
+
+# Build dependencies
+ksp = "2.1.0-1.0.29"
+
+asciidoctor = "4.0.4"
+
+# Test dependencies
+junit-jupiter = "5.11.4"
+
+assertj = "3.27.0"
+
+mockito = "5.8.0"
+
+mockito-kotlin = "5.4.0"
+
+logbackClassic = "1.5.15"
+
+sonarqube = "6.0.1.5171"
+
+[libraries]
+# Kotlin
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+
+# WebAuthn4J
+webauthn4j-core = { module = "com.webauthn4j:webauthn4j-core", version.ref = "webauthn4j" }
+webauthn4j-test = { module = "com.webauthn4j:webauthn4j-test", version.ref = "webauthn4j" }
+
+# Third-party libraries
+
+slf4j-api = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j"}
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logbackClassic" }
+
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-datatype-jsr310 = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version.ref = "jackson"}
+jackson-dataformat-cbor = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-cbor", version.ref = "jackson"}
+jackson-module-kotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version.ref = "jackson"}
+
+bouncycastle-bcpkix-jdk15to18 = { group = "org.bouncycastle", name = "bcpkix-jdk15to18", version.ref = "bouncycastle"}
+bouncycastle-bcprov-jdk15to18 = { group = "org.bouncycastle", name = "bcprov-jdk15to18", version.ref = "bouncycastle"}
+
+
+# test
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }
+junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit-jupiter" }
+
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito" }
+mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockito-kotlin" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-plugin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
+asciidoctor = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctor"}
+sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
