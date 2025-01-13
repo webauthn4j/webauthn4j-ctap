@@ -41,18 +41,3 @@ jobs:
           PGP_SIGNING_KEY_PASSPHRASE: ${{ secrets.PGP_SIGNING_KEY_PASSPHRASE }}
         run: |
           ./gradlew publishStandardPublicationToSnapshotRepository
-
-  auto-merge:
-    name: Auto Merge
-    runs-on: ubuntu-latest
-    if: ${{ github.actor == 'dependabot[bot]' }}
-    permissions:
-      contents: write
-      pull-requests: write
-    env:
-      GH_TOKEN: ${{ github.token }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Merge
-        run: gh pr merge "${GITHUB_HEAD_REF}" --merge --auto
