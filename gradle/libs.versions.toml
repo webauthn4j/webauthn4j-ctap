@@ -9,7 +9,7 @@ slf4j = "2.0.16"
 
 jackson = "2.18.2"
 
-bouncycastle = "1.79"
+bouncycastle = "1.80"
 
 
 # Build dependencies
