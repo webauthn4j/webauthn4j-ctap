@@ -13,7 +13,7 @@ bouncycastle = "1.80"
 
 
 # Build dependencies
-ksp = "2.1.10-1.0.29"
+ksp = "2.1.10-1.0.30"
 
 asciidoctor = "4.0.4"
 
