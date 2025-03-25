@@ -28,7 +28,7 @@ mockito-kotlin = "5.4.0"
 
 logbackClassic = "1.5.18"
 
-sonarqube = "6.0.1.5171"
+sonarqube = "6.1.0.5360"
 
 [libraries]
 # Kotlin
