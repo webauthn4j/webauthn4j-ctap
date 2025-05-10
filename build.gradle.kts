@@ -119,7 +119,7 @@ subprojects {
         repositories {
             maven {
                 name = "mavenCentral"
-                url = URI("https://oss.sonatype.org/service/local/staging/deploy/maven2")
+                url = URI("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
                 credentials {
                     username = "${mavenCentralUser}"
                     password = "${mavenCentralPassword}"
