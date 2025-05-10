@@ -127,10 +127,10 @@ subprojects {
             }
             maven {
                 name = "snapshot"
-                url = URI("https://oss.sonatype.org/content/repositories/snapshots")
+                url = URI("https://central.sonatype.com/repository/maven-snapshots/")
                 credentials {
-                    username = "${mavenCentralUser}"
-                    password = "${mavenCentralPassword}"
+                    username = mavenCentralUser
+                    password = mavenCentralPassword
                 }
             }
         }
