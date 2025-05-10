@@ -30,6 +30,8 @@ logbackClassic = "1.5.18"
 
 sonarqube = "6.1.0.5360"
 
+jreleaser = "1.18.0"
+
 [libraries]
 # Kotlin
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
@@ -71,3 +73,4 @@ kotlin-plugin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.re
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctor"}
 sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+jreleaser = { id = "org.jreleaser", version.ref = "jreleaser" }
