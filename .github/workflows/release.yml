@@ -36,5 +36,5 @@ jobs:
           PGP_SIGNING_KEY: ${{ secrets.PGP_SIGNING_KEY }}
           PGP_SIGNING_KEY_PASSPHRASE: ${{ secrets.PGP_SIGNING_KEY_PASSPHRASE }}
         run: |
-          ./gradlew publishStandardPublicationToMavenCentralRepository
+          ./gradlew publishStandardPublicationToLocalStagingRepository jreleaserDeploy
 

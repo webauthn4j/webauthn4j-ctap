@@ -1,5 +1,7 @@
 import org.gradle.jvm.tasks.Jar
+import org.jreleaser.model.Active
 import java.net.URI
+import java.net.URL
 import java.nio.charset.StandardCharsets
 
 plugins {
@@ -9,6 +11,7 @@ plugins {
     id(libs.plugins.kotlin.jvm.get().pluginId) version libs.versions.kotlin
     id(libs.plugins.asciidoctor.get().pluginId) version libs.versions.asciidoctor
     id(libs.plugins.sonarqube.get().pluginId) version libs.versions.sonarqube
+    id(libs.plugins.jreleaser.get().pluginId) version libs.versions.jreleaser
     id(libs.plugins.ksp.get().pluginId) version libs.versions.ksp apply false
 }
 
@@ -36,6 +39,7 @@ subprojects {
 
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "jacoco")
+    apply(plugin = "org.jreleaser")
 
     repositories {
         google()
@@ -118,12 +122,8 @@ subprojects {
 
         repositories {
             maven {
-                name = "mavenCentral"
-                url = URI("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
-                credentials {
-                    username = "${mavenCentralUser}"
-                    password = "${mavenCentralPassword}"
-                }
+                name = "localStaging"
+                url = layout.buildDirectory.dir("local-staging").get().asFile.toURI()
             }
             maven {
                 name = "snapshot"
@@ -146,13 +146,41 @@ subprojects {
         tasks.named("publishStandardPublicationToSnapshotRepository"){
             onlyIf{ webAuthn4JCTAPVersion.endsWith("-SNAPSHOT") }
         }
-        tasks.named("publishStandardPublicationToMavenCentralRepository"){
-            onlyIf{ !webAuthn4JCTAPVersion.endsWith("-SNAPSHOT") }
+
+        jreleaser {
+            project {
+                authors.set(listOf("Yoshikazu Nojima"))
+                license = "Apache-2.0"
+                links {
+                    homepage = githubUrl
+                }
+                version = webAuthn4JCTAPVersion
+            }
+
+            release{
+                github{
+                    token.set("dummy")
+                    skipRelease = true
+                    skipTag = true
+                }
+            }
+
+            deploy {
+                maven {
+                    mavenCentral {
+                        this.register("mavenCentral"){
+                            active = Active.RELEASE
+                            sign = false // artifacts are signed by gradle native feature. signing by jreleaser is not required.
+                            username = mavenCentralUser
+                            password = mavenCentralPassword
+                            url = "https://central.sonatype.com/api/v1/publisher/"
+                            stagingRepository(layout.buildDirectory.dir("local-staging").get().asFile.absolutePath)
+                        }
+                    }
+                }
+            }
         }
-
-
     }
-
 }
 
 tasks.register("updateVersionsInDocuments"){
@@ -175,8 +203,6 @@ tasks.register<JavaExec>("generateReleaseNote") {
     args(webAuthn4JCTAPVersion, file("build/release-note.md").absolutePath, "--spring.config.location=file:" + file("github-release-notes-generator.yml").absolutePath)
 }
 
-
-
 sonarqube {
     properties {
         property("sonar.projectKey", "webauthn4j-ctap")
@@ -188,5 +214,5 @@ sonarqube {
         property("sonar.issue.ignore.multicriteria.e3.ruleKey", "common-java:DuplicatedBlocks")
         property("sonar.issue.ignore.multicriteria.e3.resourceKey", "**/*.java")
     }
-}
+ }
 
