@@ -1,6 +1,7 @@
 name: Bump version
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: [release]
     types: [completed]
@@ -10,7 +11,7 @@ env:
 
 jobs:
   bump-version:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     permissions:
       contents: write
 
