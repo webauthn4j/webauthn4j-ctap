@@ -1,27 +1,27 @@
 import org.gradle.jvm.tasks.Jar
 import org.jreleaser.model.Active
 import java.net.URI
-import java.net.URL
 import java.nio.charset.StandardCharsets
 
 plugins {
     id("signing")
     id("org.gradle.maven-publish")
 
-    id(libs.plugins.kotlin.jvm.get().pluginId) version libs.versions.kotlin
+    id(libs.plugins.kotlin.jvm.get().pluginId) version libs.versions.kotlin apply false
     id(libs.plugins.asciidoctor.get().pluginId) version libs.versions.asciidoctor
     id(libs.plugins.sonarqube.get().pluginId) version libs.versions.sonarqube
     id(libs.plugins.jreleaser.get().pluginId) version libs.versions.jreleaser
     id(libs.plugins.ksp.get().pluginId) version libs.versions.ksp apply false
 }
 
-val webAuthn4JCTAPVersion: String by project
-val lastReleasedWebAuthn4JCTAPVersion: String by project
+private val webAuthn4JCTAPVersion: String by project
+private val isSnapshot: Boolean = (findProperty("isSnapshot") as? String)?.toBoolean() ?: true
+private val effectiveVersion = getEffectiveVersion()
 
 allprojects {
 
     group = "com.webauthn4j"
-    version = webAuthn4JCTAPVersion
+    version = effectiveVersion
 
     configurations.configureEach {
         resolutionStrategy.cacheDynamicVersionsFor(0, TimeUnit.SECONDS)
@@ -144,7 +144,7 @@ subprojects {
             onlyIf { pgpSigningKey != null && pgpSigningKeyPassphrase != null }
         }
         tasks.named("publishStandardPublicationToSnapshotRepository"){
-            onlyIf{ webAuthn4JCTAPVersion.endsWith("-SNAPSHOT") }
+            onlyIf{ isSnapshot }
         }
 
         jreleaser {
@@ -154,7 +154,7 @@ subprojects {
                 links {
                     homepage = githubUrl
                 }
-                version = webAuthn4JCTAPVersion
+                version = effectiveVersion
             }
 
             release{
@@ -183,15 +183,69 @@ subprojects {
     }
 }
 
+tasks.register("bumpPatchVersion"){
+    group = "documentation"
+
+    doLast{
+        val regex = Regex("""^webAuthn4JCTAPVersion=.*$""", RegexOption.MULTILINE)
+        val bumpedVersion = bumpPatchVersion(webAuthn4JCTAPVersion)
+        val replacement = "webAuthn4JCTAPVersion=${bumpedVersion}"
+
+        val file = file("gradle.properties")
+        val original = file.readText(StandardCharsets.UTF_8)
+        if (!regex.containsMatchIn(original)) {
+            throw GradleException("webAuthn4JCTAPVersion property not found in gradle.properties")
+        }
+        val updated = original.replaceFirst(regex, replacement)
+        file.writeText(updated, StandardCharsets.UTF_8)
+    }
+}
+
 tasks.register("updateVersionsInDocuments"){
     group = "documentation"
 
-    val regex = Regex("""<webauthn4jctap.version>.*</webauthn4jctap.version>""")
-    val replacement = "<webauthn4jctap.version>$lastReleasedWebAuthn4JCTAPVersion</webauthn4jctap.version>"
+    doLast{
+        val regex = Regex("""<webauthn4jctap.version>.*</webauthn4jctap.version>""")
+        val replacement = "<webauthn4jctap.version>${effectiveVersion}</webauthn4jctap.version>"
 
-    val files = arrayOf(file("README.md"))
-    files.forEach { file ->
-        val updated = file.readText(StandardCharsets.UTF_8).replaceFirst(regex, replacement)
+        val files = arrayOf(file("README.md"))
+        files.forEach { file ->
+            val updated = file.readText(StandardCharsets.UTF_8).replaceFirst(regex, replacement)
+            file.writeText(updated, StandardCharsets.UTF_8)
+        }
+    }
+}
+
+tasks.register("switchToSnapshot"){
+    group = "documentation"
+
+    doLast{
+        val regex = Regex("""^isSnapshot=.*$""", RegexOption.MULTILINE)
+        val replacement = "isSnapshot=true"
+
+        val file = file("gradle.properties")
+        val original = file.readText(StandardCharsets.UTF_8)
+        if (!regex.containsMatchIn(original)) {
+            throw GradleException("isSnapshot property not found in gradle.properties")
+        }
+        val updated = original.replaceFirst(regex, replacement)
+        file.writeText(updated, StandardCharsets.UTF_8)
+    }
+}
+
+tasks.register("switchToRelease"){
+    group = "documentation"
+
+    doLast{
+        val regex = Regex("""^isSnapshot=.*$""", RegexOption.MULTILINE)
+        val replacement = "isSnapshot=false"
+
+        val file = file("gradle.properties")
+        val original = file.readText(StandardCharsets.UTF_8)
+        if (!regex.containsMatchIn(original)) {
+            throw GradleException("isSnapshot property not found in gradle.properties")
+        }
+        val updated = original.replaceFirst(regex, replacement)
         file.writeText(updated, StandardCharsets.UTF_8)
     }
 }
@@ -200,7 +254,7 @@ tasks.register<JavaExec>("generateReleaseNote") {
     group = "documentation"
     classpath = files("gradle/lib/github-release-notes-generator.jar")
 
-    args(webAuthn4JCTAPVersion, file("build/release-note.md").absolutePath, "--spring.config.location=file:" + file("github-release-notes-generator.yml").absolutePath)
+    args(effectiveVersion, file("build/release-note.md").absolutePath, "--spring.config.location=file:" + file("github-release-notes-generator.yml").absolutePath)
 }
 
 sonarqube {
@@ -216,3 +270,21 @@ sonarqube {
     }
  }
 
+
+private fun getEffectiveVersion(): String{
+    return when {
+        isSnapshot -> webAuthn4JCTAPVersion.plus("-SNAPSHOT")
+        else -> webAuthn4JCTAPVersion.plus(".RELEASE")
+    }
+}
+
+private fun bumpPatchVersion(version: String): String {
+    val parts = version.split(".")
+    require(parts.size == 3) { "Version must be in the format 'X.Y.Z': $version" }
+
+    val major = parts[0].toInt()
+    val minor = parts[1].toInt()
+    val patch = parts[2].toInt() + 1
+
+    return "$major.$minor.$patch"
+}

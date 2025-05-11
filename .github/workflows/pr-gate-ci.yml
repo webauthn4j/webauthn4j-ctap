@@ -6,32 +6,40 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  JAVA_VERSION: 17
+
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        java_version: [17, 21]
+        os: [ubuntu-24.04]
+
+    runs-on: ${{ matrix.os }}
+
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: Set up JDK 17
+      - name: Set up JDK ${{ matrix.java_version }}
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: ${{ matrix.java_version }}
           cache: 'gradle'
       - name: Build/Unit test with Gradle
         run: ./gradlew build
 
   code-analysis:
-    name: Code Analysis
     runs-on: ubuntu-24.04
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: Set up JDK 17
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: ${{ env.JAVA_VERSION }}
           cache: 'gradle'
       - name: Build/Test with Gradle
         env:
@@ -40,7 +48,6 @@ jobs:
         run: if [ "$SONAR_TOKEN" != "" ]; then ./gradlew jacocoTestReport build sonarqube -Dsonar.organization=webauthn4j -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}; fi
 
   auto-merge:
-    name: Auto Merge
     runs-on: ubuntu-24.04
     if: ${{ github.actor == 'dependabot[bot]' }}
     permissions:

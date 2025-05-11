@@ -12,7 +12,7 @@ If you are using Maven, just add the webauthn4j-ctap as a dependency:
 <properties>
   ...
   <!-- Use the latest version whenever possible. -->
-  <webauthn4jctap.version>0.1.2.RELEASE</webauthn4jctap.version>
+  <webauthn4jctap.version>0.1.3.RELEASE</webauthn4jctap.version>
   ...
 </properties>
 
