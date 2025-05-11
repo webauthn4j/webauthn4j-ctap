@@ -29,7 +29,7 @@ jobs:
 
       - name: Bump patch version
         run: |
-          ./gradlew dumpPatchVersion
+          ./gradlew bumpPatchVersion
 
       - name: Switch to snapshot
         run: |
