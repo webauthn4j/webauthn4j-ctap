@@ -52,7 +52,7 @@ jobs:
       - name: Push tag
         run: |
           VERSION=$(grep "webAuthn4JCTAPVersion" gradle.properties | cut -d'=' -f2)
-          git push "${VERSION}.RELEASE"
+          git push origin "${VERSION}.RELEASE"
 
       - name: Publish to Maven Central
         env:
