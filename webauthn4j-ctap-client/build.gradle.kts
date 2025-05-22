@@ -49,14 +49,18 @@ dependencies {
     implementation(libs.bouncycastle.bcprov.jdk15to18)
 
     // Test dependencies
+    testImplementation(platform(libs.junit.bom))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+
+    testImplementation(libs.kotlinx.coroutines.test)
+
     testImplementation(libs.webauthn4j.test)
+
     testImplementation(libs.logback.classic)
     testImplementation(libs.mockito.core)
 //    testImplementation(libs.mockito.inline)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.assertj.core)
-    testImplementation(libs.junit.jupiter.api)
-    testImplementation(libs.junit.jupiter.engine)
-    testImplementation(libs.junit.jupiter.params)
-    testImplementation(libs.kotlinx.coroutines.test)
 }

@@ -18,7 +18,7 @@ ksp = "2.1.21-2.0.1"
 asciidoctor = "4.0.4"
 
 # Test dependencies
-junit-jupiter = "5.11.4"
+junit-jupiter = "5.12.2"
 
 assertj = "3.27.3"
 
@@ -55,9 +55,7 @@ bouncycastle-bcprov-jdk15to18 = { group = "org.bouncycastle", name = "bcprov-jdk
 
 
 # test
-junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
-junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }
-junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit-jupiter" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit-jupiter" }
 
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 
