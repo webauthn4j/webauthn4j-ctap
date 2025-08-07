@@ -20,7 +20,7 @@ asciidoctor = "4.0.4"
 # Test dependencies
 junit-jupiter = "5.13.4"
 
-assertj = "3.27.3"
+assertj = "3.27.4"
 
 mockito = "5.8.0"
 
