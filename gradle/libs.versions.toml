@@ -28,7 +28,7 @@ mockito-kotlin = "6.1.0"
 
 logbackClassic = "1.5.21"
 
-sonarqube = "7.1.0.6387"
+sonarqube = "7.2.0.6526"
 
 jreleaser = "1.21.0"
 
