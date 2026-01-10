@@ -43,7 +43,7 @@ self-contained bootstrap mechanism for the build.
 
 ### Prerequisites
 
-- Java11 or later
+- Java17 or later
 
 ### Checkout sources
 

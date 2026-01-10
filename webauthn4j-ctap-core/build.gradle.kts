@@ -29,7 +29,6 @@ tasks {
     }
 }
 
-
 dependencies {
 
     // Project dependencies

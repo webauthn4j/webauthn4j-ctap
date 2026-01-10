@@ -1,5 +1,7 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import com.webauthn4j.gradle.BuildUtils
+import com.webauthn4j.gradle.VersionUtils
 import org.gradle.jvm.tasks.Jar
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jreleaser.model.Active
 import java.net.URI
 import java.nio.charset.StandardCharsets
@@ -7,6 +9,8 @@ import java.nio.charset.StandardCharsets
 plugins {
     id("signing")
     id("org.gradle.maven-publish")
+    id("java-library")
+    id("jacoco")
 
     id(libs.plugins.kotlin.jvm.get().pluginId) version libs.versions.kotlin apply false
     id(libs.plugins.asciidoctor.get().pluginId) version libs.versions.asciidoctor
@@ -17,7 +21,7 @@ plugins {
 
 private val webAuthn4JCTAPVersion: String by project
 private val isSnapshot: Boolean = (findProperty("isSnapshot") as? String)?.toBoolean() ?: true
-private val effectiveVersion = getEffectiveVersion()
+private val effectiveVersion = VersionUtils.getEffectiveVersion(isSnapshot, webAuthn4JCTAPVersion)
 
 allprojects {
 
@@ -38,15 +42,16 @@ subprojects {
     apply(plugin = "signing")
     apply(plugin = "maven-publish")
 
+    apply(plugin = "java-library")
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "jacoco")
     apply(plugin = "org.jreleaser")
-
     repositories {
         google()
         mavenCentral()
         maven(url = "https://jitpack.io")
     }
+
 
     tasks.register("javadocJar", Jar::class) {
         dependsOn(tasks.named("javadoc"))
@@ -58,21 +63,11 @@ subprojects {
         archives(tasks.named("kotlinSourcesJar"))
     }
 
-    fun getVariable(envName: String, propertyName: String): String?{
-        return if (System.getenv(envName) != null && System.getenv(envName).isNotEmpty()) {
-            System.getenv(envName)
-        } else if (project.hasProperty(propertyName)) {
-            project.property(propertyName) as String?
-        } else {
-            null
-        }
-    }
-
     val githubUrl = "https://github.com/webauthn4j/webauthn4j-ctap"
-    val mavenCentralUser = getVariable("MAVEN_CENTRAL_USER", "mavenCentralUser")
-    val mavenCentralPassword = getVariable("MAVEN_CENTRAL_PASSWORD", "mavenCentralPassword")
-    val pgpSigningKey = getVariable("PGP_SIGNING_KEY", "pgpSigningKey")
-    val pgpSigningKeyPassphrase = getVariable("PGP_SIGNING_KEY_PASSPHRASE", "pgpSigningKeyPassphrase")
+    val mavenCentralUser = BuildUtils.getVariable(project, "MAVEN_CENTRAL_USER", "mavenCentralUser")
+    val mavenCentralPassword = BuildUtils.getVariable(project, "MAVEN_CENTRAL_PASSWORD", "mavenCentralPassword")
+    val pgpSigningKey = BuildUtils.getVariable(project, "PGP_SIGNING_KEY", "pgpSigningKey")
+    val pgpSigningKeyPassphrase = BuildUtils.getVariable(project, "PGP_SIGNING_KEY_PASSPHRASE", "pgpSigningKeyPassphrase")
 
     publishing {
         publications{
@@ -135,61 +130,63 @@ subprojects {
                 }
             }
         }
+    }
 
-        signing {
-            useInMemoryPgpKeys(pgpSigningKey, pgpSigningKeyPassphrase)
-            sign(publishing.publications["standard"])
-        }
+    signing {
+        useInMemoryPgpKeys(pgpSigningKey, pgpSigningKeyPassphrase)
+        sign(publishing.publications["standard"])
+    }
 
-        tasks.withType(Sign::class.java).configureEach {
-            onlyIf { pgpSigningKey != null && pgpSigningKeyPassphrase != null }
-        }
-        tasks.named("publishStandardPublicationToSnapshotRepository"){
-            onlyIf{ isSnapshot }
-        }
+    tasks.withType(Sign::class.java).configureEach {
+        onlyIf { pgpSigningKey != null && pgpSigningKeyPassphrase != null }
+    }
+    tasks.named("publishStandardPublicationToSnapshotRepository"){
+        onlyIf{ isSnapshot }
+    }
 
-        jreleaser {
-            project {
-                authors.set(listOf("Yoshikazu Nojima"))
-                license = "Apache-2.0"
-                links {
-                    homepage = githubUrl
-                }
-                version = effectiveVersion
+    jreleaser {
+        project {
+            authors.set(listOf("Yoshikazu Nojima"))
+            license = "Apache-2.0"
+            links {
+                homepage = githubUrl
             }
+            version = effectiveVersion
+        }
 
-            release{
-                github{
-                    token.set("dummy")
-                    skipRelease = true
-                    skipTag = true
-                }
+        release{
+            github{
+                token.set("dummy")
+                skipRelease = true
+                skipTag = true
             }
+        }
 
-            deploy {
-                maven {
-                    mavenCentral {
-                        this.register("mavenCentral"){
-                            active = Active.RELEASE
-                            sign = false // artifacts are signed by gradle native feature. signing by jreleaser is not required.
-                            username = mavenCentralUser
-                            password = mavenCentralPassword
-                            url = "https://central.sonatype.com/api/v1/publisher/"
-                            stagingRepository(layout.buildDirectory.dir("local-staging").get().asFile.absolutePath)
-                        }
+        deploy {
+            maven {
+                mavenCentral {
+                    this.register("mavenCentral"){
+                        active = Active.RELEASE
+                        sign = false // artifacts are signed by gradle native feature. signing by jreleaser is not required.
+                        username = mavenCentralUser
+                        password = mavenCentralPassword
+                        url = "https://central.sonatype.com/api/v1/publisher/"
+                        stagingRepository(layout.buildDirectory.dir("local-staging").get().asFile.absolutePath)
                     }
                 }
             }
         }
     }
+
 }
+
 
 tasks.register("bumpPatchVersion"){
     group = "documentation"
 
     doLast{
         val regex = Regex("""^webAuthn4JCTAPVersion=.*$""", RegexOption.MULTILINE)
-        val bumpedVersion = bumpPatchVersion(webAuthn4JCTAPVersion)
+        val bumpedVersion = VersionUtils.bumpPatchVersion(webAuthn4JCTAPVersion)
         val replacement = "webAuthn4JCTAPVersion=${bumpedVersion}"
 
         val file = file("gradle.properties")
@@ -258,7 +255,7 @@ tasks.register<JavaExec>("generateReleaseNote") {
     args(effectiveVersion, file("build/release-note.md").absolutePath, "--spring.config.location=file:" + file("github-release-notes-generator.yml").absolutePath)
 }
 
-sonarqube {
+sonar {
     properties {
         property("sonar.projectKey", "webauthn4j-ctap")
         property("sonar.issue.ignore.multicriteria", "e1,e2,e3")
@@ -269,23 +266,4 @@ sonarqube {
         property("sonar.issue.ignore.multicriteria.e3.ruleKey", "common-java:DuplicatedBlocks")
         property("sonar.issue.ignore.multicriteria.e3.resourceKey", "**/*.java")
     }
- }
-
-
-private fun getEffectiveVersion(): String{
-    return when {
-        isSnapshot -> webAuthn4JCTAPVersion.plus("-SNAPSHOT")
-        else -> webAuthn4JCTAPVersion.plus(".RELEASE")
-    }
-}
-
-private fun bumpPatchVersion(version: String): String {
-    val parts = version.split(".")
-    require(parts.size == 3) { "Version must be in the format 'X.Y.Z': $version" }
-
-    val major = parts[0].toInt()
-    val minor = parts[1].toInt()
-    val patch = parts[2].toInt() + 1
-
-    return "$major.$minor.$patch"
 }
