@@ -136,52 +136,54 @@ subprojects {
             }
         }
 
-        signing {
-            useInMemoryPgpKeys(pgpSigningKey, pgpSigningKeyPassphrase)
-            sign(publishing.publications["standard"])
-        }
+    }
 
-        tasks.withType(Sign::class.java).configureEach {
-            onlyIf { pgpSigningKey != null && pgpSigningKeyPassphrase != null }
-        }
-        tasks.named("publishStandardPublicationToSnapshotRepository"){
-            onlyIf{ isSnapshot }
-        }
+    signing {
+        useInMemoryPgpKeys(pgpSigningKey, pgpSigningKeyPassphrase)
+        sign(publishing.publications["standard"])
+    }
 
-        jreleaser {
-            project {
-                authors.set(listOf("Yoshikazu Nojima"))
-                license = "Apache-2.0"
-                links {
-                    homepage = githubUrl
-                }
-                version = effectiveVersion
+    tasks.withType(Sign::class.java).configureEach {
+        onlyIf { pgpSigningKey != null && pgpSigningKeyPassphrase != null }
+    }
+    tasks.named("publishStandardPublicationToSnapshotRepository"){
+        onlyIf{ isSnapshot }
+    }
+
+    jreleaser {
+        project {
+            authors.set(listOf("Yoshikazu Nojima"))
+            license = "Apache-2.0"
+            links {
+                homepage = githubUrl
             }
+            version = effectiveVersion
+        }
 
-            release{
-                github{
-                    token.set("dummy")
-                    skipRelease = true
-                    skipTag = true
-                }
+        release{
+            github{
+                token.set("dummy")
+                skipRelease = true
+                skipTag = true
             }
+        }
 
-            deploy {
-                maven {
-                    mavenCentral {
-                        this.register("mavenCentral"){
-                            active = Active.RELEASE
-                            sign = false // artifacts are signed by gradle native feature. signing by jreleaser is not required.
-                            username = mavenCentralUser
-                            password = mavenCentralPassword
-                            url = "https://central.sonatype.com/api/v1/publisher/"
-                            stagingRepository(layout.buildDirectory.dir("local-staging").get().asFile.absolutePath)
-                        }
+        deploy {
+            maven {
+                mavenCentral {
+                    this.register("mavenCentral"){
+                        active = Active.RELEASE
+                        sign = false // artifacts are signed by gradle native feature. signing by jreleaser is not required.
+                        username = mavenCentralUser
+                        password = mavenCentralPassword
+                        url = "https://central.sonatype.com/api/v1/publisher/"
+                        stagingRepository(layout.buildDirectory.dir("local-staging").get().asFile.absolutePath)
                     }
                 }
             }
         }
     }
+
 }
 
 tasks.register("bumpPatchVersion"){
