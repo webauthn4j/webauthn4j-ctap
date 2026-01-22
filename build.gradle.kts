@@ -255,7 +255,7 @@ tasks.register<JavaExec>("generateReleaseNote") {
     args(effectiveVersion, file("build/release-note.md").absolutePath, "--spring.config.location=file:" + file("github-release-notes-generator.yml").absolutePath)
 }
 
-sonar {
+sonarqube {
     properties {
         property("sonar.projectKey", "webauthn4j-ctap")
         property("sonar.issue.ignore.multicriteria", "e1,e2,e3")
