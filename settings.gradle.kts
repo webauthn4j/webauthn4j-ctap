@@ -1,0 +1,3 @@
+include(":webauthn4j-ctap-core")
+include(":webauthn4j-ctap-authenticator")
+include(":webauthn4j-ctap-client")
