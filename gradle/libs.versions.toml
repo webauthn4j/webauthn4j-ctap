@@ -24,7 +24,7 @@ assertj = "3.27.6"
 
 mockito = "5.8.0"
 
-mockito-kotlin = "6.2.2"
+mockito-kotlin = "6.2.3"
 
 logbackClassic = "1.5.25"
 
