@@ -5,7 +5,7 @@ kotlinx-coroutines = "1.11.0"
 
 webauthn4j = "0.30.2.RELEASE"
 
-slf4j = "2.0.17"
+slf4j = "2.0.18"
 
 jackson = "2.21.3"
 
