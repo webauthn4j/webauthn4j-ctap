@@ -836,7 +836,7 @@ internal class MakeCredentialExecution :
         //spec|   generate an attestation statement for the newly-created credential using
         //spec|   clientDataHash, taking into account the value of the enterpriseAttestation parameter, if present, as described above in Step 9.
         val rpIdHash = MessageDigestUtil.createSHA256().digest(rpId.toByteArray())
-        val alg = COSEAlgorithmIdentifier.ES256
+        val alg = COSEAlgorithmIdentifier.create(userCredential.credentialKey.alg!!)
         val authenticatorDataProvider: AttestationStatementRequest.AuthenticatorDataProvider =
             object : AttestationStatementRequest.AuthenticatorDataProvider {
                 override fun provide(
