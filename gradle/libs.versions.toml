@@ -3,11 +3,11 @@ kotlin = "2.3.21"
 
 kotlinx-coroutines = "1.11.0"
 
-webauthn4j = "0.30.2.RELEASE"
+webauthn4j = "0.31.5.RELEASE"
 
 slf4j = "2.0.18"
 
-jackson = "2.21.3"
+jackson = "3.1.2"
 
 bouncycastle = "1.84"
 
@@ -45,10 +45,9 @@ webauthn4j-test = { module = "com.webauthn4j:webauthn4j-test", version.ref = "we
 slf4j-api = { group = "org.slf4j", name = "slf4j-api", version.ref = "slf4j"}
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logbackClassic" }
 
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
-jackson-datatype-jsr310 = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version.ref = "jackson"}
-jackson-dataformat-cbor = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-cbor", version.ref = "jackson"}
-jackson-module-kotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version.ref = "jackson"}
+jackson-databind = { module = "tools.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-dataformat-cbor = { group = "tools.jackson.dataformat", name = "jackson-dataformat-cbor", version.ref = "jackson"}
+jackson-module-kotlin = { group = "tools.jackson.module", name = "jackson-module-kotlin", version.ref = "jackson"}
 
 bouncycastle-bcpkix-jdk15to18 = { group = "org.bouncycastle", name = "bcpkix-jdk15to18", version.ref = "bouncycastle"}
 bouncycastle-bcprov-jdk15to18 = { group = "org.bouncycastle", name = "bcprov-jdk15to18", version.ref = "bouncycastle"}

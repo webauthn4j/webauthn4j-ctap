@@ -1,8 +1,7 @@
 package com.webauthn4j.ctap.core.converter.jackson
 
-import com.fasterxml.jackson.databind.module.SimpleModule
+import tools.jackson.databind.module.SimpleModule
 import com.webauthn4j.ctap.core.converter.jackson.deserializer.CoercionLessByteArrayDeserializer
-import com.webauthn4j.ctap.core.converter.jackson.deserializer.CoercionLessStringDeserializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorClientPINRequestSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorClientPINResponseDataSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorGetAssertionRequestOptionsSerializer
@@ -106,7 +105,6 @@ class CtapCBORModule : SimpleModule("CtapCBORModule") {
             CtapPublicKeyCredentialUserEntitySerializer()
         )
 
-        this.addDeserializer(String::class.java, CoercionLessStringDeserializer())
         this.addDeserializer(ByteArray::class.java, CoercionLessByteArrayDeserializer())
     }
 }

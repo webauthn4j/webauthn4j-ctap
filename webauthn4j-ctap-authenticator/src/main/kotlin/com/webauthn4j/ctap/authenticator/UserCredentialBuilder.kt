@@ -68,7 +68,7 @@ class UserCredentialBuilder(private val objectConverter: ObjectConverter, privat
                     otherUI,
                     details
                 )
-                val data = objectConverter.cborConverter.writeValueAsBytes(nonResidentUserCredentialEnvelope)
+                val data = objectConverter.cborMapper.writeValueAsBytes(nonResidentUserCredentialEnvelope)
                 val credentialId = CipherUtil.encryptWithAESCBCPKCS5Padding(
                     data,
                     encryptionKey,

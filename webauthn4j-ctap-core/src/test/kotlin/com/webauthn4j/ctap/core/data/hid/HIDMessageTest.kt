@@ -19,7 +19,7 @@ internal class HIDMessageTest {
 
     @Test
     fun test() {
-        val cbor = ObjectConverter().cborConverter.writeValueAsBytes(
+        val cbor = ObjectConverter().cborMapper.writeValueAsBytes(
             AuthenticatorGetInfoResponse(
                 CTAP2_OK,
                 AuthenticatorGetInfoResponseData(

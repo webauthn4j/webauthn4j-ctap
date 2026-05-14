@@ -1,9 +1,8 @@
 package com.webauthn4j.ctap.authenticator
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.cbor.CBORFactory
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.dataformat.cbor.CBORMapper
+import tools.jackson.module.kotlin.KotlinModule
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementProvider
@@ -66,12 +65,12 @@ class CtapAuthenticator(
         @JvmField
         val PIN_PROTOCOLS = listOf(PinProtocolVersion.VERSION_1)
         private fun createObjectConverter(): ObjectConverter {
-            val jsonMapper = ObjectMapper()
-            val cborMapper = ObjectMapper(CBORFactory())
-            cborMapper.registerModule(CtapCBORModule())
-            cborMapper.registerModule(PublicKeyCredentialSourceCBORModule())
-            cborMapper.registerModule(JavaTimeModule())
-            cborMapper.registerModule(KotlinModule.Builder().build())
+            val jsonMapper = JsonMapper()
+            val cborMapper = CBORMapper.builder()
+                .addModule(CtapCBORModule())
+                .addModule(PublicKeyCredentialSourceCBORModule())
+                .addModule(KotlinModule.Builder().build())
+                .build()
             return ObjectConverter(jsonMapper, cborMapper)
         }
     }

@@ -1,8 +1,8 @@
 package com.webauthn4j.ctap.core.converter
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.cbor.CBORFactory
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.dataformat.cbor.CBORMapper
+import tools.jackson.module.kotlin.KotlinModule
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
@@ -25,10 +25,11 @@ internal class CtapResponseConverterTest {
     private val converter: CtapResponseConverter
 
     init {
-        val jsonMapper = ObjectMapper()
-        val cborMapper = ObjectMapper(CBORFactory())
-        cborMapper.registerModule(CtapCBORModule())
-        cborMapper.registerModule(KotlinModule.Builder().build())
+        val jsonMapper = JsonMapper()
+        val cborMapper = CBORMapper.builder()
+            .addModule(CtapCBORModule())
+            .addModule(KotlinModule.Builder().build())
+            .build()
         val objectConverter = ObjectConverter(jsonMapper, cborMapper)
         converter = CtapResponseConverter(objectConverter)
     }

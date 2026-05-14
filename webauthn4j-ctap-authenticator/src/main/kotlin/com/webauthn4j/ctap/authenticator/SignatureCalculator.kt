@@ -16,7 +16,7 @@ object SignatureCalculator {
         signedData: ByteArray
     ): ByteArray {
         return try {
-            val signature: Signature = SignatureUtil.createSignature(alg.jcaName)
+            val signature: Signature = SignatureUtil.createSignature(alg)
             signature.initSign(privateKey)
             signature.update(signedData)
             signature.sign()

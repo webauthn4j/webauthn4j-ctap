@@ -1,10 +1,9 @@
 package com.webauthn4j.ctap.core.converter.jackson.serializer
 
-import com.fasterxml.jackson.core.JsonGenerator
-import com.fasterxml.jackson.databind.SerializerProvider
-import com.fasterxml.jackson.databind.ser.std.StdSerializer
-import com.fasterxml.jackson.dataformat.cbor.CBORGenerator
-import java.io.IOException
+import tools.jackson.core.JsonGenerator
+import tools.jackson.databind.SerializationContext
+import tools.jackson.databind.ser.std.StdSerializer
+import tools.jackson.dataformat.cbor.CBORGenerator
 import java.util.function.Function
 
 abstract class AbstractCtapCanonicalCborSerializer<T>(
@@ -12,28 +11,27 @@ abstract class AbstractCtapCanonicalCborSerializer<T>(
     private val rules: List<FieldSerializationRule<T>>
 ) : StdSerializer<T>(t) {
 
-    @Throws(IOException::class)
-    override fun serialize(value: T, gen: JsonGenerator, provider: SerializerProvider) {
+    override fun serialize(value: T, generator: JsonGenerator, serializationContext: SerializationContext) {
         val nonNullValues = rules
             .map { rule: FieldSerializationRule<T> ->
                 val fieldValue = rule.getter.apply(value)
                 KeyValue(rule.name, fieldValue)
             }
             .filter { it.value != null }
-        (gen as CBORGenerator).writeStartObject(nonNullValues.size) // This is important to write finite length map
+        (generator as CBORGenerator).writeStartObject(value, nonNullValues.size) // This is important to write finite length map
         for (nonNullValue in nonNullValues) {
             when (nonNullValue.name) {
                 is String -> {
-                    gen.writeFieldName(nonNullValue.name)
+                    generator.writeName(nonNullValue.name)
                 }
                 is Int -> {
-                    gen.writeFieldId(nonNullValue.name.toLong())
+                    (generator as CBORGenerator).writePropertyId(nonNullValue.name.toLong())
                 }
                 else -> throw IllegalStateException("Unexpected field type")
             }
-            gen.writeObject(nonNullValue.value)
+            serializationContext.writeValue(generator, nonNullValue.value)
         }
-        gen.writeEndObject()
+        generator.writeEndObject()
     }
 
     private class KeyValue(val name: Any, val value: Any?)

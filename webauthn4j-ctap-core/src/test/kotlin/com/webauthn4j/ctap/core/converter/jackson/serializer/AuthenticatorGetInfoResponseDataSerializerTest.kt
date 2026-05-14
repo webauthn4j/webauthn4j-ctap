@@ -1,9 +1,9 @@
 package com.webauthn4j.ctap.core.converter.jackson.serializer
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.cbor.CBORFactory
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.webauthn4j.converter.util.CborConverter
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.dataformat.cbor.CBORMapper
+import tools.jackson.module.kotlin.KotlinModule
+
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
@@ -18,14 +18,29 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
 internal class AuthenticatorGetInfoResponseDataSerializerTest {
-    private val converter: CborConverter
+    private val cborMapper: CBORMapper
 
     init {
-        val jsonMapper = ObjectMapper()
-        val cborMapper = ObjectMapper(CBORFactory())
-        cborMapper.registerModule(CtapCBORModule())
-        cborMapper.registerModule(KotlinModule.Builder().build())
-        converter = ObjectConverter(jsonMapper, cborMapper).cborConverter
+        val jsonMapper = JsonMapper()
+        val ctapCborMapper = CBORMapper.builder()
+            .addModule(CtapCBORModule())
+            .addModule(KotlinModule.Builder().build())
+            .build()
+        cborMapper = ObjectConverter(jsonMapper, ctapCborMapper).cborMapper
+    }
+
+    @Test
+    fun integer_keys_should_be_encoded_as_cbor_unsigned_integer() {
+        val original = AuthenticatorGetInfoResponseData(
+            listOf("FIDO_2_0"), null,
+            CtapAuthenticator.AAGUID,
+            null, null, null, null, null, null
+        )
+        val encoded = cborMapper.writeValueAsBytes(original)
+        // CBOR unsigned integer key 0x01 (1) should appear, not CBOR text string "1" (0x6131)
+        // A2 = 2-element map, 01 = unsigned integer 1 (versions key), 03 = unsigned integer 3 (aaguid key)
+        Assertions.assertThat(encoded[0]).isEqualTo(0xA2.toByte()) // fixed-length map with 2 entries
+        Assertions.assertThat(encoded[1]).isEqualTo(0x01.toByte()) // key 1 as CBOR unsigned integer
     }
 
     @Test
@@ -46,8 +61,8 @@ internal class AuthenticatorGetInfoResponseDataSerializerTest {
             null,
             null
         )
-        val encoded = converter.writeValueAsBytes(original)
-        val decoded = converter.readValue(encoded, AuthenticatorGetInfoResponseData::class.java)
+        val encoded = cborMapper.writeValueAsBytes(original)
+        val decoded = cborMapper.readValue(encoded, AuthenticatorGetInfoResponseData::class.java)
         Assertions.assertThat(decoded).isEqualTo(original)
     }
 

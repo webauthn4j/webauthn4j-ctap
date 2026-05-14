@@ -1,9 +1,8 @@
 package integration.usecase.testcase
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.cbor.CBORFactory
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.KotlinModule
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.dataformat.cbor.CBORMapper
+import tools.jackson.module.kotlin.KotlinModule
 import com.webauthn4j.WebAuthnManager
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
@@ -46,12 +45,12 @@ import kotlin.reflect.KProperty
 abstract class IntegrationTestCaseBase {
 
     private val objectConverterParameter = TestParameter {
-        val jsonMapper = ObjectMapper()
-        val cborMapper = ObjectMapper(CBORFactory())
-        cborMapper.registerModule(JavaTimeModule())
-        cborMapper.registerModule(CtapCBORModule())
-        cborMapper.registerModule(PublicKeyCredentialSourceCBORModule())
-        cborMapper.registerModule(KotlinModule.Builder().build())
+        val jsonMapper = JsonMapper()
+        val cborMapper = CBORMapper.builder()
+            .addModule(CtapCBORModule())
+            .addModule(PublicKeyCredentialSourceCBORModule())
+            .addModule(KotlinModule.Builder().build())
+            .build()
         ObjectConverter(jsonMapper, cborMapper)
     }
     var objectConverter by objectConverterParameter
@@ -332,12 +331,11 @@ abstract class IntegrationTestCaseBase {
                     TestParameter { this@RelyingParty.challenge }.depends(this@RelyingParty.challengeParameter)
                 private val tokenBindingIdParameter = TestParameter<ByteArray?> { null }
                 private val serverPropertyParameter = TestParameter {
-                    ServerProperty(
-                        origin,
-                        rpId,
-                        challenge,
-                        tokenBindingId
-                    )
+                    ServerProperty.builder()
+                        .origin(origin)
+                        .rpId(rpId)
+                        .challenge(challenge)
+                        .build()
                 }.depends(
                     originParameter,
                     rpIdParameter,
@@ -421,7 +419,11 @@ abstract class IntegrationTestCaseBase {
                 private val userPresenceRequiredParameter = TestParameter { true }
 
                 private val serverPropertyParameter = TestParameter {
-                    ServerProperty(origin, rpId, challenge, tokenBindingId)
+                    ServerProperty.builder()
+                        .origin(origin)
+                        .rpId(rpId)
+                        .challenge(challenge)
+                        .build()
                 }.depends(
                     originParameter,
                     rpIdParameter,

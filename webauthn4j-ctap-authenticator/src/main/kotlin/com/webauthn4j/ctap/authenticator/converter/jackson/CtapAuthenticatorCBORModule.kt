@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.authenticator.converter.jackson
 
-import com.fasterxml.jackson.databind.module.SimpleModule
+import tools.jackson.databind.module.SimpleModule
 import com.webauthn4j.ctap.authenticator.U2FKeyEnvelope
 import com.webauthn4j.ctap.authenticator.converter.jackson.deserializer.ClientPINOptionDeserializer
 import com.webauthn4j.ctap.authenticator.converter.jackson.deserializer.PlatformOptionDeserializer

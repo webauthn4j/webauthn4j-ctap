@@ -1,13 +1,12 @@
 package com.webauthn4j.ctap.core.converter.jackson.deserializer
 
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
-import com.fasterxml.jackson.databind.node.BinaryNode
-import com.fasterxml.jackson.databind.node.ObjectNode
+import tools.jackson.core.JsonParser
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.deser.std.StdDeserializer
+import tools.jackson.databind.node.BinaryNode
+import tools.jackson.databind.node.ObjectNode
 import com.webauthn4j.util.exception.NotImplementedException
 import com.webauthn4j.util.exception.UnexpectedCheckedException
-import java.io.IOException
 import java.security.KeyFactory
 import java.security.NoSuchAlgorithmException
 import java.security.PublicKey
@@ -16,12 +15,10 @@ import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 
 class PublicKeyDeserializer : StdDeserializer<PublicKey>(PublicKey::class.java) {
-    @Throws(IOException::class)
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): PublicKey {
-        val oc = p.codec
-        val node = oc.readTree<ObjectNode>(p)
-        val algorithm = node["algorithm"].asText()
-        val format = node["format"].asText()
+        val node = p.readValueAsTree<ObjectNode>()
+        val algorithm = node["algorithm"].stringValue()
+        val format = node["format"].stringValue()
         val encoded = (node["encoded"] as BinaryNode).binaryValue()
         return when (format) {
             "PKCS#8" -> when (algorithm) {

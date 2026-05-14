@@ -59,7 +59,7 @@ class U2FRegisterExecution(
             u2FRegistrationRequest.applicationParameter,
             Instant.now()
         )
-        val data = ctapAuthenticatorSession.objectConverter.cborConverter.writeValueAsBytes(envelope)
+        val data = ctapAuthenticatorSession.objectConverter.cborMapper.writeValueAsBytes(envelope)
 
         val userPresenceResult = requestUserPresence(u2FRegistrationRequest.applicationParameter)
         if (!userPresenceResult) {

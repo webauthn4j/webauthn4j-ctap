@@ -31,11 +31,11 @@ internal class UserVerificationOptionTest {
     fun deserialize_test() {
         @Suppress("JoinDeclarationAndAssignment")
         var dto: DTO?
-        dto = ObjectConverter().jsonConverter.readValue("{ \"uv\":true }", DTO::class.java)
+        dto = ObjectConverter().jsonMapper.readValue("{ \"uv\":true }", DTO::class.java)
         Assertions.assertThat(dto!!.uv).isEqualTo(UserVerificationOption.READY)
-        dto = ObjectConverter().jsonConverter.readValue("{ \"uv\":false }", DTO::class.java)
+        dto = ObjectConverter().jsonMapper.readValue("{ \"uv\":false }", DTO::class.java)
         Assertions.assertThat(dto!!.uv).isEqualTo(UserVerificationOption.NOT_READY)
-        dto = ObjectConverter().jsonConverter.readValue("{ \"uv\":null }", DTO::class.java)
+        dto = ObjectConverter().jsonMapper.readValue("{ \"uv\":null }", DTO::class.java)
         Assertions.assertThat(dto!!.uv).isEqualTo(UserVerificationOption.NOT_SUPPORTED)
     }
 

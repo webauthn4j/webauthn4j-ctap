@@ -1,12 +1,13 @@
 package com.webauthn4j.ctap.core.converter
 
-import com.webauthn4j.converter.util.CborConverter
+
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.core.data.*
+import tools.jackson.dataformat.cbor.CBORMapper
 import java.nio.ByteBuffer
 
 class CtapRequestConverter(objectConverter: ObjectConverter) {
-    private val cborConverter: CborConverter = objectConverter.cborConverter
+    private val cborMapper: CBORMapper = objectConverter.cborMapper
 
     /**
      * Converts from a byte array to [CtapRequest].
@@ -20,16 +21,16 @@ class CtapRequestConverter(objectConverter: ObjectConverter) {
         val commandType = source.first().toUByte()
         val commandParameters = source.copyOfRange(1, source.size)
         return when (commandType) {
-            0x01.toUByte() -> cborConverter.readValue(
+            0x01.toUByte() -> cborMapper.readValue(
                 commandParameters,
                 AuthenticatorMakeCredentialRequest::class.java
             )!!
-            0x02.toUByte() -> cborConverter.readValue(
+            0x02.toUByte() -> cborMapper.readValue(
                 commandParameters,
                 AuthenticatorGetAssertionRequest::class.java
             )!!
             0x04.toUByte() -> AuthenticatorGetInfoRequest()
-            0x06.toUByte() -> cborConverter.readValue(
+            0x06.toUByte() -> cborMapper.readValue(
                 commandParameters,
                 AuthenticatorClientPINRequest::class.java
             )!!
@@ -58,7 +59,7 @@ class CtapRequestConverter(objectConverter: ObjectConverter) {
     }
 
     fun convertToRequestDataBytes(source: CtapRequest): ByteArray {
-        return cborConverter.writeValueAsBytes(source)
+        return cborMapper.writeValueAsBytes(source)
     }
 
 }

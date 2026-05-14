@@ -1,8 +1,8 @@
 package com.webauthn4j.ctap.authenticator.converter.jackson.deserializer
 
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
+import tools.jackson.core.JsonParser
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.deser.std.StdDeserializer
 import com.webauthn4j.ctap.core.data.options.UserVerificationOption
 import com.webauthn4j.ctap.core.data.options.UserVerificationOption.Companion.create
 import java.io.IOException

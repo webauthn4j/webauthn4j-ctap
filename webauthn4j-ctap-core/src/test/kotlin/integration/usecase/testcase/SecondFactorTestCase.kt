@@ -38,7 +38,7 @@ class SecondFactorTestCase : IntegrationTestCaseBase() {
         val registrationRequest = RegistrationRequest(
             attestationAuthenticatorResponse.attestationObject,
             attestationAuthenticatorResponse.clientDataJSON,
-            objectConverter.jsonConverter.writeValueAsString(registrationResponse.clientExtensionResults),
+            objectConverter.jsonMapper.writeValueAsString(registrationResponse.clientExtensionResults),
             attestationAuthenticatorResponse.transports.map { obj: AuthenticatorTransport -> obj.value }
                 .toSet()
         )
@@ -73,7 +73,7 @@ class SecondFactorTestCase : IntegrationTestCaseBase() {
             relyingParty.registration.frontend.userId,
             assertionAuthenticatorResponse.authenticatorData,
             assertionAuthenticatorResponse.clientDataJSON,
-            objectConverter.jsonConverter.writeValueAsString(assertionResponse.clientExtensionResults),
+            objectConverter.jsonMapper.writeValueAsString(assertionResponse.clientExtensionResults),
             assertionAuthenticatorResponse.signature
         )
         val attestationObject =

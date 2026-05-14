@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.core.converter.jackson
 
-import com.fasterxml.jackson.databind.module.SimpleModule
+import tools.jackson.databind.module.SimpleModule
 import com.webauthn4j.ctap.core.converter.jackson.deserializer.PrivateKeyDeserializer
 import com.webauthn4j.ctap.core.converter.jackson.deserializer.PublicKeyDeserializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.PrivateKeySerializer
