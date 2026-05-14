@@ -26,7 +26,7 @@ abstract class PackedAttestationStatementProviderBase(
         val toBeSigned = ByteBuffer.allocate(authenticatorDataBytes.size + clientDataHash.size)
             .put(authenticatorDataBytes).put(clientDataHash).array()
         val alg: COSEAlgorithmIdentifier = attestationStatementRequest.alg
-        val sig = sign(attestationStatementRequest.credentialKey.keyPair!!, toBeSigned)
+        val sig = sign(attestationStatementRequest.credentialKey.keyPair!!, toBeSigned, alg)
         return PackedAttestationStatement(
             alg,
             sig,
@@ -34,7 +34,7 @@ abstract class PackedAttestationStatementProviderBase(
         )
     }
 
-    protected abstract fun sign(credentialKey: KeyPair, toBeSigned: ByteArray): ByteArray
+    protected abstract fun sign(credentialKey: KeyPair, toBeSigned: ByteArray, alg: COSEAlgorithmIdentifier): ByteArray
     protected abstract fun createAttestationCertificatePath(attestationStatementRequest: AttestationStatementRequest): AttestationCertificatePath
 
 }
