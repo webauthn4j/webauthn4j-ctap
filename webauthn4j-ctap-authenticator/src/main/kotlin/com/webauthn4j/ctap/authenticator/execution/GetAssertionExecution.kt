@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.authenticator.execution
 
-import com.fasterxml.jackson.core.type.TypeReference
+import tools.jackson.core.type.TypeReference
 import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
 import com.webauthn4j.ctap.authenticator.GetAssertionConsentRequest
 import com.webauthn4j.ctap.authenticator.GetAssertionSession
@@ -192,7 +192,7 @@ internal class GetAssertionExecution :
         }
         try {
             val nonResidentUserCredentialEnvelope =
-                ctapAuthenticatorSession.objectConverter.cborConverter.readValue(
+                ctapAuthenticatorSession.objectConverter.cborMapper.readValue(
                     decrypted,
                     object : TypeReference<NonResidentUserCredentialSource>() {})!!
             return NonResidentUserCredential(
@@ -214,7 +214,7 @@ internal class GetAssertionExecution :
         }
         try {
             val u2fKeyEnvelope =
-                ctapAuthenticatorSession.objectConverter.cborConverter.readValue(
+                ctapAuthenticatorSession.objectConverter.cborMapper.readValue(
                     decrypted,
                     object : TypeReference<U2FKeyEnvelope>() {})!!
 

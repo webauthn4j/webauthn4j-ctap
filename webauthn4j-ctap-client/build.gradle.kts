@@ -7,13 +7,13 @@ plugins {
 description = "CTAP client library"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     compilerOptions{
-        jvmTarget = JvmTarget.JVM_11
+        jvmTarget = JvmTarget.JVM_17
         javaParameters = true
     }
 }
@@ -42,7 +42,6 @@ dependencies {
 
     implementation(libs.jackson.module.kotlin)
     implementation(libs.jackson.dataformat.cbor)
-    implementation(libs.jackson.datatype.jsr310)
 
     implementation(libs.bouncycastle.bcpkix.jdk15to18)
     implementation(libs.bouncycastle.bcprov.jdk15to18)

@@ -1,10 +1,8 @@
 package com.webauthn4j.ctap.core.converter.jackson.serializer
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.cbor.CBORFactory
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.webauthn4j.converter.util.CborConverter
-import com.webauthn4j.converter.util.ObjectConverter
+import tools.jackson.dataformat.cbor.CBORMapper
+import tools.jackson.module.kotlin.KotlinModule
+
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
 import com.webauthn4j.ctap.core.data.options.ClientPINOption
@@ -17,15 +15,10 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
 internal class AuthenticatorGetInfoResponseDataOptionsSerializerTest {
-    private val converter: CborConverter
-
-    init {
-        val jsonMapper = ObjectMapper()
-        val cborMapper = ObjectMapper(CBORFactory())
-        cborMapper.registerModule(CtapCBORModule())
-        cborMapper.registerModule(KotlinModule.Builder().build())
-        converter = ObjectConverter(jsonMapper, cborMapper).cborConverter
-    }
+    private val converter: CBORMapper = CBORMapper.builder()
+        .addModule(CtapCBORModule())
+        .addModule(KotlinModule.Builder().build())
+        .build()
 
     @Test
     fun test() {

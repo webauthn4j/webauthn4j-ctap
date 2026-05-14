@@ -1,47 +1,36 @@
 package com.webauthn4j.ctap.authenticator.store
 
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.cbor.CBORFactory
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.webauthn4j.converter.util.CborConverter
-import com.webauthn4j.converter.util.ObjectConverter
+import tools.jackson.core.type.TypeReference
+import tools.jackson.dataformat.cbor.CBORMapper
+import tools.jackson.module.kotlin.KotlinModule
+
 import com.webauthn4j.ctap.authenticator.data.credential.NonResidentCredentialKey
 import com.webauthn4j.ctap.authenticator.data.credential.NonResidentUserCredential
 import com.webauthn4j.ctap.core.converter.jackson.PublicKeyCredentialSourceCBORModule
 import com.webauthn4j.data.SignatureAlgorithm
 import com.webauthn4j.util.ECUtil
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
 
 internal class NonResidentUserCredentialTest {
 
-    private lateinit var cborConverter: CborConverter
-
-    @BeforeEach
-    fun setup() {
-        val jsonMapper = ObjectMapper()
-        val cborMapper = ObjectMapper(CBORFactory())
-        cborMapper.registerModule(JavaTimeModule())
-        cborMapper.registerModule(PublicKeyCredentialSourceCBORModule())
-        cborMapper.registerModule(KotlinModule.Builder().build())
-        cborConverter = ObjectConverter(jsonMapper, cborMapper).cborConverter
-    }
+    private val cborMapper: CBORMapper = CBORMapper.builder()
+        .addModule(PublicKeyCredentialSourceCBORModule())
+        .addModule(KotlinModule.Builder().build())
+        .build()
 
     @Test
     fun serialize_test() {
         val target = createNonResidentUserCredential()
-        cborConverter.writeValueAsBytes(target)
+        cborMapper.writeValueAsBytes(target)
     }
 
     @Test
     fun deserialize_test() {
         val target = createNonResidentUserCredential()
-        val bytes = cborConverter.writeValueAsBytes(target)
-        val data = cborConverter.readValue(
+        val bytes = cborMapper.writeValueAsBytes(target)
+        val data = cborMapper.readValue(
             bytes,
             object : TypeReference<NonResidentUserCredential>() {})
         assertThat(data).isEqualTo(target)

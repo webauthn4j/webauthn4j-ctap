@@ -61,7 +61,7 @@ class U2FAuthenticationExecution(
                 encryptionKey,
                 encryptionIV
             )
-            envelope = ctapAuthenticatorSession.objectConverter.cborConverter.readValue(
+            envelope = ctapAuthenticatorSession.objectConverter.cborMapper.readValue(
                 decrypted,
                 U2FKeyEnvelope::class.java
             )!!

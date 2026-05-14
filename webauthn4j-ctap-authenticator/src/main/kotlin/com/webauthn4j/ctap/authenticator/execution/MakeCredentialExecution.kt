@@ -1,6 +1,7 @@
 package com.webauthn4j.ctap.authenticator.execution
 
-import com.webauthn4j.converter.util.CborConverter
+
+import tools.jackson.dataformat.cbor.CBORMapper
 import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
 import com.webauthn4j.ctap.authenticator.MakeCredentialConsentRequest
 import com.webauthn4j.ctap.authenticator.UserCredentialBuilder
@@ -58,7 +59,7 @@ internal class MakeCredentialExecution :
     private val authenticatorMakeCredentialRequest: AuthenticatorMakeCredentialRequest
 
     private val authenticatorPropertyStore: AuthenticatorPropertyStore
-    private val cborConverter: CborConverter
+    private val cborMapper: CBORMapper
     private val secureRandom = SecureRandom()
 
     // command properties
@@ -94,7 +95,7 @@ internal class MakeCredentialExecution :
         this.authenticatorMakeCredentialRequest = authenticatorMakeCredentialCommand
 
         this.authenticatorPropertyStore = ctapAuthenticatorSession.authenticatorPropertyStore
-        this.cborConverter = ctapAuthenticatorSession.objectConverter.cborConverter
+        this.cborMapper = ctapAuthenticatorSession.objectConverter.cborMapper
 
         // command properties initialization and validation
         this.clientDataHash = authenticatorMakeCredentialCommand.clientDataHash

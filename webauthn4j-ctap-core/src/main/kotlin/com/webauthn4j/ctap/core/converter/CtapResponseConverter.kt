@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.core.converter
 
-import com.webauthn4j.converter.util.CborConverter
+
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponseData
@@ -15,12 +15,13 @@ import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialResponseData
 import com.webauthn4j.ctap.core.data.AuthenticatorResetResponse
 import com.webauthn4j.ctap.core.data.CtapResponse
 import com.webauthn4j.ctap.core.data.CtapStatusCode
+import tools.jackson.dataformat.cbor.CBORMapper
 import java.nio.ByteBuffer
 import java.util.Arrays
 
 class CtapResponseConverter(objectConverter: ObjectConverter) {
 
-    private val cborConverter: CborConverter = objectConverter.cborConverter
+    private val cborMapper: CBORMapper = objectConverter.cborMapper
 
     /**
      * Converts from a byte array to [CtapResponse].
@@ -37,28 +38,28 @@ class CtapResponseConverter(objectConverter: ObjectConverter) {
         val responseDataBytes = Arrays.copyOfRange(source, 1, source.size)
         return when (responseType) {
             AuthenticatorMakeCredentialResponse::class.java -> {
-                val responseData = cborConverter.readValue(
+                val responseData = cborMapper.readValue(
                     responseDataBytes,
                     AuthenticatorMakeCredentialResponseData::class.java
                 )
                 AuthenticatorMakeCredentialResponse(statusCode, responseData)
             }
             AuthenticatorGetAssertionResponse::class.java -> {
-                val responseData = cborConverter.readValue(
+                val responseData = cborMapper.readValue(
                     responseDataBytes,
                     AuthenticatorGetAssertionResponseData::class.java
                 )
                 AuthenticatorGetAssertionResponse(statusCode, responseData)
             }
             AuthenticatorGetInfoResponse::class.java -> {
-                val responseData = cborConverter.readValue(
+                val responseData = cborMapper.readValue(
                     responseDataBytes,
                     AuthenticatorGetInfoResponseData::class.java
                 )
                 AuthenticatorGetInfoResponse(statusCode, responseData)
             }
             AuthenticatorClientPINResponse::class.java -> {
-                val responseData = cborConverter.readValue(
+                val responseData = cborMapper.readValue(
                     responseDataBytes,
                     AuthenticatorClientPINResponseData::class.java
                 )
@@ -68,7 +69,7 @@ class CtapResponseConverter(objectConverter: ObjectConverter) {
                 AuthenticatorResetResponse(statusCode)
             }
             AuthenticatorGetNextAssertionResponse::class.java -> {
-                val responseData = cborConverter.readValue(
+                val responseData = cborMapper.readValue(
                     responseDataBytes,
                     AuthenticatorGetNextAssertionResponseData::class.java
                 )
@@ -88,7 +89,7 @@ class CtapResponseConverter(objectConverter: ObjectConverter) {
         return if (source.responseData == null) {
             return byteArrayOf(source.statusCode.byte)
         } else {
-            val responseData = cborConverter.writeValueAsBytes(source.responseData)
+            val responseData = cborMapper.writeValueAsBytes(source.responseData)
             ByteBuffer.allocate(1 + responseData.size).put(source.statusCode.byte).put(responseData)
                 .array()
         }
@@ -98,7 +99,7 @@ class CtapResponseConverter(objectConverter: ObjectConverter) {
         return if (source.responseData == null) {
             byteArrayOf()
         } else {
-            cborConverter.writeValueAsBytes(source.responseData)
+            cborMapper.writeValueAsBytes(source.responseData)
         }
     }
 
