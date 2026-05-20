@@ -5,12 +5,16 @@ import com.webauthn4j.ctap.core.data.hid.HIDCommand
 import com.webauthn4j.ctap.core.data.hid.HIDContinuationPacket
 import com.webauthn4j.ctap.core.data.hid.HIDInitializationPacket
 import com.webauthn4j.ctap.core.data.hid.HIDMessage
-import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.MAX_CONT_PACKET_DATA_SIZE
-import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.MAX_INIT_PACKET_DATA_SIZE
+import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.DEFAULT_PACKET_SIZE
 import java.nio.ByteBuffer
 import kotlin.math.min
 
-abstract class HIDMessageBuilderBase<T : HIDMessage> {
+abstract class HIDMessageBuilderBase<T : HIDMessage>(
+    packetSize: Int = DEFAULT_PACKET_SIZE
+) {
+
+    private val maxInitPacketDataSize = HIDMessage.initPacketDataSize(packetSize)
+    private val maxContPacketDataSize = HIDMessage.contPacketDataSize(packetSize)
 
     private var buffer = ByteBuffer.allocate(0)
     private var counter: Byte = 0
@@ -23,7 +27,7 @@ abstract class HIDMessageBuilderBase<T : HIDMessage> {
             initializationPacket.data,
             0,
             min(
-                min(initializationPacket.length.toInt(), MAX_INIT_PACKET_DATA_SIZE),
+                min(initializationPacket.length.toInt(), maxInitPacketDataSize),
                 initializationPacket.data.size
             )
         )
@@ -41,7 +45,7 @@ abstract class HIDMessageBuilderBase<T : HIDMessage> {
         buffer.put(
             continuationPacket.data,
             0,
-            min(min(buffer.remaining(), MAX_CONT_PACKET_DATA_SIZE), continuationPacket.data.size)
+            min(min(buffer.remaining(), maxContPacketDataSize), continuationPacket.data.size)
         )
         counter++
     }

@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.core.data.hid
 
-import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.MAX_PACKET_SIZE
+import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.INIT_PACKET_HEADER_SIZE
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.util.ArrayUtil
 import java.nio.ByteBuffer
@@ -31,7 +31,7 @@ class HIDInitializationPacket : HIDPacket {
     override fun toBytes(): ByteArray {
         val commandByte = command.value or HIDCommand.CMD_BIT
 
-        return ByteBuffer.allocate(MAX_PACKET_SIZE)
+        return ByteBuffer.allocate(INIT_PACKET_HEADER_SIZE + data.size)
             .put(channelId.value)
             .put(commandByte)
             .putShort(length.toShort())

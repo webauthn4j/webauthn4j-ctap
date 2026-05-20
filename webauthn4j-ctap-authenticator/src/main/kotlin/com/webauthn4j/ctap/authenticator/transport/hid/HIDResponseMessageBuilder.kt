@@ -13,7 +13,9 @@ import com.webauthn4j.ctap.core.data.hid.HIDResponseMessage
 import com.webauthn4j.ctap.core.data.hid.HIDStatusCode
 import com.webauthn4j.ctap.core.data.hid.HIDWINKResponseMessage
 
-class HIDResponseMessageBuilder : HIDMessageBuilderBase<HIDResponseMessage>() {
+class HIDResponseMessageBuilder(
+    packetSize: Int = com.webauthn4j.ctap.core.data.hid.HIDMessage.DEFAULT_PACKET_SIZE
+) : HIDMessageBuilderBase<HIDResponseMessage>(packetSize) {
     override fun createMessage(
         channelId: HIDChannelId,
         command: HIDCommand,

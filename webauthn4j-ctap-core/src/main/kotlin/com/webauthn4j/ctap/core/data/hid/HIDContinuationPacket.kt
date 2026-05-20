@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.core.data.hid
 
-import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.MAX_PACKET_SIZE
+import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.CONT_PACKET_HEADER_SIZE
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.util.ArrayUtil
 import java.nio.ByteBuffer
@@ -20,7 +20,7 @@ class HIDContinuationPacket : HIDPacket {
 
 
     override fun toBytes(): ByteArray {
-        return ByteBuffer.allocate(MAX_PACKET_SIZE).put(channelId.value).put(sec).put(data).array()
+        return ByteBuffer.allocate(CONT_PACKET_HEADER_SIZE + data.size).put(channelId.value).put(sec).put(data).array()
     }
 
     override fun equals(other: Any?): Boolean {

@@ -10,14 +10,17 @@ import com.webauthn4j.ctap.core.converter.HIDPacketConverter
 import com.webauthn4j.ctap.core.data.CtapResponse
 import com.webauthn4j.ctap.core.data.U2FStatusCode
 import com.webauthn4j.ctap.core.data.hid.*
-import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.MAX_PACKET_SIZE
+import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.DEFAULT_PACKET_SIZE
 import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import com.webauthn4j.util.HexUtil
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import kotlin.experimental.or
 
-class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
+class HIDTransport(
+    ctapAuthenticator: CtapAuthenticator,
+    private val packetSize: Int = DEFAULT_PACKET_SIZE
+) : Transport {
 
     companion object {
         private const val KEEPALIVE_INTERVAL = 100L
@@ -55,9 +58,9 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
     suspend fun onHIDDataReceived(bytes: ByteArray, hidPacketHandler: HIDPacketHandler) {
         try {
             val packetOffset = when (bytes.size) {
-                MAX_PACKET_SIZE -> 0
-                MAX_PACKET_SIZE + 1 -> 1
-                else -> throw IllegalStateException("Unexpected bytes size")
+                packetSize -> 0
+                packetSize + 1 -> 1
+                else -> throw IllegalStateException("Unexpected bytes size: ${bytes.size}, expected $packetSize or ${packetSize + 1}")
             }
             val packetBytes = bytes.copyOfRange(packetOffset, bytes.size)
 
@@ -86,7 +89,7 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
                 }
             } catch (e: RuntimeException) {
                 logger.error("Unexpected exception is thrown while processing HID packet", e)
-                HIDERRORResponseMessage(hidPacket.channelId, HIDErrorCode.OTHER).toHIDPackets()
+                HIDERRORResponseMessage(hidPacket.channelId, HIDErrorCode.OTHER).toHIDPackets(packetSize)
                     .forEach {
                         logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, it.toString())
                         hidPacketHandler.onResponse(it.toBytes())
@@ -104,7 +107,7 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
 
     private inner class HIDChannel(channelId: HIDChannelId) {
 
-        private val hidRequestMessageBuilder = HIDRequestMessageBuilder()
+        private val hidRequestMessageBuilder = HIDRequestMessageBuilder(packetSize)
 
 
         @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
@@ -125,13 +128,13 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
                 hidRequestMessageBuilder.clear()
                 try {
                     handleMessage(hidMessage) {
-                        it.toHIDPackets().forEach { parameter ->
+                        it.toHIDPackets(packetSize).forEach { parameter ->
                             responseCallback.onResponse(parameter)
                         }
                     }
                 } catch (e: RuntimeException) {
                     logger.error("Unexpected exception is thrown while processing HID message", e)
-                    HIDERRORResponseMessage(hidMessage.channelId, HIDErrorCode.OTHER).toHIDPackets()
+                    HIDERRORResponseMessage(hidMessage.channelId, HIDErrorCode.OTHER).toHIDPackets(packetSize)
                         .forEach { packet ->
                             responseCallback.onResponse(packet)
                         }

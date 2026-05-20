@@ -15,7 +15,9 @@ import com.webauthn4j.ctap.core.data.hid.HIDStatusCode
 import com.webauthn4j.ctap.core.data.hid.HIDWINKRequestMessage
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 
-class HIDRequestMessageBuilder : HIDMessageBuilderBase<HIDRequestMessage>() {
+class HIDRequestMessageBuilder(
+    packetSize: Int = com.webauthn4j.ctap.core.data.hid.HIDMessage.DEFAULT_PACKET_SIZE
+) : HIDMessageBuilderBase<HIDRequestMessage>(packetSize) {
 
     override fun createMessage(
         channelId: HIDChannelId,
