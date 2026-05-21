@@ -62,6 +62,12 @@ class UHIDBridge(
 
     private fun createDevice() {
         val event = UHIDEvent.createCreate2(config, FidoHIDReportDescriptor.DESCRIPTOR)
+        logger.debug("Creating UHID device with report descriptor size: {}", FidoHIDReportDescriptor.DESCRIPTOR.size)
+        logger.debug("Report descriptor hex: {}", FidoHIDReportDescriptor.DESCRIPTOR.joinToString(" ") { "%02X".format(it.toInt() and 0xFF) })
+        logger.debug("Device config: name={}, vid=0x{}, pid=0x{}",
+            config.deviceName,
+            Integer.toHexString(config.vendorId),
+            Integer.toHexString(config.productId))
         connection.writeEvent(event)
         deviceCreated = true
         logger.info("Virtual FIDO2 device created: {}", config.deviceName)
@@ -104,6 +110,8 @@ class UHIDBridge(
     private suspend fun handleOutput(eventBytes: ByteArray) {
         val output = UHIDEvent.parseOutput(eventBytes)
         val reportBytes = output.data
+        logger.debug("UHID_OUTPUT: size={} (actual HID report: {} bytes), rtype={}",
+            output.size, reportBytes.size, output.rtype)
         hidTransport.onHIDDataReceived(reportBytes) { responseBytes ->
             sendInput(responseBytes)
         }

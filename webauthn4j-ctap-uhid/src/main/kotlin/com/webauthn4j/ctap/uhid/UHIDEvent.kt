@@ -10,21 +10,23 @@ import java.nio.ByteOrder
 object UHIDEvent {
     const val EVENT_SIZE = 4380
 
-    // UHID_CREATE2 field offsets
-    private const val CREATE2_NAME_OFFSET = 4
+    // UHID_CREATE2 field offsets within uhid_event structure
+    // struct uhid_event { u32 type; union { struct uhid_create2_req create2; ... } u; }
+    // Offsets verified with offsetof() in Linux kernel uhid.h
+    private const val CREATE2_NAME_OFFSET = 4        // event.u.create2.name
     private const val CREATE2_NAME_SIZE = 128
-    private const val CREATE2_PHYS_OFFSET = 132
+    private const val CREATE2_PHYS_OFFSET = 132      // event.u.create2.phys
     private const val CREATE2_PHYS_SIZE = 64
-    private const val CREATE2_UNIQ_OFFSET = 196
+    private const val CREATE2_UNIQ_OFFSET = 196      // event.u.create2.uniq
     private const val CREATE2_UNIQ_SIZE = 64
-    private const val CREATE2_RD_SIZE_OFFSET = 260
-    private const val CREATE2_RD_DATA_OFFSET = 262
+    private const val CREATE2_RD_SIZE_OFFSET = 260   // event.u.create2.rd_size
+    private const val CREATE2_BUS_OFFSET = 262       // event.u.create2.bus
+    private const val CREATE2_VENDOR_OFFSET = 264    // event.u.create2.vendor
+    private const val CREATE2_PRODUCT_OFFSET = 268   // event.u.create2.product
+    private const val CREATE2_VERSION_OFFSET = 272   // event.u.create2.version
+    private const val CREATE2_COUNTRY_OFFSET = 276   // event.u.create2.country
+    private const val CREATE2_RD_DATA_OFFSET = 280   // event.u.create2.rd_data
     private const val CREATE2_RD_DATA_SIZE = 4096
-    private const val CREATE2_BUS_OFFSET = 4358
-    private const val CREATE2_VENDOR_OFFSET = 4360
-    private const val CREATE2_PRODUCT_OFFSET = 4364
-    private const val CREATE2_VERSION_OFFSET = 4368
-    private const val CREATE2_COUNTRY_OFFSET = 4372
 
     // UHID_INPUT2 field offsets
     private const val INPUT2_SIZE_OFFSET = 4
@@ -49,8 +51,6 @@ object UHIDEvent {
         putFixedString(buf, CREATE2_UNIQ_OFFSET, config.uniqueId, CREATE2_UNIQ_SIZE)
         buf.position(CREATE2_RD_SIZE_OFFSET)
         buf.putShort(reportDescriptor.size.toShort())
-        buf.position(CREATE2_RD_DATA_OFFSET)
-        buf.put(reportDescriptor)
         buf.position(CREATE2_BUS_OFFSET)
         buf.putShort(BUS_USB)
         buf.position(CREATE2_VENDOR_OFFSET)
@@ -61,6 +61,8 @@ object UHIDEvent {
         buf.putInt(config.version)
         buf.position(CREATE2_COUNTRY_OFFSET)
         buf.putInt(0)
+        buf.position(CREATE2_RD_DATA_OFFSET)
+        buf.put(reportDescriptor)
         return buf.array()
     }
 
@@ -91,9 +93,14 @@ object UHIDEvent {
         val buf = ByteBuffer.wrap(eventBytes).order(ByteOrder.LITTLE_ENDIAN)
         val size = buf.getShort(OUTPUT_SIZE_OFFSET).toInt() and 0xFFFF
         val rtype = buf.get(OUTPUT_RTYPE_OFFSET)
-        val data = ByteArray(size)
+
+        // FIDO HID reports are always 64 bytes (or 65 with report ID)
+        // The 'size' field from UHID may be larger, but we only need the HID report data
+        val reportSize = minOf(size, 64)
+        val data = ByteArray(reportSize)
         buf.position(OUTPUT_DATA_OFFSET)
-        buf.get(data, 0, size)
+        buf.get(data, 0, reportSize)
+
         return OutputEvent(data, size, rtype)
     }
 

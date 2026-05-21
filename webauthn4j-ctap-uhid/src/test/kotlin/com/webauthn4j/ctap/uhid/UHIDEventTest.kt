@@ -53,22 +53,22 @@ internal class UHIDEventTest {
         val rdSize = buf.getShort(260).toInt() and 0xFFFF
         assertThat(rdSize).isEqualTo(rdesc.size)
 
-        // rd_data
-        val rdData = ByteArray(rdesc.size)
-        buf.position(262)
-        buf.get(rdData)
-        assertThat(rdData).isEqualTo(rdesc)
-
         // bus
-        assertThat(buf.getShort(4358)).isEqualTo(0x03.toShort()) // BUS_USB
+        assertThat(buf.getShort(262)).isEqualTo(0x03.toShort()) // BUS_USB
 
         // vendor, product, version
-        assertThat(buf.getInt(4360)).isEqualTo(0x0525)
-        assertThat(buf.getInt(4364)).isEqualTo(0xF025)
-        assertThat(buf.getInt(4368)).isEqualTo(0x0100)
+        assertThat(buf.getInt(264)).isEqualTo(0x0525)
+        assertThat(buf.getInt(268)).isEqualTo(0xF025)
+        assertThat(buf.getInt(272)).isEqualTo(0x0100)
 
         // country
-        assertThat(buf.getInt(4372)).isEqualTo(0)
+        assertThat(buf.getInt(276)).isEqualTo(0)
+
+        // rd_data (at the end)
+        val rdData = ByteArray(rdesc.size)
+        buf.position(280)
+        buf.get(rdData)
+        assertThat(rdData).isEqualTo(rdesc)
     }
 
     @Test
