@@ -17,6 +17,8 @@ plugins {
     id(libs.plugins.sonarqube.get().pluginId) version libs.versions.sonarqube
     id(libs.plugins.jreleaser.get().pluginId) version libs.versions.jreleaser
     id(libs.plugins.ksp.get().pluginId) version libs.versions.ksp apply false
+    id(libs.plugins.kotlin.plugin.allopen.get().pluginId) version libs.versions.kotlin apply false
+    id(libs.plugins.quarkus.get().pluginId) version libs.versions.quarkus apply false
 }
 
 private val webAuthn4JCTAPVersion: String by project
@@ -39,14 +41,16 @@ repositories {
 
 
 subprojects {
+    if (name.endsWith("-sample") || name.startsWith("unifidokey-")) return@subprojects
+
     apply(plugin = "signing")
     apply(plugin = "maven-publish")
-
     apply(plugin = "java-library")
+    apply(plugin = "org.jreleaser")
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "jacoco")
-    apply(plugin = "org.jreleaser")
     repositories {
+        mavenLocal()
         google()
         mavenCentral()
         maven(url = "https://jitpack.io")
