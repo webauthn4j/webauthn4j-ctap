@@ -3,7 +3,7 @@ kotlin = "2.3.21"
 
 kotlinx-coroutines = "1.11.0"
 
-webauthn4j = "0.31.5.RELEASE"
+webauthn4j = "pqc-ml-dsa-support-SNAPSHOT"
 
 slf4j = "2.0.18"
 
@@ -37,8 +37,8 @@ jreleaser = "1.24.0"
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 
 # WebAuthn4J
-webauthn4j-core = { module = "com.webauthn4j:webauthn4j-core", version.ref = "webauthn4j" }
-webauthn4j-test = { module = "com.webauthn4j:webauthn4j-test", version.ref = "webauthn4j" }
+webauthn4j-core = { module = "com.github.webauthn4j.webauthn4j:webauthn4j-core", version.ref = "webauthn4j" }
+webauthn4j-test = { module = "com.github.webauthn4j.webauthn4j:webauthn4j-test", version.ref = "webauthn4j" }
 
 # Third-party libraries
 
