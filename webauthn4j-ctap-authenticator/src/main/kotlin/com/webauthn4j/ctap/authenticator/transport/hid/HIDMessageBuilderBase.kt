@@ -3,6 +3,7 @@ package com.webauthn4j.ctap.authenticator.transport.hid
 import com.webauthn4j.ctap.core.data.hid.HIDChannelId
 import com.webauthn4j.ctap.core.data.hid.HIDCommand
 import com.webauthn4j.ctap.core.data.hid.HIDContinuationPacket
+import com.webauthn4j.ctap.core.data.hid.HIDErrorCode
 import com.webauthn4j.ctap.core.data.hid.HIDInitializationPacket
 import com.webauthn4j.ctap.core.data.hid.HIDMessage
 import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.MAX_CONT_PACKET_DATA_SIZE
@@ -12,10 +13,15 @@ import kotlin.math.min
 
 abstract class HIDMessageBuilderBase<T : HIDMessage> {
 
+    companion object {
+        private const val MESSAGE_TIMEOUT_MS = 500L
+    }
+
     private var buffer = ByteBuffer.allocate(0)
     private var counter: Byte = 0
     private var channelId: HIDChannelId? = null
     private var command: HIDCommand? = null
+    private var messageStartTimeMs: Long = 0
 
     fun initialize(initializationPacket: HIDInitializationPacket) {
         buffer = ByteBuffer.allocate(initializationPacket.length.toInt())
@@ -29,14 +35,15 @@ abstract class HIDMessageBuilderBase<T : HIDMessage> {
         )
         channelId = initializationPacket.channelId
         command = initializationPacket.command
+        messageStartTimeMs = System.currentTimeMillis()
     }
 
     fun append(continuationPacket: HIDContinuationPacket) {
         if (!isInitialized) {
-            throw IllegalStateException("Builder is not initialized. It seems initialization packet haven't arrived.")
+            throw HIDProtocolException(HIDErrorCode.INVALID_SEQ, "Builder is not initialized. It seems initialization packet haven't arrived.")
         }
         if (counter != continuationPacket.sec) {
-            throw IllegalStateException("ContinuationPacket with an unexpected sequence number arrived.")
+            throw HIDProtocolException(HIDErrorCode.INVALID_SEQ, "ContinuationPacket with an unexpected sequence number arrived.")
         }
         buffer.put(
             continuationPacket.data,
@@ -52,6 +59,10 @@ abstract class HIDMessageBuilderBase<T : HIDMessage> {
     val isCompleted: Boolean
         get() = !buffer.hasRemaining()
 
+    val isTimedOut: Boolean
+        get() = isInitialized && !isCompleted &&
+                (System.currentTimeMillis() - messageStartTimeMs) > MESSAGE_TIMEOUT_MS
+
     fun build(): T {
         if (!isCompleted) {
             throw IllegalStateException("HID message not completed")
@@ -64,6 +75,7 @@ abstract class HIDMessageBuilderBase<T : HIDMessage> {
         counter = 0
         channelId = null
         command = null
+        messageStartTimeMs = 0
     }
 
     protected abstract fun createMessage(
