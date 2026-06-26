@@ -8,6 +8,7 @@ import com.webauthn4j.ctap.authenticator.UserCredentialBuilder
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementRequest
 import com.webauthn4j.ctap.authenticator.data.credential.CredentialKey
 import com.webauthn4j.ctap.authenticator.data.credential.NonResidentCredentialKey
+import com.webauthn4j.ctap.authenticator.data.credential.NonResidentUserCredentialSource
 import com.webauthn4j.ctap.authenticator.data.credential.ResidentUserCredential
 import com.webauthn4j.ctap.authenticator.data.credential.UserCredential
 import com.webauthn4j.ctap.authenticator.data.event.MakeCredentialEvent
@@ -20,6 +21,7 @@ import com.webauthn4j.ctap.authenticator.internal.KeyPairUtil.createCredentialKe
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.StoreFullException
 import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import com.webauthn4j.ctap.core.validator.AuthenticatorMakeCredentialRequestValidator
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialParameters
@@ -131,6 +133,7 @@ internal class MakeCredentialExecution :
         if (rpId == null) {
             throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_MISSING_PARAMETER)
         }
+        ctapAuthenticatorSession.onGoingGetAssertionSession = null
         execStep1ValidateExcludeList()
         execStep2ValidatePubKeyCredParams()
         execStep3ProcessOptions()
@@ -164,18 +167,17 @@ internal class MakeCredentialExecution :
     private suspend fun execStep1ValidateExcludeList() {
         excludeList.let {
             if (it != null && it.isNotEmpty()) {
-                val excludeCredentialIds = it.map { item -> item.id }
                 val rpId = rp.id
                 val userCredentials = authenticatorPropertyStore.loadUserCredentials(rpId)
-                val match = userCredentials.any { credentialSource ->
-                    excludeCredentialIds.any { item ->
-                        Arrays.equals(
-                            item,
-                            credentialSource.credentialId
-                        )
+                val residentMatch = userCredentials.any { credentialSource ->
+                    it.any { descriptor ->
+                        Arrays.equals(descriptor.id, credentialSource.credentialId)
                     }
                 }
-                if (match) {
+                val nonResidentMatch = !residentMatch && it.any { descriptor ->
+                    isKnownCredentialId(descriptor, rpId)
+                }
+                if (residentMatch || nonResidentMatch) {
                     val makeCredentialConsentRequest = MakeCredentialConsentRequest(
                         rp,
                         user,
@@ -188,6 +190,23 @@ internal class MakeCredentialExecution :
                     throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_CREDENTIAL_EXCLUDED)
                 }
             }
+        }
+    }
+
+    private fun isKnownCredentialId(descriptor: PublicKeyCredentialDescriptor, rpId: String): Boolean {
+        try {
+            val decrypted = CipherUtil.decryptWithAESCBCPKCS5Padding(
+                descriptor.id,
+                authenticatorPropertyStore.loadEncryptionKey(),
+                authenticatorPropertyStore.loadEncryptionIV()
+            ) ?: return false
+            val source = ctapAuthenticatorSession.objectConverter.cborMapper.readValue(
+                decrypted,
+                NonResidentUserCredentialSource::class.java
+            ) ?: return false
+            return source.rpId == rpId
+        } catch (e: RuntimeException) {
+            return false
         }
     }
 
