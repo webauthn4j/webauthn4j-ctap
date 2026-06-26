@@ -15,7 +15,7 @@ import com.webauthn4j.ctap.core.data.nfc.ResponseAPDU
 import com.webauthn4j.util.HexUtil
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
-import kotlin.experimental.or
+import java.security.SecureRandom
 
 class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
 
@@ -26,7 +26,7 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
         private const val MINOR_DEVICE_VERSION_NUMBER: Byte = 1
         private const val BUILD_DEVICE_VERSION_NUMBER: Byte = 0
         private val CAPABILITIES =
-            HIDCapability((HIDCapability.CBOR.value or HIDCapability.NMSG.value))
+            HIDCapability((HIDCapability.WINK.value.toInt() or HIDCapability.CBOR.value.toInt()).toByte())
 
         private const val CTAP_REQUEST_HID_PACKET_LOGGING_TEMPLATE = "CTAP Request HID Packet: {}"
         private const val CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE = "CTAP Response HID Packet: {}"
@@ -46,11 +46,21 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
 
     private val hidPacketConverter = HIDPacketConverter()
     private val hidChannels: MutableMap<HIDChannelId, HIDChannel> = HashMap()
-    private var lastAllocatedChannelId: HIDChannelId = HIDChannelId(0)
+    private val secureRandom = SecureRandom()
+
+    @Volatile
+    private var activeTransactionChannelId: HIDChannelId? = null
 
     @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
     private val u2fConfirmationWorker = newSingleThreadContext("u2f-confirmation-worker")
 
+    private fun sendError(channelId: HIDChannelId, errorCode: HIDErrorCode, hidPacketHandler: HIDPacketHandler) {
+        HIDERRORResponseMessage(channelId, errorCode).toHIDPackets()
+            .forEach {
+                logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, it.toString())
+                hidPacketHandler.onResponse(it.toBytes())
+            }
+    }
 
     suspend fun onHIDDataReceived(bytes: ByteArray, hidPacketHandler: HIDPacketHandler) {
         try {
@@ -61,36 +71,52 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
             }
             val packetBytes = bytes.copyOfRange(packetOffset, bytes.size)
 
-
             val hidPacket = hidPacketConverter.convert(packetBytes)
             try {
                 logger.debug(CTAP_REQUEST_HID_PACKET_LOGGING_TEMPLATE, hidPacket.toString())
+                val channelId = hidPacket.channelId
 
-                var hidChannel = hidChannels[hidPacket.channelId]
+                if (channelId == HIDChannelId.BROADCAST) {
+                    if (hidPacket !is HIDInitializationPacket || hidPacket.command != HIDCommand.CTAPHID_INIT) {
+                        sendError(channelId, HIDErrorCode.INVALID_CHANNEL, hidPacketHandler)
+                        return
+                    }
+                    val tempChannel = HIDChannel(channelId)
+                    tempChannel.handlePacket(hidPacket) { responsePacket ->
+                        logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, responsePacket.toString())
+                        hidPacketHandler.onResponse(hidPacketConverter.convert(responsePacket))
+                    }
+                    return
+                }
+
+                var hidChannel = hidChannels[channelId]
                 if (hidChannel == null) {
                     if (hidPacket is HIDContinuationPacket) {
-                        logger.debug("Unexpected continuation packet is received. Skipped.")
+                        logger.debug("Unexpected continuation packet on unknown channel. Skipped.")
                         return
-                    } else {
-                        hidChannel = HIDChannel(hidPacket.channelId)
-                        hidChannels[hidPacket.channelId] = hidChannel
+                    }
+                    sendError(channelId, HIDErrorCode.INVALID_CHANNEL, hidPacketHandler)
+                    return
+                }
+
+                if (hidPacket is HIDInitializationPacket) {
+                    val activeChannel = activeTransactionChannelId
+                    if (activeChannel != null && activeChannel != channelId) {
+                        sendError(channelId, HIDErrorCode.CHANNEL_BUSY, hidPacketHandler)
+                        return
                     }
                 }
+
                 hidChannel.handlePacket(hidPacket) { responsePacket ->
-                    logger.debug(
-                        CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE,
-                        responsePacket.toString()
-                    )
-                    val responseBytes = hidPacketConverter.convert(responsePacket)
-                    hidPacketHandler.onResponse(responseBytes)
+                    logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, responsePacket.toString())
+                    hidPacketHandler.onResponse(hidPacketConverter.convert(responsePacket))
                 }
+            } catch (e: HIDProtocolException) {
+                logger.warn("HID protocol error: {}", e.message)
+                sendError(hidPacket.channelId, e.errorCode, hidPacketHandler)
             } catch (e: RuntimeException) {
                 logger.error("Unexpected exception is thrown while processing HID packet", e)
-                HIDERRORResponseMessage(hidPacket.channelId, HIDErrorCode.OTHER).toHIDPackets()
-                    .forEach {
-                        logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, it.toString())
-                        hidPacketHandler.onResponse(it.toBytes())
-                    }
+                sendError(hidPacket.channelId, HIDErrorCode.OTHER, hidPacketHandler)
             }
         } catch (e: RuntimeException) {
             logger.error("Unexpected exception is thrown while processing HID packet", e)
@@ -98,14 +124,19 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
     }
 
     private fun allocateNewChannelId(): HIDChannelId {
-        lastAllocatedChannelId = lastAllocatedChannelId.next()
-        return lastAllocatedChannelId
+        while (true) {
+            val bytes = ByteArray(4)
+            secureRandom.nextBytes(bytes)
+            val id = HIDChannelId(bytes)
+            if (id != HIDChannelId.BROADCAST && !hidChannels.containsKey(id)) {
+                return id
+            }
+        }
     }
 
-    private inner class HIDChannel(channelId: HIDChannelId) {
+    private inner class HIDChannel(private val channelId: HIDChannelId) {
 
         private val hidRequestMessageBuilder = HIDRequestMessageBuilder()
-
 
         @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
         private val hidKeepAliveWorker =
@@ -115,10 +146,25 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
             hidPacket: HIDPacket,
             responseCallback: ResponseCallback<HIDPacket>
         ) {
+            if (hidPacket is HIDInitializationPacket && hidRequestMessageBuilder.isTimedOut) {
+                logger.debug("Message assembly timed out, resetting builder")
+                hidRequestMessageBuilder.clear()
+            }
+
             when (hidPacket) {
-                is HIDInitializationPacket -> hidRequestMessageBuilder.initialize(hidPacket)
-                is HIDContinuationPacket -> hidRequestMessageBuilder.append(hidPacket)
-                else -> throw IllegalStateException("Unknown HIDPacket subclass")
+                is HIDInitializationPacket -> {
+                    activeTransactionChannelId = channelId
+                    hidRequestMessageBuilder.initialize(hidPacket)
+                }
+                is HIDContinuationPacket -> {
+                    if (hidRequestMessageBuilder.isTimedOut) {
+                        hidRequestMessageBuilder.clear()
+                        activeTransactionChannelId = null
+                        throw HIDProtocolException(HIDErrorCode.MSG_TIMEOUT, "Message assembly timed out")
+                    }
+                    hidRequestMessageBuilder.append(hidPacket)
+                }
+                else -> throw HIDProtocolException(HIDErrorCode.OTHER, "Unknown HIDPacket subclass")
             }
             if (hidRequestMessageBuilder.isCompleted) {
                 val hidMessage = hidRequestMessageBuilder.build()
@@ -129,12 +175,16 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
                             responseCallback.onResponse(parameter)
                         }
                     }
+                } catch (e: HIDProtocolException) {
+                    throw e
                 } catch (e: RuntimeException) {
                     logger.error("Unexpected exception is thrown while processing HID message", e)
                     HIDERRORResponseMessage(hidMessage.channelId, HIDErrorCode.OTHER).toHIDPackets()
                         .forEach { packet ->
                             responseCallback.onResponse(packet)
                         }
+                } finally {
+                    activeTransactionChannelId = null
                 }
             }
         }
@@ -170,7 +220,7 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
                     logger.debug(CTAP_RESPONSE_HID_MESSAGE_LOGGING_TEMPLATE, it.toString())
                     responseCallback.onResponse(it)
                 }
-                else -> throw IllegalArgumentException("%s is not supported".format(hidMessage.command))
+                else -> throw HIDProtocolException(HIDErrorCode.INVALID_CMD, "%s is not supported".format(hidMessage.command))
             }
         }
 
