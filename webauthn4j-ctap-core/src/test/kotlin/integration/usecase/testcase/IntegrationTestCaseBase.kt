@@ -89,7 +89,10 @@ abstract class IntegrationTestCaseBase {
         private val authenticatorPropertyStoreParameter =
             TestParameter<AuthenticatorPropertyStore> {
                 InMemoryAuthenticatorPropertyStore().also {
-                    it.saveClientPIN(clientPIN.toByteArray())
+                    val pinBytes = clientPIN.toByteArray()
+                    it.saveClientPIN(
+                        java.util.Arrays.copyOf(com.webauthn4j.util.MessageDigestUtil.createSHA256().digest(pinBytes), 16)
+                    )
                     it.algorithms = algorithms
                 }
             }.depends(clientPINParameter, algorithmsParameter)

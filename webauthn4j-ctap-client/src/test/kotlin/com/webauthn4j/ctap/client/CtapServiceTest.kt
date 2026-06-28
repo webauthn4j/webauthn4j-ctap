@@ -8,6 +8,7 @@ import com.webauthn4j.ctap.authenticator.UserVerificationHandler
 import com.webauthn4j.ctap.authenticator.transport.internal.InternalTransport
 import com.webauthn4j.ctap.client.transport.InProcessAdaptor
 import com.webauthn4j.ctap.core.data.options.UserVerificationOption
+import com.webauthn4j.util.MessageDigestUtil
 import com.webauthn4j.data.AuthenticatorAttachment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -43,9 +44,7 @@ internal class CtapServiceTest {
         target.reset()
         target.setPIN("newPIN")
         assertThat(connection.authenticatorPropertyStore.loadClientPIN()).isEqualTo(
-            "newPIN".toByteArray(
-                StandardCharsets.UTF_8
-            )
+            pinHash("newPIN")
         )
     }
 
@@ -56,15 +55,17 @@ internal class CtapServiceTest {
         target.reset()
         target.setPIN("currentPIN")
         assertThat(connection.authenticatorPropertyStore.loadClientPIN()).isEqualTo(
-            "currentPIN".toByteArray(
-                StandardCharsets.UTF_8
-            )
+            pinHash("currentPIN")
         )
         target.changePIN("currentPIN", "newPIN")
         assertThat(connection.authenticatorPropertyStore.loadClientPIN()).isEqualTo(
-            "newPIN".toByteArray(
-                StandardCharsets.UTF_8
-            )
+            pinHash("newPIN")
+        )
+    }
+
+    private fun pinHash(pin: String): ByteArray {
+        return java.util.Arrays.copyOf(
+            MessageDigestUtil.createSHA256().digest(pin.toByteArray(StandardCharsets.UTF_8)), 16
         )
     }
 
