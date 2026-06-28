@@ -293,7 +293,7 @@ internal class MakeCredentialExecution :
                 if (it.isEmpty()) {
                     requestUserConsent()
                     if (ctapAuthenticatorSession.clientPINService.isClientPINReady) {
-                        throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
+                        throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_INVALID)
                     } else {
                         throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_NOT_SET)
                     }
@@ -353,7 +353,7 @@ internal class MakeCredentialExecution :
 
     //spec| Step9-11
     //spec| Generate a new credential key pair for the algorithm specified.
-    //spec| If "rk" in authenticatorOptions parameter is set to true:
+    //spec| If "rk" in options parameter is set to true:
     //spec| - If a credential for the same RP ID and account ID already exists on the authenticator, overwrite that credential.
     //spec| - Store the user parameter along the newly-created key pair.
     //spec| - If authenticator does not have enough internal storage to persist the new credential, return CTAP2_ERR_KEY_STORE_FULL.
@@ -391,6 +391,7 @@ internal class MakeCredentialExecution :
             )
             if (userCredential is ResidentUserCredential) {
                 try {
+                    removeExistingCredentialForSameAccount(userCredential)
                     authenticatorPropertyStore.saveUserCredential(userCredential)
                 } catch (e: StoreFullException) {
                     throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_KEY_STORE_FULL)
@@ -434,6 +435,13 @@ internal class MakeCredentialExecution :
         userCredentialBuilder.userCredentialKey(credentialKey)
         userCredentialBuilder.createdAt(Instant.now())
         return userCredentialBuilder.build()
+    }
+
+    private fun removeExistingCredentialForSameAccount(newCredential: ResidentUserCredential) {
+        val existingCredentials = authenticatorPropertyStore.loadUserCredentials(newCredential.rpId)
+        existingCredentials
+            .filter { Arrays.equals(it.userHandle, newCredential.userHandle) }
+            .forEach { authenticatorPropertyStore.removeUserCredential(it.credentialId) }
     }
 
     private fun removeInCompleteUserCredential(userCredential: ResidentUserCredential?) {

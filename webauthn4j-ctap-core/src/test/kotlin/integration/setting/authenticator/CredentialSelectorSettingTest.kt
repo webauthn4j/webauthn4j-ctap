@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test
 @Suppress("EXPERIMENTAL_API_USAGE", "ClassName")
 class CredentialSelectorSettingTest {
     private val passwordlessTestCase = PasswordlessTestCase()
+    private val secondUserId = byteArrayOf(0x02)
 
     @Nested
     inner class credentialSelector_authenticator {
@@ -34,7 +35,7 @@ class CredentialSelectorSettingTest {
             }
             passwordlessTestCase.step1_createCredential() // create a credential (1st)
             publicKeyCredential =
-                passwordlessTestCase.step1_createCredential() // create a credential (2nd)
+                passwordlessTestCase.step1_createCredential(userId = secondUserId) // create a credential (2nd)
             passwordlessTestCase.step2_validateCredentialForRegistration()
             passwordlessTestCase.step3_getCredential()
             passwordlessTestCase.step4_validateCredentialForAuthentication()
@@ -55,7 +56,7 @@ class CredentialSelectorSettingTest {
             }
             publicKeyCredential =
                 passwordlessTestCase.step1_createCredential() // create a credential (1st)
-            passwordlessTestCase.step1_createCredential() // create a credential (2nd)
+            passwordlessTestCase.step1_createCredential(userId = secondUserId) // create a credential (2nd)
             passwordlessTestCase.step2_validateCredentialForRegistration()
             passwordlessTestCase.step3_getCredential()
             Assertions.assertThatThrownBy {
@@ -82,7 +83,7 @@ class CredentialSelectorSettingTest {
 
             passwordlessTestCase.step1_createCredential() // create a credential (1st)
             publicKeyCredential =
-                passwordlessTestCase.step1_createCredential() // create a credential (2nd)
+                passwordlessTestCase.step1_createCredential(userId = secondUserId) // create a credential (2nd)
             passwordlessTestCase.step2_validateCredentialForRegistration()
             passwordlessTestCase.step3_getCredential()
             passwordlessTestCase.step4_validateCredentialForAuthentication()
@@ -100,7 +101,7 @@ class CredentialSelectorSettingTest {
 
             publicKeyCredential =
                 passwordlessTestCase.step1_createCredential() // create a credential (1st)
-            passwordlessTestCase.step1_createCredential() // create a credential (2nd)
+            passwordlessTestCase.step1_createCredential(userId = secondUserId) // create a credential (2nd)
             passwordlessTestCase.step2_validateCredentialForRegistration()
             passwordlessTestCase.step3_getCredential()
             Assertions.assertThatThrownBy {
