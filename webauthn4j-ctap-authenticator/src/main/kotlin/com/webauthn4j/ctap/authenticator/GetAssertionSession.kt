@@ -18,6 +18,8 @@ class GetAssertionSession(
         this.clientDataHash = clientDataHash
     }
 
+    fun hasNext(): Boolean = index < assertionObjects.size
+
     fun nextAssertionObject(): AssertionObject {
         if (assertionObjects.size <= index) {
             throw NoSuchElementException()
