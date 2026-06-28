@@ -16,9 +16,11 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.nio.ByteBuffer
 
-/**
- * GetNextAssertion command execution
- */
+// @see <a href="https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html#authenticatorGetNextAssertion">5.3. authenticatorGetNextAssertion</a>
+//spec| This method is used to obtain the next per-credential signature for a given
+//spec| authenticatorGetAssertion request.
+//spec| This method takes no arguments as it is always follows a call to
+//spec| authenticatorGetAssertion or authenticatorGetNextAssertion.
 internal class GetNextAssertionExecution(
     private val ctapAuthenticatorSession: CtapAuthenticatorSession,
     authenticatorGetNextAssertionRequest: AuthenticatorGetNextAssertionRequest
@@ -42,25 +44,24 @@ internal class GetNextAssertionExecution(
 
         //spec| Step2
         //spec| If the credentialCounter is equal to or greater than numberOfCredentials, return CTAP2_ERR_NOT_ALLOWED.
-        val assertionObject: GetAssertionSession.AssertionObject
-        try {
-            assertionObject = getAssertionSession.nextAssertionObject()
-        } catch (e: NoSuchElementException) {
+        if (!getAssertionSession.hasNext()) {
             return AuthenticatorGetNextAssertionResponse(CtapStatusCode.CTAP2_ERR_NOT_ALLOWED)
         }
-        val credential = assertionObject.credential
 
         //spec| Step3
         //spec| If timer since the last call to authenticatorGetAssertion/authenticatorGetNextAssertion is greater than 30 seconds,
         //spec| discard the current authenticatorGetAssertion state and return CTAP2_ERR_NOT_ALLOWED.
         //spec| This step is optional if transport is done over NFC.
         if (getAssertionSession.isExpired()) {
+            ctapAuthenticatorSession.onGoingGetAssertionSession = null
             return AuthenticatorGetNextAssertionResponse(CtapStatusCode.CTAP2_ERR_NOT_ALLOWED)
         }
 
         //spec| Step4
         //spec| Sign the clientDataHash along with authData with the credential
         //spec| using credentialCounter as index (e.g., credentials[n] assuming 0-based array), using the structure specified in [WebAuthn].
+        val assertionObject = getAssertionSession.nextAssertionObject()
+        val credential = assertionObject.credential
         val descriptor = PublicKeyCredentialDescriptor(
             PublicKeyCredentialType.PUBLIC_KEY,
             credential.credentialId,

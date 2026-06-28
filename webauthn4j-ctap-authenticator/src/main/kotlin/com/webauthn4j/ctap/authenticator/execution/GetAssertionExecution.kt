@@ -34,6 +34,7 @@ import java.nio.ByteBuffer
 import java.time.Instant
 import kotlin.experimental.or
 
+// @see <a href="https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html#authenticatorGetAssertion">5.2. authenticatorGetAssertion</a>
 @Suppress("ConvertSecondaryConstructorToPrimary")
 internal class GetAssertionExecution :
     CtapCommandExecutionBase<AuthenticatorGetAssertionRequest, AuthenticatorGetAssertionResponse> {
@@ -143,10 +144,10 @@ internal class GetAssertionExecution :
     }
 
     //spec| Step1
-    //spec| Locate all userCredentials that are eligible for retrieval under the specified criteria:
-    //spec| - If an allowList is present and is non-empty, locate all denoted userCredentials present on this authenticator and bound to the specified rpId.
-    //spec| - If an allowList is not present, locate all userCredentials that are present on this authenticator and bound to the specified rpId.
-    //spec| - Let numberOfCredentials be the number of userCredentials found.
+    //spec| Locate all credentials that are eligible for retrieval under the specified criteria:
+    //spec| - If an allowList is present and is non-empty, locate all denoted credentials present on this authenticator and bound to the specified rpId.
+    //spec| - If an allowList is not present, locate all credentials that are present on this authenticator and bound to the specified rpId.
+    //spec| - Let numberOfCredentials be the number of credentials found.
     private fun execStep1LoadEligibleUserCredentials() {
         val rpId = rpId
         credentials = if (allowList != null && allowList.isNotEmpty()) {
@@ -241,6 +242,8 @@ internal class GetAssertionExecution :
     //spec| If pinAuth parameter is present and pinProtocol is 1,
     //spec| verify it by matching it against first 16 bytes of HMAC-SHA-256 of clientDataHash parameter
     //spec| using pinToken: HMAC-SHA-256(pinToken, clientDataHash).
+    //spec| - If the verification succeeds, set the "uv" bit to 1 in the response.
+    //spec| - If the verification fails, return CTAP2_ERR_PIN_AUTH_INVALID error.
     private fun execStep2VerifyClientPIN() {
         if (pinAuth != null && pinProtocol == PinProtocolVersion.VERSION_1) {
             val clientDataHash = clientDataHash
@@ -319,15 +322,15 @@ internal class GetAssertionExecution :
     }
 
     //spec| Step7
-    //spec| Collect user consentMakeCredential if required. This step MUST happen before the following steps due to privacy reasons
+    //spec| Collect user consent if required. This step MUST happen before the following steps due to privacy reasons
     //spec| (i.e., authenticator cannot disclose existence of a credential until the user interacted with the device):
     private suspend fun execStep7RequestUserConsent() {
         //spec| - If the "uv" option was specified and set to true:
-        //spec|   - If device doesn't support user-identifiable gestures, return the CTAP2_ERR_UNSUPPORTED_OPTION error.
-        // This is already done in Step6
+        //spec|   - If device doesn’t support user-identifiable gestures, return the CTAP2_ERR_UNSUPPORTED_OPTION error.
+        // UV unsupported check is already done in Step5
         //spec|   - Collect a user-identifiable gesture. If gesture validation fails, return the CTAP2_ERR_OPERATION_DENIED error.
-        //spec| - If the "up" option was specified and set to true, collect the user’s consentMakeCredential.
-        //spec|   - If no consentMakeCredential is obtained and a timeout occurs, return the CTAP2_ERR_OPERATION_DENIED error.
+        //spec| - If the "up" option was specified and set to true, collect the user’s consent.
+        //spec|   - If no consent is obtained and a timeout occurs, return the CTAP2_ERR_OPERATION_DENIED error.
         val options = GetAssertionConsentRequest(rpId, userPresencePlan, userVerificationPlan)
         val consent = ctapAuthenticatorSession.userVerificationHandler.onGetAssertionConsentRequested(options)
         if (consent) {
@@ -344,7 +347,7 @@ internal class GetAssertionExecution :
     }
 
     //spec| Step8
-    //spec| If no userCredentials were located in step 1, return CTAP2_ERR_NO_CREDENTIALS.
+    //spec| If no credentials were located in step 1, return CTAP2_ERR_NO_CREDENTIALS.
     private fun execStep8CheckUserCredentialCandidatesExistence() {
         if (assertionObjects.isEmpty()) {
             throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_NO_CREDENTIALS)
@@ -354,17 +357,17 @@ internal class GetAssertionExecution :
     //spec| Step9
     //spec| If more than one credential was located in step 1 and allowList is present and not empty,
     //spec| select any applicable credential and proceed to step 12.
-    //spec| Otherwise, order the userCredentials by the time when they were created in reverse order.
+    //spec| Otherwise, order the credentials by the time when they were created in reverse order.
     //spec| The first credential is the most recent credential that was created.
     private fun execStep9SortUserCredentials() {
-        assertionObjects.sortedBy { assertionObject -> assertionObject.credential.createdAt.epochSecond }
+        assertionObjects = assertionObjects.sortedByDescending { it.credential.createdAt.epochSecond }
     }
 
     //spec| Step10
     //spec| If authenticator does not have a display:
     //spec| - Remember the authenticatorGetAssertion parameters.
     //spec| - Create a credential counter(credentialCounter) and set it 1.
-    //spec|   This counter signifies how many userCredentials are sent to the platform by the authenticator.
+    //spec|   This counter signifies how many credentials are sent to the platform by the authenticator.
     //spec| - Start a timer. This is used during authenticatorGetNextAssertion command.
     //spec|   This step is optional if transport is done over NFC.
     //spec| - Update the response to include the first credential’s publicKeyCredentialUserEntity information and numberOfCredentials.
@@ -403,7 +406,7 @@ internal class GetAssertionExecution :
 
     //spec| Step11
     //spec| If authenticator has a display:
-    //spec| - Display all these userCredentials to the user, using their friendly name along with other stored account information.
+    //spec| - Display all these credentials to the user, using their friendly name along with other stored account information.
     //spec| - Also, display the rpId of the requester (specified in the request) and ask the user to select a credential.
     //spec| - If the user declines to select a credential or takes too long (as determined by the authenticator),
     //spec|   terminate this procedure and return the CTAP2_ERR_OPERATION_DENIED error.
