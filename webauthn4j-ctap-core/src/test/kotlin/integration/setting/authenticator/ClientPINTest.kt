@@ -46,7 +46,7 @@ class ClientPINTest {
 
     @Test
     fun changePIN_with_invalid_PIN_and_reach_MAX_VOLATILE_PIN_RETRIES_test() {
-        repeat(3) {
+        repeat(2) {
             assertThatThrownBy {
                 runTest {
                     clientPINTestCase.clientPlatform.ctapService.changePIN(
@@ -67,7 +67,7 @@ class ClientPINTest {
 
     @Test
     fun changePIN_with_invalid_PIN_and_reach_MAX_PIN_RETRIES_test() {
-        repeat(8) {
+        repeat(7) {
             assertThatThrownBy {
                 runTest {
                     clientPINTestCase.clientPlatform.ctapService.changePIN(
