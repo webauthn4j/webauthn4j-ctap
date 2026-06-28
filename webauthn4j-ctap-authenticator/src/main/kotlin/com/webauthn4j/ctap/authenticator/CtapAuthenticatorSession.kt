@@ -161,10 +161,8 @@ class CtapAuthenticatorSession internal constructor(
         exceptionReporters.forEach { it.onException(exception) }
     }
 
+    @Deprecated("Lock is now handled at the HID transport layer", level = DeprecationLevel.WARNING)
     suspend fun lock(timeMillis: Long) {
-        mutex.withLock {
-            delay(timeMillis)
-        }
     }
 
 }
