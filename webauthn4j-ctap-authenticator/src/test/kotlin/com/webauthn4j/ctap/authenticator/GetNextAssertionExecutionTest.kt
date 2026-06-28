@@ -44,8 +44,8 @@ class GetNextAssertionExecutionTest {
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
         val connection = ctapAuthenticator.createSession()
-        makeCredential(connection)
-        makeCredential(connection)
+        makeCredential(connection, userId = byteArrayOf(0x01))
+        makeCredential(connection, userId = byteArrayOf(0x02))
 
         val clientDataHash = ByteArray(0)
         val allowList: List<PublicKeyCredentialDescriptor> = emptyList()
@@ -85,8 +85,8 @@ class GetNextAssertionExecutionTest {
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
         val connection = ctapAuthenticator.createSession()
-        makeCredential(connection)
-        makeCredential(connection)
+        makeCredential(connection, userId = byteArrayOf(0x01))
+        makeCredential(connection, userId = byteArrayOf(0x02))
 
         val clientDataHash = ByteArray(0)
         val allowList: List<PublicKeyCredentialDescriptor> = emptyList()
@@ -117,8 +117,8 @@ class GetNextAssertionExecutionTest {
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
         val connection = ctapAuthenticator.createSession()
-        makeCredential(connection)
-        makeCredential(connection)
+        makeCredential(connection, userId = byteArrayOf(0x01))
+        makeCredential(connection, userId = byteArrayOf(0x02))
 
         val instant = Instant.parse("2020-01-01T00:00:00Z")
         val expiredInstant = Instant.parse("2020-01-01T00:00:30Z")
@@ -161,11 +161,12 @@ class GetNextAssertionExecutionTest {
     suspend fun makeCredential(
         ctapAuthenticatorSession: CtapAuthenticatorSession,
         rk: Boolean = true,
-        uv: Boolean = true
+        uv: Boolean = true,
+        userId: ByteArray = byteArrayOf(0x01, 0x23)
     ) {
         val clientDataHash = ByteArray(0)
         val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
-        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
+        val user = CtapPublicKeyCredentialUserEntity(userId, "John.doe", "John Doe", "icon")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,
