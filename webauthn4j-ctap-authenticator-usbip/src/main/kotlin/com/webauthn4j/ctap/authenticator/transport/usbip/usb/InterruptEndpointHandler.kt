@@ -12,6 +12,10 @@ import org.slf4j.LoggerFactory
  * For Interrupt IN, [handleIn] suspends until response data becomes available,
  * matching real USB behavior where NAK is handled transparently by the
  * host controller at the hardware level.
+ *
+ * HID OUT data is passed directly to [HIDTransport.onHIDDataReceived] which
+ * queues it internally for async processing. Response data is collected via
+ * the callback and made available to IN transfers through [responseChannel].
  */
 class InterruptEndpointHandler(
     private val hidTransport: HIDTransport
@@ -20,11 +24,7 @@ class InterruptEndpointHandler(
 
     private val responseChannel = Channel<ByteArray>(Channel.UNLIMITED)
 
-    /**
-     * Handles Interrupt OUT transfer (host -> device).
-     * Receives 64-byte HID reports and passes them to HIDTransport.
-     */
-    suspend fun handleOut(request: SubmitRequest): SubmitResponse {
+    fun handleOut(request: SubmitRequest): SubmitResponse {
         logger.debug("Interrupt OUT: {} bytes", request.data.size)
 
         if (request.data.isEmpty()) {
@@ -37,16 +37,11 @@ class InterruptEndpointHandler(
             logger.debug("Queued response: {} bytes", responseBytes.size)
         }
 
-        return SubmitResponse.success(request, ByteArray(0), actualLength = request.data.size)
+        return SubmitResponse.success(request, ByteArray(0))
     }
 
-    /**
-     * Handles Interrupt IN transfer (device -> host).
-     * Suspends until response data is available.
-     * Cancellation via CMD_UNLINK is handled by cancelling the calling coroutine.
-     */
     suspend fun handleIn(request: SubmitRequest): SubmitResponse {
-        logger.trace("Interrupt IN: waiting for data (seqnum={})", request.seqnum)
+        logger.debug("Interrupt IN: waiting for data (seqnum={})", request.seqnum)
         val data = responseChannel.receive()
         logger.debug("Interrupt IN: returning {} bytes (seqnum={})", data.size, request.seqnum)
         return SubmitResponse.success(request, data)

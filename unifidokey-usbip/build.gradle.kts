@@ -21,7 +21,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.webauthn4j.metadata)
 
-    implementation(enforcedPlatform("io.quarkus.platform:quarkus-bom:${libs.versions.quarkus.get()}"))
+    implementation(platform("io.quarkus.platform:quarkus-bom:${libs.versions.quarkus.get()}"))
     implementation("io.quarkus:quarkus-kotlin")
     implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-picocli")

@@ -27,7 +27,8 @@ class UniFIDOKeyUSBIP : Runnable {
     override fun run() {
         val config = USBIPDeviceConfig(host = host, port = port)
         val authenticator = CtapAuthenticator(
-            attestationStatementProvider = PackedBasicAttestationStatementProvider.createWithDemoAttestationKey()
+            attestationStatementProvider = PackedBasicAttestationStatementProvider.createWithDemoAttestationKey(),
+            userVerificationHandler = ConsoleUserVerificationHandler()
         )
         val device = USBIPDevice(authenticator, config)
         val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())

@@ -43,6 +43,8 @@ class USBIPDevice(
         logger.info("Server address: {}:{}", config.host, config.port)
         logger.info("Bus ID: {}", config.busId)
 
+        hidTransport.start(scope)
+
         val deviceInfo = createDeviceInfo()
         val sm = SelectorManager(Dispatchers.IO)
         selectorManager = sm
@@ -73,6 +75,7 @@ class USBIPDevice(
         selectorManager?.close()
         selectorManager = null
         interruptHandler.close()
+        hidTransport.close()
         logger.info("USB-IP server stopped")
     }
 

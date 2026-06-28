@@ -1,0 +1,40 @@
+{
+  "aaguid" : "33c1642b-b5e9-423d-9add-5a0119c2a8b8",
+  "description" : "UniFIDOKey USB-IP Virtual FIDO2 Authenticator",
+  "authenticatorVersion" : 2,
+  "protocolFamily" : "fido2",
+  "schema" : 3,
+  "upv" : [ {
+    "major" : 1,
+    "minor" : 0
+  } ],
+  "authenticationAlgorithms" : [ "secp256r1_ecdsa_sha256_raw" ],
+  "publicKeyAlgAndEncodings" : [ "cose" ],
+  "attestationTypes" : [ "basic_full" ],
+  "userVerificationDetails" : [ [ {
+    "userVerificationMethod" : "presence_internal"
+  } ], [ {
+    "userVerificationMethod" : "passcode_internal"
+  } ], [ {
+    "userVerificationMethod" : "passcode_external"
+  } ] ],
+  "keyProtection" : [ "software" ],
+  "matcherProtection" : [ "on_chip" ],
+  "attachmentHint" : [ "external" ],
+  "tcDisplay" : [ ],
+  "attestationRootCertificates" : [ "MIIBkzCCATmgAwIBAgIBATAKBggqhkjOPQQDAjBJMQswCQYDVQQGEwJVUzEbMBkGA1UEChMSV2ViQXV0aG40SiBQcm9qZWN0MR0wGwYDVQQDExRVbmlmaWRvS2V5RGVtb1Jvb3RDQTAgFw0wMDAxMDEwMDAwMDBaGA8yOTk5MTIzMTIzNTk1OVowSTELMAkGA1UEBhMCVVMxGzAZBgNVBAoTEldlYkF1dGhuNEogUHJvamVjdDEdMBsGA1UEAxMUVW5pZmlkb0tleURlbW9Sb290Q0EwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAATNdy65xbpUNeEzQcq1CgF6yGpGw8eUD3+Udlv5yjjraC26D+ZViUqYKPrBOnWNFxk5F7zpHlZlRowzQUCE3f8ioxAwDjAMBgNVHRMEBTADAQH/MAoGCCqGSM49BAMCA0gAMEUCIDEGs0M2wfwKoYlIcySks1x8ijv5pEvAC1nvFxnmbtjHAiEA0aOqrO4DwseP8i0XLPsw+uJYTgaP6+hBTLVGANws7LI" ],
+  "authenticatorGetInfo" : {
+    "versions" : [ "U2F_V2", "FIDO_2_0" ],
+    "extensions" : [ ],
+    "aaguid" : "33c1642bb5e9423d9add5a0119c2a8b8",
+    "options" : {
+      "plat" : false,
+      "rk" : true,
+      "clientPin" : false,
+      "up" : true,
+      "uv" : true
+    },
+    "maxMsgSize" : 2048,
+    "pinUvAuthProtocols" : [ 1 ]
+  }
+}

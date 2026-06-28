@@ -18,8 +18,10 @@ import io.ktor.utils.io.ByteWriteChannel
 import io.ktor.utils.io.readFully
 import io.ktor.utils.io.writeFully
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -45,6 +47,7 @@ class USBIPClientHandler(
     private val logger = LoggerFactory.getLogger(USBIPClientHandler::class.java)
     private val writeMutex = Mutex()
     private val pendingInJobs = ConcurrentHashMap<Int, Job>()
+    private val inRequestQueue = Channel<PendingInRequest>(Channel.UNLIMITED)
 
     private lateinit var readChannel: ByteReadChannel
     private lateinit var writeChannel: ByteWriteChannel
@@ -107,12 +110,34 @@ class USBIPClientHandler(
     // --- URB phase: command(4) + seqnum(4) + ... ---
 
     private suspend fun CoroutineScope.handleSubmitPhase() {
+        launch { interruptInPump() }
         while (isActive) {
             val header = readBigEndianBuffer(48)
             when (header.int) {
                 USBIPProtocol.USBIP_CMD_SUBMIT -> handleCmdSubmit(header)
                 USBIPProtocol.USBIP_CMD_UNLINK -> handleCmdUnlink(header)
                 else -> logger.warn("Unknown command")
+            }
+        }
+    }
+
+    /**
+     * Sequentially processes queued Interrupt IN requests.
+     * Interrupt IN is a polling transfer that suspends until the device has data to send.
+     * A sequential pump ensures response ordering for multi-packet HID replies.
+     */
+    private suspend fun interruptInPump() {
+        for (pending in inRequestQueue) {
+            try {
+                val response = device.handleSubmit(pending.request)
+                writeResponse(response)
+                pending.done.complete(Unit)
+            } catch (_: CancellationException) {
+                pending.done.complete(Unit)
+            } catch (e: Exception) {
+                logger.error("Error processing Interrupt IN request", e)
+                writeResponse(SubmitResponse.error(pending.request, USBIPProtocol.STATUS_EINVAL))
+                pending.done.complete(Unit)
             }
         }
     }
@@ -130,19 +155,28 @@ class USBIPClientHandler(
             request = request.copy(data = readBytes(request.transferBufferLength))
         }
 
-        logger.trace("CMD_SUBMIT: ep={}, dir={}, len={}", request.ep, request.direction, request.transferBufferLength)
+        logger.debug("CMD_SUBMIT: ep={}, dir={}, len={}", request.ep, request.direction, request.transferBufferLength)
 
         val capturedRequest = request
-        launch {
-            try {
-                writeResponse(device.handleSubmit(capturedRequest))
-            } catch (_: CancellationException) {
-                // Request was unlinked via CMD_UNLINK, no response needed
-            } catch (e: Exception) {
-                logger.error("Error processing submit request", e)
-                writeResponse(SubmitResponse.error(capturedRequest, USBIPProtocol.STATUS_EINVAL))
+        when {
+            // Control transfers (EP0) and OUT transfers always have immediate responses.
+            request.ep == USBIPProtocol.EP0_ADDRESS || request.direction == USBIPProtocol.USBIP_DIR_OUT -> {
+                try {
+                    writeResponse(device.handleSubmit(capturedRequest))
+                } catch (e: Exception) {
+                    logger.error("Error processing submit request", e)
+                    writeResponse(SubmitResponse.error(capturedRequest, USBIPProtocol.STATUS_EINVAL))
+                }
             }
-        }.trackIfInterruptIn(request)
+            // Interrupt IN transfers suspend until data is available; route through sequential pump.
+            else -> {
+                val pending = PendingInRequest(capturedRequest)
+                inRequestQueue.send(pending)
+                val job = launch { pending.done.await() }
+                pendingInJobs[request.seqnum] = job
+                job.invokeOnCompletion { pendingInJobs.remove(request.seqnum) }
+            }
+        }
     }
 
     private suspend fun handleCmdUnlink(header: ByteBuffer) {
@@ -155,12 +189,10 @@ class USBIPClientHandler(
 
     // --- Helpers ---
 
-    private fun Job.trackIfInterruptIn(request: SubmitRequest) {
-        if (request.ep != USBIPProtocol.EP0_ADDRESS && request.direction == USBIPProtocol.USBIP_DIR_IN) {
-            pendingInJobs[request.seqnum] = this
-            invokeOnCompletion { pendingInJobs.remove(request.seqnum) }
-        }
-    }
+    private class PendingInRequest(
+        val request: SubmitRequest,
+        val done: CompletableDeferred<Unit> = CompletableDeferred()
+    )
 
     private suspend fun writeResponse(result: SubmitResponse) {
         writeResponse(result.toBytes())
@@ -180,10 +212,6 @@ class USBIPClientHandler(
         writeMutex.withLock {
             writeChannel.writeFully(data, 0, data.size)
         }
-    }
-
-    fun close() {
-        socket.close()
     }
 
     companion object {

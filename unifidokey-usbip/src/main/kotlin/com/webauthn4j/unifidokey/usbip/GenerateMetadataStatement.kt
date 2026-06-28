@@ -11,6 +11,7 @@ import com.webauthn4j.data.KeyProtectionType
 import com.webauthn4j.data.MatcherProtectionType
 import com.webauthn4j.data.PublicKeyRepresentationFormat
 import com.webauthn4j.data.UserVerificationMethod
+import com.webauthn4j.data.attestation.authenticator.AAGUID
 import com.webauthn4j.metadata.converter.jackson.WebAuthnMetadataJSONModule
 import com.webauthn4j.metadata.data.statement.AuthenticatorGetInfo
 import com.webauthn4j.metadata.data.statement.AuthenticatorGetInfo.Options
@@ -18,8 +19,13 @@ import com.webauthn4j.metadata.data.statement.MetadataStatement
 import com.webauthn4j.metadata.data.statement.VerificationMethodANDCombinations
 import com.webauthn4j.metadata.data.statement.VerificationMethodDescriptor
 import com.webauthn4j.metadata.data.statement.Version
+import com.webauthn4j.util.HexUtil
 import picocli.CommandLine.Command
+import tools.jackson.core.JsonGenerator
 import tools.jackson.databind.SerializationFeature
+import tools.jackson.databind.SerializationContext
+import tools.jackson.databind.annotation.JsonSerialize
+import tools.jackson.databind.ser.std.StdSerializer
 
 @Command(name = "generate-metadata", mixinStandardHelpOptions = true,
     description = ["Generate FIDO MetadataStatement JSON for Conformance Tools"])
@@ -48,6 +54,9 @@ class GenerateMetadataStatement : Runnable {
                 )),
                 VerificationMethodANDCombinations(listOf(
                     VerificationMethodDescriptor(UserVerificationMethod.PASSCODE_INTERNAL, null, null, null),
+                )),
+                VerificationMethodANDCombinations(listOf(
+                    VerificationMethodDescriptor(UserVerificationMethod.PASSCODE_EXTERNAL, null, null, null),
                 ))
             ),
             listOf(KeyProtectionType.SOFTWARE), // keyProtection
@@ -65,19 +74,19 @@ class GenerateMetadataStatement : Runnable {
             null, // supportedExtensions
             AuthenticatorGetInfo(
                 listOf("U2F_V2", "FIDO_2_0"),
-                null, // extensions
+                emptyList(), // extensions
                 aaguid,
                 Options(
                     Options.PlatformOption.CROSS_PLATFORM,
                     Options.ResidentKeyOption.SUPPORTED,
-                    null, // clientPin
+                    Options.ClientPINOption.NOT_SET, // clientPin (PIN not set initially)
                     Options.UserPresenceOption.SUPPORTED,
                     Options.UserVerificationOption.READY,
                     null, // uvToken
                     null  // config
                 ),
                 2048, // maxMsgSize
-                null  // pinUvAuthProtocols
+                listOf(com.webauthn4j.data.PinProtocolVersion.VERSION_1)  // pinUvAuthProtocols
             )
         )
 
@@ -86,7 +95,19 @@ class GenerateMetadataStatement : Runnable {
             .addModule(WebAuthnMetadataJSONModule())
             .enable(SerializationFeature.INDENT_OUTPUT)
             .changeDefaultPropertyInclusion { JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL) }
+            .addMixIn(AuthenticatorGetInfo::class.java, AuthenticatorGetInfoHexAaguidMixIn::class.java)
             .build()
         println(mapper.writeValueAsString(metadataStatement))
+    }
+
+    abstract class AuthenticatorGetInfoHexAaguidMixIn {
+        @get:JsonSerialize(using = HexAaguidSerializer::class)
+        abstract val aaguid: AAGUID
+    }
+
+    class HexAaguidSerializer : StdSerializer<AAGUID>(AAGUID::class.java) {
+        override fun serialize(value: AAGUID, gen: JsonGenerator, ctxt: SerializationContext) {
+            gen.writeString(HexUtil.encodeToString(value.bytes).lowercase())
+        }
     }
 }

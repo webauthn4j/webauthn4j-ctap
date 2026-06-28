@@ -40,6 +40,7 @@ class UHIDDevice(
     suspend fun start(scope: CoroutineScope) {
         connection.open()
         createDevice()
+        hidTransport.start(scope)
         readJob = scope.launch(Dispatchers.IO) {
             readLoop()
         }
@@ -48,6 +49,7 @@ class UHIDDevice(
     suspend fun stop() {
         readJob?.cancelAndJoin()
         readJob = null
+        hidTransport.close()
         if (deviceCreated) {
             destroyDevice()
         }
@@ -96,11 +98,13 @@ class UHIDDevice(
         }
     }
 
-    private suspend fun handleOutput(output: OutputReportEvent) {
+    private fun handleOutput(output: OutputReportEvent) {
         logger.debug("UHID_OUTPUT: size={} (actual HID report: {} bytes), rtype={}",
             output.size, output.data.size, output.rtype)
         hidTransport.onHIDDataReceived(output.data) { responseBytes ->
-            connection.writeEvent(InputReportEvent(responseBytes))
+            synchronized(connection) {
+                connection.writeEvent(InputReportEvent(responseBytes))
+            }
         }
     }
 }
