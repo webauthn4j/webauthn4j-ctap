@@ -73,6 +73,16 @@ class CtapAuthenticatorSession internal constructor(
 
     @Volatile
     var isWaitingForUserPresence: Boolean = false
+        private set
+
+    suspend fun <T> withUserPresenceWait(block: suspend () -> T): T {
+        isWaitingForUserPresence = true
+        try {
+            return block()
+        } finally {
+            isWaitingForUserPresence = false
+        }
+    }
 
     suspend fun <TC : AuthenticatorRequest, TR : AuthenticatorResponse?> invokeCommand(request: TC): TR {
         onGoingJob = coroutineContext[Job]

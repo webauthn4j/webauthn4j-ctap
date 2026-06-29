@@ -95,7 +95,9 @@ class U2FRegisterExecution(
             isUserPresenceRequired = true,
             isUserVerificationRequired = false
         )
-        return ctapAuthenticatorSession.userVerificationHandler.onMakeCredentialConsentRequested(makeCredentialConsentRequest)
+        return ctapAuthenticatorSession.withUserPresenceWait {
+            ctapAuthenticatorSession.userVerificationHandler.onMakeCredentialConsentRequested(makeCredentialConsentRequest)
+        }
     }
 
 }
