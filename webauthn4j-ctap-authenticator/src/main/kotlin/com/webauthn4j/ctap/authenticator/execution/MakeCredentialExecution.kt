@@ -232,8 +232,8 @@ internal class MakeCredentialExecution :
                 residentKeyPlan = ctapAuthenticatorSession.residentKey == ResidentKeySetting.ALWAYS
             }
             else -> {
-                if(requestOptions.up == true){
-                    throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_INVALID_OPTION)
+                if(requestOptions.up == false){
+                    throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
                 }
                 residentKeyPlan = when (requestOptions.rk) {
                     true -> when (ctapAuthenticatorSession.residentKey) {
