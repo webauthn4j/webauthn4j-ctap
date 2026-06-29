@@ -1,3 +1,5 @@
 include(":webauthn4j-ctap-core")
 include(":webauthn4j-ctap-authenticator")
 include(":webauthn4j-ctap-client")
+include(":webauthn4j-ctap-authenticator-uhid")
+include(":unifidokey-uhid")
