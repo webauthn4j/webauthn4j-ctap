@@ -2,13 +2,18 @@ package com.webauthn4j.ctap.authenticator.transport.hid
 
 import com.webauthn4j.ctap.authenticator.transport.hid.handler.*
 import com.webauthn4j.ctap.core.data.hid.*
+import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.DEFAULT_PACKET_SIZE
+import kotlinx.coroutines.CloseableCoroutineDispatcher
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import org.slf4j.LoggerFactory
+import java.io.Closeable
 
 class HIDChannel(
     private val channelId: HIDChannelId,
     private val scope: CoroutineScope,
+    private val packetSize: Int = DEFAULT_PACKET_SIZE,
+    private val keepAliveWorker: CloseableCoroutineDispatcher,
     private val activeTransactionChannelIdSetter: (HIDChannelId?) -> Unit,
     private val commandTimeSetter: (Long) -> Unit,
     private val initHandler: HIDInitCommandHandler,
@@ -18,10 +23,10 @@ class HIDChannel(
     private val cancelHandler: HIDCancelCommandHandler,
     private val winkHandler: HIDWinkCommandHandler,
     private val lockHandler: HIDLockCommandHandler
-) {
+) : Closeable {
 
     private val logger = LoggerFactory.getLogger(HIDChannel::class.java)
-    private val hidRequestMessageBuilder = HIDRequestMessageBuilder()
+    private val hidRequestMessageBuilder = HIDRequestMessageBuilder(packetSize)
     private var cborCompletion: CompletableDeferred<Unit>? = null
 
     suspend fun handlePacket(
@@ -56,14 +61,14 @@ class HIDChannel(
             try {
                 logger.debug("CTAP Request HID Message: {}", hidMessage)
                 handleMessage(hidMessage) {
-                    it.toHIDPackets().forEach { packet -> responseCallback(packet) }
+                    it.toHIDPackets(packetSize).forEach { packet -> responseCallback(packet) }
                 }
             } catch (e: HIDProtocolException) {
                 activeTransactionChannelIdSetter(null)
                 throw e
             } catch (e: RuntimeException) {
                 logger.error("Unexpected exception is thrown while processing HID message", e)
-                HIDERRORResponseMessage(hidMessage.channelId, HIDErrorCode.OTHER).toHIDPackets()
+                HIDERRORResponseMessage(hidMessage.channelId, HIDErrorCode.OTHER).toHIDPackets(packetSize)
                     .forEach { packet -> responseCallback(packet) }
                 activeTransactionChannelIdSetter(null)
             }
@@ -134,5 +139,15 @@ class HIDChannel(
                 throw HIDProtocolException(HIDErrorCode.INVALID_CMD, "%s is not supported".format(hidMessage.command))
             }
         }
+    }
+
+    suspend fun cancelAndAwaitCbor() {
+        val completion = cborCompletion ?: return
+        cancelHandler.handle()
+        completion.await()
+    }
+
+    override fun close() {
+        keepAliveWorker.close()
     }
 }
