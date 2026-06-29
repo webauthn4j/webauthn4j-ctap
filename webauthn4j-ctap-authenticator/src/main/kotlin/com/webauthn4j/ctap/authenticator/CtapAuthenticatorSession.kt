@@ -170,6 +170,7 @@ class CtapAuthenticatorSession internal constructor(
     }
 
     fun cancelOnGoingTransaction() {
+        logger.debug("Cancel ongoing transaction requested")
         onGoingJob?.cancel()
         onGoingGetAssertionSession = null
     }

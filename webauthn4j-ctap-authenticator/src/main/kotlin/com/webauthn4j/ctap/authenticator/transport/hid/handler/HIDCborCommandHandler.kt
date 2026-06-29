@@ -12,6 +12,9 @@ import com.webauthn4j.ctap.core.data.hid.HIDKEEPALIVEResponseMessage
 import com.webauthn4j.ctap.core.data.hid.HIDResponseMessage
 import com.webauthn4j.ctap.core.data.hid.HIDStatusCode
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -35,38 +38,47 @@ class HIDCborCommandHandler(
         private const val KEEPALIVE_INTERVAL = 100L
     }
 
-    suspend fun handle(
+    fun handle(
+        scope: CoroutineScope,
         hidMessage: HIDCBORRequestMessage,
-        responseCallback: (HIDResponseMessage) -> Unit
-    ) {
-        try {
-            coroutineScope {
-                val keepAliveJob = launch(keepAliveWorker) {
-                    while (true) {
-                        //spec| STATUS_PROCESSING 1 The authenticator is still processing the current request.
-                        //spec| STATUS_UPNEEDED 2 The authenticator is waiting for user presence.
-                        val statusCode = if (ctapAuthenticatorSession.isWaitingForUserPresence) {
-                            HIDStatusCode.UPNEEDED
-                        } else {
-                            HIDStatusCode.PROCESSING
+        responseCallback: (HIDResponseMessage) -> Unit,
+        onComplete: () -> Unit
+    ): CompletableDeferred<Unit> {
+        val completion = CompletableDeferred<Unit>()
+        scope.launch(Dispatchers.Default) {
+            try {
+                coroutineScope {
+                    val keepAliveJob = launch(keepAliveWorker) {
+                        while (true) {
+                            //spec| STATUS_PROCESSING 1 The authenticator is still processing the current request.
+                            //spec| STATUS_UPNEEDED 2 The authenticator is waiting for user presence.
+                            val statusCode = if (ctapAuthenticatorSession.isWaitingForUserPresence) {
+                                HIDStatusCode.UPNEEDED
+                            } else {
+                                HIDStatusCode.PROCESSING
+                            }
+                            responseCallback(HIDKEEPALIVEResponseMessage(hidMessage.channelId, statusCode))
+                            delay(KEEPALIVE_INTERVAL)
                         }
-                        responseCallback(HIDKEEPALIVEResponseMessage(hidMessage.channelId, statusCode))
-                        delay(KEEPALIVE_INTERVAL)
                     }
+                    val ctapCommand = ctapRequestConverter.convert(hidMessage.data)
+                    val ctapResponse: CtapResponse = ctapAuthenticatorSession.invokeCommand(ctapCommand)
+                    val cbor = ctapResponseConverter.convertToResponseDataBytes(ctapResponse)
+                    val responseMessage = HIDCBORResponseMessage(hidMessage.channelId, ctapResponse.statusCode, cbor)
+                    keepAliveJob.cancelAndJoin()
+                    responseCallback(responseMessage)
                 }
-                val ctapCommand = ctapRequestConverter.convert(hidMessage.data)
-                val ctapResponse: CtapResponse = ctapAuthenticatorSession.invokeCommand(ctapCommand)
-                val cbor = ctapResponseConverter.convertToResponseDataBytes(ctapResponse)
-                val responseMessage = HIDCBORResponseMessage(hidMessage.channelId, ctapResponse.statusCode, cbor)
-                keepAliveJob.cancelAndJoin()
-                responseCallback(responseMessage)
+            } catch (_: CancellationException) {
+                responseCallback(HIDCBORResponseMessage(hidMessage.channelId, CtapStatusCode.CTAP2_ERR_KEEPALIVE_CANCEL, ByteArray(0)))
+            } catch (e: CtapCommandExecutionException) {
+                responseCallback(HIDCBORResponseMessage(hidMessage.channelId, e.statusCode, ByteArray(0)))
+            } catch (_: Exception) {
+                responseCallback(HIDCBORResponseMessage(hidMessage.channelId, CtapStatusCode.CTAP1_ERR_OTHER, ByteArray(0)))
+            } finally {
+                onComplete()
+                completion.complete(Unit)
             }
-        } catch (_: CancellationException) {
-            responseCallback(HIDCBORResponseMessage(hidMessage.channelId, CtapStatusCode.CTAP2_ERR_KEEPALIVE_CANCEL, ByteArray(0)))
-        } catch (e: CtapCommandExecutionException) {
-            responseCallback(HIDCBORResponseMessage(hidMessage.channelId, e.statusCode, ByteArray(0)))
-        } catch (_: Exception) {
-            responseCallback(HIDCBORResponseMessage(hidMessage.channelId, CtapStatusCode.CTAP1_ERR_OTHER, ByteArray(0)))
         }
+        return completion
     }
 }
