@@ -1,6 +1,7 @@
 package com.webauthn4j.ctap.authenticator.transport.hid.handler
 
 import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
+import com.webauthn4j.ctap.authenticator.execution.CtapCommandExecutionException
 import com.webauthn4j.ctap.core.converter.CtapRequestConverter
 import com.webauthn4j.ctap.core.converter.CtapResponseConverter
 import com.webauthn4j.ctap.core.data.CtapResponse
@@ -55,6 +56,10 @@ class HIDCborCommandHandler(
             }
         } catch (_: CancellationException) {
             responseCallback(HIDCBORResponseMessage(hidMessage.channelId, CtapStatusCode.CTAP2_ERR_KEEPALIVE_CANCEL, ByteArray(0)))
+        } catch (e: CtapCommandExecutionException) {
+            responseCallback(HIDCBORResponseMessage(hidMessage.channelId, e.statusCode, ByteArray(0)))
+        } catch (_: Exception) {
+            responseCallback(HIDCBORResponseMessage(hidMessage.channelId, CtapStatusCode.CTAP1_ERR_OTHER, ByteArray(0)))
         }
     }
 }
