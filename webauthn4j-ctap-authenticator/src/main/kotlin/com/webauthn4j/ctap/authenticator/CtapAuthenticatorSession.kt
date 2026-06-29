@@ -18,9 +18,11 @@ import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.data.attestation.authenticator.AAGUID
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.coroutines.coroutineContext
 import org.slf4j.LoggerFactory
 
 /**
@@ -66,25 +68,36 @@ class CtapAuthenticatorSession internal constructor(
 
     var onGoingGetAssertionSession: GetAssertionSession? = null
 
+    @Volatile
+    private var onGoingJob: Job? = null
+
+    @Volatile
+    var isWaitingForUserPresence: Boolean = false
+
     suspend fun <TC : AuthenticatorRequest, TR : AuthenticatorResponse?> invokeCommand(request: TC): TR {
-        val response = when (request) {
-            is AuthenticatorMakeCredentialRequest -> makeCredential(request)
-            is AuthenticatorGetAssertionRequest -> getAssertion(request)
-            is AuthenticatorGetNextAssertionRequest -> getNextAssertion(request)
-            is AuthenticatorGetInfoRequest -> getInfo(request)
-            is AuthenticatorClientPINRequest -> clientPIN(request)
-            is AuthenticatorResetRequest -> reset(request)
-            is U2FRegistrationRequest -> u2fRegister(request)
-            is U2FAuthenticationRequest -> u2fSign(request)
-            else -> throw IllegalStateException(
-                String.format(
-                    "unknown command %s is invoked.",
-                    request::class.java.toString()
+        onGoingJob = coroutineContext[Job]
+        try {
+            val response = when (request) {
+                is AuthenticatorMakeCredentialRequest -> makeCredential(request)
+                is AuthenticatorGetAssertionRequest -> getAssertion(request)
+                is AuthenticatorGetNextAssertionRequest -> getNextAssertion(request)
+                is AuthenticatorGetInfoRequest -> getInfo(request)
+                is AuthenticatorClientPINRequest -> clientPIN(request)
+                is AuthenticatorResetRequest -> reset(request)
+                is U2FRegistrationRequest -> u2fRegister(request)
+                is U2FAuthenticationRequest -> u2fSign(request)
+                else -> throw IllegalStateException(
+                    String.format(
+                        "unknown command %s is invoked.",
+                        request::class.java.toString()
+                    )
                 )
-            )
+            }
+            @Suppress("UNCHECKED_CAST")
+            return response as TR
+        } finally {
+            onGoingJob = null
         }
-        @Suppress("UNCHECKED_CAST")
-        return response as TR
     }
 
     suspend fun makeCredential(authenticatorMakeCredentialCommand: AuthenticatorMakeCredentialRequest): AuthenticatorMakeCredentialResponse {
@@ -147,10 +160,8 @@ class CtapAuthenticatorSession internal constructor(
     }
 
     fun cancelOnGoingTransaction() {
-        TODO()
-//        mutex.withLock {
-//            transaction?.cancel()
-//        }
+        onGoingJob?.cancel()
+        onGoingGetAssertionSession = null
     }
 
     internal fun publishEvent(event: Event) {
