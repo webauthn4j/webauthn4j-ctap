@@ -9,20 +9,24 @@ import com.webauthn4j.ctap.core.converter.CtapRequestConverter
 import com.webauthn4j.ctap.core.converter.CtapResponseConverter
 import com.webauthn4j.ctap.core.converter.HIDPacketConverter
 import com.webauthn4j.ctap.core.data.hid.*
-import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.MAX_PACKET_SIZE
+import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.DEFAULT_PACKET_SIZE
 import com.webauthn4j.util.HexUtil
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import org.slf4j.LoggerFactory
 import java.security.SecureRandom
 
 // @see <a href="https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html#usb-discovery">8.1. USB Human Interface Device (USB HID)</a>
-class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
+class HIDTransport(
+    ctapAuthenticator: CtapAuthenticator,
+    private val packetSize: Int = DEFAULT_PACKET_SIZE
+) : Transport, AutoCloseable {
 
     companion object {
         private const val CTAP_REQUEST_HID_PACKET_LOGGING_TEMPLATE = "CTAP Request HID Packet: {}"
         private const val CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE = "CTAP Response HID Packet: {}"
         private const val CTAP_REQUEST_HID_MESSAGE_LOGGING_TEMPLATE = "CTAP Request HID Message: {}"
-        private const val CTAP_RESPONSE_HID_MESSAGE_LOGGING_TEMPLATE = "CTAP Request HID Message: {}"
+        private const val CTAP_RESPONSE_HID_MESSAGE_LOGGING_TEMPLATE = "CTAP Response HID Message: {}"
     }
 
     private val logger = LoggerFactory.getLogger(HIDTransport::class.java)
@@ -46,6 +50,16 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
     @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
     private val u2fConfirmationWorker = newSingleThreadContext("u2f-confirmation-worker")
 
+    @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
+    private val consumerDispatcher = newSingleThreadContext("hid-consumer")
+
+    private val incomingPackets = Channel<QueuedPacket>(Channel.UNLIMITED)
+    private var consumerJob: Job? = null
+    private lateinit var scope: CoroutineScope
+
+    @Volatile
+    private var currentCommandStartTimeMs: Long = 0
+
     private val initHandler = HIDInitCommandHandler(object : HIDInitCommandHandler.ChannelAllocator {
         override fun allocateChannel(): HIDChannelId {
             val id = allocateNewChannelId()
@@ -61,27 +75,36 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
     private val cancelHandler = HIDCancelCommandHandler(ctapAuthenticatorSession)
     private val winkHandler = HIDWinkCommandHandler(ctapAuthenticatorSession)
     private val lockHandler = HIDLockCommandHandler(lockState)
-    private val cborHandler = HIDCborCommandHandler(
-        CtapRequestConverter(ctapAuthenticator.objectConverter),
-        CtapResponseConverter(ctapAuthenticator.objectConverter),
-        ctapAuthenticatorSession,
-        newSingleThreadContext("hid-cbor-keepalive-worker")
-    )
 
-    private fun sendError(channelId: HIDChannelId, errorCode: HIDErrorCode, hidPacketHandler: HIDPacketHandler) {
-        HIDERRORResponseMessage(channelId, errorCode).toHIDPackets()
-            .forEach {
-                logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, it.toString())
-                hidPacketHandler.onResponse(it.toBytes())
+    fun start(scope: CoroutineScope) {
+        this.scope = scope
+        consumerJob = scope.launch(consumerDispatcher) {
+            for (queued in incomingPackets) {
+                processPacket(queued.bytes, queued.hidPacketHandler)
             }
+        }
     }
 
-    suspend fun onHIDDataReceived(bytes: ByteArray, hidPacketHandler: HIDPacketHandler) {
+    override fun close() {
+        incomingPackets.close()
+        consumerJob?.cancel()
+    }
+
+    fun onHIDDataReceived(bytes: ByteArray, hidPacketHandler: HIDPacketHandler) {
+        val commandStartTime = currentCommandStartTimeMs
+        if (commandStartTime > 0) {
+            logger.debug("Queuing packet while previous command is processing (started {}ms ago)",
+                System.currentTimeMillis() - commandStartTime)
+        }
+        incomingPackets.trySend(QueuedPacket(bytes, hidPacketHandler))
+    }
+
+    private suspend fun processPacket(bytes: ByteArray, hidPacketHandler: HIDPacketHandler) {
         try {
             val packetOffset = when (bytes.size) {
-                MAX_PACKET_SIZE -> 0
-                MAX_PACKET_SIZE + 1 -> 1
-                else -> throw IllegalStateException("Unexpected bytes size")
+                packetSize -> 0
+                packetSize + 1 -> 1
+                else -> throw IllegalStateException("Unexpected bytes size: ${bytes.size}, expected $packetSize or ${packetSize + 1}")
             }
             val packetBytes = bytes.copyOfRange(packetOffset, bytes.size)
 
@@ -159,6 +182,14 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
         }
     }
 
+    private fun sendError(channelId: HIDChannelId, errorCode: HIDErrorCode, hidPacketHandler: HIDPacketHandler) {
+        HIDERRORResponseMessage(channelId, errorCode).toHIDPackets()
+            .forEach {
+                logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, it.toString())
+                hidPacketHandler.onResponse(it.toBytes())
+            }
+    }
+
     private fun allocateNewChannelId(): HIDChannelId {
         while (true) {
             val bytes = ByteArray(4)
@@ -182,7 +213,9 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
         )
         return HIDChannel(
             channelId = channelId,
+            scope = scope,
             activeTransactionChannelIdSetter = { activeTransactionChannelId = it },
+            commandTimeSetter = { currentCommandStartTimeMs = it },
             initHandler = initHandler,
             cborHandler = perChannelCborHandler,
             msgHandler = msgHandler,
@@ -193,8 +226,9 @@ class HIDTransport(ctapAuthenticator: CtapAuthenticator) : Transport {
         )
     }
 
-    private fun interface ResponseCallback<T> {
-        fun onResponse(response: T)
-    }
+    private data class QueuedPacket(
+        val bytes: ByteArray,
+        val hidPacketHandler: HIDPacketHandler
+    )
 
 }
