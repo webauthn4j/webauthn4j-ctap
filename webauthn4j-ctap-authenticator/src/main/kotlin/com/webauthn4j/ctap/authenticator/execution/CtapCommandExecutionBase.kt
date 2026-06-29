@@ -5,6 +5,7 @@ import com.webauthn4j.ctap.core.data.CtapRequest
 import com.webauthn4j.ctap.core.data.CtapResponse
 import com.webauthn4j.ctap.core.data.CtapStatusCode
 import org.slf4j.LoggerFactory
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Base class for Ctap command execution
@@ -20,6 +21,8 @@ abstract class CtapCommandExecutionBase<TC : CtapRequest, TR : CtapResponse>(pri
 
         val ctapResponse = try {
             doExecute()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: CtapCommandExecutionException) {
             onFailure(e)
         } catch (e: RuntimeException) {
