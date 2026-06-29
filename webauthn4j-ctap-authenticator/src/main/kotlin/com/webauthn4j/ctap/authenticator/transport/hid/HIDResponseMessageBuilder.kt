@@ -5,6 +5,7 @@ import com.webauthn4j.ctap.core.data.hid.HIDCBORResponseMessage
 import com.webauthn4j.ctap.core.data.hid.HIDCapability
 import com.webauthn4j.ctap.core.data.hid.HIDChannelId
 import com.webauthn4j.ctap.core.data.hid.HIDCommand
+import com.webauthn4j.ctap.core.data.hid.HIDErrorCode
 import com.webauthn4j.ctap.core.data.hid.HIDINITResponseMessage
 import com.webauthn4j.ctap.core.data.hid.HIDKEEPALIVEResponseMessage
 import com.webauthn4j.ctap.core.data.hid.HIDLOCKResponseMessage
@@ -59,7 +60,8 @@ class HIDResponseMessageBuilder : HIDMessageBuilderBase<HIDResponseMessage>() {
             HIDCommand.CTAPHID_LOCK -> {
                 HIDLOCKResponseMessage(channelId)
             }
-            else -> throw IllegalStateException(
+            else -> throw HIDProtocolException(
+                HIDErrorCode.INVALID_CMD,
                 String.format(
                     "Unexpected HIDCommand received: 0x%02X",
                     command.value
