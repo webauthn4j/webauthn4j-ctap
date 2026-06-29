@@ -100,6 +100,10 @@ class AuthenticatorMakeCredentialRequest @JsonCreator constructor(
             result = 31 * result + (uv?.hashCode() ?: 0)
             return result
         }
+
+        override fun toString(): String {
+            return "Options(rk=$rk, up=$up, uv=$uv)"
+        }
     }
 
 }
