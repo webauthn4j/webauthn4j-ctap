@@ -70,6 +70,24 @@ class CtapAuthenticator(
                 .addModule(CtapCBORModule())
                 .addModule(PublicKeyCredentialSourceCBORModule())
                 .addModule(KotlinModule.Builder().build())
+                .withCoercionConfigDefaults { config ->
+                    config.setCoercion(
+                        tools.jackson.databind.cfg.CoercionInputShape.Integer,
+                        tools.jackson.databind.cfg.CoercionAction.Fail
+                    )
+                    config.setCoercion(
+                        tools.jackson.databind.cfg.CoercionInputShape.Boolean,
+                        tools.jackson.databind.cfg.CoercionAction.Fail
+                    )
+                    config.setCoercion(
+                        tools.jackson.databind.cfg.CoercionInputShape.Float,
+                        tools.jackson.databind.cfg.CoercionAction.Fail
+                    )
+                    config.setCoercion(
+                        tools.jackson.databind.cfg.CoercionInputShape.Array,
+                        tools.jackson.databind.cfg.CoercionAction.Fail
+                    )
+                }
                 .build()
             return ObjectConverter(jsonMapper, cborMapper)
         }
