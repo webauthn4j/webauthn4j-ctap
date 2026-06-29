@@ -26,7 +26,7 @@ class HIDInitCommandHandler(
             HIDCapability((HIDCapability.WINK.value.toInt() or HIDCapability.CBOR.value.toInt()).toByte())
     }
 
-    fun handle(hidMessage: HIDINITRequestMessage): HIDResponseMessage {
+    suspend fun handle(hidMessage: HIDINITRequestMessage): HIDResponseMessage {
         val channelId = hidMessage.channelId
         val nonce = hidMessage.nonce
 
@@ -59,6 +59,6 @@ class HIDInitCommandHandler(
 
     interface ChannelAllocator {
         fun allocateChannel(): HIDChannelId
-        fun resyncChannel(channelId: HIDChannelId)
+        suspend fun resyncChannel(channelId: HIDChannelId)
     }
 }

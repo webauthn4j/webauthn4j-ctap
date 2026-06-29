@@ -66,8 +66,10 @@ class HIDTransport(
             hidChannels[id] = createChannel(id)
             return id
         }
-        override fun resyncChannel(channelId: HIDChannelId) {
-            hidChannels.remove(channelId)
+        override suspend fun resyncChannel(channelId: HIDChannelId) {
+            val old = hidChannels.remove(channelId)
+            old?.cancelAndAwaitCbor()
+            old?.close()
             hidChannels[channelId] = createChannel(channelId)
         }
     })
@@ -88,6 +90,8 @@ class HIDTransport(
     override fun close() {
         incomingPackets.close()
         consumerJob?.cancel()
+        hidChannels.values.forEach { it.close() }
+        hidChannels.clear()
     }
 
     fun onHIDDataReceived(bytes: ByteArray, hidPacketHandler: HIDPacketHandler) {
@@ -120,6 +124,12 @@ class HIDTransport(
                         sendError(channelId, HIDErrorCode.INVALID_CHANNEL, hidPacketHandler)
                         return
                     }
+                    val activeChannel = activeTransactionChannelId
+                    if (activeChannel != null) {
+                        logger.debug("Cancelling ongoing CBOR on channel {} before processing broadcast INIT", activeChannel)
+                        hidChannels[activeChannel]?.cancelAndAwaitCbor()
+                    }
+                    ctapAuthenticatorSession.resetVolatileState()
                     val tempChannel = createChannel(channelId)
                     tempChannel.handlePacket(hidPacket) { responsePacket ->
                         logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, responsePacket.toString())
@@ -183,7 +193,7 @@ class HIDTransport(
     }
 
     private fun sendError(channelId: HIDChannelId, errorCode: HIDErrorCode, hidPacketHandler: HIDPacketHandler) {
-        HIDERRORResponseMessage(channelId, errorCode).toHIDPackets()
+        HIDERRORResponseMessage(channelId, errorCode).toHIDPackets(packetSize)
             .forEach {
                 logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, it.toString())
                 hidPacketHandler.onResponse(it.toBytes())
@@ -214,6 +224,8 @@ class HIDTransport(
         return HIDChannel(
             channelId = channelId,
             scope = scope,
+            packetSize = packetSize,
+            keepAliveWorker = keepAliveWorker,
             activeTransactionChannelIdSetter = { activeTransactionChannelId = it },
             commandTimeSetter = { currentCommandStartTimeMs = it },
             initHandler = initHandler,
