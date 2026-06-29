@@ -42,7 +42,14 @@ class HIDCborCommandHandler(
             coroutineScope {
                 val keepAliveJob = launch(keepAliveWorker) {
                     while (true) {
-                        responseCallback(HIDKEEPALIVEResponseMessage(hidMessage.channelId, HIDStatusCode.PROCESSING))
+                        //spec| STATUS_PROCESSING 1 The authenticator is still processing the current request.
+                        //spec| STATUS_UPNEEDED 2 The authenticator is waiting for user presence.
+                        val statusCode = if (ctapAuthenticatorSession.isWaitingForUserPresence) {
+                            HIDStatusCode.UPNEEDED
+                        } else {
+                            HIDStatusCode.PROCESSING
+                        }
+                        responseCallback(HIDKEEPALIVEResponseMessage(hidMessage.channelId, statusCode))
                         delay(KEEPALIVE_INTERVAL)
                     }
                 }
