@@ -1,7 +1,11 @@
 [versions]
 kotlin = "2.4.0"
 
-kotlinx-coroutines = "1.11.0"
+kotlinx-coroutines = "1.10.2"
+
+ktor = "3.1.3"
+
+quarkus = "3.35.4"
 
 webauthn4j = "0.31.6.RELEASE"
 
@@ -36,8 +40,12 @@ jreleaser = "1.25.0"
 # Kotlin
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 
+# Ktor
+ktor-network = { group = "io.ktor", name = "ktor-network", version.ref = "ktor" }
+
 # WebAuthn4J
 webauthn4j-core = { module = "com.webauthn4j:webauthn4j-core", version.ref = "webauthn4j" }
+webauthn4j-metadata = { module = "com.webauthn4j:webauthn4j-metadata", version.ref = "webauthn4j" }
 webauthn4j-test = { module = "com.webauthn4j:webauthn4j-test", version.ref = "webauthn4j" }
 
 # Third-party libraries
@@ -71,3 +79,4 @@ asciidoctor = { id = "org.asciidoctor.jvm.convert", version.ref = "asciidoctor"}
 sonarqube = { id = "org.sonarqube", version.ref = "sonarqube" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 jreleaser = { id = "org.jreleaser", version.ref = "jreleaser" }
+quarkus = { id = "io.quarkus", version.ref = "quarkus" }
