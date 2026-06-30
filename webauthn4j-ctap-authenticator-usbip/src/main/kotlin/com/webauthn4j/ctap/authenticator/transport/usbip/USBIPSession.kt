@@ -18,13 +18,10 @@ import io.ktor.utils.io.writeFully
 import org.slf4j.LoggerFactory
 
 /**
- * Represents an established USB-IP client connection.
+ * An established USB-IP client connection with its per-session endpoints.
  *
- * Created via [create], which opens TCP channels and completes the USB-IP
- * handshake (device list / import). Once created, the session is ready for
- * URB processing via [URBProcessor].
- *
- * Each session owns its own [ControlEndpoint] and [InterruptEndpoint] instances.
+ * [create] opens TCP channels, negotiates the USB-IP handshake, and returns
+ * a ready-to-use session. [URBProcessor] then drives endpoint I/O on it.
  */
 class USBIPSession private constructor(
     val readChannel: ByteReadChannel,
@@ -33,9 +30,9 @@ class USBIPSession private constructor(
     val interruptEndpoint: InterruptEndpoint
 ) : AutoCloseable {
 
-    companion object {
-        private val logger = LoggerFactory.getLogger(USBIPSession::class.java)
+    private val logger = LoggerFactory.getLogger(USBIPSession::class.java)
 
+    companion object {
         suspend fun create(
             socket: Socket,
             deviceInfo: DeviceInfo,
@@ -53,24 +50,24 @@ class USBIPSession private constructor(
             session.negotiateHandshake(deviceInfo)
             return session
         }
+    }
 
-        private suspend fun USBIPSession.negotiateHandshake(deviceInfo: DeviceInfo) {
-            while (true) {
-                when (val request = HandshakeRequest.parse(readChannel)) {
-                    is DeviceListRequest -> {
-                        logger.debug("Handling OP_REQ_DEVLIST")
-                        writeResponse(DeviceListResponse(devices = listOf(deviceInfo)).toBytes())
+    private suspend fun negotiateHandshake(deviceInfo: DeviceInfo) {
+        while (true) {
+            when (val request = HandshakeRequest.parse(readChannel)) {
+                is DeviceListRequest -> {
+                    logger.debug("Handling OP_REQ_DEVLIST")
+                    writeResponse(DeviceListResponse(devices = listOf(deviceInfo)).toBytes())
+                }
+                is ImportRequest -> {
+                    logger.debug("Handling OP_REQ_IMPORT: busid={}", request.busId)
+                    if (request.busId != deviceInfo.busid) {
+                        logger.warn("Import request for unknown busid: {}", request.busId)
+                        continue
                     }
-                    is ImportRequest -> {
-                        logger.debug("Handling OP_REQ_IMPORT: busid={}", request.busId)
-                        if (request.busId != deviceInfo.busid) {
-                            logger.warn("Import request for unknown busid: {}", request.busId)
-                            continue
-                        }
-                        writeResponse(ImportResponse(device = deviceInfo).toBytes())
-                        logger.info("Device attached to client")
-                        return
-                    }
+                    writeResponse(ImportResponse(device = deviceInfo).toBytes())
+                    logger.info("Device attached to client")
+                    return
                 }
             }
         }

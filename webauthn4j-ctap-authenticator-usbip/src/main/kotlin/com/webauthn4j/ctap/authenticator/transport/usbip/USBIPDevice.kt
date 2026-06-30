@@ -10,10 +10,11 @@ import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 
 /**
- * Virtual USB FIDO2 security key exposed over USB/IP (TCP/IP).
+ * Virtual USB FIDO2 security key exposed over USB/IP.
  *
- * Wraps a [CtapAuthenticator] and serves it as a USB HID device that remote
- * machines can attach via the USB/IP protocol.
+ * Listens for TCP connections and, for each client, creates a [USBIPSession]
+ * (which negotiates the handshake) and hands it to a [URBProcessor] that
+ * drives endpoint I/O until the connection closes.
  */
 class USBIPDevice(
     ctapAuthenticator: CtapAuthenticator,
@@ -56,8 +57,8 @@ class USBIPDevice(
                                     URBProcessor(session).process()
                                 }
                             }
-                        } catch (_: java.io.IOException) {
-                            logger.debug("Client disconnected: {}", clientSocket.remoteAddress)
+                        } catch (e: java.io.IOException) {
+                            logger.debug("Session ended: {} ({})", clientSocket.remoteAddress, e.message)
                         } catch (e: Exception) {
                             logger.error("Session error", e)
                         }

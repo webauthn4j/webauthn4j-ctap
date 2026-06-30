@@ -19,19 +19,17 @@ import kotlinx.coroutines.selects.select
 import org.slf4j.LoggerFactory
 
 /**
- * Processes URBs on an established [USBIPSession] using a select-based event loop.
+ * Drives URB processing on an established [USBIPSession].
  *
- * An IO coroutine reads URBs from the TCP stream and feeds them into a queue.
- * The main loop uses [select] to monitor both the URB queue and the HID response
- * channel simultaneously, ensuring Interrupt IN requests are fulfilled in FIFO
- * order without blocking URB reading.
- *
- * UNLINK requests correctly remove pending Interrupt IN entries, preventing
- * stale responses and ensuring accurate status reporting.
+ * An IO coroutine reads URBs from the TCP stream into a queue. The main
+ * coroutine uses [select] to concurrently monitor that queue and the HID
+ * response channel, dispatching each URB to the appropriate endpoint and
+ * fulfilling pending Interrupt IN requests in FIFO order.
  */
 class URBProcessor(private val session: USBIPSession) {
 
     private val logger = LoggerFactory.getLogger(URBProcessor::class.java)
+    private val pendingIns = LinkedHashMap<Int, SubmitRequest>()
 
     suspend fun process() {
         coroutineScope {
@@ -52,60 +50,67 @@ class URBProcessor(private val session: USBIPSession) {
     }
 
     private suspend fun processURBs(urbQueue: Channel<UrbRequest>) {
-        val pendingIns = LinkedHashMap<Int, SubmitRequest>()
-
         while (true) {
             select {
                 urbQueue.onReceive { urb ->
                     when (urb) {
-                        is SubmitRequest -> {
-                            if (urb.transferBufferLength > MAX_TRANSFER_BUFFER_LENGTH) {
-                                logger.warn("Transfer size too large: {}", urb.transferBufferLength)
-                                session.writeResponse(SubmitResponse.error(urb, UrbStatus.EINVAL).toBytes())
-                                return@onReceive
-                            }
-                            logger.debug("CMD_SUBMIT: ep={}, dir={}, len={}", urb.ep, urb.direction, urb.transferBufferLength)
-                            if (urb.direction == TransferDirection.IN && urb.ep == InterruptEndpoint.EP_NUMBER) {
-                                pendingIns[urb.seqnum] = urb
-                            } else {
-                                submitAndRespond(urb)
-                            }
-                        }
-                        is UnlinkRequest -> {
-                            logger.debug("CMD_UNLINK: seqnum={}, unlinkSeqnum={}", urb.seqnum, urb.unlinkSeqnum)
-                            val wasPending = pendingIns.remove(urb.unlinkSeqnum) != null
-                            val status = if (wasPending) UrbStatus.ECONNRESET else UrbStatus.SUCCESS
-                            session.writeResponse(UnlinkResponse(seqnum = urb.seqnum, status = status).toBytes())
-                        }
+                        is SubmitRequest -> handleSubmit(urb)
+                        is UnlinkRequest -> handleUnlink(urb)
                     }
                 }
                 if (pendingIns.isNotEmpty()) {
                     session.interruptEndpoint.responses.onReceive { data ->
-                        val entry = pendingIns.entries.first()
-                        pendingIns.remove(entry.key)
-                        logger.debug("Interrupt IN: returning {} bytes (seqnum={})", data.size, entry.key)
-                        session.writeResponse(SubmitResponse.ok(entry.value, data).toBytes())
+                        completeInterruptIn(data)
                     }
                 }
             }
         }
     }
 
-    private suspend fun submitAndRespond(request: SubmitRequest) {
-        try {
-            val response = when (request.ep) {
-                ControlEndpoint.EP_NUMBER -> session.controlEndpoint.process(request)
-                InterruptEndpoint.EP_NUMBER -> session.interruptEndpoint.processOut(request)
-                else -> {
-                    logger.warn("Unknown endpoint: 0x{}", Integer.toHexString(request.ep))
-                    SubmitResponse.error(request, UrbStatus.EPIPE)
-                }
+    private suspend fun handleSubmit(request: SubmitRequest) {
+        if (request.transferBufferLength > MAX_TRANSFER_BUFFER_LENGTH) {
+            logger.warn("Transfer size too large: {}", request.transferBufferLength)
+            session.writeResponse(SubmitResponse.error(request, UrbStatus.EINVAL).toBytes())
+            return
+        }
+        logger.debug("CMD_SUBMIT: ep={}, dir={}, len={}", request.ep, request.direction, request.transferBufferLength)
+        if (request.direction == TransferDirection.IN && request.ep == InterruptEndpoint.EP_NUMBER) {
+            pendingIns[request.seqnum] = request
+        } else {
+            val response = try {
+                dispatchSubmit(request)
+            } catch (e: Exception) {
+                handleEndpointFailure(request, e)
             }
             session.writeResponse(response.toBytes())
-        } catch (e: Exception) {
-            logger.error("Error processing submit request", e)
-            session.writeResponse(SubmitResponse.error(request, UrbStatus.EINVAL).toBytes())
         }
+    }
+
+    private suspend fun handleUnlink(request: UnlinkRequest) {
+        logger.debug("CMD_UNLINK: seqnum={}, unlinkSeqnum={}", request.seqnum, request.unlinkSeqnum)
+        val wasPending = pendingIns.remove(request.unlinkSeqnum) != null
+        val status = if (wasPending) UrbStatus.ECONNRESET else UrbStatus.SUCCESS
+        session.writeResponse(UnlinkResponse(seqnum = request.seqnum, status = status).toBytes())
+    }
+
+    private suspend fun completeInterruptIn(data: ByteArray) {
+        val entry = pendingIns.entries.first()
+        pendingIns.remove(entry.key)
+        logger.debug("Interrupt IN: returning {} bytes (seqnum={})", data.size, entry.key)
+        session.writeResponse(SubmitResponse.ok(entry.value, data).toBytes())
+    }
+
+    private suspend fun dispatchSubmit(request: SubmitRequest): SubmitResponse {
+        return when (request.ep) {
+            ControlEndpoint.EP_NUMBER -> session.controlEndpoint.process(request)
+            InterruptEndpoint.EP_NUMBER -> session.interruptEndpoint.process(request)
+            else -> throw IllegalArgumentException("Unknown endpoint: 0x${Integer.toHexString(request.ep)}")
+        }
+    }
+
+    private fun handleEndpointFailure(request: SubmitRequest, e: Exception): SubmitResponse {
+        logger.error("Error processing submit request", e)
+        return SubmitResponse.error(request, UrbStatus.EINVAL)
     }
 
     companion object {
