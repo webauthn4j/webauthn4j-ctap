@@ -7,7 +7,7 @@ import com.webauthn4j.ctap.authenticator.transport.uhid.event.CreateDeviceEvent
 import com.webauthn4j.ctap.authenticator.transport.uhid.event.InputReportEvent
 import com.webauthn4j.ctap.authenticator.transport.uhid.event.OutputReportEvent
 import com.webauthn4j.ctap.authenticator.transport.uhid.event.UHIDEvent
-import com.webauthn4j.ctap.authenticator.transport.uhid.usb.UHIDConnection
+import com.webauthn4j.ctap.authenticator.transport.uhid.UHIDConnection
 import com.webauthn4j.ctap.core.converter.CtapRequestConverter
 import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.ctap.core.data.hid.*

@@ -11,8 +11,8 @@ import com.webauthn4j.ctap.authenticator.transport.uhid.event.OpenEvent
 import com.webauthn4j.ctap.authenticator.transport.uhid.event.StartEvent
 import com.webauthn4j.ctap.authenticator.transport.uhid.event.StopEvent
 import com.webauthn4j.ctap.authenticator.transport.uhid.event.UnknownEvent
-import com.webauthn4j.ctap.authenticator.transport.uhid.usb.FidoHIDReportDescriptor
-import com.webauthn4j.ctap.authenticator.transport.uhid.usb.UHIDConnection
+import com.webauthn4j.ctap.authenticator.transport.uhid.FidoHIDReportDescriptor
+import com.webauthn4j.ctap.authenticator.transport.uhid.UHIDConnection
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -102,9 +102,9 @@ class UHIDDevice(
         logger.debug("UHID_OUTPUT: size={} (actual HID report: {} bytes), rtype={}",
             output.size, output.data.size, output.rtype)
         hidTransport.onHIDDataReceived(output.data) { responseBytes ->
-            synchronized(connection) {
-                connection.writeEvent(InputReportEvent(responseBytes))
-            }
+            // synchronized: callback fires from HIDTransport's consumer thread,
+            // concurrent with the read loop on Dispatchers.IO
+            synchronized(connection) { connection.writeEvent(InputReportEvent(responseBytes)) }
         }
     }
 }
