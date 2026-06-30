@@ -7,7 +7,7 @@ import com.webauthn4j.ctap.authenticator.transport.uhid.event.OutputReportEvent
 import com.webauthn4j.ctap.authenticator.transport.uhid.event.StartEvent
 import com.webauthn4j.ctap.authenticator.transport.uhid.event.UHIDEvent
 import com.webauthn4j.ctap.authenticator.transport.uhid.event.UnknownEvent
-import com.webauthn4j.ctap.authenticator.transport.uhid.usb.FidoHIDReportDescriptor
+import com.webauthn4j.ctap.authenticator.transport.uhid.FidoHIDReportDescriptor
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer

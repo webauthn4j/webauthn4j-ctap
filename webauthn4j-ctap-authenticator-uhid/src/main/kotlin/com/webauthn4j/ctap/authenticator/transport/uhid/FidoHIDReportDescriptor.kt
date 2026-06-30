@@ -1,4 +1,4 @@
-package com.webauthn4j.ctap.authenticator.transport.uhid.usb
+package com.webauthn4j.ctap.authenticator.transport.uhid
 
 /**
  * Standard FIDO HID report descriptor as defined in the CTAP specification.

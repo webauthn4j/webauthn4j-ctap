@@ -24,5 +24,6 @@ device.start(scope)
 | Class | Description |
 |---|---|
 | `UHIDDevice` | Lifecycle management and UHID event loop |
-| `UHIDConnection` | Low-level `/dev/uhid` I/O |
+| `UHIDConnection` | Low-level `/dev/uhid` I/O wrapper |
 | `UHIDDeviceConfig` | Device metadata (name, VID, PID, etc.) |
+| `FidoHIDReportDescriptor` | Standard FIDO HID report descriptor |

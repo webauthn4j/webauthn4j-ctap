@@ -1,4 +1,4 @@
-package com.webauthn4j.ctap.authenticator.transport.uhid.usb
+package com.webauthn4j.ctap.authenticator.transport.uhid
 
 import com.webauthn4j.ctap.authenticator.transport.uhid.event.UHIDEvent
 import java.nio.ByteBuffer
