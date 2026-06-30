@@ -7,14 +7,11 @@ import kotlinx.coroutines.channels.Channel
 import org.slf4j.LoggerFactory
 
 /**
- * Bridges USB HID interrupt endpoint transfers to [HIDTransport].
+ * Bridges USB HID interrupt transfers to [HIDTransport].
  *
- * OUT transfers pass HID data to [HIDTransport.onHIDDataReceived], which
- * queues it for async processing. Resulting HID responses are delivered
- * to [responses] for the session to pick up and return to pending IN requests.
- *
- * Each instance is scoped to a single session. When the session ends,
- * [close] should be called to discard stale responses.
+ * OUT transfers forward HID data to [HIDTransport]; resulting responses
+ * are queued in [responses] for [URBProcessor] to pair with pending
+ * Interrupt IN requests. Each instance is scoped to a single session.
  */
 class InterruptEndpoint(
     private val hidTransport: HIDTransport
@@ -27,7 +24,7 @@ class InterruptEndpoint(
         const val EP_NUMBER = 1
     }
 
-    fun processOut(request: SubmitRequest): SubmitResponse {
+    fun process(request: SubmitRequest): SubmitResponse {
         logger.debug("Interrupt OUT: {} bytes", request.transferBuffer.size)
 
         if (request.transferBuffer.isEmpty()) {

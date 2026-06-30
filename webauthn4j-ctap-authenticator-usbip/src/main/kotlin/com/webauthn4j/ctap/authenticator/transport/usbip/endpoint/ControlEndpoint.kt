@@ -21,12 +21,6 @@ class ControlEndpoint(
         private const val USB_REQ_GET_DESCRIPTOR = 0x06
         private const val USB_REQ_SET_CONFIGURATION = 0x09
         private const val USB_REQ_SET_IDLE = 0x0A
-
-        private const val USB_DT_DEVICE = 0x01
-        private const val USB_DT_CONFIG = 0x02
-        private const val USB_DT_STRING = 0x03
-        private const val USB_DT_HID = 0x21
-        private const val USB_DT_REPORT = 0x22
     }
 
     fun process(request: SubmitRequest): SubmitResponse {
@@ -58,11 +52,11 @@ class ControlEndpoint(
             Integer.toHexString(descriptorType), descriptorIndex, setup.wLength)
 
         val descriptorData = when (descriptorType) {
-            USB_DT_DEVICE -> USBDescriptors.generateDeviceDescriptor(config)
-            USB_DT_CONFIG -> USBDescriptors.generateConfigurationDescriptor()
-            USB_DT_STRING -> USBDescriptors.generateStringDescriptor(descriptorIndex, config.deviceName)
-            USB_DT_REPORT -> USBDescriptors.getReportDescriptor()
-            USB_DT_HID -> USBDescriptors.getHIDDescriptor()
+            USBDescriptors.USB_DT_DEVICE -> USBDescriptors.generateDeviceDescriptor(config)
+            USBDescriptors.USB_DT_CONFIG -> USBDescriptors.generateConfigurationDescriptor()
+            USBDescriptors.USB_DT_STRING -> USBDescriptors.generateStringDescriptor(descriptorIndex, config.deviceName)
+            USBDescriptors.USB_DT_REPORT -> USBDescriptors.getReportDescriptor()
+            USBDescriptors.USB_DT_HID -> USBDescriptors.getHIDDescriptor()
             else -> {
                 logger.warn("Unknown descriptor type: 0x{}", Integer.toHexString(descriptorType))
                 return SubmitResponse.error(request, UrbStatus.EPIPE)
