@@ -2,6 +2,7 @@ package com.webauthn4j.unifidokey.usbip
 
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.attestation.PackedBasicAttestationStatementProvider
+import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
 import com.webauthn4j.ctap.authenticator.transport.usbip.USBIPDevice
 import com.webauthn4j.ctap.authenticator.transport.usbip.USBIPDeviceConfig
 import kotlinx.coroutines.CoroutineScope
@@ -29,7 +30,9 @@ class UniFIDOKeyUSBIP : Runnable {
         val authenticator = CtapAuthenticator(
             attestationStatementProvider = PackedBasicAttestationStatementProvider.createWithDemoAttestationKey(),
             userVerificationHandler = ConsoleUserVerificationHandler()
-        )
+        ).apply {
+            credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
+        }
         val device = USBIPDevice(authenticator, config)
         val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 

@@ -94,6 +94,10 @@ class HIDTransport(
         hidChannels.clear()
     }
 
+    fun onDeviceAttached() {
+        ctapAuthenticatorSession.resetVolatileState()
+    }
+
     fun onHIDDataReceived(bytes: ByteArray, hidPacketHandler: HIDPacketHandler) {
         val commandStartTime = currentCommandStartTimeMs
         if (commandStartTime > 0) {
@@ -129,7 +133,6 @@ class HIDTransport(
                         logger.debug("Cancelling ongoing CBOR on channel {} before processing broadcast INIT", activeChannel)
                         hidChannels[activeChannel]?.cancelAndAwaitCbor()
                     }
-                    ctapAuthenticatorSession.resetVolatileState()
                     val tempChannel = createChannel(channelId)
                     tempChannel.handlePacket(hidPacket) { responsePacket ->
                         logger.debug(CTAP_RESPONSE_HID_PACKET_LOGGING_TEMPLATE, responsePacket.toString())

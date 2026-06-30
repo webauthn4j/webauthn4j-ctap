@@ -176,7 +176,7 @@ class CtapAuthenticatorSession internal constructor(
     }
 
     fun resetVolatileState() {
-        clientPINService.resetVolatilePinRetryCounter()
+        clientPINService.regenerateKeys()
     }
 
     internal fun publishEvent(event: Event) {

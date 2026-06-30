@@ -50,15 +50,17 @@ class USBIPDevice(
                     val clientSocket = serverSocket.accept()
                     logger.info("Client connected from {}", clientSocket.remoteAddress)
 
+                    val remoteAddress = clientSocket.remoteAddress
                     launch {
                         try {
                             clientSocket.use { socket ->
                                 USBIPSession.create(socket, deviceInfo, config, hidTransport).use { session ->
+                                    hidTransport.onDeviceAttached()
                                     URBProcessor(session).process()
                                 }
                             }
                         } catch (e: java.io.IOException) {
-                            logger.debug("Session ended: {} ({})", clientSocket.remoteAddress, e.message)
+                            logger.debug("Session ended: {} ({})", remoteAddress, e.message)
                         } catch (e: Exception) {
                             logger.error("Session error", e)
                         }
