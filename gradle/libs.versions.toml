@@ -5,7 +5,7 @@ kotlinx-coroutines = "1.11.0"
 
 ktor = "3.5.1"
 
-quarkus = "3.35.4"
+quarkus = "3.37.0"
 
 webauthn4j = "0.31.6.RELEASE"
 
