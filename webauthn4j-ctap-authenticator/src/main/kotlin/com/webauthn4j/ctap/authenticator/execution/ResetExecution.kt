@@ -34,7 +34,6 @@ class ResetExecution internal constructor(
         return when (ctapAuthenticatorSession.resetProtection) {
             ResetProtectionSetting.ENABLED -> AuthenticatorResetResponse(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
             else -> {
-                ctapAuthenticatorSession.clientPINService.resetVolatilePinRetryCounter()
                 authenticatorPropertyStore.clear()
                 ctapAuthenticatorSession.publishEvent(ResetEvent(Instant.now()))
                 AuthenticatorResetResponse(CtapStatusCode.CTAP2_OK)
