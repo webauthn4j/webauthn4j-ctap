@@ -11,6 +11,7 @@ import com.webauthn4j.ctap.authenticator.data.event.GetAssertionEvent
 import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
+import com.webauthn4j.ctap.authenticator.extension.AssertionCredentialFilter
 import com.webauthn4j.ctap.authenticator.extension.AuthenticationExtensionContext
 import com.webauthn4j.ctap.authenticator.extension.AuthenticationExtensionProcessor
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
@@ -108,6 +109,7 @@ internal class GetAssertionExecution :
         execStep5ProcessOptions()
         execStep6ProcessExtensions()
         execStep7RequestUserConsent()
+        execStep7bFilterByCredentialProtection()
         execStep8CheckUserCredentialCandidatesExistence()
         execStep9SortUserCredentials()
         execStep10PrepareGetAssertionSession()
@@ -346,6 +348,23 @@ internal class GetAssertionExecution :
             throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
         }
 
+    }
+
+    //spec| Iterate through the applicable credentials list, and if credential protection for a credential
+    //spec| is marked as userVerificationRequired, and the "uv" bit is false in the response,
+    //spec| remove that credential from the applicable credentials list.
+    //spec| Iterate through the applicable credentials list, and if credential protection for a credential
+    //spec| is marked as userVerificationOptionalWithCredentialIDList and there is no allowList passed
+    //spec| by the client and the "uv" bit is false in the response,
+    //spec| remove that credential from the applicable credentials list.
+    // @see <a href="https://fidoalliance.org/specs/fido-v2.1-ps-20210615/fido-client-to-authenticator-protocol-v2.1-ps-errata-20220621.html#sctn-credProtect-extension">CTAP 2.1 §12.1</a>
+    private fun execStep7bFilterByCredentialProtection() {
+        val filters = ctapAuthenticatorSession.extensionProcessors
+            .filterIsInstance<AssertionCredentialFilter>()
+        if (filters.isEmpty()) return
+        assertionObjects = assertionObjects.filter { obj ->
+            filters.all { it.isAssertionCandidate(obj.credential, userVerificationResult, allowList) }
+        }
     }
 
     //spec| Step8
