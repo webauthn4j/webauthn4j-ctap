@@ -22,7 +22,7 @@ ksp = "2.3.9"
 asciidoctor = "4.0.5"
 
 # Test dependencies
-junit-jupiter = "5.13.4"
+junit-jupiter = "6.1.1"
 
 assertj = "3.27.7"
 
