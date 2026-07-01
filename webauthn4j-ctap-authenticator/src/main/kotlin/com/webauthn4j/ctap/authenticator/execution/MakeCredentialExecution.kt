@@ -46,6 +46,8 @@ import kotlin.experimental.or
 
 /**
  * MakeCredential command execution
+ *
+ * @see <a href="https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-makeCred-authnr-alg">CTAP 2.3 §6.1.2 authenticatorMakeCredential Algorithm</a>
  */
 @Suppress("ConvertSecondaryConstructorToPrimary", "FunctionName")
 internal class MakeCredentialExecution :
@@ -134,15 +136,53 @@ internal class MakeCredentialExecution :
             throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_MISSING_PARAMETER)
         }
         ctapAuthenticatorSession.onGoingGetAssertionSession = null
-        execStep1ValidateExcludeList()
-        execStep2ValidatePubKeyCredParams()
-        execStep3ProcessOptions()
-        execStep4ProcessExtensions()
-        execStep5ProcessPinAuth()
-        execStep6ValidateClientPin()
-        execStep7ValidatePinProtocol()
-        execStep8RequestUserConsent()
-        val response = execStep9to11GenerateAttestedCredential()
+
+        // Step 1: TODO: CTAP 2.1 - zero length pinUvAuthParam handling
+        //spec| Step 1. If authenticator supports either pinUvAuthToken or clientPin features and the platform sends a zero length pinUvAuthParam:
+        // execStep1ZeroLengthPinUvAuthParam()
+
+        // Step 2: TODO: CTAP 2.1 - pinUvAuthProtocol validation
+        //spec| Step 2. If the pinUvAuthParam parameter is present:
+        // execStep2ValidatePinUvAuthProtocol()
+
+        execStep3ValidatePubKeyCredParams()
+
+        // Step 4: TODO: CTAP 2.1 - initialize response structure
+        //spec| Step 4. Create a new authenticatorMakeCredential response structure and initialize both its "uv" bit and "up" bit as false.
+        // execStep4InitializeResponseStructure()
+
+        execStep5ProcessOptions()
+
+        // Step 6: TODO: CTAP 2.1 - alwaysUv processing
+        //spec| Step 6. If the alwaysUv option ID is present and true then:
+        // execStep6ProcessAlwaysUv()
+
+        // Step 7: TODO: CTAP 2.1 - makeCredUvNotRqd (present and true)
+        //spec| Step 7. If the makeCredUvNotRqd option ID is present and set to true in the authenticatorGetInfo response:
+        // execStep7ProcessMakeCredUvNotRqd()
+
+        // Step 8: TODO: CTAP 2.1 - makeCredUvNotRqd (absent or false)
+        //spec| Step 8. Else: (the makeCredUvNotRqd option ID in authenticatorGetInfo's response is present with the value false or is absent):
+        // execStep8ProcessMakeCredUvNotRqdElse()
+
+        // Step 9: TODO: CTAP 2.1 - enterprise attestation
+        //spec| Step 9. If the enterpriseAttestation parameter is present:
+        // execStep9ProcessEnterpriseAttestation()
+
+        // Step 10: TODO: CTAP 2.1 - UV not required check
+        //spec| Step 10. If the following statements are all true:
+        // execStep10CheckUvNotRequired()
+
+        execStep11ProcessUserVerification()
+        execStep12ValidateExcludeList()
+
+        // Step 13: TODO: CTAP 2.1 - set up from built-in UV
+        //spec| Step 13. If evidence of user interaction was provided as part of Step 11 (i.e., by invoking performBuiltInUv()):
+        // execStep13SetUpFromBuiltInUv()
+
+        execStep14RequestUserConsent()
+        execStep15ProcessExtensions()
+        val response = execStep16to19GenerateCredentialAndAttestation()
         val event = MakeCredentialEvent(
             Instant.now(),
             rpId,
@@ -160,11 +200,109 @@ internal class MakeCredentialExecution :
     }
 
 
-    //spec| Step1
-    //spec| If the excludeList parameter is present and contains a credential ID that is present on this authenticator and bound to the specified rpId,
-    //spec| wait for user presence, then terminate this procedure and return error code CTAP2_ERR_CREDENTIAL_EXCLUDED.
-    //spec| User presence check is required for CTAP2 authenticators before the RP gets told that the token is already registered to behave similarly to CTAP1/U2F authenticators.
-    private suspend fun execStep1ValidateExcludeList() {
+    //spec| Step 3. Validate pubKeyCredParams with the following steps:
+    //spec| For each element of pubKeyCredParams:
+    //spec| If the element specifies an algorithm that is supported by the authenticator, and no algorithm has yet been chosen by this loop, then let the algorithm specified by the current element be the chosen algorithm.
+    //spec| If the loop completes and no algorithm was chosen then return CTAP2_ERR_UNSUPPORTED_ALGORITHM.
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-makeCred-authnr-alg
+    private fun execStep3ValidatePubKeyCredParams() {
+        algorithmIdentifier =
+            pubKeyCredParams.firstOrNull { it.type == PublicKeyCredentialType.PUBLIC_KEY && authenticatorPropertyStore.supports(it.alg) }?.alg
+                ?: throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_ALGORITHM)
+    }
+
+    //spec| Step 5. If the options parameter is present, process all option keys and values present in the parameter.
+    //spec| Treat any option keys that are not understood as absent.
+    //spec| Note: As this specification defines normative behaviours for the "rk", "up", and "uv" option keys,
+    //spec| they MUST be understood by all authenticators.
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-makeCred-authnr-alg
+    private fun execStep5ProcessOptions() {
+        when (val requestOptions = options) {
+            null -> {
+                residentKeyPlan = ctapAuthenticatorSession.residentKey == ResidentKeySetting.ALWAYS
+            }
+            else -> {
+                if(requestOptions.up == false){
+                    throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
+                }
+                residentKeyPlan = when (requestOptions.rk) {
+                    true -> when (ctapAuthenticatorSession.residentKey) {
+                        ResidentKeySetting.NEVER -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
+                        else -> true
+                    }
+                    else -> ctapAuthenticatorSession.residentKey == ResidentKeySetting.ALWAYS
+                }
+                userVerificationPlan = when (requestOptions.uv) {
+                    true -> {
+                        when (ctapAuthenticatorSession.userVerification) {
+                            UserVerificationSetting.READY -> true
+                            else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
+                        }
+                    }
+                    else -> false
+                }
+            }
+        }
+        userPresencePlan = when (ctapAuthenticatorSession.userPresence) {
+            UserPresenceSetting.SUPPORTED -> true
+            else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
+        }
+    }
+
+    //spec| Step 11. If the authenticator is protected by some form of user verification, then:
+    //spec| If pinUvAuthParam parameter is present (implying the "uv" option is false (see Step 5)):
+    //spec| Call verify(pinUvAuthToken, clientDataHash, pinUvAuthParam).
+    //spec| If the verification returns error, then end the operation by returning CTAP2_ERR_PIN_AUTH_INVALID error.
+    //spec| If the "uv" option is present and set to true (implying the pinUvAuthParam parameter is not present,
+    //spec| and that the authenticator supports an enabled built-in user verification method, see Step 5):
+    //
+    // This method merges the CTAP 2.0 steps 5 (pinAuth processing), 6 (clientPin validation),
+    // and 7 (pinProtocol validation) into a single user verification step aligned with CTAP 2.3.
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-makeCred-authnr-alg
+    private suspend fun execStep11ProcessUserVerification() {
+        // Process pinAuth (formerly CTAP 2.0 Step 5)
+        pinAuth.let {
+            if (it != null && pinProtocol == PinProtocolVersion.VERSION_1) {
+                // Handle zero length pinAuth for authenticator selection
+                if (it.isEmpty()) {
+                    requestUserConsent()
+                    if (ctapAuthenticatorSession.clientPINService.isClientPINReady) {
+                        throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_INVALID)
+                    } else {
+                        throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_NOT_SET)
+                    }
+                } else {
+                    ctapAuthenticatorSession.clientPINService.validatePINAuth(it, clientDataHash)
+                    userPresenceResult = true
+                    userVerificationResult = true
+                }
+            }
+        }
+
+        // Validate clientPin requirement (formerly CTAP 2.0 Step 6)
+        //TODO: to be fixed to align CTAP2.1 spec.
+//        if (authenticatorMakeCredentialRequest.pinAuth == null && ctapAuthenticatorSession.clientPINService.clientPIN != null) {
+//            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_REQUIRED)
+//        }
+
+        // Validate pinProtocol (formerly CTAP 2.0 Step 7)
+        if (authenticatorMakeCredentialRequest.pinAuth != null && authenticatorMakeCredentialRequest.pinProtocol != PinProtocolVersion.VERSION_1) {
+            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
+        }
+    }
+
+    //spec| Step 12. If the excludeList parameter is present and contains a credential ID created by this authenticator,
+    //spec| that is bound to the specified rp.id:
+    //spec| If the credential's credProtect value is not userVerificationRequired, then:
+    //spec| Wait for user presence.
+    //spec| Regardless of whether user presence is obtained or the authenticator times out,
+    //spec| terminate this procedure and return CTAP2_ERR_CREDENTIAL_EXCLUDED.
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-makeCred-authnr-alg
+    private suspend fun execStep12ValidateExcludeList() {
         excludeList.let {
             if (it != null && it.isNotEmpty()) {
                 val rpId = rp.id
@@ -212,124 +350,22 @@ internal class MakeCredentialExecution :
         }
     }
 
-    //spec| Step2
-    //spec| If the pubKeyCredParams parameter does not contain a valid COSEAlgorithmIdentifier value that is supported by the authenticator,
-    //spec| terminate this procedure and return error code CTAP2_ERR_UNSUPPORTED_ALGORITHM.
-    private fun execStep2ValidatePubKeyCredParams() {
-        algorithmIdentifier =
-            pubKeyCredParams.firstOrNull { it.type == PublicKeyCredentialType.PUBLIC_KEY && authenticatorPropertyStore.supports(it.alg) }?.alg
-                ?: throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_ALGORITHM)
-    }
-
-    //spec| Step3
-    //spec| If the options parameter is present, process all the options.
-    //spec| If the option is known but not supported, terminate this procedure and return CTAP2_ERR_UNSUPPORTED_OPTION.
-    //spec| If the option is known but not valid for this command, terminate this procedure and return CTAP2_ERR_INVALID_OPTION.
-    //spec| Ignore any options that are not understood.
-    //spec| Note that because this specification defines normative behaviors for them,
-    //spec| all authenticators MUST understand the "rk", "up", and "uv" options.
-    private fun execStep3ProcessOptions() {
-        when (val requestOptions = options) {
-            null -> {
-                residentKeyPlan = ctapAuthenticatorSession.residentKey == ResidentKeySetting.ALWAYS
-            }
-            else -> {
-                if(requestOptions.up == false){
-                    throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
-                }
-                residentKeyPlan = when (requestOptions.rk) {
-                    true -> when (ctapAuthenticatorSession.residentKey) {
-                        ResidentKeySetting.NEVER -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
-                        else -> true
-                    }
-                    else -> ctapAuthenticatorSession.residentKey == ResidentKeySetting.ALWAYS
-                }
-                userVerificationPlan = when (requestOptions.uv) {
-                    true -> {
-                        when (ctapAuthenticatorSession.userVerification) {
-                            UserVerificationSetting.READY -> true
-                            else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
-                        }
-                    }
-                    else -> false
-                }
-            }
-        }
-        userPresencePlan = when (ctapAuthenticatorSession.userPresence) {
-            UserPresenceSetting.SUPPORTED -> true
-            else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
-        }
-    }
-
-    //spec| Step4
-    //spec| Optionally, if the extensions parameter is present, process any extensions that this authenticator supports.
-    //spec| Authenticator extension outputs generated by the authenticator extension processing are returned in the authenticator data.
-    private fun execStep4ProcessExtensions() {
-        val inputs = this.registrationExtensionAuthenticatorInputs
-        val outputsBuilder = AuthenticationExtensionsAuthenticatorOutputs.BuilderForRegistration()
-        if(inputs != null){
-            ctapAuthenticatorSession.extensionProcessors.filterIsInstance<RegistrationExtensionProcessor>().forEach{ processor ->
-                if(processor.supportsRegistrationExtension(inputs)){
-                    val context = RegistrationExtensionContext(ctapAuthenticatorSession, authenticatorMakeCredentialRequest)
-                    processor.processRegistrationExtension(context, userCredentialBuilder, outputsBuilder)
-                }
-            }
-            registrationExtensionAuthenticatorOutputs = outputsBuilder.build()
-        }
-    }
-
-    //spec| Step5
-    //spec| If pinAuth parameter is present and pinProtocol is 1,
-    //spec| verify it by matching it against first 16 bytes of HMAC-SHA-256 of clientDataHash parameter using pinToken: HMAC- SHA-256(pinToken, clientDataHash).
-    //spec|
-    //spec| - If the verification succeeds, set the "uv" bit to 1 in the response.
-    //spec| - If the verification fails, return CTAP2_ERR_PIN_AUTH_INVALID error.
-    private suspend fun execStep5ProcessPinAuth() {
-        pinAuth.let {
-            if (it != null && pinProtocol == PinProtocolVersion.VERSION_1) {
-                //spec| If platform sends zero length pinAuth, authenticator needs to wait for user touch
-                //spec| and then returns either CTAP2_ERR_PIN_NOT_SET if pin is not set or CTAP2_ERR_PIN_INVALID if pin has been set.
-                //spec| This is done for the case where multiple authenticators are attached to the platform and
-                //spec| the platform wants to enforce clientPin semantics,
-                //spec| but the user has to select which authenticator to send the pinToken to.
-                if (it.isEmpty()) {
-                    requestUserConsent()
-                    if (ctapAuthenticatorSession.clientPINService.isClientPINReady) {
-                        throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_INVALID)
-                    } else {
-                        throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_NOT_SET)
-                    }
-                } else {
-                    ctapAuthenticatorSession.clientPINService.validatePINAuth(it, clientDataHash)
-                    userPresenceResult = true
-                    userVerificationResult = true
-                }
-            }
-        }
-    }
-
-    //TODO: to be fixed to align CTAP2.1 spec.
-    //spec| Step6
-    //spec| If pinAuth parameter is not present and clientPin been set on the authenticator, return CTAP2_ERR_PIN_REQUIRED error.
-    private fun execStep6ValidateClientPin() {
-//        if (authenticatorMakeCredentialRequest.pinAuth == null && ctapAuthenticatorSession.clientPINService.clientPIN != null) {
-//            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_REQUIRED)
-//        }
-    }
-
-    //spec| Step7
-    //spec| If pinAuth parameter is present and the pinProtocol is not supported, return CTAP2_ERR_PIN_AUTH_INVALID.
-    private fun execStep7ValidatePinProtocol() {
-        if (authenticatorMakeCredentialRequest.pinAuth != null && authenticatorMakeCredentialRequest.pinProtocol != PinProtocolVersion.VERSION_1) {
-            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
-        }
-    }
-
-    //spec| Step8
-    //spec| If the authenticator has a display, show the items contained within the user and rp parameter structures to the user.
-    //spec| Alternatively, request user interaction in an authenticator-specific way (e.g., flash the LED light).
-    //spec| Request permission to create a credential. If the user declines permission, return the CTAP2_ERR_OPERATION_DENIED error.
-    private suspend fun execStep8RequestUserConsent() {
+    //spec| Step 14. If the "up" option is set to true:
+    //spec| If the pinUvAuthParam parameter is present then:
+    //spec| Let userPresentFlagValue be the result of calling getUserPresentFlagValue().
+    //spec| If userPresentFlagValue is false:
+    //spec| Request evidence of user interaction in an authenticator-specific way (e.g., flash the LED light).
+    //spec| If the authenticator has a display, show the items contained within the user and rp parameter structures to the user, and request permission to create a credential.
+    //spec| If the user declines permission, or the operation times out, then end the operation by returning CTAP2_ERR_OPERATION_DENIED.
+    //spec| Else (implying the pinUvAuthParam parameter is not present):
+    //spec| If the "up" bit is false in the response:
+    //spec| Request evidence of user interaction in an authenticator-specific way (e.g., flash the LED light).
+    //spec| If the authenticator has a display, show the items contained within the user and rp parameter structures to the user, and request permission to create a credential.
+    //spec| If the user declines permission, or the operation times out, then end the operation by returning CTAP2_ERR_OPERATION_DENIED.
+    //spec| Set the "up" bit to true in the response.
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-makeCred-authnr-alg
+    private suspend fun execStep14RequestUserConsent() {
         val consent: Boolean = requestUserConsent()
         if (consent) {
             if (userPresencePlan) {
@@ -355,14 +391,40 @@ internal class MakeCredentialExecution :
         }
     }
 
-    //spec| Step9-11
-    //spec| Generate a new credential key pair for the algorithm specified.
-    //spec| If "rk" in options parameter is set to true:
-    //spec| - If a credential for the same RP ID and account ID already exists on the authenticator, overwrite that credential.
-    //spec| - Store the user parameter along the newly-created key pair.
-    //spec| - If authenticator does not have enough internal storage to persist the new credential, return CTAP2_ERR_KEY_STORE_FULL.
-    //spec| Generate an attestation statement for the newly-created key using clientDataHash.
-    private suspend fun execStep9to11GenerateAttestedCredential(): AuthenticatorMakeCredentialResponse {
+    //spec| Step 15. If the extensions parameter is present:
+    //spec| Process any extensions that this authenticator supports, ignoring any that it does not support.
+    //spec| Authenticator extension outputs generated by the authenticator extension processing
+    //spec| are returned in the authenticator data.
+    //spec| The set of keys in the authenticator extension outputs map MUST be equal to, or a subset of, the keys of the authenticator extension inputs map.
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-makeCred-authnr-alg
+    private fun execStep15ProcessExtensions() {
+        val inputs = this.registrationExtensionAuthenticatorInputs
+        val outputsBuilder = AuthenticationExtensionsAuthenticatorOutputs.BuilderForRegistration()
+        if(inputs != null){
+            ctapAuthenticatorSession.extensionProcessors.filterIsInstance<RegistrationExtensionProcessor>().forEach{ processor ->
+                if(processor.supportsRegistrationExtension(inputs)){
+                    val context = RegistrationExtensionContext(ctapAuthenticatorSession, authenticatorMakeCredentialRequest)
+                    processor.processRegistrationExtension(context, userCredentialBuilder, outputsBuilder)
+                }
+            }
+            registrationExtensionAuthenticatorOutputs = outputsBuilder.build()
+        }
+    }
+
+    //spec| Step 16. Generate a new credential key pair for the algorithm chosen in step 3.
+    //spec| Step 17. If the "rk" option is set to true:
+    //spec| The authenticator MUST create a discoverable credential.
+    //spec| If a credential for the same rp.id and account ID already exists on the authenticator:
+    //spec| Overwrite that credential.
+    //spec| Store the user parameter along with the newly-created key pair.
+    //spec| If authenticator does not have enough internal storage to persist the new credential, return CTAP2_ERR_KEY_STORE_FULL.
+    //spec| Step 18. Otherwise, if the "rk" option is false: the authenticator MUST create a non-discoverable credential.
+    //spec| Step 19. If the authenticator doesn't support multiple attestation formats or the attestationFormatsPreference is absent or its value is the empty list,
+    //spec| generate an attestation statement for the newly-created credential using clientDataHash.
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-makeCred-authnr-alg
+    private suspend fun execStep16to19GenerateCredentialAndAttestation(): AuthenticatorMakeCredentialResponse {
         val userCredential = createUserCredential()
         val rpIdHash = MessageDigestUtil.createSHA256().digest(rpId!!.toByteArray())
         val alg = COSEAlgorithmIdentifier.ES256 // Attestation statement is fixed to ES256 for now
