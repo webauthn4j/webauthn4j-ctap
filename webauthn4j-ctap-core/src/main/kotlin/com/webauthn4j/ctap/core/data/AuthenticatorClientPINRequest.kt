@@ -14,7 +14,9 @@ class AuthenticatorClientPINRequest @JsonCreator constructor(
     @JsonProperty("3") keyAgreement: COSEKey?,
     @JsonProperty("4") pinAuth: ByteArray?,
     @JsonProperty("5") newPinEnc: ByteArray?,
-    @JsonProperty("6") pinHashEnc: ByteArray?
+    @JsonProperty("6") pinHashEnc: ByteArray?,
+    @JsonProperty("9") permissions: PinUvAuthTokenPermissions?,
+    @JsonProperty("10") rpId: String?
 ) : CtapRequest {
 
     override val command: CtapCommand = CtapCommand.CLIENT_PIN
@@ -28,6 +30,8 @@ class AuthenticatorClientPINRequest @JsonCreator constructor(
         get() = ArrayUtil.clone(field)
     val pinHashEnc: ByteArray? = ArrayUtil.clone(pinHashEnc)
         get() = ArrayUtil.clone(field)
+    val permissions: PinUvAuthTokenPermissions? = permissions
+    val rpId: String? = rpId
 
 
     companion object {
@@ -35,6 +39,8 @@ class AuthenticatorClientPINRequest @JsonCreator constructor(
             return AuthenticatorClientPINRequest(
                 PinProtocolVersion.VERSION_1,
                 PinSubCommand.GET_PIN_RETRIES,
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -46,6 +52,8 @@ class AuthenticatorClientPINRequest @JsonCreator constructor(
             return AuthenticatorClientPINRequest(
                 PinProtocolVersion.VERSION_1,
                 PinSubCommand.GET_KEY_AGREEMENT,
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -64,6 +72,8 @@ class AuthenticatorClientPINRequest @JsonCreator constructor(
                 keyAgreement,
                 pinAuth,
                 newPinEnc,
+                null,
+                null,
                 null
             )
         }
@@ -80,7 +90,9 @@ class AuthenticatorClientPINRequest @JsonCreator constructor(
                 keyAgreement,
                 pinAuth,
                 newPinEnc,
-                pinHashEnc
+                pinHashEnc,
+                null,
+                null
             )
         }
 
@@ -94,7 +106,61 @@ class AuthenticatorClientPINRequest @JsonCreator constructor(
                 keyAgreement,
                 null,
                 null,
-                pinHashEnc
+                pinHashEnc,
+                null,
+                null
+            )
+        }
+
+        fun createGetPinUvAuthTokenUsingPinWithPermissions(
+            pinProtocol: PinProtocolVersion,
+            keyAgreement: COSEKey?,
+            pinHashEnc: ByteArray?,
+            permissions: PinUvAuthTokenPermissions,
+            rpId: String?
+        ): AuthenticatorClientPINRequest {
+            return AuthenticatorClientPINRequest(
+                pinProtocol,
+                PinSubCommand.GET_PIN_UV_AUTH_TOKEN_USING_PIN_WITH_PERMISSIONS,
+                keyAgreement,
+                null,
+                null,
+                pinHashEnc,
+                permissions,
+                rpId
+            )
+        }
+
+        fun createGetPinUvAuthTokenUsingUvWithPermissions(
+            pinProtocol: PinProtocolVersion,
+            keyAgreement: COSEKey?,
+            permissions: PinUvAuthTokenPermissions,
+            rpId: String?
+        ): AuthenticatorClientPINRequest {
+            return AuthenticatorClientPINRequest(
+                pinProtocol,
+                PinSubCommand.GET_PIN_UV_AUTH_TOKEN_USING_UV_WITH_PERMISSIONS,
+                keyAgreement,
+                null,
+                null,
+                null,
+                permissions,
+                rpId
+            )
+        }
+
+        fun createGetUVRetries(
+            pinProtocol: PinProtocolVersion
+        ): AuthenticatorClientPINRequest {
+            return AuthenticatorClientPINRequest(
+                pinProtocol,
+                PinSubCommand.GET_UV_RETRIES,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
             )
         }
     }
@@ -129,7 +195,7 @@ class AuthenticatorClientPINRequest @JsonCreator constructor(
             HexUtil.encodeToString(
                 pinHashEnc
             )
-        })"
+        }, permissions=$permissions, rpId=$rpId)"
     }
 
 }

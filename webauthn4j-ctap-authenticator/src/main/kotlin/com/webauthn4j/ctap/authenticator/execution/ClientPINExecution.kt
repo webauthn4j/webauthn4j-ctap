@@ -33,6 +33,8 @@ internal class ClientPINExecution(
         val pinAuth = authenticatorClientPINRequest.pinAuth
         val newPinEnc = authenticatorClientPINRequest.newPinEnc
         val pinHashEnc = authenticatorClientPINRequest.pinHashEnc
+        val permissions = authenticatorClientPINRequest.permissions
+        val rpId = authenticatorClientPINRequest.rpId
         return when (authenticatorClientPINRequest.subCommand) {
             PinSubCommand.GET_PIN_RETRIES -> {
                 logger.debug("Processing clientPIN getRetries sub-command")
@@ -53,6 +55,18 @@ internal class ClientPINExecution(
             PinSubCommand.GET_PIN_TOKEN -> {
                 logger.debug("Processing clientPIN getPINToken sub-command (protocol={})", pinProtocol)
                 pinUvAuthService.getPinToken(pinProtocol, platformKeyAgreementKey, pinHashEnc)
+            }
+            PinSubCommand.GET_PIN_UV_AUTH_TOKEN_USING_PIN_WITH_PERMISSIONS -> {
+                logger.debug("Processing clientPIN getPinUvAuthTokenUsingPinWithPermissions sub-command (protocol={})", pinProtocol)
+                pinUvAuthService.getPinUvAuthTokenUsingPinWithPermissions(pinProtocol, platformKeyAgreementKey, pinHashEnc, permissions, rpId)
+            }
+            PinSubCommand.GET_PIN_UV_AUTH_TOKEN_USING_UV_WITH_PERMISSIONS -> {
+                logger.debug("Processing clientPIN getPinUvAuthTokenUsingUvWithPermissions sub-command (protocol={})", pinProtocol)
+                pinUvAuthService.getPinUvAuthTokenUsingUvWithPermissions(pinProtocol, platformKeyAgreementKey, permissions, rpId)
+            }
+            PinSubCommand.GET_UV_RETRIES -> {
+                logger.debug("Processing clientPIN getUVRetries sub-command")
+                pinUvAuthService.getUVRetries()
             }
         }
     }

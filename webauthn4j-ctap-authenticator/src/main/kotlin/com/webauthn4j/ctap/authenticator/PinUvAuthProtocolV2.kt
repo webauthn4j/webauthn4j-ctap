@@ -47,6 +47,8 @@ class PinUvAuthProtocolV2 : PinUvAuthProtocol {
     override val pinUvAuthToken: ByteArray
         get() = _pinUvAuthToken.copyOf()
 
+    override val tokenState: PinUvAuthTokenState = PinUvAuthTokenState()
+
     init {
         SecureRandom().nextBytes(_pinUvAuthToken)
     }
@@ -63,6 +65,7 @@ class PinUvAuthProtocolV2 : PinUvAuthProtocol {
     override fun resetPinUvAuthToken() {
         _pinUvAuthToken = ByteArray(PIN_UV_AUTH_TOKEN_LENGTH)
         SecureRandom().nextBytes(_pinUvAuthToken)
+        tokenState.stopUsingPinUvAuthToken()
     }
 
     override fun getPublicKey(): COSEKey {
@@ -132,6 +135,10 @@ class PinUvAuthProtocolV2 : PinUvAuthProtocol {
     //spec|   Compute HMAC-SHA-256 with the given key and message.
     //spec|   Return success if the signature is equal to the result, otherwise return an error.
     override fun verify(key: ByteArray, message: ByteArray, signature: ByteArray): Boolean {
+        // If the key is the current pinUvAuthToken and it is not in use, return error
+        if (key.contentEquals(_pinUvAuthToken) && !tokenState.isInUse()) {
+            return false
+        }
         val expected = authenticate(key, message)
         return Arrays.equals(expected, signature)
     }

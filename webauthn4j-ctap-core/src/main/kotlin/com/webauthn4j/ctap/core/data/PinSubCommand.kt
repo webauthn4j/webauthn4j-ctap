@@ -9,7 +9,10 @@ enum class PinSubCommand(@get:JsonValue val value: UInt) {
     GET_KEY_AGREEMENT(0x02u),
     SET_PIN(0x03u),
     CHANGE_PIN(0x04u),
-    GET_PIN_TOKEN(0x05u);
+    GET_PIN_TOKEN(0x05u),
+    GET_PIN_UV_AUTH_TOKEN_USING_UV_WITH_PERMISSIONS(0x06u),
+    GET_UV_RETRIES(0x07u),
+    GET_PIN_UV_AUTH_TOKEN_USING_PIN_WITH_PERMISSIONS(0x09u);
 
     companion object {
         @JvmStatic
@@ -21,6 +24,9 @@ enum class PinSubCommand(@get:JsonValue val value: UInt) {
                 0x03u -> SET_PIN
                 0x04u -> CHANGE_PIN
                 0x05u -> GET_PIN_TOKEN
+                0x06u -> GET_PIN_UV_AUTH_TOKEN_USING_UV_WITH_PERMISSIONS
+                0x07u -> GET_UV_RETRIES
+                0x09u -> GET_PIN_UV_AUTH_TOKEN_USING_PIN_WITH_PERMISSIONS
                 else -> throw IllegalArgumentException("value '$value' is out of range")
             }
         }

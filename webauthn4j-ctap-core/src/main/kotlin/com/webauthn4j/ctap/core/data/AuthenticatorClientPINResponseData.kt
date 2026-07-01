@@ -10,13 +10,19 @@ import com.webauthn4j.util.ArrayUtil
 class AuthenticatorClientPINResponseData @JsonCreator constructor(
     @JsonProperty("1") keyAgreement: COSEKey?,
     @JsonProperty("2") pinToken: ByteArray?,
-    @JsonProperty("3") retries: UInt?
+    @JsonProperty("3") retries: UInt?,
+    @JsonProperty("4") powerCycleState: Boolean?,
+    @JsonProperty("5") uvRetries: UInt?
 ) : CtapResponseData {
 
     val keyAgreement: COSEKey? = keyAgreement
     val pinToken: ByteArray? = ArrayUtil.clone(pinToken)
         get() = ArrayUtil.clone(field)
     val retries: UInt? = retries
+    val powerCycleState: Boolean? = powerCycleState
+    val uvRetries: UInt? = uvRetries
+
+    constructor(keyAgreement: COSEKey?, pinToken: ByteArray?, retries: UInt?) : this(keyAgreement, pinToken, retries, null, null)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -26,6 +32,8 @@ class AuthenticatorClientPINResponseData @JsonCreator constructor(
 
         if (keyAgreement != other.keyAgreement) return false
         if (retries != other.retries) return false
+        if (powerCycleState != other.powerCycleState) return false
+        if (uvRetries != other.uvRetries) return false
 
         return true
     }
@@ -33,13 +41,15 @@ class AuthenticatorClientPINResponseData @JsonCreator constructor(
     override fun hashCode(): Int {
         var result = keyAgreement?.hashCode() ?: 0
         result = 31 * result + (retries?.hashCode() ?: 0)
+        result = 31 * result + (powerCycleState?.hashCode() ?: 0)
+        result = 31 * result + (uvRetries?.hashCode() ?: 0)
         return result
     }
 
     override fun toString(): String {
         return "AuthenticatorClientPINResponseData(keyAgreement=$keyAgreement, pinToken=${
             HexUtil.encodeToString(pinToken)
-        }, retries=$retries)"
+        }, retries=$retries, powerCycleState=$powerCycleState, uvRetries=$uvRetries)"
     }
 
 

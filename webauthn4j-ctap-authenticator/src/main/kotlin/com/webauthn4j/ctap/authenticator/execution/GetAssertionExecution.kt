@@ -15,6 +15,7 @@ import com.webauthn4j.ctap.authenticator.extension.AuthenticationExtensionContex
 import com.webauthn4j.ctap.authenticator.extension.AuthenticationExtensionProcessor
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.StoreFullException
+import com.webauthn4j.ctap.core.data.PinUvAuthTokenPermission
 import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.core.util.internal.BooleanUtil
@@ -171,17 +172,12 @@ internal class GetAssertionExecution :
     private fun execStep6ProcessUserVerification() {
         // If pinUvAuthParam parameter is present and pinProtocol is supported,
         // verify it and set the "uv" bit to true in the response.
-        if (pinAuth != null && pinProtocol == PinProtocolVersion.VERSION_1) {
-            val clientDataHash = clientDataHash
-            val pinAuth = pinAuth
-            ctapAuthenticatorSession.pinUvAuthService.verifyPinUvAuthParam(pinAuth, clientDataHash)
+        if (pinAuth != null && pinProtocol != null) {
+            ctapAuthenticatorSession.pinUvAuthService.verifyPinUvAuthParam(
+                pinAuth, clientDataHash, PinUvAuthTokenPermission.GA, rpId
+            )
             userVerificationResult = true
             return
-        }
-        // If pinUvAuthParam parameter is present and the pinProtocol is not supported,
-        // return CTAP2_ERR_PIN_AUTH_INVALID.
-        if (pinAuth != null && pinProtocol != PinProtocolVersion.VERSION_1) {
-            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
         }
         // If pinUvAuthParam parameter is not present and clientPin has been set on the authenticator,
         // set the "uv" bit to false in the response.

@@ -22,8 +22,14 @@ open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
     private lateinit var credentialSourceEncryptionKey: SecretKey
     private lateinit var credentialSourceEncryptionIV: ByteArray
     private var clientPIN: ByteArray? = null
-    private var pinRetries: UInt = 0u
+    private var pinRetries: UInt = DEFAULT_MAX_PIN_RETRIES
+    private var uvRetries: UInt = DEFAULT_MAX_UV_RETRIES
     private var deviceWideCounter = 0u
+
+    companion object {
+        const val DEFAULT_MAX_PIN_RETRIES: UInt = 8u
+        const val DEFAULT_MAX_UV_RETRIES: UInt = 3u
+    }
 
     init {
         initializeKeys()
@@ -34,7 +40,8 @@ open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
         credentialSourceEncryptionKey = generateAESKey()
         credentialSourceEncryptionIV = generateIV()
         clientPIN = null
-        pinRetries = PinUvAuthService.MAX_PIN_RETRIES
+        pinRetries = DEFAULT_MAX_PIN_RETRIES
+        uvRetries = DEFAULT_MAX_UV_RETRIES
     }
 
     override fun createUserCredentialKey(
@@ -107,6 +114,14 @@ open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
 
     override fun savePINRetries(pinRetries: UInt) {
         this.pinRetries = pinRetries
+    }
+
+    override fun saveUVRetries(uvRetries: UInt) {
+        this.uvRetries = uvRetries
+    }
+
+    override fun loadUVRetries(): UInt {
+        return uvRetries
     }
 
     override fun clear() {
