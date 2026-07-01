@@ -18,7 +18,7 @@ import java.security.SecureRandom
 
 // @see <a href="https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html#usb-discovery">8.1. USB Human Interface Device (USB HID)</a>
 class HIDTransport(
-    ctapAuthenticator: CtapAuthenticator,
+    private val ctapAuthenticator: CtapAuthenticator,
     private val packetSize: Int = DEFAULT_PACKET_SIZE
 ) : Transport, AutoCloseable {
 
@@ -31,9 +31,9 @@ class HIDTransport(
 
     private val logger = LoggerFactory.getLogger(HIDTransport::class.java)
 
-    private var ctapAuthenticatorSession: CtapAuthenticatorSession = ctapAuthenticator.createSession() //TODO: revisit
+    private var ctapAuthenticatorSession: CtapAuthenticatorSession = ctapAuthenticator.createSession()
 
-    private val u2fAPDUProcessor = U2FAPDUProcessor().also { it.onConnect(ctapAuthenticatorSession) }
+    private var u2fAPDUProcessor = createU2FAPDUProcessor()
 
     private val hidPacketConverter = HIDPacketConverter()
     private val hidChannels: MutableMap<HIDChannelId, HIDChannel> = HashMap()
@@ -74,8 +74,8 @@ class HIDTransport(
         }
     })
     private val pingHandler = HIDPingCommandHandler()
-    private val cancelHandler = HIDCancelCommandHandler(ctapAuthenticatorSession)
-    private val winkHandler = HIDWinkCommandHandler(ctapAuthenticatorSession)
+    private var cancelHandler = HIDCancelCommandHandler(ctapAuthenticatorSession)
+    private var winkHandler = HIDWinkCommandHandler(ctapAuthenticatorSession)
     private val lockHandler = HIDLockCommandHandler(lockState)
 
     fun start(scope: CoroutineScope) {
@@ -95,7 +95,16 @@ class HIDTransport(
     }
 
     fun onDeviceAttached() {
-        ctapAuthenticatorSession.resetVolatileState()
+        ctapAuthenticatorSession = ctapAuthenticator.createSession()
+        u2fAPDUProcessor = createU2FAPDUProcessor()
+        cancelHandler = HIDCancelCommandHandler(ctapAuthenticatorSession)
+        winkHandler = HIDWinkCommandHandler(ctapAuthenticatorSession)
+        hidChannels.values.forEach { it.close() }
+        hidChannels.clear()
+    }
+
+    private fun createU2FAPDUProcessor(): U2FAPDUProcessor {
+        return U2FAPDUProcessor().also { it.onConnect(ctapAuthenticatorSession) }
     }
 
     fun onHIDDataReceived(bytes: ByteArray, hidPacketHandler: HIDPacketHandler) {

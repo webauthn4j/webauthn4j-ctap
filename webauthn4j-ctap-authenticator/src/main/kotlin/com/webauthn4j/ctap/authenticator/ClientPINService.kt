@@ -51,12 +51,6 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
         SecureRandom().nextBytes(pinToken)
     }
 
-    fun regenerateKeys() {
-        authenticatorKeyAgreementKey = ECUtil.createKeyPair()
-        SecureRandom().nextBytes(pinToken)
-        volatilePinRetryCounter = MAX_VOLATILE_PIN_RETRIES
-    }
-
     //spec| 5.5.3 Getting Retries from Authenticator
     //spec| Retries count is the number of attempts remaining before lockout.
     //spec| Authenticator responds back with retries.
@@ -303,10 +297,6 @@ class ClientPINService(private val authenticatorPropertyStore: AuthenticatorProp
         if (!Arrays.equals(calculatedPinAuth, pinAuth)) {
             throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
         }
-    }
-
-    fun resetVolatilePinRetryCounter() {
-        volatilePinRetryCounter = MAX_VOLATILE_PIN_RETRIES
     }
 
     val isClientPINReady: Boolean
