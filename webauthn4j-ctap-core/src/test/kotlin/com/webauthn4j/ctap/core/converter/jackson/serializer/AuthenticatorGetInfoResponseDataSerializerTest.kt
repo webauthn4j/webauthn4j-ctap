@@ -8,7 +8,7 @@ import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
-import com.webauthn4j.ctap.core.data.PinProtocolVersion
+import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.core.data.options.ClientPINOption
 import com.webauthn4j.ctap.core.data.options.PlatformOption
 import com.webauthn4j.ctap.core.data.options.ResidentKeyOption

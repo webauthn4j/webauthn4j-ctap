@@ -1,7 +1,7 @@
 package com.webauthn4j.ctap.core.validator
 
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINRequest
-import com.webauthn4j.ctap.core.data.PinProtocolVersion
+import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.core.data.PinSubCommand
 
 class AuthenticatorClientPINRequestValidator {

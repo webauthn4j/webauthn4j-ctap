@@ -16,6 +16,7 @@ import com.webauthn4j.ctap.authenticator.extension.AuthenticationExtensionProces
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.StoreFullException
 import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.core.util.internal.BooleanUtil
 import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import com.webauthn4j.ctap.core.util.internal.HexUtil
