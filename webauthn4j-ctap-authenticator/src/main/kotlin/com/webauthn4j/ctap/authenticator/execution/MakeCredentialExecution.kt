@@ -21,6 +21,7 @@ import com.webauthn4j.ctap.authenticator.internal.KeyPairUtil.createCredentialKe
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.StoreFullException
 import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.ctap.core.data.PinUvAuthTokenPermission
 import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import com.webauthn4j.ctap.core.validator.AuthenticatorMakeCredentialRequestValidator
@@ -266,7 +267,7 @@ internal class MakeCredentialExecution :
     private suspend fun execStep11ProcessUserVerification() {
         // Process pinAuth (formerly CTAP 2.0 Step 5)
         pinAuth.let {
-            if (it != null && pinProtocol == PinProtocolVersion.VERSION_1) {
+            if (it != null && pinProtocol != null) {
                 // Handle zero length pinAuth for authenticator selection
                 if (it.isEmpty()) {
                     requestUserConsent()
@@ -276,7 +277,9 @@ internal class MakeCredentialExecution :
                         throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_NOT_SET)
                     }
                 } else {
-                    ctapAuthenticatorSession.pinUvAuthService.verifyPinUvAuthParam(it, clientDataHash)
+                    ctapAuthenticatorSession.pinUvAuthService.verifyPinUvAuthParam(
+                        it, clientDataHash, PinUvAuthTokenPermission.MC, rpId
+                    )
                     userPresenceResult = true
                     userVerificationResult = true
                 }
@@ -288,11 +291,6 @@ internal class MakeCredentialExecution :
 //        if (authenticatorMakeCredentialRequest.pinAuth == null && ctapAuthenticatorSession.pinUvAuthService.clientPIN != null) {
 //            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_REQUIRED)
 //        }
-
-        // Validate pinProtocol (formerly CTAP 2.0 Step 7)
-        if (authenticatorMakeCredentialRequest.pinAuth != null && authenticatorMakeCredentialRequest.pinProtocol != PinProtocolVersion.VERSION_1) {
-            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
-        }
     }
 
     //spec| Step 12. If the excludeList parameter is present and contains a credential ID created by this authenticator,

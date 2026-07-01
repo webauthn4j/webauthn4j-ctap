@@ -52,4 +52,7 @@ interface PinUvAuthProtocol {
     fun verify(key: ByteArray, message: ByteArray, signature: ByteArray): Boolean
 
     val pinUvAuthToken: ByteArray
+
+    //spec| A pinUvAuthToken has the following associated state variables.
+    val tokenState: PinUvAuthTokenState
 }
