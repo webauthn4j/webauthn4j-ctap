@@ -88,7 +88,7 @@ internal class GetInfoExecution(
                 ctapAuthenticatorSession.aaguid,   // aaguid (0x03): Required
                 AuthenticatorGetInfoResponseData.Options(plat, rk, clientPin, up, uv), // options (0x04): Optional
                 2048u,                             // maxMsgSize (0x05): Optional
-                CtapAuthenticator.PIN_PROTOCOLS,   // pinProtocols (0x06): Optional
+                ctapAuthenticatorSession.pinProtocols,   // pinProtocols (0x06): Optional
                 null,
                 null,
                 ctapAuthenticatorSession.transports

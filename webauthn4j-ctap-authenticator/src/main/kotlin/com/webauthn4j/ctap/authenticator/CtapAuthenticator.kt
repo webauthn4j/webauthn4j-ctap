@@ -34,6 +34,7 @@ class CtapAuthenticator(
     var attestationStatementProvider: AttestationStatementProvider = NoneAttestationStatementProvider(),
     var fidoU2FBasicAttestationStatementGenerator: FIDOU2FAttestationStatementProvider = FIDOU2FBasicAttestationStatementProvider.createWithDemoAttestationKey(),
     transports: Set<AuthenticatorTransport> = setOf(),
+    pinProtocols: Set<PinProtocolVersion> = setOf(PinProtocolVersion.VERSION_2, PinProtocolVersion.VERSION_1),
     val extensionProcessors: List<ExtensionProcessor> = listOf(),
     // Handlers
     var authenticatorPropertyStore: AuthenticatorPropertyStore = InMemoryAuthenticatorPropertyStore(),
@@ -62,8 +63,6 @@ class CtapAuthenticator(
         @JvmField
         val VERSIONS = listOf(VERSION_U2F_V2, VERSION_FIDO_2_0)
 
-        @JvmField
-        val PIN_PROTOCOLS = listOf(PinProtocolVersion.VERSION_1)
         private fun createObjectConverter(): ObjectConverter {
             val jsonMapper = JsonMapper()
             val cborMapper = CBORMapper.builder()
@@ -94,6 +93,7 @@ class CtapAuthenticator(
     }
 
     val transports: MutableSet<AuthenticatorTransport> = transports.toMutableSet()
+    val pinProtocols: Set<PinProtocolVersion> = pinProtocols
     internal val eventListeners: MutableList<EventListener> = mutableListOf()
     internal val exceptionReporters: MutableList<ExceptionReporter> = mutableListOf()
 

@@ -98,12 +98,12 @@ abstract class IntegrationTestCaseBase {
             }.depends(clientPINParameter, algorithmsParameter)
         internal val ctapAuthenticatorParameter = TestParameter {
             val ctapAuthenticator = CtapAuthenticator(
-                objectConverter,
-                attestationStatementGenerator,
-                fidoU2FAttestationStatementGenerator,
-                emptySet(),
-                emptyList(),
-                authenticatorPropertyStore,
+                objectConverter = objectConverter,
+                attestationStatementProvider = attestationStatementGenerator,
+                fidoU2FBasicAttestationStatementGenerator = fidoU2FAttestationStatementGenerator,
+                transports = emptySet(),
+                extensionProcessors = emptyList(),
+                authenticatorPropertyStore = authenticatorPropertyStore,
                 credentialSelectionHandler = credentialSelectionHandler
             )
             ctapAuthenticator.aaguid = aaguid

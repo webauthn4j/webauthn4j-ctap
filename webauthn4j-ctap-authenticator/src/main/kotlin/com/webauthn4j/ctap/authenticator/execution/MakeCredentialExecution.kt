@@ -276,7 +276,7 @@ internal class MakeCredentialExecution :
                         throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_NOT_SET)
                     }
                 } else {
-                    ctapAuthenticatorSession.clientPINService.validatePINAuth(it, clientDataHash)
+                    ctapAuthenticatorSession.clientPINService.verifyPinUvAuthParam(it, clientDataHash)
                     userPresenceResult = true
                     userVerificationResult = true
                 }
