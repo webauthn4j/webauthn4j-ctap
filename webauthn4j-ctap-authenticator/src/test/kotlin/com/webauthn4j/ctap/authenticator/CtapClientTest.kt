@@ -1,6 +1,7 @@
 package com.webauthn4j.ctap.authenticator
 
 import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.core.data.options.*
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialParameters

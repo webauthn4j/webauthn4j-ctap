@@ -15,7 +15,7 @@ import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialRequest
 import com.webauthn4j.ctap.core.data.CtapStatusCode
-import com.webauthn4j.ctap.core.data.PinProtocolVersion
+import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.core.data.options.ClientPINOption
 import com.webauthn4j.ctap.core.data.options.ResidentKeyOption
 import com.webauthn4j.ctap.core.data.options.UserPresenceOption

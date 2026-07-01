@@ -1,4 +1,5 @@
 package com.webauthn4j.ctap.core.data
+import com.webauthn4j.data.PinProtocolVersion
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty

@@ -12,7 +12,7 @@ import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialRequest
 import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
 import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
 import com.webauthn4j.ctap.core.data.CtapStatusCode
-import com.webauthn4j.ctap.core.data.PinProtocolVersion
+import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.core.data.options.UserVerificationOption
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialParameters

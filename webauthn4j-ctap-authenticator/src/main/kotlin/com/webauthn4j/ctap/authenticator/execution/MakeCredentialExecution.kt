@@ -21,6 +21,7 @@ import com.webauthn4j.ctap.authenticator.internal.KeyPairUtil.createCredentialKe
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.StoreFullException
 import com.webauthn4j.ctap.core.data.*
+import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import com.webauthn4j.ctap.core.validator.AuthenticatorMakeCredentialRequestValidator
 import com.webauthn4j.data.PublicKeyCredentialDescriptor

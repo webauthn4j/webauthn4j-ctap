@@ -21,7 +21,7 @@ import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
 import com.webauthn4j.ctap.core.converter.jackson.PublicKeyCredentialSourceCBORModule
-import com.webauthn4j.ctap.core.data.PinProtocolVersion
+import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.core.data.options.UserVerificationOption
 import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.data.attestation.authenticator.AAGUID
