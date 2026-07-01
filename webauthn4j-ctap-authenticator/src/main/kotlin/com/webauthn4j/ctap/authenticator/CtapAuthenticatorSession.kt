@@ -4,6 +4,7 @@ import com.webauthn4j.converter.AuthenticatorDataConverter
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.data.event.Event
+import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.authenticator.data.settings.*
 import com.webauthn4j.ctap.authenticator.execution.ClientPINExecution
 import com.webauthn4j.ctap.authenticator.execution.GetAssertionExecution
@@ -51,7 +52,19 @@ class CtapAuthenticatorSession internal constructor(
 
     val objectConverter = ctapAuthenticator.objectConverter
     val authenticatorDataConverter: AuthenticatorDataConverter = AuthenticatorDataConverter(ctapAuthenticator.objectConverter)
-    val clientPINService: ClientPINService = ClientPINService(authenticatorPropertyStore)
+    val pinProtocols: List<PinProtocolVersion> = ctapAuthenticator.pinProtocols
+        .sortedByDescending { it.value }
+
+    val clientPINService: ClientPINService = ClientPINService(
+        authenticatorPropertyStore,
+        pinProtocols.map { version ->
+            when (version) {
+                PinProtocolVersion.VERSION_1 -> PinUvAuthProtocolV1()
+                PinProtocolVersion.VERSION_2 -> PinUvAuthProtocolV2()
+                else -> throw IllegalArgumentException("Unsupported PIN protocol version: $version")
+            }
+        }
+    )
 
     // Authenticator characteristics
     val platform: AttachmentSetting = ctapAuthenticator.platform

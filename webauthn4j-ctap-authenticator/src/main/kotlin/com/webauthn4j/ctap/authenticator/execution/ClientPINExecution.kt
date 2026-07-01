@@ -28,6 +28,7 @@ internal class ClientPINExecution(
 
     override suspend fun doExecute(): AuthenticatorClientPINResponse {
         val clientPINService = ctapAuthenticatorSession.clientPINService
+        val pinProtocol = authenticatorClientPINRequest.pinProtocol
         val platformKeyAgreementKey = authenticatorClientPINRequest.keyAgreement
         val pinAuth = authenticatorClientPINRequest.pinAuth
         val newPinEnc = authenticatorClientPINRequest.newPinEnc
@@ -38,20 +39,20 @@ internal class ClientPINExecution(
                 clientPINService.getPinRetries()
             }
             PinSubCommand.GET_KEY_AGREEMENT -> {
-                logger.debug("Processing clientPIN getKeyAgreement sub-command")
-                clientPINService.getKeyAgreement()
+                logger.debug("Processing clientPIN getKeyAgreement sub-command (protocol={})", pinProtocol)
+                clientPINService.getKeyAgreement(pinProtocol)
             }
             PinSubCommand.SET_PIN -> {
-                logger.debug("Processing clientPIN setPIN sub-command")
-                clientPINService.setPIN(platformKeyAgreementKey, pinAuth, newPinEnc)
+                logger.debug("Processing clientPIN setPIN sub-command (protocol={})", pinProtocol)
+                clientPINService.setPIN(pinProtocol, platformKeyAgreementKey, pinAuth, newPinEnc)
             }
             PinSubCommand.CHANGE_PIN -> {
-                logger.debug("Processing clientPIN changePIN sub-command")
-                clientPINService.changePIN(platformKeyAgreementKey, pinAuth, newPinEnc, pinHashEnc)
+                logger.debug("Processing clientPIN changePIN sub-command (protocol={})", pinProtocol)
+                clientPINService.changePIN(pinProtocol, platformKeyAgreementKey, pinAuth, newPinEnc, pinHashEnc)
             }
             PinSubCommand.GET_PIN_TOKEN -> {
-                logger.debug("Processing clientPIN getPINToken sub-command")
-                clientPINService.getPinToken(platformKeyAgreementKey, pinHashEnc)
+                logger.debug("Processing clientPIN getPINToken sub-command (protocol={})", pinProtocol)
+                clientPINService.getPinToken(pinProtocol, platformKeyAgreementKey, pinHashEnc)
             }
         }
     }

@@ -7,7 +7,16 @@ import com.webauthn4j.ctap.core.data.PinSubCommand
 class AuthenticatorClientPINRequestValidator {
 
     fun validate(value: AuthenticatorClientPINRequest) {
-        require(value.pinProtocol == PinProtocolVersion.VERSION_1) { "Only PIN Protocol version 1 is supported" }
+        val pinProtocol = value.pinProtocol
+        require(pinProtocol == PinProtocolVersion.VERSION_1 || pinProtocol == PinProtocolVersion.VERSION_2) {
+            "PIN Protocol version ${pinProtocol.value} is not supported"
+        }
+        // Expected pinAuth length: 16 bytes for v1, 32 bytes for v2
+        val expectedPinAuthLength = when (pinProtocol) {
+            PinProtocolVersion.VERSION_1 -> 16
+            PinProtocolVersion.VERSION_2 -> 32
+            else -> throw IllegalArgumentException("Unsupported PIN protocol version: ${pinProtocol.value}")
+        }
         when (value.subCommand) {
             PinSubCommand.GET_PIN_RETRIES -> {
                 // nop
@@ -20,7 +29,9 @@ class AuthenticatorClientPINRequestValidator {
                 requireNotNull(value.newPinEnc)
                 val pinAuth = value.pinAuth
                 requireNotNull(pinAuth)
-                require(pinAuth.size == 16) { "pinAuth must be 16 bytes length" }
+                require(pinAuth.size == expectedPinAuthLength) {
+                    "pinAuth must be $expectedPinAuthLength bytes length for PIN protocol ${pinProtocol.value}"
+                }
             }
             PinSubCommand.CHANGE_PIN -> {
                 requireNotNull(value.keyAgreement)
@@ -28,7 +39,9 @@ class AuthenticatorClientPINRequestValidator {
                 requireNotNull(value.newPinEnc)
                 val pinAuth = value.pinAuth
                 requireNotNull(pinAuth)
-                require(pinAuth.size == 16) { "pinAuth must be 16 bytes length" }
+                require(pinAuth.size == expectedPinAuthLength) {
+                    "pinAuth must be $expectedPinAuthLength bytes length for PIN protocol ${pinProtocol.value}"
+                }
             }
             PinSubCommand.GET_PIN_TOKEN -> {
                 requireNotNull(value.keyAgreement)

@@ -174,7 +174,7 @@ internal class GetAssertionExecution :
         if (pinAuth != null && pinProtocol == PinProtocolVersion.VERSION_1) {
             val clientDataHash = clientDataHash
             val pinAuth = pinAuth
-            ctapAuthenticatorSession.clientPINService.validatePINAuth(pinAuth, clientDataHash)
+            ctapAuthenticatorSession.clientPINService.verifyPinUvAuthParam(pinAuth, clientDataHash)
             userVerificationResult = true
             return
         }
