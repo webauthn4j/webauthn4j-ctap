@@ -10,6 +10,8 @@ class AuthenticatorClientPINRequestSerializer :
             FieldSerializationRule(3, AuthenticatorClientPINRequest::keyAgreement),
             FieldSerializationRule(4, AuthenticatorClientPINRequest::pinAuth),
             FieldSerializationRule(5, AuthenticatorClientPINRequest::newPinEnc),
-            FieldSerializationRule(6, AuthenticatorClientPINRequest::pinHashEnc)
+            FieldSerializationRule(6, AuthenticatorClientPINRequest::pinHashEnc),
+            FieldSerializationRule(9, AuthenticatorClientPINRequest::permissions),
+            FieldSerializationRule(10, AuthenticatorClientPINRequest::rpId)
         )
     )

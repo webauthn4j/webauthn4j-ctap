@@ -72,6 +72,9 @@ interface AuthenticatorPropertyStore {
     fun savePINRetries(pinRetries: UInt)
     fun loadPINRetries(): UInt
 
+    fun saveUVRetries(uvRetries: UInt)
+    fun loadUVRetries(): UInt
+
     fun loadDeviceWideCounter(): UInt
     fun saveDeviceWideCounter(deviceWideCounter: UInt)
 
