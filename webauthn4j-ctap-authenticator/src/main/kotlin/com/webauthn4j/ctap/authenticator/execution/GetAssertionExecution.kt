@@ -174,7 +174,7 @@ internal class GetAssertionExecution :
         if (pinAuth != null && pinProtocol == PinProtocolVersion.VERSION_1) {
             val clientDataHash = clientDataHash
             val pinAuth = pinAuth
-            ctapAuthenticatorSession.clientPINService.verifyPinUvAuthParam(pinAuth, clientDataHash)
+            ctapAuthenticatorSession.pinUvAuthService.verifyPinUvAuthParam(pinAuth, clientDataHash)
             userVerificationResult = true
             return
         }
@@ -185,7 +185,7 @@ internal class GetAssertionExecution :
         }
         // If pinUvAuthParam parameter is not present and clientPin has been set on the authenticator,
         // set the "uv" bit to false in the response.
-        if (pinAuth == null && ctapAuthenticatorSession.clientPINService.isClientPINReady) {
+        if (pinAuth == null && ctapAuthenticatorSession.pinUvAuthService.isClientPINReady) {
             userVerificationResult = false
         }
     }

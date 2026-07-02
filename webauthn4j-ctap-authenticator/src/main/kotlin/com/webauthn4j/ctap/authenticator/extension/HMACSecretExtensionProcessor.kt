@@ -81,7 +81,7 @@ class HMACSecretExtensionProcessor : RegistrationExtensionProcessor,
         //spec| then return CTAP2_ERR_PIN_AUTH_INVALID.
         val pinProtocol = hmacGetSecretAuthenticatorInput.pinUvAuthProtocol
             ?: PinProtocolVersion.VERSION_1
-        val protocol = context.ctapAuthenticatorSession.clientPINService.getProtocol(pinProtocol)
+        val protocol = context.ctapAuthenticatorSession.pinUvAuthService.getProtocol(pinProtocol)
 
         //spec| The authenticator calls decapsulate on the provided platform key-agreement key to obtain a shared secret.
         val sharedSecret = protocol.decapsulate(platformKeyAgreementKey)

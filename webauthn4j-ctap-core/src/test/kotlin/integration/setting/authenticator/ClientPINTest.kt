@@ -1,6 +1,6 @@
 package integration.setting.authenticator
 
-import com.webauthn4j.ctap.authenticator.ClientPINService
+import com.webauthn4j.ctap.authenticator.PinUvAuthService
 import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
 import com.webauthn4j.ctap.authenticator.transport.internal.InternalTransport
 import com.webauthn4j.ctap.client.CtapClient
@@ -90,12 +90,12 @@ class ClientPINTest {
 
     @Test
     fun getRetries_test() = runTest {
-        assertThat(clientPINTestCase.clientPlatform.ctapService.getRetries()).isEqualTo(ClientPINService.MAX_PIN_RETRIES)
+        assertThat(clientPINTestCase.clientPlatform.ctapService.getRetries()).isEqualTo(PinUvAuthService.MAX_PIN_RETRIES)
         try {
             clientPINTestCase.clientPlatform.ctapService.changePIN("invalid-PIN", "invalid-PIN")
         } catch (e: CtapErrorException) { /* nop */
         }
-        assertThat(clientPINTestCase.clientPlatform.ctapService.getRetries()).isEqualTo(ClientPINService.MAX_PIN_RETRIES - 1u)
+        assertThat(clientPINTestCase.clientPlatform.ctapService.getRetries()).isEqualTo(PinUvAuthService.MAX_PIN_RETRIES - 1u)
     }
 
     @Disabled

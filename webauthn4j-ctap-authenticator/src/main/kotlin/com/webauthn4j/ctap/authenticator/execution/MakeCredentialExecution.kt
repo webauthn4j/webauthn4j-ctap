@@ -270,13 +270,13 @@ internal class MakeCredentialExecution :
                 // Handle zero length pinAuth for authenticator selection
                 if (it.isEmpty()) {
                     requestUserConsent()
-                    if (ctapAuthenticatorSession.clientPINService.isClientPINReady) {
+                    if (ctapAuthenticatorSession.pinUvAuthService.isClientPINReady) {
                         throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_INVALID)
                     } else {
                         throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_NOT_SET)
                     }
                 } else {
-                    ctapAuthenticatorSession.clientPINService.verifyPinUvAuthParam(it, clientDataHash)
+                    ctapAuthenticatorSession.pinUvAuthService.verifyPinUvAuthParam(it, clientDataHash)
                     userPresenceResult = true
                     userVerificationResult = true
                 }
@@ -285,7 +285,7 @@ internal class MakeCredentialExecution :
 
         // Validate clientPin requirement (formerly CTAP 2.0 Step 6)
         //TODO: to be fixed to align CTAP2.1 spec.
-//        if (authenticatorMakeCredentialRequest.pinAuth == null && ctapAuthenticatorSession.clientPINService.clientPIN != null) {
+//        if (authenticatorMakeCredentialRequest.pinAuth == null && ctapAuthenticatorSession.pinUvAuthService.clientPIN != null) {
 //            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_REQUIRED)
 //        }
 

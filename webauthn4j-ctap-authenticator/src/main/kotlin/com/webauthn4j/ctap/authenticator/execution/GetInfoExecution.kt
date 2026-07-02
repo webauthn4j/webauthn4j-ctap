@@ -59,7 +59,7 @@ internal class GetInfoExecution(
         //spec| Client PIN is one of the ways to do user verification.
         val clientPin: ClientPINOption? = when (ctapAuthenticatorSession.clientPIN) {
             ClientPINSetting.ENABLED -> when {
-                ctapAuthenticatorSession.clientPINService.isClientPINReady -> ClientPINOption.SET
+                ctapAuthenticatorSession.pinUvAuthService.isClientPINReady -> ClientPINOption.SET
                 else -> ClientPINOption.NOT_SET
             }
             ClientPINSetting.DISABLED -> ClientPINOption.NOT_SUPPORTED

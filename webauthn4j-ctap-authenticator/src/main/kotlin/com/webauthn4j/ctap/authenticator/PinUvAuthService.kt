@@ -20,7 +20,7 @@ import java.util.Arrays
  *
  * @see <a href="https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#authenticatorClientPIN">6.5. authenticatorClientPIN</a>
  */
-class ClientPINService(
+class PinUvAuthService(
     private val authenticatorPropertyStore: AuthenticatorPropertyStore,
     private val protocols: List<PinUvAuthProtocol> = listOf(PinUvAuthProtocolV1())
 ) {
