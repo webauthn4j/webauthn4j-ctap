@@ -55,7 +55,7 @@ class CtapAuthenticatorSession internal constructor(
     val pinProtocols: List<PinProtocolVersion> = ctapAuthenticator.pinProtocols
         .sortedByDescending { it.value }
 
-    val clientPINService: ClientPINService = ClientPINService(
+    val pinUvAuthService: PinUvAuthService = PinUvAuthService(
         authenticatorPropertyStore,
         pinProtocols.map { version ->
             when (version) {

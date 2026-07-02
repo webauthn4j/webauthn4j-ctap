@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.client
 
-import com.webauthn4j.ctap.authenticator.ClientPINService
+import com.webauthn4j.ctap.authenticator.PinUvAuthService
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.GetAssertionConsentRequest
 import com.webauthn4j.ctap.authenticator.MakeCredentialConsentRequest
@@ -74,14 +74,14 @@ internal class CtapServiceTest {
     @Test
     @Throws(ExecutionException::class, InterruptedException::class)
     fun getRetries_test() = runTest {
-        assertThat(target.getRetries()).isEqualTo(ClientPINService.MAX_PIN_RETRIES)
+        assertThat(target.getRetries()).isEqualTo(PinUvAuthService.MAX_PIN_RETRIES)
         try {
             target.changePIN("wrongPIN", "newPIN")
         } catch (e: RuntimeException) {
         }
-        assertThat(target.getRetries()).isEqualTo(ClientPINService.MAX_PIN_RETRIES - 1u)
+        assertThat(target.getRetries()).isEqualTo(PinUvAuthService.MAX_PIN_RETRIES - 1u)
         target.reset()
-        assertThat(target.getRetries()).isEqualTo(ClientPINService.MAX_PIN_RETRIES)
+        assertThat(target.getRetries()).isEqualTo(PinUvAuthService.MAX_PIN_RETRIES)
     }
 
     @ExperimentalCoroutinesApi

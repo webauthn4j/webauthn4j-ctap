@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.authenticator.store
 
-import com.webauthn4j.ctap.authenticator.ClientPINService
+import com.webauthn4j.ctap.authenticator.PinUvAuthService
 import com.webauthn4j.ctap.authenticator.data.credential.ResidentCredentialKey
 import com.webauthn4j.ctap.authenticator.data.credential.ResidentUserCredential
 import com.webauthn4j.ctap.authenticator.internal.KeyPairUtil.createCredentialKeyPair
@@ -34,7 +34,7 @@ open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
         credentialSourceEncryptionKey = generateAESKey()
         credentialSourceEncryptionIV = generateIV()
         clientPIN = null
-        pinRetries = ClientPINService.MAX_PIN_RETRIES
+        pinRetries = PinUvAuthService.MAX_PIN_RETRIES
     }
 
     override fun createUserCredentialKey(

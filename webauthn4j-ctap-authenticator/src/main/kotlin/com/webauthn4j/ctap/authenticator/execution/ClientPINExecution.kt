@@ -27,7 +27,7 @@ internal class ClientPINExecution(
     }
 
     override suspend fun doExecute(): AuthenticatorClientPINResponse {
-        val clientPINService = ctapAuthenticatorSession.clientPINService
+        val pinUvAuthService = ctapAuthenticatorSession.pinUvAuthService
         val pinProtocol = authenticatorClientPINRequest.pinProtocol
         val platformKeyAgreementKey = authenticatorClientPINRequest.keyAgreement
         val pinAuth = authenticatorClientPINRequest.pinAuth
@@ -36,23 +36,23 @@ internal class ClientPINExecution(
         return when (authenticatorClientPINRequest.subCommand) {
             PinSubCommand.GET_PIN_RETRIES -> {
                 logger.debug("Processing clientPIN getRetries sub-command")
-                clientPINService.getPinRetries()
+                pinUvAuthService.getPinRetries()
             }
             PinSubCommand.GET_KEY_AGREEMENT -> {
                 logger.debug("Processing clientPIN getKeyAgreement sub-command (protocol={})", pinProtocol)
-                clientPINService.getKeyAgreement(pinProtocol)
+                pinUvAuthService.getKeyAgreement(pinProtocol)
             }
             PinSubCommand.SET_PIN -> {
                 logger.debug("Processing clientPIN setPIN sub-command (protocol={})", pinProtocol)
-                clientPINService.setPIN(pinProtocol, platformKeyAgreementKey, pinAuth, newPinEnc)
+                pinUvAuthService.setPIN(pinProtocol, platformKeyAgreementKey, pinAuth, newPinEnc)
             }
             PinSubCommand.CHANGE_PIN -> {
                 logger.debug("Processing clientPIN changePIN sub-command (protocol={})", pinProtocol)
-                clientPINService.changePIN(pinProtocol, platformKeyAgreementKey, pinAuth, newPinEnc, pinHashEnc)
+                pinUvAuthService.changePIN(pinProtocol, platformKeyAgreementKey, pinAuth, newPinEnc, pinHashEnc)
             }
             PinSubCommand.GET_PIN_TOKEN -> {
                 logger.debug("Processing clientPIN getPINToken sub-command (protocol={})", pinProtocol)
-                clientPINService.getPinToken(pinProtocol, platformKeyAgreementKey, pinHashEnc)
+                pinUvAuthService.getPinToken(pinProtocol, platformKeyAgreementKey, pinHashEnc)
             }
         }
     }
