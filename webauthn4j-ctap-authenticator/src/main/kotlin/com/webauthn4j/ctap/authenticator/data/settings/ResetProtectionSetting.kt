@@ -1,15 +1,15 @@
 package com.webauthn4j.ctap.authenticator.data.settings
 
 /**
- * Controls whether the authenticator restricts the authenticatorReset command.
+ * Controls whether the authenticator allows the authenticatorReset command.
  *
- * When [ENABLED], reset is only allowed within a limited time window after power-up,
- * preventing accidental or unauthorized erasure of credentials.
+ * When [ENABLED], the authenticator always rejects reset requests with CTAP2_ERR_OPERATION_DENIED.
+ * When [DISABLED], reset clears all stored credentials and state.
  */
 enum class ResetProtectionSetting(val value: Boolean) {
-    /** Reset is restricted to a time window after power-up. */
+    /** Reset is always rejected. */
     ENABLED(true),
-    /** Reset is allowed at any time. */
+    /** Reset is allowed. */
     DISABLED(false);
 
     companion object {
