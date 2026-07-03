@@ -9,6 +9,7 @@ import com.webauthn4j.ctap.authenticator.SignatureCalculator.calculate
 import com.webauthn4j.ctap.authenticator.U2FKeyEnvelope
 import com.webauthn4j.ctap.authenticator.data.credential.*
 import com.webauthn4j.ctap.authenticator.data.event.GetAssertionEvent
+import com.webauthn4j.ctap.authenticator.data.settings.AlwaysUvSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
 import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
@@ -270,7 +271,7 @@ internal class GetAssertionExecution :
     //
     // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg
     private fun execStep5ProcessAlwaysUv() {
-        if (!ctapAuthenticatorSession.alwaysUv) return
+        if (ctapAuthenticatorSession.alwaysUv != AlwaysUvSetting.ENABLED) return
         if (!userPresencePlan) return
 
         //spec| If the authenticator is not protected by some form of user verification:

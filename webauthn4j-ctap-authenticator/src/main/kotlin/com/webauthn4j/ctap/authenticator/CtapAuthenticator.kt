@@ -9,7 +9,9 @@ import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatement
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FBasicAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.NoneAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.data.credential.Credential
+import com.webauthn4j.ctap.authenticator.data.settings.AlwaysUvSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
+import com.webauthn4j.ctap.authenticator.data.settings.MakeCredUvNotRqdSetting
 import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
 import com.webauthn4j.ctap.authenticator.data.settings.AttachmentSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ResetProtectionSetting
@@ -105,8 +107,8 @@ class CtapAuthenticator(
     var resetProtection: ResetProtectionSetting = ResetProtectionSetting.DISABLED
     var userPresence: UserPresenceSetting = UserPresenceSetting.SUPPORTED
     var userVerification: UserVerificationSetting = UserVerificationSetting.READY
-    var alwaysUv: Boolean = false
-    var makeCredUvNotRqd: Boolean = false
+    var alwaysUv: AlwaysUvSetting = AlwaysUvSetting.DISABLED
+    var makeCredUvNotRqd: MakeCredUvNotRqdSetting = MakeCredUvNotRqdSetting.DISABLED
     var credentialSelector: CredentialSelectorSetting = CredentialSelectorSetting.AUTHENTICATOR
 
     fun createSession(

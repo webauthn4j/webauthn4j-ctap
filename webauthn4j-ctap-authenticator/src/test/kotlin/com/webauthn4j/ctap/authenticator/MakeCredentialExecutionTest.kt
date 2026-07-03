@@ -1,5 +1,6 @@
 package com.webauthn4j.ctap.authenticator
 
+import com.webauthn4j.ctap.authenticator.data.settings.MakeCredUvNotRqdSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
@@ -155,7 +156,7 @@ internal class MakeCredentialExecutionTest {
 
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.residentKey = residentKeySetting
-        ctapAuthenticator.makeCredUvNotRqd = true
+        ctapAuthenticator.makeCredUvNotRqd = MakeCredUvNotRqdSetting.ENABLED
         ctapAuthenticator.userVerification = UserVerificationSetting.NOT_SUPPORTED
         ctapAuthenticator.clientPIN = com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting.DISABLED
         val connection = ctapAuthenticator.createSession()

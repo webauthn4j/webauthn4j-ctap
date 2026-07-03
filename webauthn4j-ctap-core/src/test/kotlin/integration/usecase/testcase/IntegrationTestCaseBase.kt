@@ -115,7 +115,7 @@ abstract class IntegrationTestCaseBase {
             ctapAuthenticator.userPresence = userPresenceSetting
             ctapAuthenticator.userVerification = userVerificationSetting
             ctapAuthenticator.credentialSelector = credentialSelectorSetting
-            ctapAuthenticator.makeCredUvNotRqd = true
+            ctapAuthenticator.makeCredUvNotRqd = com.webauthn4j.ctap.authenticator.data.settings.MakeCredUvNotRqdSetting.ENABLED
 
             return@TestParameter ctapAuthenticator
         }.depends(

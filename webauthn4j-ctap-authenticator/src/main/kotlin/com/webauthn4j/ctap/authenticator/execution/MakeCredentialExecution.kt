@@ -13,7 +13,9 @@ import com.webauthn4j.ctap.authenticator.data.credential.NonResidentUserCredenti
 import com.webauthn4j.ctap.authenticator.data.credential.ResidentUserCredential
 import com.webauthn4j.ctap.authenticator.data.credential.UserCredential
 import com.webauthn4j.ctap.authenticator.data.event.MakeCredentialEvent
+import com.webauthn4j.ctap.authenticator.data.settings.AlwaysUvSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
+import com.webauthn4j.ctap.authenticator.data.settings.MakeCredUvNotRqdSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
@@ -326,7 +328,7 @@ internal class MakeCredentialExecution :
     //
     // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-makeCred-authnr-alg
     private fun execStep6ProcessAlwaysUv() {
-        if (!ctapAuthenticatorSession.alwaysUv) return
+        if (ctapAuthenticatorSession.alwaysUv != AlwaysUvSetting.ENABLED) return
 
         //spec| 6.1 Let the makeCredUvNotRqd option ID be treated as false.
         // (effectiveMakeCredUvNotRqd is computed in Step 7/8/10 using alwaysUv flag)
@@ -371,7 +373,7 @@ internal class MakeCredentialExecution :
     //
     // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-makeCred-authnr-alg
     private fun execStep7ProcessMakeCredUvNotRqd() {
-        val effectiveMakeCredUvNotRqd = if (ctapAuthenticatorSession.alwaysUv) false else ctapAuthenticatorSession.makeCredUvNotRqd
+        val effectiveMakeCredUvNotRqd = if (ctapAuthenticatorSession.alwaysUv == AlwaysUvSetting.ENABLED) false else ctapAuthenticatorSession.makeCredUvNotRqd == MakeCredUvNotRqdSetting.ENABLED
         if (!effectiveMakeCredUvNotRqd) return
 
         if (isProtectedByUserVerification && !userVerificationPlan && pinAuth == null && residentKeyPlan) {
@@ -395,7 +397,7 @@ internal class MakeCredentialExecution :
     //
     // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-makeCred-authnr-alg
     private fun execStep8ProcessMakeCredUvNotRqdElse() {
-        val effectiveMakeCredUvNotRqd = if (ctapAuthenticatorSession.alwaysUv) false else ctapAuthenticatorSession.makeCredUvNotRqd
+        val effectiveMakeCredUvNotRqd = if (ctapAuthenticatorSession.alwaysUv == AlwaysUvSetting.ENABLED) false else ctapAuthenticatorSession.makeCredUvNotRqd == MakeCredUvNotRqdSetting.ENABLED
         if (effectiveMakeCredUvNotRqd) return
 
         if (isProtectedByUserVerification && !userVerificationPlan && pinAuth == null) {
@@ -415,7 +417,7 @@ internal class MakeCredentialExecution :
     //
     // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-makeCred-authnr-alg
     private fun execStep10CheckUvNotRequired() {
-        val effectiveMakeCredUvNotRqd = if (ctapAuthenticatorSession.alwaysUv) false else ctapAuthenticatorSession.makeCredUvNotRqd
+        val effectiveMakeCredUvNotRqd = if (ctapAuthenticatorSession.alwaysUv == AlwaysUvSetting.ENABLED) false else ctapAuthenticatorSession.makeCredUvNotRqd == MakeCredUvNotRqdSetting.ENABLED
         if (!residentKeyPlan && !userVerificationPlan && effectiveMakeCredUvNotRqd && pinAuth == null) {
             uvNotRequired = true
         }

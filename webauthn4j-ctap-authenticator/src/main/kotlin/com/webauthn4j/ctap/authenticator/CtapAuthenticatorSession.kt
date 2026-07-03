@@ -77,8 +77,8 @@ class CtapAuthenticatorSession internal constructor(
     val credentialSelector: CredentialSelectorSetting = ctapAuthenticator.credentialSelector
     val userPresence: UserPresenceSetting = ctapAuthenticator.userPresence
     val userVerification: UserVerificationSetting = ctapAuthenticator.userVerification
-    val alwaysUv: Boolean = ctapAuthenticator.alwaysUv
-    val makeCredUvNotRqd: Boolean = ctapAuthenticator.makeCredUvNotRqd
+    val alwaysUv: AlwaysUvSetting = ctapAuthenticator.alwaysUv
+    val makeCredUvNotRqd: MakeCredUvNotRqdSetting = ctapAuthenticator.makeCredUvNotRqd
 
     // Authenticator properties
     val aaguid: AAGUID = ctapAuthenticator.aaguid
