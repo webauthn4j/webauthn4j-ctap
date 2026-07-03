@@ -79,6 +79,8 @@ internal class GetInfoExecution(
         //spec| If absent, it indicates that the device is not capable of user verification within itself.
         //spec| A device that can only do Client PIN will not return the "uv" parameter.
         val uv: UserVerificationOption? = ctapAuthenticatorSession.userVerificationHandler.getUserVerificationOption(null)
+        val alwaysUv: Boolean? = if (ctapAuthenticatorSession.alwaysUv) true else null
+        val makeCredUvNotRqd: Boolean? = if (ctapAuthenticatorSession.makeCredUvNotRqd) true else null
         val extensions = ctapAuthenticatorSession.extensionProcessors.map { it.extensionId }
         return AuthenticatorGetInfoResponse(
             CtapStatusCode.CTAP2_OK,
@@ -86,7 +88,7 @@ internal class GetInfoExecution(
                 CtapAuthenticator.VERSIONS,       // versions (0x01): Required
                 extensions,                        // extensions (0x02): Optional
                 ctapAuthenticatorSession.aaguid,   // aaguid (0x03): Required
-                AuthenticatorGetInfoResponseData.Options(plat, rk, clientPin, up, uv), // options (0x04): Optional
+                AuthenticatorGetInfoResponseData.Options(plat, rk, clientPin, up, uv, alwaysUv, makeCredUvNotRqd), // options (0x04): Optional
                 2048u,                             // maxMsgSize (0x05): Optional
                 ctapAuthenticatorSession.pinProtocols,   // pinProtocols (0x06): Optional
                 null,

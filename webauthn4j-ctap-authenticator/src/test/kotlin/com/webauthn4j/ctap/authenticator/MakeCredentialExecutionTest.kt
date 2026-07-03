@@ -155,6 +155,9 @@ internal class MakeCredentialExecutionTest {
 
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.residentKey = residentKeySetting
+        ctapAuthenticator.makeCredUvNotRqd = true
+        ctapAuthenticator.userVerification = UserVerificationSetting.NOT_SUPPORTED
+        ctapAuthenticator.clientPIN = com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting.DISABLED
         val connection = ctapAuthenticator.createSession()
 
         val response = connection.makeCredential(command)
@@ -225,9 +228,9 @@ internal class MakeCredentialExecutionTest {
     @CsvSource(
         value = [
             "true, READY, CTAP2_OK",
-            "true, NOT_READY, CTAP2_ERR_UNSUPPORTED_OPTION",
-            "true, NOT_SUPPORTED, CTAP2_ERR_UNSUPPORTED_OPTION",
-            "false, READY, CTAP2_OK",
+            "true, NOT_READY, CTAP2_ERR_INVALID_OPTION",
+            "true, NOT_SUPPORTED, CTAP2_ERR_INVALID_OPTION",
+            "false, READY, CTAP2_ERR_OPERATION_DENIED",
             "false, NOT_READY, CTAP2_OK",
             "false, NOT_SUPPORTED, CTAP2_OK",
         ]
@@ -278,7 +281,7 @@ internal class MakeCredentialExecutionTest {
     @CsvSource(
         value = [
             "SUPPORTED, CTAP2_OK",
-            "NOT_SUPPORTED, CTAP2_ERR_UNSUPPORTED_OPTION",
+            "NOT_SUPPORTED, CTAP2_ERR_INVALID_OPTION",
         ]
     )
     fun userPresence_test(userPresenceSetting: UserPresenceSetting, statusCode: CtapStatusCode) =
@@ -295,7 +298,7 @@ internal class MakeCredentialExecutionTest {
             val excludeList: List<PublicKeyCredentialDescriptor> = emptyList()
             val extensions =
                 AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>()
-            val options = AuthenticatorMakeCredentialRequest.Options(rk = true, uv = false)
+            val options = AuthenticatorMakeCredentialRequest.Options(rk = true, uv = true)
             val pinAuth: ByteArray? = null
             val pinProtocol: PinProtocolVersion? = null
             val command = AuthenticatorMakeCredentialRequest(

@@ -4,10 +4,12 @@ import tools.jackson.core.type.TypeReference
 import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
 import com.webauthn4j.ctap.authenticator.GetAssertionConsentRequest
 import com.webauthn4j.ctap.authenticator.GetAssertionSession
+import com.webauthn4j.ctap.authenticator.PinUvAuthProtocol
 import com.webauthn4j.ctap.authenticator.SignatureCalculator.calculate
 import com.webauthn4j.ctap.authenticator.U2FKeyEnvelope
 import com.webauthn4j.ctap.authenticator.data.credential.*
 import com.webauthn4j.ctap.authenticator.data.event.GetAssertionEvent
+import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
 import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
@@ -37,7 +39,11 @@ import java.nio.ByteBuffer
 import java.time.Instant
 import kotlin.experimental.or
 
-// @see <a href="https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg">6.2.2. authenticatorGetAssertion Algorithm</a>
+/**
+ * GetAssertion command execution
+ *
+ * @see <a href="https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg">CTAP 2.3 §6.2.2 authenticatorGetAssertion Algorithm</a>
+ */
 @Suppress("ConvertSecondaryConstructorToPrimary")
 internal class GetAssertionExecution :
     CtapCommandExecutionBase<AuthenticatorGetAssertionRequest, AuthenticatorGetAssertionResponse> {
@@ -74,8 +80,17 @@ internal class GetAssertionExecution :
 
     private var userVerificationPlan = false
     private var userPresencePlan = false
+
+    //spec| Step 3. Create a new authenticatorGetAssertion response structure and initialize both its "uv" bit and "up" bit as false.
     private var userVerificationResult = false
     private var userPresenceResult = false
+
+    private var matchedProtocol: PinUvAuthProtocol? = null
+    private var uvPerformedViaBuiltIn = false
+
+    private val isProtectedByUserVerification: Boolean
+        get() = ctapAuthenticatorSession.isClientPINReady ||
+                ctapAuthenticatorSession.userVerification == UserVerificationSetting.READY
 
 
     constructor(
@@ -104,14 +119,14 @@ internal class GetAssertionExecution :
     }
 
     override suspend fun doExecute(): AuthenticatorGetAssertionResponse {
-        // execStep1ZeroLengthPinUvAuthParam()     // TODO: CTAP 2.1
-        // execStep2ValidatePinUvAuthProtocol()     // TODO: CTAP 2.1
-        // execStep3InitializeResponseStructure()   // TODO: CTAP 2.1
+        execStep1ZeroLengthPinUvAuthParam()
+        execStep2ValidatePinUvAuthProtocol()
+        // Step 3: response structure initialized via field declarations (userPresenceResult=false, userVerificationResult=false)
         execStep4ProcessOptions()
-        // execStep5ProcessAlwaysUv()               // TODO: CTAP 2.1
+        execStep5ProcessAlwaysUv()
         execStep6ProcessUserVerification()
         execStep7LocateCredentials()
-        // execStep8SetUpFromBuiltInUv()            // TODO: CTAP 2.1
+        execStep8SetUpFromBuiltInUv()
         execStep9RequestUserConsent()
         execStep10ProcessExtensions()
         execStep11And12SelectCredential()
@@ -146,76 +161,198 @@ internal class GetAssertionExecution :
         return AuthenticatorGetAssertionResponse(statusCode)
     }
 
-    //spec| Step 4
-    //spec| If the options parameter is present, process all option keys and values present in the parameter.
-    //spec| Treat any option keys that are not understood as absent.
-    //spec| @see <a href="https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg">6.2.2. authenticatorGetAssertion Algorithm</a>
-    private fun execStep4ProcessOptions() {
-        if (options != null) {
-            if (BooleanUtil.isTrue(options.uv)) {
-                userVerificationPlan = when (ctapAuthenticatorSession.userVerification) {
-                    UserVerificationSetting.READY -> true
-                    else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
-                }
+    //spec| Step 1. If authenticator supports either pinUvAuthToken or clientPin features and the platform sends a
+    //spec| zero length pinUvAuthParam:
+    //spec|   Request evidence of user interaction in an authenticator-specific way (e.g., flash the LED light).
+    //spec|   If the user declines permission, or the operation times out, then end the operation by returning CTAP2_ERR_OPERATION_DENIED.
+    //spec|   If evidence of user interaction is provided in this step then return either
+    //spec|   CTAP2_ERR_PIN_NOT_SET if PIN is not set or CTAP2_ERR_PIN_INVALID if PIN has been set.
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg
+    private suspend fun execStep1ZeroLengthPinUvAuthParam() {
+        if (pinAuth != null && pinAuth.isEmpty()) {
+            val consent = ctapAuthenticatorSession.withUserPresenceWait {
+                ctapAuthenticatorSession.userVerificationHandler.onGetAssertionConsentRequested(
+                    GetAssertionConsentRequest(rpId, true, false)
+                )
             }
-            if (options.up != false) {
-                userPresencePlan = when (ctapAuthenticatorSession.userPresence) {
-                    UserPresenceSetting.SUPPORTED -> true
-                    else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_OPTION)
-                }
+            if (!consent) {
+                throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
+            }
+            if (ctapAuthenticatorSession.isClientPINReady) {
+                throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_INVALID)
+            } else {
+                throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_NOT_SET)
             }
         }
     }
 
-    //spec| Step 6
-    //spec| If the authenticator is protected by some form of user verification, then:
-    //spec| @see <a href="https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg">6.2.2. authenticatorGetAssertion Algorithm</a>
+    //spec| Step 2. If the pinUvAuthParam parameter is present:
+    //spec|   If the pinUvAuthProtocol parameter's value is not supported, return CTAP1_ERR_INVALID_PARAMETER error.
+    //spec|   If the pinUvAuthProtocol parameter is absent, return CTAP2_ERR_MISSING_PARAMETER error.
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg
+    private fun execStep2ValidatePinUvAuthProtocol() {
+        if (pinAuth != null) {
+            if (pinProtocol == null) {
+                throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_MISSING_PARAMETER)
+            }
+            if (ctapAuthenticatorSession.pinProtocols.none { it == pinProtocol }) {
+                throw CtapCommandExecutionException(CtapStatusCode.CTAP1_ERR_INVALID_PARAMETER)
+            }
+        }
+    }
+
+    //spec| Step 4. If the options parameter is present, process all option keys and values present in the parameter.
+    //spec| Treat any option keys that are not understood as absent.
+    //spec|   If the "uv" option is absent, let the "uv" option be treated as being present with the value false. (This is the default)
+    //spec|   If the pinUvAuthParam is present, let the "uv" option be treated as being present with the value false.
+    //spec|   If the "uv" option is present and true then:
+    //spec|     If the authenticator does not support a built-in user verification method end the operation by returning CTAP2_ERR_INVALID_OPTION.
+    //spec|     If the built-in user verification method has not yet been enabled, end the operation by returning CTAP2_ERR_INVALID_OPTION.
+    //spec|   If the "rk" option is present then:
+    //spec|     Return CTAP2_ERR_UNSUPPORTED_OPTION.
+    //spec|   If the "up" option is not present then:
+    //spec|     Let the "up" option be treated as being present with the value true. (This is the default)
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg
+    private fun execStep4ProcessOptions() {
+        if (options != null) {
+            userVerificationPlan = if (pinAuth != null) {
+                false
+            } else {
+                when {
+                    BooleanUtil.isTrue(options.uv) -> {
+                        when (ctapAuthenticatorSession.userVerification) {
+                            UserVerificationSetting.READY -> true
+                            else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_INVALID_OPTION)
+                        }
+                    }
+                    else -> false
+                }
+            }
+            userPresencePlan = if (options.up != false) {
+                when (ctapAuthenticatorSession.userPresence) {
+                    UserPresenceSetting.SUPPORTED -> true
+                    else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_INVALID_OPTION)
+                }
+            } else {
+                false
+            }
+        } else {
+            userPresencePlan = when (ctapAuthenticatorSession.userPresence) {
+                UserPresenceSetting.SUPPORTED -> true
+                else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_INVALID_OPTION)
+            }
+        }
+    }
+
+    //spec| Step 5. If the alwaysUv option ID is present and true and the "up" option is present and true then:
+    //spec|   If the authenticator is not protected by some form of user verification:
+    //spec|     If the clientPin option ID is present and noMcGaPermissionsWithClientPin option ID is absent or false
+    //spec|     (clientPin is supported for the ga permission):
+    //spec|       End the operation by returning CTAP2_ERR_PUAT_REQUIRED.
+    //spec|     Else (clientPin is not supported):
+    //spec|       End the operation by returning CTAP2_ERR_OPERATION_DENIED.
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg
+    private fun execStep5ProcessAlwaysUv() {
+        if (!ctapAuthenticatorSession.alwaysUv) return
+        if (!userPresencePlan) return
+
+        if (!isProtectedByUserVerification) {
+            if (ctapAuthenticatorSession.clientPIN == ClientPINSetting.ENABLED) {
+                throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PUAT_REQUIRED)
+            } else {
+                throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
+            }
+        }
+
+        if (pinAuth == null && !userVerificationPlan) {
+            if (ctapAuthenticatorSession.userVerification == UserVerificationSetting.READY) {
+                userVerificationPlan = true
+            } else if (ctapAuthenticatorSession.clientPIN == ClientPINSetting.ENABLED) {
+                throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PUAT_REQUIRED)
+            } else {
+                throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
+            }
+        }
+    }
+
+    //spec| Step 6. If the authenticator is protected by some form of user verification, then:
+    //spec|   6.1 If pinUvAuthParam parameter is present (implying the "uv" option is treated as false, see Step 4):
+    //spec|     Call verify(pinUvAuthToken, clientDataHash, pinUvAuthParam).
+    //spec|     If the verification returns error, return CTAP2_ERR_PIN_AUTH_INVALID error.
+    //spec|     If the verification returns success, set the "uv" bit to true in the response.
+    //spec|     Let userVerifiedFlagValue be the result of calling getUserVerifiedFlagValue().
+    //spec|     If userVerifiedFlagValue is false then end the operation by returning CTAP2_ERR_PIN_AUTH_INVALID.
+    //spec|     Verify that the pinUvAuthToken has the ga permission, if not, return CTAP2_ERR_PIN_AUTH_INVALID.
+    //spec|     If the pinUvAuthToken has a permissions RP ID associated:
+    //spec|       If the permissions RP ID does not match the rpId in this request, return CTAP2_ERR_PIN_AUTH_INVALID.
+    //spec|     If the pinUvAuthToken does not have a permissions RP ID associated:
+    //spec|       Associate the request's rpId parameter value with the pinUvAuthToken as its permissions RP ID.
+    //spec|     Go to Step 7.
+    //spec|   6.2 If the "uv" option is present and set to true (implying the pinUvAuthParam parameter is not present,
+    //spec|   and that the authenticator supports an enabled built-in user verification method, see Step 4):
+    //spec|     Let internalRetry be true.
+    //spec|     Let uvState be the result of calling performBuiltInUv(internalRetry)
+    //spec|     If uvState is error:
+    //spec|       If the error reason is a user action timeout, then return CTAP2_ERR_USER_ACTION_TIMEOUT.
+    //spec|       If the uvRetries counter is 0, return CTAP2_ERR_PIN_BLOCKED.
+    //spec|       Otherwise, end the operation by returning CTAP2_ERR_OPERATION_DENIED.
+    //spec|     If uvState is success:
+    //spec|       Set the "uv" bit to true in the response.
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg
     private fun execStep6ProcessUserVerification() {
-        // If pinUvAuthParam parameter is present and pinProtocol is supported,
-        // verify it and set the "uv" bit to true in the response.
+        if (!isProtectedByUserVerification) return
+
+        // Step 6.1
         if (pinAuth != null && pinProtocol != null) {
-            //spec| Call verify(pinUvAuthToken, clientDataHash, pinUvAuthParam).
-            //spec| If the verification returns error, return CTAP2_ERR_PIN_AUTH_INVALID error.
-            val matchedProtocol = ctapAuthenticatorSession.pinUvAuthManager.pinUvAuthProtocols.firstOrNull { protocol ->
-                val calculatedPinAuth = protocol.authenticate(protocol.pinUvAuthToken, clientDataHash)
-                Arrays.equals(calculatedPinAuth, pinAuth)
+            val protocol = ctapAuthenticatorSession.pinUvAuthManager.pinUvAuthProtocols.firstOrNull { protocol ->
+                protocol.verify(protocol.pinUvAuthToken, clientDataHash, pinAuth)
             } ?: throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
 
-            //spec| Verify that the pinUvAuthToken has the ga permission, if not, return CTAP2_ERR_PIN_AUTH_INVALID.
-            if (matchedProtocol.tokenState.isInUse() && !matchedProtocol.tokenState.hasPermission(PinUvAuthTokenPermission.GA)) {
+            userVerificationResult = true
+
+            if (!protocol.tokenState.getUserVerifiedFlagValue()) {
                 throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
             }
-            //spec| If the pinUvAuthToken has a permissions RP ID associated:
-            //spec| If the permissions RP ID does not match the rpId in this request, return CTAP2_ERR_PIN_AUTH_INVALID.
-            val tokenRpId = matchedProtocol.tokenState.permissionsRpId
+
+            if (!protocol.tokenState.hasPermission(PinUvAuthTokenPermission.GA)) {
+                throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
+            }
+
+            val tokenRpId = protocol.tokenState.permissionsRpId
             if (tokenRpId != null && tokenRpId != rpId) {
                 throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
             }
 
-            if (matchedProtocol.tokenState.isInUse()) {
-                matchedProtocol.tokenState.recordPlatformUsage()
+            if (protocol.tokenState.permissionsRpId == null) {
+                protocol.tokenState.permissionsRpId = rpId
             }
 
-            userVerificationResult = true
+            protocol.tokenState.recordPlatformUsage()
+            matchedProtocol = protocol
             return
         }
-        // If pinUvAuthParam parameter is not present and clientPin has been set on the authenticator,
-        // set the "uv" bit to false in the response.
-        if (pinAuth == null && ctapAuthenticatorSession.isClientPINReady) {
-            userVerificationResult = false
-        }
+
+        // Step 6.2: built-in UV is handled via the consent flow in Step 9.
+        // userVerificationPlan remains true and will be processed during consent.
     }
 
-    //spec| Step 7
-    //spec| Locate all credentials that are eligible for retrieval under the specified criteria:
-    //spec| @see <a href="https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg">6.2.2. authenticatorGetAssertion Algorithm</a>
+    //spec| Step 7. Locate all credentials that are eligible for retrieval under the specified criteria:
+    //spec|   If the allowList parameter is present and is non-empty, locate all
+    //spec|   denoted credentials created by this authenticator and bound to the specified rpId.
+    //spec|   If an allowList is not present, locate all discoverable credentials that are
+    //spec|   created by this authenticator and bound to the specified rpId.
+    //spec|   Create an applicable credentials list populated with the located credentials.
+    //spec|   If the applicable credentials list is empty, return CTAP2_ERR_NO_CREDENTIALS.
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg
     private fun execStep7LocateCredentials() {
         val rpId = rpId
 
-        //spec| If the allowList parameter is present and is non-empty, locate all
-        //spec| denoted credentials created by this authenticator and bound to the specified rpId.
-        //spec| If an allowList is not present, locate all discoverable credentials that are
-        //spec| created by this authenticator and bound to the specified rpId.
         credentials = if (allowList != null && allowList.isNotEmpty()) {
             val storedCredentials = authenticatorPropertyStore.loadUserCredentials(rpId)
                 .filter {
@@ -238,7 +375,6 @@ internal class GetAssertionExecution :
             )
         }
 
-        //spec| If the applicable credentials list is empty, return CTAP2_ERR_NO_CREDENTIALS.
         if (credentials.isEmpty()) {
             throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_NO_CREDENTIALS)
         }
@@ -309,29 +445,85 @@ internal class GetAssertionExecution :
         return null
     }
 
-    //spec| Step 9
-    //spec| If the "up" option is set to true or not present:
-    //spec| @see <a href="https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg">6.2.2. authenticatorGetAssertion Algorithm</a>
-    private suspend fun execStep9RequestUserConsent() {
-        val options = GetAssertionConsentRequest(rpId, userPresencePlan, userVerificationPlan)
-        val consent = ctapAuthenticatorSession.withUserPresenceWait {
-            ctapAuthenticatorSession.userVerificationHandler.onGetAssertionConsentRequested(options)
+    //spec| Step 8. If evidence of user interaction was provided as part of Step 6.2 (i.e., by invoking performBuiltInUv()):
+    //spec|   Set the "up" bit to true in the response.
+    //spec|   Go to Step 10
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg
+    private fun execStep8SetUpFromBuiltInUv(): Boolean {
+        if (uvPerformedViaBuiltIn) {
+            userPresenceResult = true
+            return true
         }
-        if (consent) {
-            if (userVerificationPlan) {
-                userVerificationResult = true
+        return false
+    }
+
+    //spec| Step 9. If the "up" option is set to true or not present:
+    //spec|   If the pinUvAuthParam parameter is present then:
+    //spec|     Let userPresentFlagValue be the result of calling getUserPresentFlagValue().
+    //spec|     If userPresentFlagValue is false:
+    //spec|       Request evidence of user interaction in an authenticator-specific way (e.g., flash the LED light).
+    //spec|       If the authenticator has a display, show the rpId parameter value to the user,
+    //spec|       and request permission to create an assertion.
+    //spec|       If the user declines permission, or the operation times out, then end the operation by returning CTAP2_ERR_OPERATION_DENIED.
+    //spec|   Else (implying the pinUvAuthParam parameter is not present):
+    //spec|     If the "up" bit is false in the response:
+    //spec|       Request evidence of user interaction in an authenticator-specific way (e.g., flash the LED light).
+    //spec|       If the authenticator has a display, show the rpId parameter value to the user,
+    //spec|       and request permission to create an assertion.
+    //spec|       If the user declines permission, or the operation times out, then end the operation by returning CTAP2_ERR_OPERATION_DENIED.
+    //spec|   Set the "up" bit to true in the response.
+    //spec|   Call clearUserPresentFlag(), clearUserVerifiedFlag(), and clearPinUvAuthTokenPermissionsExceptLbw().
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg
+    private suspend fun execStep9RequestUserConsent() {
+        if (userPresencePlan) {
+            var needsInteraction = false
+
+            if (pinAuth != null) {
+                val protocol = matchedProtocol
+                if (protocol != null && !protocol.tokenState.getUserPresentFlagValue()) {
+                    needsInteraction = true
+                } else if (protocol == null) {
+                    needsInteraction = true
+                }
+            } else {
+                if (!userPresenceResult) {
+                    needsInteraction = true
+                }
             }
-            if (userPresencePlan) {
-                userPresenceResult = true
+
+            if (needsInteraction) {
+                val consentRequest = GetAssertionConsentRequest(rpId, userPresencePlan, userVerificationPlan)
+                val consent = ctapAuthenticatorSession.withUserPresenceWait {
+                    ctapAuthenticatorSession.userVerificationHandler.onGetAssertionConsentRequested(consentRequest)
+                }
+                if (!consent) {
+                    throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
+                }
+                if (userVerificationPlan) {
+                    userVerificationResult = true
+                }
             }
-        } else {
-            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
+
+            userPresenceResult = true
+
+            // Clear cached UP/UV state
+            ctapAuthenticatorSession.pinUvAuthManager.pinUvAuthProtocols.forEach { protocol ->
+                protocol.tokenState.clearUserPresentFlag()
+                protocol.tokenState.clearUserVerifiedFlag()
+                protocol.tokenState.clearPinUvAuthTokenPermissionsExceptLbw()
+            }
         }
     }
 
-    //spec| Step 10
-    //spec| If the extensions parameter is present:
-    //spec| @see <a href="https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg">6.2.2. authenticatorGetAssertion Algorithm</a>
+    //spec| Step 10. If the extensions parameter is present:
+    //spec|   Process any extensions that this authenticator supports, ignoring any that it does not support.
+    //spec|   Authenticator extension outputs generated by the authenticator extension processing
+    //spec|   are returned in the authenticator data.
+    //spec|   The set of keys in the authenticator extension outputs map MUST be equal to, or a subset of, the keys of the authenticator extension inputs map.
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg
     private fun execStep10ProcessExtensions() {
         val inputs = this.authenticationExtensionsAuthenticatorInputs
         assertionObjects = credentials.map { credential ->
@@ -356,17 +548,18 @@ internal class GetAssertionExecution :
         }
     }
 
-    //spec| Step 11
-    //spec| If the allowList parameter is present:
-    //spec| Step 12
-    //spec| If allowList is not present:
-    //spec| @see <a href="https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg">6.2.2. authenticatorGetAssertion Algorithm</a>
+    //spec| Step 11. If the allowList parameter is present:
+    //spec|   Select any credential from the applicable credentials list.
+    //spec| Step 12. If allowList is not present:
+    //spec|   Order the credentials in the applicable credentials list by the time when they were created in reverse order.
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg
     private suspend fun execStep11And12SelectCredential() {
         // Sort credentials by creation time in reverse order (most recent first)
         assertionObjects = assertionObjects.sortedByDescending { it.credential.createdAt.epochSecond }
 
         // Mask user identifiable information if user verification was not performed
-        if (!(userVerificationPlan || authenticatorGetAssertionRequest.pinAuth != null)) {
+        if (!userVerificationResult && pinAuth == null) {
             assertionObjects.map {
                 it.maskUserIdentifiableInfo = true
             }
@@ -403,9 +596,9 @@ internal class GetAssertionExecution :
         }
     }
 
-    //spec| Step 13
-    //spec| Sign the clientDataHash along with authData with the selected credential, using the structure specified in [WebAuthn].
-    //spec| @see <a href="https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg">6.2.2. authenticatorGetAssertion Algorithm</a>
+    //spec| Step 13. Sign the clientDataHash along with authData with the selected credential, using the structure specified in [WebAuthn].
+    //
+    // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg
     private fun execStep13Sign(): AuthenticatorGetAssertionResponse {
         val assertionObject = onGoingGetAssertionSession.nextAssertionObject()
         val credential = assertionObject.credential
@@ -423,10 +616,6 @@ internal class GetAssertionExecution :
         )
         val authData = ctapAuthenticatorSession.authenticatorDataConverter.convert(authenticatorDataObject)
 
-        // Let signature be the assertion signature of the concatenation authenticatorData || hash using
-        // the privateKey of selectedCredential as shown in Figure 2, below. A simple, un-delimited concatenation is
-        // safe to use here because the authenticator data describes its own length.
-        // The hash of the serialized client data (which potentially has a variable length) is always the last element.
         val clientDataHash = onGoingGetAssertionSession.clientDataHash
         val signedData = ByteBuffer.allocate(authData.size + clientDataHash.size).put(authData)
             .put(clientDataHash).array()
@@ -454,7 +643,6 @@ internal class GetAssertionExecution :
         }
         val numberOfCredentials = onGoingGetAssertionSession.numberOfAssertionObjects
 
-        //spec| On success, the authenticator returns an attestation object in its response as defined in [WebAuthn]:
         val responseData = AuthenticatorGetAssertionResponseData(
             descriptor,
             authData,

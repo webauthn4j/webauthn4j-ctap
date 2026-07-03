@@ -8,6 +8,7 @@ import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialType
 import com.webauthn4j.data.RegistrationParameters
 import com.webauthn4j.data.RegistrationRequest
+import com.webauthn4j.data.ResidentKeyRequirement
 import com.webauthn4j.data.UserVerificationRequirement
 import org.junit.jupiter.api.fail
 
@@ -15,6 +16,7 @@ class SecondFactorTestCase : IntegrationTestCaseBase() {
 
     init {
         relyingParty.registration.frontend.requireResidentKey = false
+        relyingParty.registration.frontend.residentKey = ResidentKeyRequirement.DISCOURAGED
         relyingParty.registration.frontend.userVerification =
             UserVerificationRequirement.DISCOURAGED
         relyingParty.registration.backend.userVerificationRequired = false

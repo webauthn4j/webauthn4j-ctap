@@ -5,6 +5,7 @@ import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
 import com.webauthn4j.ctap.client.exception.UPNotSupportedException
+import com.webauthn4j.data.UserVerificationRequirement
 import integration.usecase.testcase.SecondFactorTestCase
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
@@ -21,6 +22,9 @@ internal class AuthenticatorSecondFactorUseCaseTest {
         @Test
         fun residentKey_always_test() = runTest {
             secondFactorTestCase.authenticator.residentKeySetting = ResidentKeySetting.ALWAYS
+            secondFactorTestCase.relyingParty.registration.frontend.userVerification =
+                UserVerificationRequirement.REQUIRED
+            secondFactorTestCase.relyingParty.registration.backend.userVerificationRequired = true
             secondFactorTestCase.run()
         }
 

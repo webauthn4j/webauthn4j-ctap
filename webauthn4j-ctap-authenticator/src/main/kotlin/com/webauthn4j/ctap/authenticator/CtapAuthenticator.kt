@@ -105,6 +105,8 @@ class CtapAuthenticator(
     var resetProtection: ResetProtectionSetting = ResetProtectionSetting.DISABLED
     var userPresence: UserPresenceSetting = UserPresenceSetting.SUPPORTED
     var userVerification: UserVerificationSetting = UserVerificationSetting.READY
+    var alwaysUv: Boolean = false
+    var makeCredUvNotRqd: Boolean = false
     var credentialSelector: CredentialSelectorSetting = CredentialSelectorSetting.AUTHENTICATOR
 
     fun createSession(

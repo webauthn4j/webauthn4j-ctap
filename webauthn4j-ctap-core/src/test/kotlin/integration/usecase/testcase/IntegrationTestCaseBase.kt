@@ -115,6 +115,7 @@ abstract class IntegrationTestCaseBase {
             ctapAuthenticator.userPresence = userPresenceSetting
             ctapAuthenticator.userVerification = userVerificationSetting
             ctapAuthenticator.credentialSelector = credentialSelectorSetting
+            ctapAuthenticator.makeCredUvNotRqd = true
 
             return@TestParameter ctapAuthenticator
         }.depends(

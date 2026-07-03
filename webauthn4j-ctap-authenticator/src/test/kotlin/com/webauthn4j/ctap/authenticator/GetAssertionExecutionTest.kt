@@ -199,7 +199,7 @@ internal class GetAssertionExecutionTest {
     @CsvSource(
         value = [
             "true, SUPPORTED, CTAP2_OK",
-            "true, NOT_SUPPORTED, CTAP2_ERR_UNSUPPORTED_OPTION",
+            "true, NOT_SUPPORTED, CTAP2_ERR_INVALID_OPTION",
             "false, SUPPORTED, CTAP2_OK",
             "false, NOT_SUPPORTED, CTAP2_OK",
         ]
@@ -242,8 +242,8 @@ internal class GetAssertionExecutionTest {
     @CsvSource(
         value = [
             "true, READY, CTAP2_OK",
-            "true, NOT_READY, CTAP2_ERR_UNSUPPORTED_OPTION",
-            "true, NOT_SUPPORTED, CTAP2_ERR_UNSUPPORTED_OPTION",
+            "true, NOT_READY, CTAP2_ERR_INVALID_OPTION",
+            "true, NOT_SUPPORTED, CTAP2_ERR_INVALID_OPTION",
             "false, READY, CTAP2_OK",
             "false, NOT_READY, CTAP2_OK",
             "false, NOT_SUPPORTED, CTAP2_OK",
@@ -255,9 +255,11 @@ internal class GetAssertionExecutionTest {
         statusCode: CtapStatusCode
     ) = runTest {
         val ctapAuthenticator = CtapAuthenticator()
-        ctapAuthenticator.userVerification = userVerificationSetting
         val connection = ctapAuthenticator.createSession()
-        makeCredential(connection, uv = false)
+        makeCredential(connection)
+
+        ctapAuthenticator.userVerification = userVerificationSetting
+        val connectionWithUpdatedSetting = ctapAuthenticator.createSession()
 
         val clientDataHash = ByteArray(0)
         val allowList: List<PublicKeyCredentialDescriptor> = emptyList()
@@ -275,7 +277,7 @@ internal class GetAssertionExecutionTest {
             pinAuth,
             pinProtocol
         )
-        val response: AuthenticatorGetAssertionResponse = connection.getAssertion(command)
+        val response: AuthenticatorGetAssertionResponse = connectionWithUpdatedSetting.getAssertion(command)
         Assertions.assertThat(response.statusCode).isEqualTo(statusCode)
     }
 
