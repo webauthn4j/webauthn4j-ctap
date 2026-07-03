@@ -53,8 +53,8 @@ internal class MakeCredentialExecutionTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>()
         val options = AuthenticatorMakeCredentialRequest.Options(rk = true, uv = true)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorMakeCredentialRequest(
             clientDataHash,
             rp,
@@ -63,8 +63,8 @@ internal class MakeCredentialExecutionTest {
             excludeList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
         val response = connection.makeCredential(command)
         assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
@@ -99,8 +99,8 @@ internal class MakeCredentialExecutionTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>()
         val options = AuthenticatorMakeCredentialRequest.Options(rk = true, uv = true)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorMakeCredentialRequest(
             clientDataHash,
             rp,
@@ -109,8 +109,8 @@ internal class MakeCredentialExecutionTest {
             excludeList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
         val response = connection.makeCredential(command)
         assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_ERR_KEY_STORE_FULL)
@@ -141,8 +141,8 @@ internal class MakeCredentialExecutionTest {
         val excludeList: List<PublicKeyCredentialDescriptor> = emptyList()
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>()
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorMakeCredentialRequest(
             clientDataHash,
             rp,
@@ -151,8 +151,8 @@ internal class MakeCredentialExecutionTest {
             excludeList,
             extensions,
             null,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
 
         val ctapAuthenticator = CtapAuthenticator()
@@ -198,8 +198,8 @@ internal class MakeCredentialExecutionTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>()
         val options = AuthenticatorMakeCredentialRequest.Options(rk = rk, uv = true)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorMakeCredentialRequest(
             clientDataHash,
             rp,
@@ -208,8 +208,8 @@ internal class MakeCredentialExecutionTest {
             excludeList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
 
         val ctapAuthenticator = CtapAuthenticator()
@@ -253,8 +253,8 @@ internal class MakeCredentialExecutionTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>()
         val options = AuthenticatorMakeCredentialRequest.Options(rk = true, uv = uv)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorMakeCredentialRequest(
             clientDataHash,
             rp,
@@ -263,8 +263,8 @@ internal class MakeCredentialExecutionTest {
             excludeList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
 
         val ctapAuthenticator = CtapAuthenticator()
@@ -299,8 +299,8 @@ internal class MakeCredentialExecutionTest {
             val extensions =
                 AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>()
             val options = AuthenticatorMakeCredentialRequest.Options(rk = true, uv = false)
-            val pinAuth: ByteArray? = null
-            val pinProtocol: PinProtocolVersion? = null
+            val pinUvAuthParam: ByteArray? = null
+            val pinUvAuthProtocol: PinProtocolVersion? = null
             val command = AuthenticatorMakeCredentialRequest(
                 clientDataHash,
                 rp,
@@ -309,8 +309,8 @@ internal class MakeCredentialExecutionTest {
                 excludeList,
                 extensions,
                 options,
-                pinAuth,
-                pinProtocol
+                pinUvAuthParam,
+                pinUvAuthProtocol
             )
 
             val ctapAuthenticator = CtapAuthenticator()
@@ -339,8 +339,8 @@ internal class MakeCredentialExecutionTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>()
         val options = AuthenticatorMakeCredentialRequest.Options(rk = true, uv = true)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorMakeCredentialRequest(
             clientDataHash,
             rp,
@@ -349,8 +349,8 @@ internal class MakeCredentialExecutionTest {
             excludeList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
 
         val ctapAuthenticator = CtapAuthenticator()
@@ -381,8 +381,8 @@ internal class MakeCredentialExecutionTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>()
         val options = AuthenticatorMakeCredentialRequest.Options(rk = true, uv = true)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorMakeCredentialRequest(
             clientDataHash,
             rp,
@@ -391,8 +391,8 @@ internal class MakeCredentialExecutionTest {
             excludeList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
 
         val ctapAuthenticator = CtapAuthenticator()

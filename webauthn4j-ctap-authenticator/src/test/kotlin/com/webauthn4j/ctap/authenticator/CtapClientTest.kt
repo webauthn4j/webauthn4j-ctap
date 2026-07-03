@@ -51,16 +51,16 @@ internal class CtapClientTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>()
         val options = AuthenticatorGetAssertionRequest.Options(up = true, uv = true)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorGetAssertionRequest(
             RP_ID,
             clientDataHash,
             allowList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
         val response: AuthenticatorGetAssertionResponse = connection.getAssertion(command)
         Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
@@ -92,8 +92,8 @@ internal class CtapClientTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>()
         val options = AuthenticatorMakeCredentialRequest.Options(rk = true, uv = true)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorMakeCredentialRequest(
             clientDataHash,
             rp,
@@ -102,8 +102,8 @@ internal class CtapClientTest {
             excludeList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
         return try {
             connection.makeCredential(command)

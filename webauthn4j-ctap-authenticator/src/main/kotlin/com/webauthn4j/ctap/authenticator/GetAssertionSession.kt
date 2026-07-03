@@ -5,11 +5,16 @@ import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthen
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorOutputs
 import java.time.Instant
 
+// Holds the state for an ongoing authenticatorGetAssertion flow, including
+// GetNextAssertion iteration. Corresponds to §6.2.2 Step 12.2.2.
 class GetAssertionSession(
+    // 12.2.2.1: remembered authenticatorGetAssertion parameters
     val assertionObjects: List<AssertionObject>,
     clientDataHash: ByteArray
 ) {
+    // 12.2.2.2: credential counter (zero-based index into assertionObjects)
     private var index = 0
+    // 12.2.2.3: timer for GetNextAssertion expiration (30 seconds)
     private var instant: Instant
     val clientDataHash: ByteArray
 
@@ -20,13 +25,15 @@ class GetAssertionSession(
 
     fun hasNext(): Boolean = index < assertionObjects.size
 
-    fun nextAssertionObject(): AssertionObject {
+    fun currentAssertionObject(): AssertionObject {
         if (assertionObjects.size <= index) {
             throw NoSuchElementException()
         }
-        val assertionObject = assertionObjects[index]
+        return assertionObjects[index]
+    }
+
+    fun incrementCredentialCounter() {
         index++
-        return assertionObject
     }
 
     val numberOfAssertionObjects: Int

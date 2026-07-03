@@ -10,7 +10,7 @@ class AuthenticatorGetAssertionRequestSerializer :
             FieldSerializationRule(3, AuthenticatorGetAssertionRequest::allowList),
             FieldSerializationRule(4, AuthenticatorGetAssertionRequest::extensions),
             FieldSerializationRule(5, AuthenticatorGetAssertionRequest::options),
-            FieldSerializationRule(6, AuthenticatorGetAssertionRequest::pinAuth),
-            FieldSerializationRule(7, AuthenticatorGetAssertionRequest::pinProtocol)
+            FieldSerializationRule(6, AuthenticatorGetAssertionRequest::pinUvAuthParam),
+            FieldSerializationRule(7, AuthenticatorGetAssertionRequest::pinUvAuthProtocol)
         )
     )

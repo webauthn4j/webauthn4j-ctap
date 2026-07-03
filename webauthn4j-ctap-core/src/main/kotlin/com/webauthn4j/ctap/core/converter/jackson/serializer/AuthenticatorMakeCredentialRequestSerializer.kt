@@ -12,7 +12,7 @@ class AuthenticatorMakeCredentialRequestSerializer :
             FieldSerializationRule(5, AuthenticatorMakeCredentialRequest::excludeList),
             FieldSerializationRule(6, AuthenticatorMakeCredentialRequest::extensions),
             FieldSerializationRule(7, AuthenticatorMakeCredentialRequest::options),
-            FieldSerializationRule(8, AuthenticatorMakeCredentialRequest::pinAuth),
-            FieldSerializationRule(9, AuthenticatorMakeCredentialRequest::pinProtocol)
+            FieldSerializationRule(8, AuthenticatorMakeCredentialRequest::pinUvAuthParam),
+            FieldSerializationRule(9, AuthenticatorMakeCredentialRequest::pinUvAuthProtocol)
         )
     )
