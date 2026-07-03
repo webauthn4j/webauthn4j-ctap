@@ -55,7 +55,7 @@ class CtapAuthenticatorSession internal constructor(
     val pinProtocols: List<PinProtocolVersion> = ctapAuthenticator.pinProtocols
         .sortedByDescending { it.value }
 
-    val pinUvAuthService: PinUvAuthService = PinUvAuthService(
+    val pinUvAuthManager: PinUvAuthManager = PinUvAuthManager(
         authenticatorPropertyStore,
         pinProtocols.map { version ->
             when (version) {
@@ -65,6 +65,9 @@ class CtapAuthenticatorSession internal constructor(
             }
         }
     )
+
+    val isClientPINReady: Boolean
+        get() = authenticatorPropertyStore.loadClientPIN() != null
 
     // Authenticator characteristics
     val platform: AttachmentSetting = ctapAuthenticator.platform

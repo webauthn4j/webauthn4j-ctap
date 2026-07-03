@@ -47,6 +47,25 @@ class AuthenticatorClientPINRequestValidator {
                 requireNotNull(value.keyAgreement)
                 requireNotNull(value.pinHashEnc)
             }
+            //spec| getPinUvAuthTokenUsingUvWithPermissions (0x06)
+            //spec| Platform sends:
+            //spec|   pinUvAuthProtocol, keyAgreement, permissions
+            PinSubCommand.GET_PIN_UV_AUTH_TOKEN_USING_UV_WITH_PERMISSIONS -> {
+                requireNotNull(value.keyAgreement)
+                requireNotNull(value.permissions)
+            }
+            //spec| getUVRetries (0x07)
+            PinSubCommand.GET_UV_RETRIES -> {
+                // nop - no required parameters beyond pinProtocol and subCommand
+            }
+            //spec| getPinUvAuthTokenUsingPinWithPermissions (0x09)
+            //spec| Platform sends:
+            //spec|   pinUvAuthProtocol, keyAgreement, pinHashEnc, permissions
+            PinSubCommand.GET_PIN_UV_AUTH_TOKEN_USING_PIN_WITH_PERMISSIONS -> {
+                requireNotNull(value.keyAgreement)
+                requireNotNull(value.pinHashEnc)
+                requireNotNull(value.permissions)
+            }
         }
     }
 }

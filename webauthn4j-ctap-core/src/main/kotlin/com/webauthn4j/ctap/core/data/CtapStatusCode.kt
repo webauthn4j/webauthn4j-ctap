@@ -49,6 +49,9 @@ class CtapStatusCode(private val value: Byte) {
         val CTAP2_ERR_REQUEST_TOO_LARGE = CtapStatusCode(0x39)
         val CTAP2_ERR_ACTION_TIMEOUT = CtapStatusCode(0x3A)
         val CTAP2_ERR_UP_REQUIRED = CtapStatusCode(0x3B)
+        val CTAP2_ERR_UV_BLOCKED = CtapStatusCode(0x3C)
+        val CTAP2_ERR_UV_INVALID = CtapStatusCode(0x3F)
+        val CTAP2_ERR_UNAUTHORIZED_PERMISSION = CtapStatusCode(0x40)
         val CTAP1_ERR_OTHER = CtapStatusCode(0x7F)
 
         private val map: Map<CtapStatusCode, String>
@@ -96,6 +99,9 @@ class CtapStatusCode(private val value: Byte) {
             tmp[CTAP2_ERR_REQUEST_TOO_LARGE] = "CTAP2_ERR_REQUEST_TOO_LARGE"
             tmp[CTAP2_ERR_ACTION_TIMEOUT] = "CTAP2_ERR_ACTION_TIMEOUT"
             tmp[CTAP2_ERR_UP_REQUIRED] = "CTAP2_ERR_UP_REQUIRED"
+            tmp[CTAP2_ERR_UV_BLOCKED] = "CTAP2_ERR_UV_BLOCKED"
+            tmp[CTAP2_ERR_UV_INVALID] = "CTAP2_ERR_UV_INVALID"
+            tmp[CTAP2_ERR_UNAUTHORIZED_PERMISSION] = "CTAP2_ERR_UNAUTHORIZED_PERMISSION"
             tmp[CTAP1_ERR_OTHER] = "CTAP1_ERR_OTHER"
             map = HashMap(tmp)
         }
@@ -145,6 +151,9 @@ class CtapStatusCode(private val value: Byte) {
                 "CTAP2_ERR_REQUEST_TOO_LARGE" -> CTAP2_ERR_REQUEST_TOO_LARGE
                 "CTAP2_ERR_ACTION_TIMEOUT" -> CTAP2_ERR_ACTION_TIMEOUT
                 "CTAP2_ERR_UP_REQUIRED" -> CTAP2_ERR_UP_REQUIRED
+                "CTAP2_ERR_UV_BLOCKED" -> CTAP2_ERR_UV_BLOCKED
+                "CTAP2_ERR_UV_INVALID" -> CTAP2_ERR_UV_INVALID
+                "CTAP2_ERR_UNAUTHORIZED_PERMISSION" -> CTAP2_ERR_UNAUTHORIZED_PERMISSION
                 "CTAP1_ERR_OTHER" -> CTAP1_ERR_OTHER
 
                 else -> throw IllegalArgumentException("value '$value' is out of range")
