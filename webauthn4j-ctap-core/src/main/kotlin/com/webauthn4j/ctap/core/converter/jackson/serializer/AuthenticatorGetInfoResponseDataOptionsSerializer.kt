@@ -11,6 +11,6 @@ class AuthenticatorGetInfoResponseDataOptionsSerializer :
             FieldSerializationRule("uv") { it.uv?.value },
             FieldSerializationRule("plat") { it.plat?.value },
             FieldSerializationRule("clientPin") { it.clientPin?.value },
-            FieldSerializationRule("alwaysUv") { it.alwaysUv },
-            FieldSerializationRule("makeCredUvNotRqd") { it.makeCredUvNotRqd }
+            FieldSerializationRule("alwaysUv") { it.alwaysUv?.value },
+            FieldSerializationRule("makeCredUvNotRqd") { it.makeCredUvNotRqd?.value }
         ))
