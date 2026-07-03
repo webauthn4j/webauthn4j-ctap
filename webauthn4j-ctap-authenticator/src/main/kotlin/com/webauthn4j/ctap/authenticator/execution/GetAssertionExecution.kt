@@ -171,6 +171,8 @@ internal class GetAssertionExecution :
     // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg
     private suspend fun execStep1ZeroLengthPinUvAuthParam() {
         if (pinAuth != null && pinAuth.isEmpty()) {
+            //spec| Request evidence of user interaction in an authenticator-specific way (e.g., flash the LED light).
+            //spec| If the user declines permission, or the operation times out, then end the operation by returning CTAP2_ERR_OPERATION_DENIED.
             val consent = ctapAuthenticatorSession.withUserPresenceWait {
                 ctapAuthenticatorSession.userVerificationHandler.onGetAssertionConsentRequested(
                     GetAssertionConsentRequest(rpId, true, false)
@@ -179,6 +181,8 @@ internal class GetAssertionExecution :
             if (!consent) {
                 throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
             }
+            //spec| If evidence of user interaction is provided in this step then return either
+            //spec| CTAP2_ERR_PIN_NOT_SET if PIN is not set or CTAP2_ERR_PIN_INVALID if PIN has been set.
             if (ctapAuthenticatorSession.isClientPINReady) {
                 throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_INVALID)
             } else {
@@ -194,9 +198,11 @@ internal class GetAssertionExecution :
     // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg
     private fun execStep2ValidatePinUvAuthProtocol() {
         if (pinAuth != null) {
+            //spec| If the pinUvAuthProtocol parameter is absent, return CTAP2_ERR_MISSING_PARAMETER error.
             if (pinProtocol == null) {
                 throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_MISSING_PARAMETER)
             }
+            //spec| If the pinUvAuthProtocol parameter's value is not supported, return CTAP1_ERR_INVALID_PARAMETER error.
             if (ctapAuthenticatorSession.pinProtocols.none { it == pinProtocol }) {
                 throw CtapCommandExecutionException(CtapStatusCode.CTAP1_ERR_INVALID_PARAMETER)
             }
@@ -218,16 +224,21 @@ internal class GetAssertionExecution :
     // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg
     private fun execStep4ProcessOptions() {
         if (options != null) {
+            //spec| If the pinUvAuthParam is present, let the "uv" option be treated as being present with the value false.
             userVerificationPlan = if (pinAuth != null) {
                 false
             } else {
                 when {
+                    //spec| If the "uv" option is present and true then:
+                    //spec|   If the authenticator does not support a built-in user verification method end the operation by returning CTAP2_ERR_INVALID_OPTION.
+                    //spec|   If the built-in user verification method has not yet been enabled, end the operation by returning CTAP2_ERR_INVALID_OPTION.
                     BooleanUtil.isTrue(options.uv) -> {
                         when (ctapAuthenticatorSession.userVerification) {
                             UserVerificationSetting.READY -> true
                             else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_INVALID_OPTION)
                         }
                     }
+                    //spec| If the "uv" option is absent, let the "uv" option be treated as being present with the value false. (This is the default)
                     else -> false
                 }
             }
@@ -240,6 +251,8 @@ internal class GetAssertionExecution :
                 false
             }
         } else {
+            //spec| If the "up" option is not present then:
+            //spec|   Let the "up" option be treated as being present with the value true. (This is the default)
             userPresencePlan = when (ctapAuthenticatorSession.userPresence) {
                 UserPresenceSetting.SUPPORTED -> true
                 else -> throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_INVALID_OPTION)
@@ -260,7 +273,12 @@ internal class GetAssertionExecution :
         if (!ctapAuthenticatorSession.alwaysUv) return
         if (!userPresencePlan) return
 
+        //spec| If the authenticator is not protected by some form of user verification:
         if (!isProtectedByUserVerification) {
+            //spec| If the clientPin option ID is present and noMcGaPermissionsWithClientPin option ID is absent or false:
+            //spec|   End the operation by returning CTAP2_ERR_PUAT_REQUIRED.
+            //spec| Else (clientPin is not supported):
+            //spec|   End the operation by returning CTAP2_ERR_OPERATION_DENIED.
             if (ctapAuthenticatorSession.clientPIN == ClientPINSetting.ENABLED) {
                 throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PUAT_REQUIRED)
             } else {
@@ -268,6 +286,11 @@ internal class GetAssertionExecution :
             }
         }
 
+        //spec| If the pinUvAuthParam is present then go to Step 6.
+        //spec| If the "uv" option is true then go to Step 6.
+        //spec| If the "uv" option is false and the authenticator supports a built-in user verification method,
+        //spec| and the user verification method is enabled then:
+        //spec|   Let the "uv" option be treated as being present with the value true.
         if (pinAuth == null && !userVerificationPlan) {
             if (ctapAuthenticatorSession.userVerification == UserVerificationSetting.READY) {
                 userVerificationPlan = true
@@ -307,37 +330,50 @@ internal class GetAssertionExecution :
     private fun execStep6ProcessUserVerification() {
         if (!isProtectedByUserVerification) return
 
-        // Step 6.1
+        //spec| 6.1 If pinUvAuthParam parameter is present (implying the "uv" option is treated as false, see Step 4):
         if (pinAuth != null && pinProtocol != null) {
+            //spec| Call verify(pinUvAuthToken, clientDataHash, pinUvAuthParam).
+            //spec| If the verification returns error, return CTAP2_ERR_PIN_AUTH_INVALID error.
             val protocol = ctapAuthenticatorSession.pinUvAuthManager.pinUvAuthProtocols.firstOrNull { protocol ->
                 protocol.verify(protocol.pinUvAuthToken, clientDataHash, pinAuth)
             } ?: throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
 
+            //spec| If the verification returns success, set the "uv" bit to true in the response.
             userVerificationResult = true
 
+            //spec| Let userVerifiedFlagValue be the result of calling getUserVerifiedFlagValue().
+            //spec| If userVerifiedFlagValue is false then end the operation by returning CTAP2_ERR_PIN_AUTH_INVALID.
             if (!protocol.tokenState.getUserVerifiedFlagValue()) {
                 throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
             }
 
+            //spec| Verify that the pinUvAuthToken has the ga permission, if not, return CTAP2_ERR_PIN_AUTH_INVALID.
             if (!protocol.tokenState.hasPermission(PinUvAuthTokenPermission.GA)) {
                 throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
             }
 
+            //spec| If the pinUvAuthToken has a permissions RP ID associated:
+            //spec|   If the permissions RP ID does not match the rpId in this request, return CTAP2_ERR_PIN_AUTH_INVALID.
             val tokenRpId = protocol.tokenState.permissionsRpId
             if (tokenRpId != null && tokenRpId != rpId) {
                 throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
             }
 
+            //spec| If the pinUvAuthToken does not have a permissions RP ID associated:
+            //spec|   Associate the request's rpId parameter value with the pinUvAuthToken as its permissions RP ID.
             if (protocol.tokenState.permissionsRpId == null) {
                 protocol.tokenState.permissionsRpId = rpId
             }
 
             protocol.tokenState.recordPlatformUsage()
             matchedProtocol = protocol
+            //spec| Go to Step 7.
             return
         }
 
-        // Step 6.2: built-in UV is handled via the consent flow in Step 9.
+        //spec| 6.2 If the "uv" option is present and set to true (implying the pinUvAuthParam parameter is not present,
+        //spec| and that the authenticator supports an enabled built-in user verification method, see Step 4):
+        // Built-in UV is handled via the consent flow in Step 9.
         // userVerificationPlan remains true and will be processed during consent.
     }
 
@@ -480,7 +516,10 @@ internal class GetAssertionExecution :
         if (userPresencePlan) {
             var needsInteraction = false
 
+            //spec| If the pinUvAuthParam parameter is present then:
             if (pinAuth != null) {
+                //spec| Let userPresentFlagValue be the result of calling getUserPresentFlagValue().
+                //spec| If userPresentFlagValue is false:
                 val protocol = matchedProtocol
                 if (protocol != null && !protocol.tokenState.getUserPresentFlagValue()) {
                     needsInteraction = true
@@ -488,12 +527,16 @@ internal class GetAssertionExecution :
                     needsInteraction = true
                 }
             } else {
+                //spec| Else (implying the pinUvAuthParam parameter is not present):
+                //spec|   If the "up" bit is false in the response:
                 if (!userPresenceResult) {
                     needsInteraction = true
                 }
             }
 
             if (needsInteraction) {
+                //spec| Request evidence of user interaction in an authenticator-specific way (e.g., flash the LED light).
+                //spec| If the user declines permission, or the operation times out, then end the operation by returning CTAP2_ERR_OPERATION_DENIED.
                 val consentRequest = GetAssertionConsentRequest(rpId, userPresencePlan, userVerificationPlan)
                 val consent = ctapAuthenticatorSession.withUserPresenceWait {
                     ctapAuthenticatorSession.userVerificationHandler.onGetAssertionConsentRequested(consentRequest)
@@ -506,9 +549,10 @@ internal class GetAssertionExecution :
                 }
             }
 
+            //spec| Set the "up" bit to true in the response.
             userPresenceResult = true
 
-            // Clear cached UP/UV state
+            //spec| Call clearUserPresentFlag(), clearUserVerifiedFlag(), and clearPinUvAuthTokenPermissionsExceptLbw().
             ctapAuthenticatorSession.pinUvAuthManager.pinUvAuthProtocols.forEach { protocol ->
                 protocol.tokenState.clearUserPresentFlag()
                 protocol.tokenState.clearUserVerifiedFlag()
