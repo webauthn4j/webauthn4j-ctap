@@ -112,8 +112,8 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
         @param:JsonProperty("clientPin") val clientPin: ClientPINOption?,
         @param:JsonProperty("up") val up: UserPresenceOption?,
         @param:JsonProperty("uv") val uv: UserVerificationOption?,
-        @param:JsonProperty("alwaysUv") val alwaysUv: AlwaysUvOption? = null,
-        @param:JsonProperty("makeCredUvNotRqd") val makeCredUvNotRqd: MakeCredUvNotRqdOption? = null
+        @param:JsonProperty("alwaysUv") val alwaysUv: AlwaysUvOption?,
+        @param:JsonProperty("makeCredUvNotRqd") val makeCredUvNotRqd: MakeCredUvNotRqdOption?
     ) {
 
         override fun toString(): String {
