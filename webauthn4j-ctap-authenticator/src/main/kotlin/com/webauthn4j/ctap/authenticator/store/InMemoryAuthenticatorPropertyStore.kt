@@ -1,6 +1,6 @@
 package com.webauthn4j.ctap.authenticator.store
 
-import com.webauthn4j.ctap.authenticator.PinUvAuthService
+import com.webauthn4j.ctap.authenticator.PinUvAuthManager
 import com.webauthn4j.ctap.authenticator.data.credential.ResidentCredentialKey
 import com.webauthn4j.ctap.authenticator.data.credential.ResidentUserCredential
 import com.webauthn4j.ctap.authenticator.internal.KeyPairUtil.createCredentialKeyPair

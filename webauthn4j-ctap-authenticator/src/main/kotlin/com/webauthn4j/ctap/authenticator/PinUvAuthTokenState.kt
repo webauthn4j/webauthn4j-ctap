@@ -93,7 +93,7 @@ class PinUvAuthTokenState(
     // The spec models this as a background observer continuously watching the usage timer.
     // This implementation uses lazy evaluation instead: this function is called on-demand
     // when token state is queried (getUserPresentFlagValue, getUserVerifiedFlagValue) or
-    // when the token is verified (verifyPinUvAuthParam in PinUvAuthService), rather than
+    // when the token is verified (in MakeCredentialExecution/GetAssertionExecution), rather than
     // running as a background timer. The observable results are equivalent because token
     // state only matters when it is read by an authenticator operation.
     private fun pinUvAuthTokenUsageTimerObserver() {

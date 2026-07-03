@@ -23,6 +23,7 @@ import com.webauthn4j.ctap.authenticator.store.StoreFullException
 import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.ctap.core.data.PinUvAuthTokenPermission
 import com.webauthn4j.data.PinProtocolVersion
+import java.util.Arrays
 import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import com.webauthn4j.ctap.core.validator.AuthenticatorMakeCredentialRequestValidator
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
@@ -271,15 +272,37 @@ internal class MakeCredentialExecution :
                 // Handle zero length pinAuth for authenticator selection
                 if (it.isEmpty()) {
                     requestUserConsent()
-                    if (ctapAuthenticatorSession.pinUvAuthService.isClientPINReady) {
+                    if (ctapAuthenticatorSession.isClientPINReady) {
                         throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_INVALID)
                     } else {
                         throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_NOT_SET)
                     }
                 } else {
-                    ctapAuthenticatorSession.pinUvAuthService.verifyPinUvAuthParam(
-                        it, clientDataHash, PinUvAuthTokenPermission.MC, rpId
-                    )
+                    //spec| Call verify(pinUvAuthToken, clientDataHash, pinUvAuthParam).
+                    //spec| If the verification returns error, then end the operation by returning
+                    //spec| CTAP2_ERR_PIN_AUTH_INVALID error.
+                    val matchedProtocol = ctapAuthenticatorSession.pinUvAuthManager.pinUvAuthProtocols.firstOrNull { protocol ->
+                        val calculatedPinAuth = protocol.authenticate(protocol.pinUvAuthToken, clientDataHash)
+                        Arrays.equals(calculatedPinAuth, it)
+                    } ?: throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
+
+                    //spec| Verify that the pinUvAuthToken has the mc permission, if not, then end the operation
+                    //spec| by returning CTAP2_ERR_PIN_AUTH_INVALID.
+                    if (matchedProtocol.tokenState.isInUse() && !matchedProtocol.tokenState.hasPermission(PinUvAuthTokenPermission.MC)) {
+                        throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
+                    }
+                    //spec| If the pinUvAuthToken has a permissions RP ID associated:
+                    //spec| If the permissions RP ID does not match the rp.id in this request,
+                    //spec| then end the operation by returning CTAP2_ERR_PIN_AUTH_INVALID.
+                    val tokenRpId = matchedProtocol.tokenState.permissionsRpId
+                    if (tokenRpId != null && rpId != null && tokenRpId != rpId) {
+                        throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
+                    }
+
+                    if (matchedProtocol.tokenState.isInUse()) {
+                        matchedProtocol.tokenState.recordPlatformUsage()
+                    }
+
                     userPresenceResult = true
                     userVerificationResult = true
                 }
@@ -288,7 +311,7 @@ internal class MakeCredentialExecution :
 
         // Validate clientPin requirement (formerly CTAP 2.0 Step 6)
         //TODO: to be fixed to align CTAP2.1 spec.
-//        if (authenticatorMakeCredentialRequest.pinAuth == null && ctapAuthenticatorSession.pinUvAuthService.clientPIN != null) {
+//        if (authenticatorMakeCredentialRequest.pinAuth == null && ctapAuthenticatorSession.isClientPINReady) {
 //            throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_REQUIRED)
 //        }
     }

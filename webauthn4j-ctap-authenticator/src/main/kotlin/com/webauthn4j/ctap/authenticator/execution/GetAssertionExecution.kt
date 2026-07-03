@@ -17,6 +17,7 @@ import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.StoreFullException
 import com.webauthn4j.ctap.core.data.PinUvAuthTokenPermission
 import com.webauthn4j.ctap.core.data.*
+import java.util.Arrays
 import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.core.util.internal.BooleanUtil
 import com.webauthn4j.ctap.core.util.internal.CipherUtil
@@ -173,15 +174,34 @@ internal class GetAssertionExecution :
         // If pinUvAuthParam parameter is present and pinProtocol is supported,
         // verify it and set the "uv" bit to true in the response.
         if (pinAuth != null && pinProtocol != null) {
-            ctapAuthenticatorSession.pinUvAuthService.verifyPinUvAuthParam(
-                pinAuth, clientDataHash, PinUvAuthTokenPermission.GA, rpId
-            )
+            //spec| Call verify(pinUvAuthToken, clientDataHash, pinUvAuthParam).
+            //spec| If the verification returns error, return CTAP2_ERR_PIN_AUTH_INVALID error.
+            val matchedProtocol = ctapAuthenticatorSession.pinUvAuthManager.pinUvAuthProtocols.firstOrNull { protocol ->
+                val calculatedPinAuth = protocol.authenticate(protocol.pinUvAuthToken, clientDataHash)
+                Arrays.equals(calculatedPinAuth, pinAuth)
+            } ?: throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
+
+            //spec| Verify that the pinUvAuthToken has the ga permission, if not, return CTAP2_ERR_PIN_AUTH_INVALID.
+            if (matchedProtocol.tokenState.isInUse() && !matchedProtocol.tokenState.hasPermission(PinUvAuthTokenPermission.GA)) {
+                throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
+            }
+            //spec| If the pinUvAuthToken has a permissions RP ID associated:
+            //spec| If the permissions RP ID does not match the rpId in this request, return CTAP2_ERR_PIN_AUTH_INVALID.
+            val tokenRpId = matchedProtocol.tokenState.permissionsRpId
+            if (tokenRpId != null && tokenRpId != rpId) {
+                throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
+            }
+
+            if (matchedProtocol.tokenState.isInUse()) {
+                matchedProtocol.tokenState.recordPlatformUsage()
+            }
+
             userVerificationResult = true
             return
         }
         // If pinUvAuthParam parameter is not present and clientPin has been set on the authenticator,
         // set the "uv" bit to false in the response.
-        if (pinAuth == null && ctapAuthenticatorSession.pinUvAuthService.isClientPINReady) {
+        if (pinAuth == null && ctapAuthenticatorSession.isClientPINReady) {
             userVerificationResult = false
         }
     }

@@ -27,7 +27,7 @@ internal class ClientPINExecution(
     }
 
     override suspend fun doExecute(): AuthenticatorClientPINResponse {
-        val pinUvAuthService = ctapAuthenticatorSession.pinUvAuthService
+        val pinUvAuthManager = ctapAuthenticatorSession.pinUvAuthManager
         val pinProtocol = authenticatorClientPINRequest.pinProtocol
         val platformKeyAgreementKey = authenticatorClientPINRequest.keyAgreement
         val pinAuth = authenticatorClientPINRequest.pinAuth
@@ -38,35 +38,35 @@ internal class ClientPINExecution(
         return when (authenticatorClientPINRequest.subCommand) {
             PinSubCommand.GET_PIN_RETRIES -> {
                 logger.debug("Processing clientPIN getRetries sub-command")
-                pinUvAuthService.getPinRetries()
+                pinUvAuthManager.getPinRetries()
             }
             PinSubCommand.GET_KEY_AGREEMENT -> {
                 logger.debug("Processing clientPIN getKeyAgreement sub-command (protocol={})", pinProtocol)
-                pinUvAuthService.getKeyAgreement(pinProtocol)
+                pinUvAuthManager.getKeyAgreement(pinProtocol)
             }
             PinSubCommand.SET_PIN -> {
                 logger.debug("Processing clientPIN setPIN sub-command (protocol={})", pinProtocol)
-                pinUvAuthService.setPIN(pinProtocol, platformKeyAgreementKey, pinAuth, newPinEnc)
+                pinUvAuthManager.setPIN(pinProtocol, platformKeyAgreementKey, pinAuth, newPinEnc)
             }
             PinSubCommand.CHANGE_PIN -> {
                 logger.debug("Processing clientPIN changePIN sub-command (protocol={})", pinProtocol)
-                pinUvAuthService.changePIN(pinProtocol, platformKeyAgreementKey, pinAuth, newPinEnc, pinHashEnc)
+                pinUvAuthManager.changePIN(pinProtocol, platformKeyAgreementKey, pinAuth, newPinEnc, pinHashEnc)
             }
             PinSubCommand.GET_PIN_TOKEN -> {
                 logger.debug("Processing clientPIN getPINToken sub-command (protocol={})", pinProtocol)
-                pinUvAuthService.getPinToken(pinProtocol, platformKeyAgreementKey, pinHashEnc)
+                pinUvAuthManager.getPinToken(pinProtocol, platformKeyAgreementKey, pinHashEnc)
             }
             PinSubCommand.GET_PIN_UV_AUTH_TOKEN_USING_PIN_WITH_PERMISSIONS -> {
                 logger.debug("Processing clientPIN getPinUvAuthTokenUsingPinWithPermissions sub-command (protocol={})", pinProtocol)
-                pinUvAuthService.getPinUvAuthTokenUsingPinWithPermissions(pinProtocol, platformKeyAgreementKey, pinHashEnc, permissions, rpId)
+                pinUvAuthManager.getPinUvAuthTokenUsingPinWithPermissions(pinProtocol, platformKeyAgreementKey, pinHashEnc, permissions, rpId)
             }
             PinSubCommand.GET_PIN_UV_AUTH_TOKEN_USING_UV_WITH_PERMISSIONS -> {
                 logger.debug("Processing clientPIN getPinUvAuthTokenUsingUvWithPermissions sub-command (protocol={})", pinProtocol)
-                pinUvAuthService.getPinUvAuthTokenUsingUvWithPermissions(pinProtocol, platformKeyAgreementKey, permissions, rpId)
+                pinUvAuthManager.getPinUvAuthTokenUsingUvWithPermissions(pinProtocol, platformKeyAgreementKey, permissions, rpId)
             }
             PinSubCommand.GET_UV_RETRIES -> {
                 logger.debug("Processing clientPIN getUVRetries sub-command")
-                pinUvAuthService.getUVRetries()
+                pinUvAuthManager.getUVRetries()
             }
         }
     }
