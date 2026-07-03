@@ -76,6 +76,8 @@ abstract class IntegrationTestCaseBase {
         private val userVerificationSettingParameter =
             TestParameter { UserVerificationSetting.READY }
         private val algorithmsParameter = TestParameter { setOf(COSEAlgorithmIdentifier.ES256) }
+        private val makeCredUvNotRqdSettingParameter =
+            TestParameter { MakeCredUvNotRqdSetting.DISABLED }
         private val credentialSelectorSettingParameter =
             TestParameter { CredentialSelectorSetting.CLIENT_PLATFORM }
 
@@ -114,6 +116,7 @@ abstract class IntegrationTestCaseBase {
             ctapAuthenticator.resetProtection = resetProtectionSetting
             ctapAuthenticator.userPresence = userPresenceSetting
             ctapAuthenticator.userVerification = userVerificationSetting
+            ctapAuthenticator.makeCredUvNotRqd = makeCredUvNotRqdSetting
             ctapAuthenticator.credentialSelector = credentialSelectorSetting
 
             return@TestParameter ctapAuthenticator
@@ -133,6 +136,7 @@ abstract class IntegrationTestCaseBase {
             resetProtectionSettingParameter,
             userPresenceSettingParameter,
             userVerificationSettingParameter,
+            makeCredUvNotRqdSettingParameter,
             credentialSelectorSettingParameter,
 
             algorithmsParameter
@@ -176,6 +180,7 @@ abstract class IntegrationTestCaseBase {
         var resetProtectionSetting by resetProtectionSettingParameter
         var userPresenceSetting by userPresenceSettingParameter
         var userVerificationSetting by userVerificationSettingParameter
+        var makeCredUvNotRqdSetting by makeCredUvNotRqdSettingParameter
         var credentialSelectorSetting by credentialSelectorSettingParameter
 
         var algorithms by algorithmsParameter

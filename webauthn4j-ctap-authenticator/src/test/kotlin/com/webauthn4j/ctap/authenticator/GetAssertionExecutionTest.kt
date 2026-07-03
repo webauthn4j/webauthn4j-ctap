@@ -209,10 +209,14 @@ internal class GetAssertionExecutionTest {
         userPresenceSetting: UserPresenceSetting,
         statusCode: CtapStatusCode
     ) = runTest {
+        // Create a credential with default settings first,
+        // then switch to the target userPresence setting for the GetAssertion test.
         val ctapAuthenticator = CtapAuthenticator()
-        val connection = ctapAuthenticator.createSession()
-        makeCredential(connection)
+        val setupConnection = ctapAuthenticator.createSession()
+        makeCredential(setupConnection)
 
+        ctapAuthenticator.userPresence = userPresenceSetting
+        val connection = ctapAuthenticator.createSession()
 
         val clientDataHash = ByteArray(0)
         val allowList: List<PublicKeyCredentialDescriptor> = emptyList()
@@ -230,10 +234,7 @@ internal class GetAssertionExecutionTest {
             pinAuth,
             pinProtocol
         )
-
-        ctapAuthenticator.userPresence = userPresenceSetting
-        val connectionWithUpdatedSetting = ctapAuthenticator.createSession()
-        val response: AuthenticatorGetAssertionResponse = connectionWithUpdatedSetting.getAssertion(command)
+        val response: AuthenticatorGetAssertionResponse = connection.getAssertion(command)
         Assertions.assertThat(response.statusCode).isEqualTo(statusCode)
     }
 
@@ -254,10 +255,15 @@ internal class GetAssertionExecutionTest {
         userVerificationSetting: UserVerificationSetting,
         statusCode: CtapStatusCode
     ) = runTest {
+        // Create a credential with default settings (userVerification=READY) first,
+        // then switch to the target userVerification setting for the GetAssertion test.
+        // This is needed because MakeCredential requires UV on a UV-protected authenticator (Step 8).
         val ctapAuthenticator = CtapAuthenticator()
+        val setupConnection = ctapAuthenticator.createSession()
+        makeCredential(setupConnection)
+
         ctapAuthenticator.userVerification = userVerificationSetting
         val connection = ctapAuthenticator.createSession()
-        makeCredential(connection, uv = false)
 
         val clientDataHash = ByteArray(0)
         val allowList: List<PublicKeyCredentialDescriptor> = emptyList()
