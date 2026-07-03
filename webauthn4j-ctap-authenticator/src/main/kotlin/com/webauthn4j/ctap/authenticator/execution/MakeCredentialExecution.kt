@@ -201,7 +201,10 @@ internal class MakeCredentialExecution :
         if (pinAuth != null && pinAuth.isEmpty()) {
             //spec| Request evidence of user interaction in an authenticator-specific way (e.g., flash the LED light).
             //spec| If the user declines permission, or the operation times out, then end the operation by returning CTAP2_ERR_OPERATION_DENIED.
-            requestUserConsent()
+            val consent = requestUserConsent()
+            if (!consent) {
+                throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
+            }
             //spec| If evidence of user interaction is provided in this step then return either
             //spec| CTAP2_ERR_PIN_NOT_SET if PIN is not set or CTAP2_ERR_PIN_INVALID if PIN has been set.
             if (ctapAuthenticatorSession.isClientPINReady) {
@@ -305,8 +308,16 @@ internal class MakeCredentialExecution :
     }
 
     //spec| Step 6. If the alwaysUv option ID is present and true then:
-    //spec|   Let the makeCredUvNotRqd option ID be treated as false.
-    //spec|   If the authenticator is not protected by some form of user verification:
+    //spec|   6.1 Let the makeCredUvNotRqd option ID be treated as false.
+    //spec|   6.2 If the authenticator is not protected by some form of user verification:
+    //spec|     If the clientPin option ID is present and noMcGaPermissionsWithClientPin option ID is absent or false
+    //spec|     (clientPin is supported for the mc permission):
+    //spec|       End the operation by returning CTAP2_ERR_PUAT_REQUIRED.
+    //spec|     Else (clientPin is not supported):
+    //spec|       End the operation by returning CTAP2_ERR_OPERATION_DENIED.
+    //spec|   6.3 If the pinUvAuthParam is not present, and the uv option ID is true,
+    //spec|   let the "uv" option be treated as being present with the value true.
+    //spec|   6.4 If the pinUvAuthParam is not present, and the "uv" option is false or absent:
     //spec|     If the clientPin option ID is present and noMcGaPermissionsWithClientPin option ID is absent or false
     //spec|     (clientPin is supported for the mc permission):
     //spec|       End the operation by returning CTAP2_ERR_PUAT_REQUIRED.
@@ -317,8 +328,10 @@ internal class MakeCredentialExecution :
     private fun execStep6ProcessAlwaysUv() {
         if (!ctapAuthenticatorSession.alwaysUv) return
 
-        //spec| Let the makeCredUvNotRqd option ID be treated as false.
-        //spec| If the authenticator is not protected by some form of user verification:
+        //spec| 6.1 Let the makeCredUvNotRqd option ID be treated as false.
+        // (effectiveMakeCredUvNotRqd is computed in Step 7/8/10 using alwaysUv flag)
+
+        //spec| 6.2 If the authenticator is not protected by some form of user verification:
         if (!isProtectedByUserVerification) {
             //spec| If the clientPin option ID is present and noMcGaPermissionsWithClientPin option ID is absent or false:
             //spec|   End the operation by returning CTAP2_ERR_PUAT_REQUIRED.
@@ -330,7 +343,12 @@ internal class MakeCredentialExecution :
                 throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
             }
         }
-        //spec| If the pinUvAuthParam is not present, and the "uv" option is false or absent:
+
+        //spec| 6.3 If the pinUvAuthParam is not present, and the uv option ID is true,
+        //spec| let the "uv" option be treated as being present with the value true.
+        // (userVerificationPlan is already true from Step 5 when uv=true)
+
+        //spec| 6.4 If the pinUvAuthParam is not present, and the "uv" option is false or absent:
         if (pinAuth == null && !userVerificationPlan) {
             if (ctapAuthenticatorSession.clientPIN == ClientPINSetting.ENABLED) {
                 throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PUAT_REQUIRED)
