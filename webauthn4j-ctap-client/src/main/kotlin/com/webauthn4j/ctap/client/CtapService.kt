@@ -80,6 +80,11 @@ open class CtapService(protected val ctapClient: CtapClient) {
             getInfoResponseData.options
         )
 
+        // TODO: When GetInfo does not report rk, this should return null (absent) instead of false.
+        //  Sending rk=false causes the authenticator to return CTAP2_ERR_UNSUPPORTED_OPTION
+        //  (Step 5.4.1) because the rk option is "present" even though the value is false.
+        //  The correct behavior is to omit the rk option entirely, which falls through to
+        //  Step 5.5 (default to false) without error.
         val rk: Boolean = when (getInfoResponseData.options?.rk) {
             ResidentKeyOption.SUPPORTED -> {
                 when (makeCredentialRequest.authenticatorSelection?.residentKey) {

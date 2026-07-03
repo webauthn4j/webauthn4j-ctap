@@ -8,13 +8,22 @@ import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialType
 import com.webauthn4j.data.RegistrationParameters
 import com.webauthn4j.data.RegistrationRequest
+import com.webauthn4j.ctap.authenticator.data.settings.MakeCredUvNotRqdSetting
+import com.webauthn4j.data.ResidentKeyRequirement
 import com.webauthn4j.data.UserVerificationRequirement
 import org.junit.jupiter.api.fail
 
 class SecondFactorTestCase : IntegrationTestCaseBase() {
 
     init {
+        // TODO: makeCredUvNotRqd and residentKey=DISCOURAGED are workarounds because the client
+        //  does not yet handle CTAP2_ERR_PUAT_REQUIRED by retrying with UV.
+        //  Without makeCredUvNotRqd, Step 8 rejects all uv=false requests on UV-protected authenticators.
+        //  With PREFERRED, the client sends rk=true and Step 7 rejects it without UV.
+        //  Once the client supports PUAT_REQUIRED retry, these can be removed.
+        authenticator.makeCredUvNotRqdSetting = MakeCredUvNotRqdSetting.ENABLED
         relyingParty.registration.frontend.requireResidentKey = false
+        relyingParty.registration.frontend.residentKey = ResidentKeyRequirement.DISCOURAGED
         relyingParty.registration.frontend.userVerification =
             UserVerificationRequirement.DISCOURAGED
         relyingParty.registration.backend.userVerificationRequired = false
