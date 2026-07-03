@@ -3,9 +3,15 @@ package com.webauthn4j.ctap.authenticator.data.settings
 import com.fasterxml.jackson.annotation.JsonValue
 import com.webauthn4j.data.attestation.statement.AttestationType
 
+/**
+ * Controls the type of attestation the authenticator provides during credential creation.
+ */
 enum class AttestationTypeSetting(@get:JsonValue val value: String) {
+    /** Attestation signed by a manufacturer-provisioned attestation key. */
     BASIC("basic"),
+    /** Self-attestation: the credential key signs its own attestation statement. */
     SELF("self"),
+    /** No attestation is provided. */
     NONE("none");
 
     companion object {

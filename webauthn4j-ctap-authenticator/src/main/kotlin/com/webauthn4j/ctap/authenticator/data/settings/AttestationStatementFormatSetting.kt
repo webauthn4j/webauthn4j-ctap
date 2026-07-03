@@ -2,6 +2,9 @@ package com.webauthn4j.ctap.authenticator.data.settings
 
 import com.fasterxml.jackson.annotation.JsonValue
 
+/**
+ * Controls which attestation statement format the authenticator uses when generating attestation objects.
+ */
 enum class AttestationStatementFormatSetting(@get:JsonValue val value: String) {
     COMPOUND("compound"),
     ANDROID_KEY("android-key"),

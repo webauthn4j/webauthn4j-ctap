@@ -27,7 +27,9 @@ internal class AuthenticatorGetInfoResponseDataOptionsSerializerTest {
             ResidentKeyOption.SUPPORTED,
             ClientPINOption.NOT_SET,
             UserPresenceOption.SUPPORTED,
-            UserVerificationOption.NOT_SUPPORTED
+            UserVerificationOption.NOT_SUPPORTED,
+            null,
+            null
         )
         val encoded = converter.writeValueAsBytes(original)
         Assertions.assertThat(encoded)

@@ -53,7 +53,9 @@ internal class AuthenticatorGetInfoResponseDataSerializerTest {
                 ResidentKeyOption.SUPPORTED,
                 ClientPINOption.NOT_SET,
                 UserPresenceOption.SUPPORTED,
-                UserVerificationOption.READY
+                UserVerificationOption.READY,
+                null,
+                null
             ),
             2048u,
             listOf(PinProtocolVersion.VERSION_1),

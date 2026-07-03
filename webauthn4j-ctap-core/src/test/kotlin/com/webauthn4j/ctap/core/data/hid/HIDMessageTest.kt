@@ -31,7 +31,9 @@ internal class HIDMessageTest {
                         ResidentKeyOption.SUPPORTED,
                         ClientPINOption.NOT_SET,
                         UserPresenceOption.SUPPORTED,
-                        UserVerificationOption.READY
+                        UserVerificationOption.READY,
+                        null,
+                        null
                     ),
                     1024u,
                     listOf(),

@@ -111,11 +111,13 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
         @param:JsonProperty("rk") val rk: ResidentKeyOption?,
         @param:JsonProperty("clientPin") val clientPin: ClientPINOption?,
         @param:JsonProperty("up") val up: UserPresenceOption?,
-        @param:JsonProperty("uv") val uv: UserVerificationOption?
+        @param:JsonProperty("uv") val uv: UserVerificationOption?,
+        @param:JsonProperty("alwaysUv") val alwaysUv: AlwaysUvOption?,
+        @param:JsonProperty("makeCredUvNotRqd") val makeCredUvNotRqd: MakeCredUvNotRqdOption?
     ) {
 
         override fun toString(): String {
-            return "Options(plat=${plat?.value}, rk=${rk?.value}, clientPin=${clientPin?.value}, up=${up?.value}, uv=${uv?.value})"
+            return "Options(plat=${plat?.value}, rk=${rk?.value}, clientPin=${clientPin?.value}, up=${up?.value}, uv=${uv?.value}, alwaysUv=${alwaysUv?.value}, makeCredUvNotRqd=${makeCredUvNotRqd?.value})"
         }
 
         override fun equals(other: Any?): Boolean {
@@ -129,6 +131,8 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
             if (clientPin != other.clientPin) return false
             if (up != other.up) return false
             if (uv != other.uv) return false
+            if (alwaysUv != other.alwaysUv) return false
+            if (makeCredUvNotRqd != other.makeCredUvNotRqd) return false
 
             return true
         }
@@ -139,6 +143,8 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
             result = 31 * result + (clientPin?.hashCode() ?: 0)
             result = 31 * result + (up?.hashCode() ?: 0)
             result = 31 * result + (uv?.hashCode() ?: 0)
+            result = 31 * result + (alwaysUv?.hashCode() ?: 0)
+            result = 31 * result + (makeCredUvNotRqd?.hashCode() ?: 0)
             return result
         }
 

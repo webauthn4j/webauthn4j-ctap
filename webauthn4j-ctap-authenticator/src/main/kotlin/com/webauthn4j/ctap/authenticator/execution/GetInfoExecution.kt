@@ -2,15 +2,19 @@ package com.webauthn4j.ctap.authenticator.execution
 
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
+import com.webauthn4j.ctap.authenticator.data.settings.AlwaysUvSetting
 import com.webauthn4j.ctap.authenticator.data.settings.AttachmentSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
+import com.webauthn4j.ctap.authenticator.data.settings.MakeCredUvNotRqdSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
 import com.webauthn4j.ctap.core.data.CtapStatusCode
+import com.webauthn4j.ctap.core.data.options.AlwaysUvOption
 import com.webauthn4j.ctap.core.data.options.ClientPINOption
+import com.webauthn4j.ctap.core.data.options.MakeCredUvNotRqdOption
 import com.webauthn4j.ctap.core.data.options.PlatformOption
 import com.webauthn4j.ctap.core.data.options.ResidentKeyOption
 import com.webauthn4j.ctap.core.data.options.UserPresenceOption
@@ -79,6 +83,14 @@ internal class GetInfoExecution(
         //spec| If absent, it indicates that the device is not capable of user verification within itself.
         //spec| A device that can only do Client PIN will not return the "uv" parameter.
         val uv: UserVerificationOption? = ctapAuthenticatorSession.userVerificationHandler.getUserVerificationOption(null)
+        val alwaysUv: AlwaysUvOption? = when (ctapAuthenticatorSession.alwaysUv) {
+            AlwaysUvSetting.ENABLED -> AlwaysUvOption.ENABLED
+            AlwaysUvSetting.DISABLED -> null
+        }
+        val makeCredUvNotRqd: MakeCredUvNotRqdOption? = when (ctapAuthenticatorSession.makeCredUvNotRqd) {
+            MakeCredUvNotRqdSetting.ENABLED -> MakeCredUvNotRqdOption.ENABLED
+            MakeCredUvNotRqdSetting.DISABLED -> null
+        }
         val extensions = ctapAuthenticatorSession.extensionProcessors.map { it.extensionId }
         return AuthenticatorGetInfoResponse(
             CtapStatusCode.CTAP2_OK,
@@ -86,7 +98,7 @@ internal class GetInfoExecution(
                 CtapAuthenticator.VERSIONS,       // versions (0x01): Required
                 extensions,                        // extensions (0x02): Optional
                 ctapAuthenticatorSession.aaguid,   // aaguid (0x03): Required
-                AuthenticatorGetInfoResponseData.Options(plat, rk, clientPin, up, uv), // options (0x04): Optional
+                AuthenticatorGetInfoResponseData.Options(plat, rk, clientPin, up, uv, alwaysUv, makeCredUvNotRqd), // options (0x04): Optional
                 2048u,                             // maxMsgSize (0x05): Optional
                 ctapAuthenticatorSession.pinProtocols,   // pinProtocols (0x06): Optional
                 null,
