@@ -12,8 +12,21 @@ class AuthenticatorGetAssertionResponseData @JsonCreator constructor(
     @JsonProperty("2") authData: ByteArray,
     @JsonProperty("3") signature: ByteArray,
     @JsonProperty("4") user: CtapPublicKeyCredentialUserEntity?,
-    @JsonProperty("5") numberOfCredentials: Int?
+    @JsonProperty("5") numberOfCredentials: Int?,
+    @JsonProperty("6") userSelected: Boolean?
+    // TODO: largeBlobKey (0x07) - "The contents of the associated largeBlobKey if present for the asserted credential,
+    //  and if largeBlobKey was true in the extensions input."
+    // TODO: unsignedExtensionOutputs (0x08) - "A map, keyed by extension identifiers, to unsigned outputs of extensions, if any.
+    //  Authenticators SHOULD omit this field if no processed extensions define unsigned outputs."
 ) : CtapResponseData {
+
+    constructor(
+        credential: PublicKeyCredentialDescriptor?,
+        authData: ByteArray,
+        signature: ByteArray,
+        user: CtapPublicKeyCredentialUserEntity?,
+        numberOfCredentials: Int?
+    ) : this(credential, authData, signature, user, numberOfCredentials, null)
 
     val credential: PublicKeyCredentialDescriptor? = credential
     val authData: ByteArray = ArrayUtil.clone(authData)
@@ -22,6 +35,7 @@ class AuthenticatorGetAssertionResponseData @JsonCreator constructor(
         get() = ArrayUtil.clone(field)
     val user: CtapPublicKeyCredentialUserEntity? = user
     val numberOfCredentials: Int? = numberOfCredentials
+    val userSelected: Boolean? = userSelected
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -32,6 +46,7 @@ class AuthenticatorGetAssertionResponseData @JsonCreator constructor(
         if (credential != other.credential) return false
         if (user != other.user) return false
         if (numberOfCredentials != other.numberOfCredentials) return false
+        if (userSelected != other.userSelected) return false
 
         return true
     }
@@ -40,6 +55,7 @@ class AuthenticatorGetAssertionResponseData @JsonCreator constructor(
         var result = credential?.hashCode() ?: 0
         result = 31 * result + (user?.hashCode() ?: 0)
         result = 31 * result + (numberOfCredentials ?: 0)
+        result = 31 * result + (userSelected?.hashCode() ?: 0)
         return result
     }
 
@@ -48,7 +64,7 @@ class AuthenticatorGetAssertionResponseData @JsonCreator constructor(
             HexUtil.encodeToString(
                 authData
             )
-        }, signature=${HexUtil.encodeToString(signature)}, user=$user, numberOfCredentials=$numberOfCredentials)"
+        }, signature=${HexUtil.encodeToString(signature)}, user=$user, numberOfCredentials=$numberOfCredentials, userSelected=$userSelected)"
     }
 
 

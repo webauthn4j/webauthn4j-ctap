@@ -24,6 +24,9 @@ class AuthenticatorMakeCredentialResponseData : CtapResponseData {
     constructor(
         @JsonProperty("2") authenticatorData: AuthenticatorData<RegistrationExtensionAuthenticatorOutput>,
         @JsonProperty("3") attestationStatement: AttestationStatement
+        // TODO: epAtt (0x04) - §6.1 "true if an enterprise attestation was returned"
+        // TODO: largeBlobKey (0x05) - §6.1 "The largeBlobKey for the credential"
+        // TODO: unsignedExtensionOutputs (0x06) - §6.1 "A map, keyed by extension identifiers, to unsigned outputs of extensions"
     ) {
         this.authenticatorData = authenticatorData
         this.attestationStatement = attestationStatement

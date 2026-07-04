@@ -52,16 +52,16 @@ class GetNextAssertionExecutionTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>()
         val options = AuthenticatorGetAssertionRequest.Options(up = true, uv = true)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorGetAssertionRequest(
             "example.com",
             clientDataHash,
             allowList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
         connection.getAssertion(command)
         val response = connection.getNextAssertion()
@@ -93,16 +93,16 @@ class GetNextAssertionExecutionTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>()
         val options = AuthenticatorGetAssertionRequest.Options(up = true, uv = true)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorGetAssertionRequest(
             "example.com",
             clientDataHash,
             allowList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
         connection.getAssertion(command) // fetch 1st credential
         connection.getNextAssertion(AuthenticatorGetNextAssertionRequest()) // fetch 2nd credential
@@ -130,16 +130,16 @@ class GetNextAssertionExecutionTest {
             val extensions =
                 AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>()
             val options = AuthenticatorGetAssertionRequest.Options(up = true, uv = true)
-            val pinAuth: ByteArray? = null
-            val pinProtocol: PinProtocolVersion? = null
+            val pinUvAuthParam: ByteArray? = null
+            val pinUvAuthProtocol: PinProtocolVersion? = null
             val command = AuthenticatorGetAssertionRequest(
                 "example.com",
                 clientDataHash,
                 allowList,
                 extensions,
                 options,
-                pinAuth,
-                pinProtocol
+                pinUvAuthParam,
+                pinUvAuthProtocol
             )
 
             it.`when`<Instant>(Instant::now)
@@ -177,8 +177,8 @@ class GetNextAssertionExecutionTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>()
         val options = AuthenticatorMakeCredentialRequest.Options(rk = rk, uv = uv)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorMakeCredentialRequest(
             clientDataHash,
             rp,
@@ -187,8 +187,8 @@ class GetNextAssertionExecutionTest {
             excludeList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
         val response = ctapAuthenticatorSession.makeCredential(command)
         Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)

@@ -6,7 +6,7 @@ import com.webauthn4j.data.PinProtocolVersion
 class AuthenticatorMakeCredentialRequestValidator {
 
     fun validate(value: AuthenticatorMakeCredentialRequest) {
-        require(value.pinAuth == null || value.pinAuth?.isEmpty() == true || value.pinAuth?.size == 16) { "pinAuth must be empty or 16 bytes length" }
-        require(value.pinProtocol == null || value.pinProtocol == PinProtocolVersion.VERSION_1) { "Only PIN Protocol version 1 is supported" }
+        require(value.pinUvAuthParam == null || value.pinUvAuthParam?.isEmpty() == true || value.pinUvAuthParam?.size == 16) { "pinUvAuthParam must be empty or 16 bytes length" }
+        require(value.pinUvAuthProtocol == null || value.pinUvAuthProtocol == PinProtocolVersion.VERSION_1) { "Only PIN Protocol version 1 is supported" }
     }
 }

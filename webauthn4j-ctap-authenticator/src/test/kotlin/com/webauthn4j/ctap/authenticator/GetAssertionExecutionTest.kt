@@ -55,16 +55,16 @@ internal class GetAssertionExecutionTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>()
         val options = AuthenticatorGetAssertionRequest.Options(up = true, uv = true)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorGetAssertionRequest(
             "example.com",
             clientDataHash,
             allowList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
         val response: AuthenticatorGetAssertionResponse = connection.getAssertion(command)
         Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
@@ -91,16 +91,16 @@ internal class GetAssertionExecutionTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>()
         val options = AuthenticatorGetAssertionRequest.Options(up = true, uv = true)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorGetAssertionRequest(
             "example.com",
             clientDataHash,
             allowList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
         val response: AuthenticatorGetAssertionResponse = connection.getAssertion(command)
         Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
@@ -116,16 +116,16 @@ internal class GetAssertionExecutionTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>()
         val options = AuthenticatorGetAssertionRequest.Options(up = true, uv = true)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorGetAssertionRequest(
             "example.com",
             clientDataHash,
             allowList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
         val response: AuthenticatorGetAssertionResponse = connection.getAssertion(command)
         Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_ERR_NO_CREDENTIALS)
@@ -141,16 +141,16 @@ internal class GetAssertionExecutionTest {
         val allowList: List<PublicKeyCredentialDescriptor> = emptyList()
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>()
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorGetAssertionRequest(
             "example.com",
             clientDataHash,
             allowList,
             extensions,
             null,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
         val response: AuthenticatorGetAssertionResponse = connection.getAssertion(command)
         Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
@@ -180,16 +180,16 @@ internal class GetAssertionExecutionTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>()
         val options = AuthenticatorGetAssertionRequest.Options(up = true, uv = true)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorGetAssertionRequest(
             "example.com",
             clientDataHash,
             allowList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
         val response: AuthenticatorGetAssertionResponse = connection.getAssertion(command)
         Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_ERR_KEY_STORE_FULL)
@@ -223,16 +223,16 @@ internal class GetAssertionExecutionTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>()
         val options = AuthenticatorGetAssertionRequest.Options(up = up, uv = true)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorGetAssertionRequest(
             "example.com",
             clientDataHash,
             allowList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
         val response: AuthenticatorGetAssertionResponse = connection.getAssertion(command)
         Assertions.assertThat(response.statusCode).isEqualTo(statusCode)
@@ -243,8 +243,8 @@ internal class GetAssertionExecutionTest {
     @CsvSource(
         value = [
             "true, READY, CTAP2_OK",
-            "true, NOT_READY, CTAP2_ERR_UNSUPPORTED_OPTION",
-            "true, NOT_SUPPORTED, CTAP2_ERR_UNSUPPORTED_OPTION",
+            "true, NOT_READY, CTAP2_ERR_INVALID_OPTION",
+            "true, NOT_SUPPORTED, CTAP2_ERR_INVALID_OPTION",
             "false, READY, CTAP2_OK",
             "false, NOT_READY, CTAP2_OK",
             "false, NOT_SUPPORTED, CTAP2_OK",
@@ -270,16 +270,16 @@ internal class GetAssertionExecutionTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>()
         val options = AuthenticatorGetAssertionRequest.Options(up = true, uv = uv)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorGetAssertionRequest(
             "example.com",
             clientDataHash,
             allowList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
         val response: AuthenticatorGetAssertionResponse = connection.getAssertion(command)
         Assertions.assertThat(response.statusCode).isEqualTo(statusCode)
@@ -305,8 +305,8 @@ internal class GetAssertionExecutionTest {
         val extensions =
             AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>()
         val options = AuthenticatorMakeCredentialRequest.Options(rk = rk, uv = uv)
-        val pinAuth: ByteArray? = null
-        val pinProtocol: PinProtocolVersion? = null
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
         val command = AuthenticatorMakeCredentialRequest(
             clientDataHash,
             rp,
@@ -315,8 +315,8 @@ internal class GetAssertionExecutionTest {
             excludeList,
             extensions,
             options,
-            pinAuth,
-            pinProtocol
+            pinUvAuthParam,
+            pinUvAuthProtocol
         )
         val response = ctapAuthenticatorSession.makeCredential(command)
         Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)

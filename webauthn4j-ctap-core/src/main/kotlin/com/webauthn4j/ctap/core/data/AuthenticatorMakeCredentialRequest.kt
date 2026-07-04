@@ -19,8 +19,10 @@ class AuthenticatorMakeCredentialRequest @JsonCreator constructor(
     @JsonProperty("5") excludeList: List<PublicKeyCredentialDescriptor>?,
     @JsonProperty("6") extensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>?,
     @JsonProperty("7") options: Options?,
-    @JsonProperty("8") pinAuth: ByteArray?,
-    @JsonProperty("9") pinProtocol: PinProtocolVersion?
+    @JsonProperty("8") pinUvAuthParam: ByteArray?,
+    @JsonProperty("9") pinUvAuthProtocol: PinProtocolVersion?
+    // TODO: enterpriseAttestation (0x0A) - §6.1 "This is an unsigned integer or absent."
+    // TODO: attestationFormatsPreference (0x0B) - §6.1 "An ordered list of preferred attestation statement formats."
 ) : CtapRequest {
 
     override val command: CtapCommand = CtapCommand.MAKE_CREDENTIAL
@@ -36,9 +38,9 @@ class AuthenticatorMakeCredentialRequest @JsonCreator constructor(
     val extensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>? =
         extensions
     val options: Options? = options
-    val pinAuth: ByteArray? = ArrayUtil.clone(pinAuth)
+    val pinUvAuthParam: ByteArray? = ArrayUtil.clone(pinUvAuthParam)
         get() = ArrayUtil.clone(field)
-    val pinProtocol: PinProtocolVersion? = pinProtocol
+    val pinUvAuthProtocol: PinProtocolVersion? = pinUvAuthProtocol
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -50,7 +52,7 @@ class AuthenticatorMakeCredentialRequest @JsonCreator constructor(
         if (user != other.user) return false
         if (extensions != other.extensions) return false
         if (options != other.options) return false
-        if (pinProtocol != other.pinProtocol) return false
+        if (pinUvAuthProtocol != other.pinUvAuthProtocol) return false
 
         return true
     }
@@ -60,7 +62,7 @@ class AuthenticatorMakeCredentialRequest @JsonCreator constructor(
         result = 31 * result + user.hashCode()
         result = 31 * result + (extensions?.hashCode() ?: 0)
         result = 31 * result + (options?.hashCode() ?: 0)
-        result = 31 * result + (pinProtocol?.hashCode() ?: 0)
+        result = 31 * result + (pinUvAuthProtocol?.hashCode() ?: 0)
         return result
     }
 
@@ -69,16 +71,16 @@ class AuthenticatorMakeCredentialRequest @JsonCreator constructor(
             HexUtil.encodeToString(
                 clientDataHash
             )
-        }, rp=$rp, user=$user, pubKeyCredParams=$pubKeyCredParams, excludeList=$excludeList, extensions=$extensions, options=$options, pinAuth=${
+        }, rp=$rp, user=$user, pubKeyCredParams=$pubKeyCredParams, excludeList=$excludeList, extensions=$extensions, options=$options, pinUvAuthParam=${
             HexUtil.encodeToString(
-                pinAuth
+                pinUvAuthParam
             )
-        }, pinProtocol=$pinProtocol)"
+        }, pinUvAuthProtocol=$pinUvAuthProtocol)"
     }
 
     class Options @JsonCreator constructor(
         @param:JsonProperty("rk") val rk: Boolean?,
-        @param:JsonProperty("up") val up: Boolean?, //This is a known but invalid option, and should return CTAP2_ERR_INVALID_OPTION if present
+        @param:JsonProperty("up") val up: Boolean?,
         @param:JsonProperty("uv") val uv: Boolean?
     ) {
 

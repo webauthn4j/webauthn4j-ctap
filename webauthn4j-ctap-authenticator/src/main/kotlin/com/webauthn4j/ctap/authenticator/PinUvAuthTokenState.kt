@@ -54,7 +54,7 @@ class PinUvAuthTokenState(
     //spec| A userPresent flag, initially false.
     private var userPresentFlag: Boolean = false
 
-    private var platformHasUsedToken: Boolean = false
+    private var tokenUsed: Boolean = false
 
     companion object {
         val DEFAULT_INITIAL_USAGE_TIME_LIMIT: Duration = Duration.ofSeconds(30)
@@ -73,7 +73,7 @@ class PinUvAuthTokenState(
         initialUsageTimeLimit = transportInitialUsageTimeLimit
         usageTimer = Instant.now()
         inUse = true
-        platformHasUsedToken = false
+        tokenUsed = false
     }
 
     //spec| pinUvAuthTokenUsageTimerObserver()
@@ -109,14 +109,14 @@ class PinUvAuthTokenState(
             clearUserPresentFlag()
         }
 
-        if (elapsed >= initialUsageTimeLimit && !platformHasUsedToken) {
+        if (elapsed >= initialUsageTimeLimit && !tokenUsed) {
             stopUsingPinUvAuthToken()
             return
         }
     }
 
-    internal fun recordPlatformUsage() {
-        platformHasUsedToken = true
+    internal fun recordTokenUsage() {
+        tokenUsed = true
     }
 
     //spec| stopUsingPinUvAuthToken()
@@ -130,7 +130,7 @@ class PinUvAuthTokenState(
         userPresentTimeLimit = transportUserPresentTimeLimit    // initially same as initial usage time limit
         userVerifiedFlag = false                 // initially false
         userPresentFlag = false                  // initially false
-        platformHasUsedToken = false
+        tokenUsed = false
     }
 
     // Checks whether the token is currently in use, after running the timer observer.
