@@ -74,7 +74,7 @@ internal class GetNextAssertionExecution(
         val descriptor = PublicKeyCredentialDescriptor(
             PublicKeyCredentialType.PUBLIC_KEY,
             credential.credentialId,
-            ctapAuthenticatorSession.transports.toSet()
+            ctapAuthenticatorSession.transports
         )
 
         //spec| Step 5. Update the response to include the selected credential's publicKeyCredentialUserEntity information.

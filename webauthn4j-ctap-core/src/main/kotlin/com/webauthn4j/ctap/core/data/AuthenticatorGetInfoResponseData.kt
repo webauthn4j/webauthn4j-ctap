@@ -25,7 +25,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
             @JsonProperty("6") pinUvAuthProtocols: List<PinProtocolVersion>?,
             @JsonProperty("7") maxCredentialCountInList: Long?,
             @JsonProperty("8") maxCredentialIdLength: Long?,
-            @JsonProperty("9") transports: List<AuthenticatorTransport>?,
+            @JsonProperty("9") transports: Set<AuthenticatorTransport>?,
             @JsonProperty("10") algorithms: List<PublicKeyCredentialParameters>?,
             @JsonProperty("11") maxSerializedLargeBlobArray: Long?,
             @JsonProperty("12") forcePINChange: Boolean?,
@@ -42,7 +42,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
             @JsonProperty("23") uvCountSinceLastPinEntry: Long?,
             @JsonProperty("24") longTouchForReset: Boolean?,
             @JsonProperty("25") encIdentifier: String?,
-            @JsonProperty("26") transportsForReset: List<AuthenticatorTransport>?,
+            @JsonProperty("26") transportsForReset: Set<AuthenticatorTransport>?,
             @JsonProperty("27") pinComplexityPolicy: Boolean?,
             @JsonProperty("28") pinComplexityPolicyURL: String?,
             @JsonProperty("29") maxPINLength: Long?,
@@ -102,7 +102,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
     // §6.4 maxCredentialIdLength (0x08): Optional
     val maxCredentialIdLength: UInt?
     // §6.4 transports (0x09): Optional
-    val transports: List<AuthenticatorTransport>?
+    val transports: Set<AuthenticatorTransport>?
     // §6.4 algorithms (0x0A): Optional
     val algorithms: List<PublicKeyCredentialParameters>?
     // §6.4 maxSerializedLargeBlobArray (0x0B): Optional
@@ -136,7 +136,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
     // §6.4 encIdentifier (0x19): Optional
     val encIdentifier: String?
     // §6.4 transportsForReset (0x1A): Optional
-    val transportsForReset: List<AuthenticatorTransport>?
+    val transportsForReset: Set<AuthenticatorTransport>?
     // §6.4 pinComplexityPolicy (0x1B): Optional
     val pinComplexityPolicy: Boolean?
     // §6.4 pinComplexityPolicyURL (0x1C): Optional
@@ -157,7 +157,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
         pinUvAuthProtocols: List<PinProtocolVersion>?,
         maxCredentialCountInList: UInt?,
         maxCredentialIdLength: UInt?,
-        transports: List<AuthenticatorTransport>?,
+        transports: Set<AuthenticatorTransport>?,
         algorithms: List<PublicKeyCredentialParameters>? = null,
         maxSerializedLargeBlobArray: UInt? = null,
         forcePINChange: Boolean? = null,
@@ -174,7 +174,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
         uvCountSinceLastPinEntry: UInt? = null,
         longTouchForReset: Boolean? = null,
         encIdentifier: String? = null,
-        transportsForReset: List<AuthenticatorTransport>? = null,
+        transportsForReset: Set<AuthenticatorTransport>? = null,
         pinComplexityPolicy: Boolean? = null,
         pinComplexityPolicyURL: String? = null,
         maxPINLength: UInt? = null,

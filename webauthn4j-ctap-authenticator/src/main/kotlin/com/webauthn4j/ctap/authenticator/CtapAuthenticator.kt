@@ -35,7 +35,7 @@ class CtapAuthenticator(
     // These are final as it should not be updated on the fly for integrity. To update these, new instance should be created.
     var attestationStatementProvider: AttestationStatementProvider = NoneAttestationStatementProvider(),
     var fidoU2FBasicAttestationStatementGenerator: FIDOU2FAttestationStatementProvider = FIDOU2FBasicAttestationStatementProvider.createWithDemoAttestationKey(),
-    transports: List<AuthenticatorTransport> = listOf(),
+    transports: Set<AuthenticatorTransport> = setOf(),
     pinProtocols: Set<PinProtocolVersion> = setOf(PinProtocolVersion.VERSION_2, PinProtocolVersion.VERSION_1),
     val extensionProcessors: List<ExtensionProcessor> = listOf(),
     // Handlers
@@ -94,7 +94,7 @@ class CtapAuthenticator(
         }
     }
 
-    val transports: MutableList<AuthenticatorTransport> = transports.toMutableList()
+    val transports: MutableSet<AuthenticatorTransport> = transports.toMutableSet()
     val pinProtocols: Set<PinProtocolVersion> = pinProtocols
     internal val eventListeners: MutableList<EventListener> = mutableListOf()
     internal val exceptionReporters: MutableList<ExceptionReporter> = mutableListOf()

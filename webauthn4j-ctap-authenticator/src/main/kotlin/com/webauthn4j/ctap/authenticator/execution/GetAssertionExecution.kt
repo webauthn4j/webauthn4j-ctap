@@ -782,7 +782,7 @@ internal class GetAssertionExecution :
         val descriptor = PublicKeyCredentialDescriptor(
             PublicKeyCredentialType.PUBLIC_KEY,
             credential.credentialId,
-            ctapAuthenticatorSession.transports.toSet()
+            ctapAuthenticatorSession.transports
         )
         val counter = credential.counter
         val authenticatorDataObject = AuthenticatorData(
