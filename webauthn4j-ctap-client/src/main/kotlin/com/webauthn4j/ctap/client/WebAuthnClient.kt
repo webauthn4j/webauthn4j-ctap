@@ -125,7 +125,7 @@ class WebAuthnClient(
             )
         }
         val attestationObjectBytes = attestationObjectConverter.convertToBytes(attestationObject)
-        val transports: Set<AuthenticatorTransport> = makeCredentialResponse.getInfoResponseData.transports?: emptySet()
+        val transports: Set<AuthenticatorTransport> = makeCredentialResponse.getInfoResponseData.transports ?: emptySet()
         val attachment: AuthenticatorAttachment = convertToAttachment(makeCredentialResponse.getInfoResponseData.options?.plat)
         val authenticatorAttestationResponse =
             AuthenticatorAttestationResponse(clientDataJSON, attestationObjectBytes, transports)

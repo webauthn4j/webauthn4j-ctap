@@ -130,7 +130,7 @@ class GenerateMetadataStatement : Runnable {
                 getInfo.aaguid,
                 getInfo.options?.let { toMetadataOptions(it) },
                 getInfo.maxMsgSize?.toInt(),
-                getInfo.pinProtocols?.map { PinProtocolVersion.create(it.value.toInt()) }
+                getInfo.pinUvAuthProtocols?.map { PinProtocolVersion.create(it.value.toInt()) }
             )
         }
 
