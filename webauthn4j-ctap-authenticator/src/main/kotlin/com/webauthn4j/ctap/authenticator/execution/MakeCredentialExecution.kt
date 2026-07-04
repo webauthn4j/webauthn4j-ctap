@@ -12,6 +12,8 @@ import com.webauthn4j.ctap.authenticator.data.credential.NonResidentUserCredenti
 import com.webauthn4j.ctap.authenticator.data.credential.ResidentUserCredential
 import com.webauthn4j.ctap.authenticator.data.credential.UserCredential
 import com.webauthn4j.ctap.authenticator.data.event.MakeCredentialEvent
+import com.webauthn4j.ctap.authenticator.extension.MakeCredentialCredentialFilter
+import com.webauthn4j.ctap.authenticator.extension.MakeCredentialCredentialFilterContext
 import com.webauthn4j.ctap.authenticator.data.settings.AlwaysUvSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
 import com.webauthn4j.ctap.authenticator.data.settings.MakeCredUvNotRqdSetting
@@ -582,9 +584,7 @@ internal class MakeCredentialExecution :
     //spec|     12.1.5 Else, (implying userPresentFlagValue is true) terminate this procedure
     //spec|     and return CTAP2_ERR_CREDENTIAL_EXCLUDED.
     //spec|   12.2 Else (implying the credential's credProtect value is userVerificationRequired):
-    //
-    // credProtect filtering (12.1 vs 12.2 distinction) is not yet implemented;
-    // all matched credentials are treated as 12.1 (not userVerificationRequired).
+    // 12.1 vs 12.2 distinction is delegated to MakeCredentialCredentialFilter implementations (e.g., CredProtectExtensionProcessor).
     //
     // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-makeCred-authnr-alg
     private suspend fun execStep12ValidateExcludeList() {
@@ -594,7 +594,13 @@ internal class MakeCredentialExecution :
             if (it != null && it.isNotEmpty()) {
                 val rpId = rp.id
                 val userCredentials = authenticatorPropertyStore.loadUserCredentials(rpId)
+                val credentialFilters = ctapAuthenticatorSession.extensionProcessors
+                    .filterIsInstance<MakeCredentialCredentialFilter>()
                 val residentMatch = userCredentials.any { credentialSource ->
+                    //spec| 12.1 If the credential's credProtect value is not userVerificationRequired, then:
+                    //spec| 12.2 Else (implying the credential's credProtect value is userVerificationRequired):
+                    // Filtering is delegated to MakeCredentialCredentialFilter; false = 12.2 (skip), true = 12.1 (proceed).
+                    credentialFilters.all { it.test(MakeCredentialCredentialFilterContext(authenticatorMakeCredentialRequest, credentialSource, uvResult)) } &&
                     it.any { descriptor ->
                         Arrays.equals(descriptor.id, credentialSource.credentialId)
                     }
@@ -602,12 +608,6 @@ internal class MakeCredentialExecution :
                 val nonResidentMatch = !residentMatch && it.any { descriptor ->
                     isKnownCredentialId(descriptor, rpId)
                 }
-                // TODO: credProtect filtering (12.1 vs 12.2) not yet implemented.
-                //  Currently all credentials are treated as 12.1 (not userVerificationRequired).
-                //  12.1.1-12.1.3 (userPresentFlagValue from getUserPresentFlagValue/uvState) are also
-                //  not implemented; always falls through to 12.1.4 (wait for user presence).
-                //  12.2 (userVerificationRequired credentials) should be handled when credProtect is implemented.
-                //spec| 12.1 If the credential's credProtect value is not userVerificationRequired, then:
                 if (residentMatch || nonResidentMatch) {
                     //spec| 12.1.4 If userPresentFlagValue is false, then:
                     //spec|   12.1.4.1 Wait for user presence.
@@ -624,6 +624,8 @@ internal class MakeCredentialExecution :
                     }
                     //spec|   12.1.4.2 Regardless of whether user presence is obtained or the authenticator times out,
                     //spec|   terminate this procedure and return CTAP2_ERR_CREDENTIAL_EXCLUDED.
+                    //spec| 12.1.5 Else, (implying userPresentFlagValue is true) terminate this procedure
+                    //spec| and return CTAP2_ERR_CREDENTIAL_EXCLUDED.
                     throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_CREDENTIAL_EXCLUDED)
                 }
             }

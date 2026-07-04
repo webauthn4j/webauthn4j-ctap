@@ -18,6 +18,7 @@ import com.webauthn4j.ctap.authenticator.data.settings.ResetProtectionSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ResidentKeySetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
+import com.webauthn4j.ctap.authenticator.extension.CredProtectExtensionProcessor
 import com.webauthn4j.ctap.authenticator.extension.ExtensionProcessor
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
@@ -37,7 +38,7 @@ class CtapAuthenticator(
     var fidoU2FBasicAttestationStatementGenerator: FIDOU2FAttestationStatementProvider = FIDOU2FBasicAttestationStatementProvider.createWithDemoAttestationKey(),
     transports: Set<AuthenticatorTransport> = setOf(),
     pinProtocols: Set<PinProtocolVersion> = setOf(PinProtocolVersion.VERSION_2, PinProtocolVersion.VERSION_1),
-    val extensionProcessors: List<ExtensionProcessor> = listOf(),
+    val extensionProcessors: List<ExtensionProcessor> = listOf(CredProtectExtensionProcessor()),
     // Handlers
     var authenticatorPropertyStore: AuthenticatorPropertyStore = InMemoryAuthenticatorPropertyStore(),
     var userVerificationHandler: UserVerificationHandler = object : UserVerificationHandler {
