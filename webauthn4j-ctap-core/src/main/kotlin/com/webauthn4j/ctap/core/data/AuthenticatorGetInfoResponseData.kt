@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.webauthn4j.ctap.core.data.options.*
 import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.data.PublicKeyCredentialParameters
+import com.webauthn4j.data.UserVerificationMethod
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 
 // §6.4 authenticatorGetInfo (0x04)
@@ -24,7 +25,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
             @JsonProperty("6") pinUvAuthProtocols: List<PinProtocolVersion>?,
             @JsonProperty("7") maxCredentialCountInList: Long?,
             @JsonProperty("8") maxCredentialIdLength: Long?,
-            @JsonProperty("9") transports: Set<AuthenticatorTransport>?,
+            @JsonProperty("9") transports: List<AuthenticatorTransport>?,
             @JsonProperty("10") algorithms: List<PublicKeyCredentialParameters>?,
             @JsonProperty("11") maxSerializedLargeBlobArray: Long?,
             @JsonProperty("12") forcePINChange: Boolean?,
@@ -33,19 +34,19 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
             @JsonProperty("15") maxCredBlobLength: Long?,
             @JsonProperty("16") maxRPIDsForSetMinPINLength: Long?,
             @JsonProperty("17") preferredPlatformUvAttempts: Long?,
-            @JsonProperty("18") uvModality: Long?,
+            @JsonProperty("18") uvModality: Set<UserVerificationMethod>?,
             @JsonProperty("19") certifications: Map<String, Any>?,
             @JsonProperty("20") remainingDiscoverableCredentials: Long?,
             @JsonProperty("21") vendorPrototypeConfigCommands: List<Long>?,
             @JsonProperty("22") attestationFormats: List<String>?,
             @JsonProperty("23") uvCountSinceLastPinEntry: Long?,
             @JsonProperty("24") longTouchForReset: Boolean?,
-            @JsonProperty("25") encIdentifier: ByteArray?,
-            @JsonProperty("26") transportsForReset: Set<AuthenticatorTransport>?,
+            @JsonProperty("25") encIdentifier: String?,
+            @JsonProperty("26") transportsForReset: List<AuthenticatorTransport>?,
             @JsonProperty("27") pinComplexityPolicy: Boolean?,
             @JsonProperty("28") pinComplexityPolicyURL: String?,
             @JsonProperty("29") maxPINLength: Long?,
-            @JsonProperty("30") encCredStoreState: ByteArray?,
+            @JsonProperty("30") encCredStoreState: String?,
             @JsonProperty("31") authenticatorConfigCommands: List<Long>?
         ): AuthenticatorGetInfoResponseData {
             return AuthenticatorGetInfoResponseData(
@@ -66,7 +67,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
                 maxCredBlobLength?.toUInt(),
                 maxRPIDsForSetMinPINLength?.toUInt(),
                 preferredPlatformUvAttempts?.toUInt(),
-                uvModality?.toUInt(),
+                uvModality,
                 certifications,
                 remainingDiscoverableCredentials?.toUInt(),
                 vendorPrototypeConfigCommands?.map { it.toUInt() },
@@ -101,7 +102,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
     // §6.4 maxCredentialIdLength (0x08): Optional
     val maxCredentialIdLength: UInt?
     // §6.4 transports (0x09): Optional
-    val transports: Set<AuthenticatorTransport>?
+    val transports: List<AuthenticatorTransport>?
     // §6.4 algorithms (0x0A): Optional
     val algorithms: List<PublicKeyCredentialParameters>?
     // §6.4 maxSerializedLargeBlobArray (0x0B): Optional
@@ -119,7 +120,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
     // §6.4 preferredPlatformUvAttempts (0x11): Optional
     val preferredPlatformUvAttempts: UInt?
     // §6.4 uvModality (0x12): Optional
-    val uvModality: UInt?
+    val uvModality: Set<UserVerificationMethod>?
     // §6.4 certifications (0x13): Optional
     val certifications: Map<String, Any>?
     // §6.4 remainingDiscoverableCredentials (0x14): Optional
@@ -133,9 +134,9 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
     // §6.4 longTouchForReset (0x18): Optional
     val longTouchForReset: Boolean?
     // §6.4 encIdentifier (0x19): Optional
-    val encIdentifier: ByteArray?
+    val encIdentifier: String?
     // §6.4 transportsForReset (0x1A): Optional
-    val transportsForReset: Set<AuthenticatorTransport>?
+    val transportsForReset: List<AuthenticatorTransport>?
     // §6.4 pinComplexityPolicy (0x1B): Optional
     val pinComplexityPolicy: Boolean?
     // §6.4 pinComplexityPolicyURL (0x1C): Optional
@@ -143,7 +144,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
     // §6.4 maxPINLength (0x1D): Optional
     val maxPINLength: UInt?
     // §6.4 encCredStoreState (0x1E): Optional
-    val encCredStoreState: ByteArray?
+    val encCredStoreState: String?
     // §6.4 authenticatorConfigCommands (0x1F): Optional
     val authenticatorConfigCommands: List<UInt>?
 
@@ -156,7 +157,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
         pinUvAuthProtocols: List<PinProtocolVersion>?,
         maxCredentialCountInList: UInt?,
         maxCredentialIdLength: UInt?,
-        transports: Set<AuthenticatorTransport>?,
+        transports: List<AuthenticatorTransport>?,
         algorithms: List<PublicKeyCredentialParameters>? = null,
         maxSerializedLargeBlobArray: UInt? = null,
         forcePINChange: Boolean? = null,
@@ -165,19 +166,19 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
         maxCredBlobLength: UInt? = null,
         maxRPIDsForSetMinPINLength: UInt? = null,
         preferredPlatformUvAttempts: UInt? = null,
-        uvModality: UInt? = null,
+        uvModality: Set<UserVerificationMethod>? = null,
         certifications: Map<String, Any>? = null,
         remainingDiscoverableCredentials: UInt? = null,
         vendorPrototypeConfigCommands: List<UInt>? = null,
         attestationFormats: List<String>? = null,
         uvCountSinceLastPinEntry: UInt? = null,
         longTouchForReset: Boolean? = null,
-        encIdentifier: ByteArray? = null,
-        transportsForReset: Set<AuthenticatorTransport>? = null,
+        encIdentifier: String? = null,
+        transportsForReset: List<AuthenticatorTransport>? = null,
         pinComplexityPolicy: Boolean? = null,
         pinComplexityPolicyURL: String? = null,
         maxPINLength: UInt? = null,
-        encCredStoreState: ByteArray? = null,
+        encCredStoreState: String? = null,
         authenticatorConfigCommands: List<UInt>? = null
     ) {
         this.versions = versions.toList()
@@ -243,18 +244,12 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
         if (attestationFormats != other.attestationFormats) return false
         if (uvCountSinceLastPinEntry != other.uvCountSinceLastPinEntry) return false
         if (longTouchForReset != other.longTouchForReset) return false
-        if (encIdentifier != null) {
-            if (other.encIdentifier == null) return false
-            if (!encIdentifier.contentEquals(other.encIdentifier)) return false
-        } else if (other.encIdentifier != null) return false
+        if (encIdentifier != other.encIdentifier) return false
         if (transportsForReset != other.transportsForReset) return false
         if (pinComplexityPolicy != other.pinComplexityPolicy) return false
         if (pinComplexityPolicyURL != other.pinComplexityPolicyURL) return false
         if (maxPINLength != other.maxPINLength) return false
-        if (encCredStoreState != null) {
-            if (other.encCredStoreState == null) return false
-            if (!encCredStoreState.contentEquals(other.encCredStoreState)) return false
-        } else if (other.encCredStoreState != null) return false
+        if (encCredStoreState != other.encCredStoreState) return false
         if (authenticatorConfigCommands != other.authenticatorConfigCommands) return false
 
         return true
@@ -285,12 +280,12 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
         result = 31 * result + (attestationFormats?.hashCode() ?: 0)
         result = 31 * result + (uvCountSinceLastPinEntry?.hashCode() ?: 0)
         result = 31 * result + (longTouchForReset?.hashCode() ?: 0)
-        result = 31 * result + (encIdentifier?.contentHashCode() ?: 0)
+        result = 31 * result + (encIdentifier?.hashCode() ?: 0)
         result = 31 * result + (transportsForReset?.hashCode() ?: 0)
         result = 31 * result + (pinComplexityPolicy?.hashCode() ?: 0)
         result = 31 * result + (pinComplexityPolicyURL?.hashCode() ?: 0)
         result = 31 * result + (maxPINLength?.hashCode() ?: 0)
-        result = 31 * result + (encCredStoreState?.contentHashCode() ?: 0)
+        result = 31 * result + (encCredStoreState?.hashCode() ?: 0)
         result = 31 * result + (authenticatorConfigCommands?.hashCode() ?: 0)
         return result
     }

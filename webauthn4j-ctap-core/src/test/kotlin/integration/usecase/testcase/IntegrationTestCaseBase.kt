@@ -103,7 +103,7 @@ abstract class IntegrationTestCaseBase {
                 objectConverter = objectConverter,
                 attestationStatementProvider = attestationStatementGenerator,
                 fidoU2FBasicAttestationStatementGenerator = fidoU2FAttestationStatementGenerator,
-                transports = emptySet(),
+                transports = emptyList(),
                 extensionProcessors = emptyList(),
                 authenticatorPropertyStore = authenticatorPropertyStore,
                 credentialSelectionHandler = credentialSelectionHandler

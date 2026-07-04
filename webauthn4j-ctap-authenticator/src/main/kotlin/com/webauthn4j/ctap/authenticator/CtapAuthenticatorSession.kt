@@ -41,7 +41,7 @@ class CtapAuthenticatorSession internal constructor(
     // Core logic delegates
     val attestationStatementProvider: AttestationStatementProvider = ctapAuthenticator.attestationStatementProvider
     val fidoU2FBasicAttestationStatementGenerator: FIDOU2FAttestationStatementProvider = ctapAuthenticator.fidoU2FBasicAttestationStatementGenerator
-    val transports: Set<AuthenticatorTransport> = ctapAuthenticator.transports
+    val transports: List<AuthenticatorTransport> = ctapAuthenticator.transports
     val extensionProcessors: List<ExtensionProcessor> = ctapAuthenticator.extensionProcessors
     val authenticatorPropertyStore: AuthenticatorPropertyStore = ctapAuthenticator.authenticatorPropertyStore
     val userVerificationHandler: UserVerificationHandler = userVerificationHandler ?: ctapAuthenticator.userVerificationHandler

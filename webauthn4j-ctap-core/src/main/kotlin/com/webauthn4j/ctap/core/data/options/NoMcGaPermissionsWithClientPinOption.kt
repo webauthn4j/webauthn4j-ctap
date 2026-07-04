@@ -7,10 +7,10 @@ data class NoMcGaPermissionsWithClientPinOption constructor(@get:JsonValue val v
 
     companion object {
         @JvmField
-        val MC_GA_NOT_PERMITTED = NoMcGaPermissionsWithClientPinOption(true)
+        val MC_GA_NOT_PERMITTED_FOR_CLIENT_PIN = NoMcGaPermissionsWithClientPinOption(true)
 
         @JvmField
-        val MC_GA_PERMITTED = NoMcGaPermissionsWithClientPinOption(false)
+        val MC_GA_PERMITTED_FOR_CLIENT_PIN = NoMcGaPermissionsWithClientPinOption(false)
 
         @JvmField
         val NULL: NoMcGaPermissionsWithClientPinOption? = null
@@ -20,8 +20,8 @@ data class NoMcGaPermissionsWithClientPinOption constructor(@get:JsonValue val v
         fun create(value: Boolean?): NoMcGaPermissionsWithClientPinOption? {
             return when {
                 value == null -> NULL
-                value -> MC_GA_NOT_PERMITTED
-                else -> MC_GA_PERMITTED
+                value -> MC_GA_NOT_PERMITTED_FOR_CLIENT_PIN
+                else -> MC_GA_PERMITTED_FOR_CLIENT_PIN
             }
         }
     }
