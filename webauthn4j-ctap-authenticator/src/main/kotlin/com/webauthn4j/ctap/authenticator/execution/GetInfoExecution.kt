@@ -15,15 +15,19 @@ import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.ctap.core.data.options.AlwaysUvOption
 import com.webauthn4j.ctap.core.data.options.ClientPINOption
 import com.webauthn4j.ctap.core.data.options.MakeCredUvNotRqdOption
+import com.webauthn4j.ctap.core.data.options.PinUvAuthTokenOption
 import com.webauthn4j.ctap.core.data.options.PlatformOption
 import com.webauthn4j.ctap.core.data.options.ResidentKeyOption
 import com.webauthn4j.ctap.core.data.options.UserPresenceOption
 import com.webauthn4j.ctap.core.data.options.UserVerificationOption
+import com.webauthn4j.data.PublicKeyCredentialParameters
+import com.webauthn4j.data.PublicKeyCredentialType
 import org.slf4j.LoggerFactory
 
-// @see <a href="https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html#authenticatorGetInfo">5.4. authenticatorGetInfo</a>
-//spec| Using this method, the host can request that the authenticator report a list of all supported
-//spec| protocol versions, supported extensions, AAGUID of the device, and its capabilities.
+// §6.4 authenticatorGetInfo (0x04)
+//spec| Using this method, platforms can request that the authenticator report a list of its supported
+//spec| protocol versions and extensions, its AAGUID, and other aspects of its overall capabilities.
+//spec| Platforms should use this information to tailor their command parameters choices.
 //spec| This method takes no inputs.
 internal class GetInfoExecution(
     private val ctapAuthenticatorSession: CtapAuthenticatorSession,
@@ -83,6 +87,22 @@ internal class GetInfoExecution(
         //spec| If absent, it indicates that the device is not capable of user verification within itself.
         //spec| A device that can only do Client PIN will not return the "uv" parameter.
         val uv: UserVerificationOption? = ctapAuthenticatorSession.userVerificationHandler.getUserVerificationOption(null)
+        //spec| pinUvAuthToken: If pinUvAuthToken is:
+        //spec| present and set to true, pinUvAuthToken is supported.
+        //spec| present and set to false, or absent, pinUvAuthToken is not supported.
+        val pinUvAuthToken: PinUvAuthTokenOption = PinUvAuthTokenOption.SUPPORTED
+        // TODO: §6.4 noMcGaPermissionsWithClientPin — mc/ga permission restriction not yet implemented
+        // TODO: §6.4 largeBlobs — authenticatorLargeBlobs command not yet implemented
+        // TODO: §6.4 ep — enterprise attestation not yet implemented
+        // TODO: §6.4 bioEnroll — authenticatorBioEnrollment command not yet implemented
+        // TODO: §6.4 userVerificationMgmtPreview — FIDO_2_1_PRE prototype, not yet implemented
+        // TODO: §6.4 uvBioEnroll — depends on bioEnroll, not yet implemented
+        // TODO: §6.4 authnrCfg — authenticatorConfig command not yet implemented
+        // TODO: §6.4 uvAcfg — depends on authnrCfg, not yet implemented
+        // TODO: §6.4 credMgmt — authenticatorCredentialManagement command not yet implemented
+        // TODO: §6.4 perCredMgmtRO — depends on credMgmt, not yet implemented
+        // TODO: §6.4 credentialMgmtPreview — FIDO_2_1_PRE prototype, not yet implemented
+        // TODO: §6.4 setMinPINLength — depends on authnrCfg, not yet implemented
         val alwaysUv: AlwaysUvOption? = when (ctapAuthenticatorSession.alwaysUv) {
             AlwaysUvSetting.ENABLED -> AlwaysUvOption.ENABLED
             AlwaysUvSetting.DISABLED -> null
@@ -92,18 +112,54 @@ internal class GetInfoExecution(
             MakeCredUvNotRqdSetting.DISABLED -> null
         }
         val extensions = ctapAuthenticatorSession.extensionProcessors.map { it.extensionId }
+
+        // §6.4 algorithms (0x0A)
+        val algorithms = ctapAuthenticatorSession.authenticatorPropertyStore.algorithms.map { alg ->
+            PublicKeyCredentialParameters(PublicKeyCredentialType.PUBLIC_KEY, alg)
+        }
+
+        // §6.4 minPINLength (0x0D)
+        val minPINLength: UInt? = when (ctapAuthenticatorSession.clientPIN) {
+            ClientPINSetting.ENABLED -> ctapAuthenticatorSession.pinUvAuthManager.minPINLength.toUInt()
+            ClientPINSetting.DISABLED -> null
+        }
+
         return AuthenticatorGetInfoResponse(
             CtapStatusCode.CTAP2_OK,
             AuthenticatorGetInfoResponseData(
                 CtapAuthenticator.VERSIONS,       // versions (0x01): Required
                 extensions,                        // extensions (0x02): Optional
                 ctapAuthenticatorSession.aaguid,   // aaguid (0x03): Required
-                AuthenticatorGetInfoResponseData.Options(plat, rk, clientPin, up, uv, alwaysUv, makeCredUvNotRqd), // options (0x04): Optional
+                AuthenticatorGetInfoResponseData.Options(
+                    plat, rk, clientPin, up, uv,
+                    pinUvAuthToken,
+                    null, // noMcGaPermissionsWithClientPin
+                    null, // largeBlobs
+                    null, // ep
+                    null, // bioEnroll
+                    null, // userVerificationMgmtPreview
+                    null, // uvBioEnroll
+                    null, // authnrCfg
+                    null, // uvAcfg
+                    null, // credMgmt
+                    null, // perCredMgmtRO
+                    null, // credentialMgmtPreview
+                    null, // setMinPINLength
+                    makeCredUvNotRqd,
+                    alwaysUv
+                ),                                 // options (0x04): Optional
                 2048u,                             // maxMsgSize (0x05): Optional
-                ctapAuthenticatorSession.pinProtocols,   // pinProtocols (0x06): Optional
-                null,
-                null,
-                ctapAuthenticatorSession.transports
+                ctapAuthenticatorSession.pinProtocols,   // pinUvAuthProtocols (0x06): Optional
+                null,                              // maxCredentialCountInList (0x07): Optional
+                null,                              // maxCredentialIdLength (0x08): Optional
+                ctapAuthenticatorSession.transports, // transports (0x09): Optional
+                algorithms,                        // algorithms (0x0A): Optional
+                // TODO: §6.4 maxSerializedLargeBlobArray (0x0B) — depends on largeBlobs
+                // TODO: §6.4 forcePINChange (0x0C) — depends on authenticatorConfig setMinPINLength
+                minPINLength = minPINLength,        // minPINLength (0x0D): Optional
+                // TODO: §6.4 firmwareVersion (0x0E)
+                // TODO: §6.4 maxCredBlobLength (0x0F) — depends on credBlob extension
+                // TODO: §6.4 remainingDiscoverableCredentials (0x14) — store has no capacity concept
             )
         )
     }

@@ -27,7 +27,7 @@ internal class CtapClientTest {
         Assertions.assertThat(response.responseData!!.aaguid).isEqualTo(CtapAuthenticator.AAGUID)
         Assertions.assertThat(response.responseData!!.versions)
             .isEqualTo(CtapAuthenticator.VERSIONS)
-        Assertions.assertThat(response.responseData!!.pinProtocols)
+        Assertions.assertThat(response.responseData!!.pinUvAuthProtocols)
             .isEqualTo(listOf(PinProtocolVersion.VERSION_2, PinProtocolVersion.VERSION_1))
         Assertions.assertThat(response.responseData!!.options).isNotNull
         Assertions.assertThat(response.responseData!!.options!!.plat)

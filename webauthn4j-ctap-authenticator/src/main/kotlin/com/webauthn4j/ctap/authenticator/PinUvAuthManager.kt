@@ -36,7 +36,14 @@ class PinUvAuthManager(
         const val MAX_PIN_RETRIES: UInt = 8u
         const val MAX_VOLATILE_PIN_RETRIES = 3
         const val MAX_UV_RETRIES: UInt = 3u
+        // §6.4 minPINLength (0x0D): default minimum PIN length in Unicode code points
+        const val DEFAULT_MIN_PIN_LENGTH = 4
     }
+
+    // §6.4 minPINLength (0x0D)
+    // TODO: update via authenticatorConfig setMinPINLength subcommand when implemented
+    var minPINLength: Int = DEFAULT_MIN_PIN_LENGTH
+        private set
 
     private var volatilePinRetryCounter = MAX_VOLATILE_PIN_RETRIES
 
