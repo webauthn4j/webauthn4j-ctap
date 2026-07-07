@@ -157,8 +157,7 @@ class GetNextAssertionExecutionTest {
     }
 
 
-    @Test
-    suspend fun makeCredential(
+    private suspend fun makeCredential(
         ctapAuthenticatorSession: CtapAuthenticatorSession,
         rk: Boolean = true,
         uv: Boolean = true,
