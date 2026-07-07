@@ -10,8 +10,6 @@ import com.webauthn4j.ctap.client.transport.InProcessAdaptor
 import com.webauthn4j.ctap.core.data.options.UserVerificationOption
 import com.webauthn4j.util.MessageDigestUtil
 import com.webauthn4j.data.AuthenticatorAttachment
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets
@@ -37,10 +35,9 @@ internal class CtapServiceTest {
         })))
     private val target = CtapService(ctapClient)
 
-    @ExperimentalCoroutinesApi
     @Test
     @Throws(ExecutionException::class, InterruptedException::class)
-    fun setPIN_test() = runTest {
+    suspend fun setPIN_test() {
         target.reset()
         target.setPIN("newPIN")
         assertThat(connection.authenticatorPropertyStore.loadClientPIN()).isEqualTo(
@@ -48,10 +45,9 @@ internal class CtapServiceTest {
         )
     }
 
-    @ExperimentalCoroutinesApi
     @Test
     @Throws(ExecutionException::class, InterruptedException::class)
-    fun changePIN_test() = runTest {
+    suspend fun changePIN_test() {
         target.reset()
         target.setPIN("currentPIN")
         assertThat(connection.authenticatorPropertyStore.loadClientPIN()).isEqualTo(
@@ -70,10 +66,9 @@ internal class CtapServiceTest {
     }
 
     /*ignore exception*/
-    @ExperimentalCoroutinesApi
     @Test
     @Throws(ExecutionException::class, InterruptedException::class)
-    fun getRetries_test() = runTest {
+    suspend fun getRetries_test() {
         assertThat(target.getRetries()).isEqualTo(PinUvAuthManager.MAX_PIN_RETRIES)
         try {
             target.changePIN("wrongPIN", "newPIN")
@@ -84,10 +79,9 @@ internal class CtapServiceTest {
         assertThat(target.getRetries()).isEqualTo(PinUvAuthManager.MAX_PIN_RETRIES)
     }
 
-    @ExperimentalCoroutinesApi
     @Test
     @Throws(ExecutionException::class, InterruptedException::class)
-    fun reset_test() = runTest {
+    suspend fun reset_test() {
         target.reset()
     }
 }

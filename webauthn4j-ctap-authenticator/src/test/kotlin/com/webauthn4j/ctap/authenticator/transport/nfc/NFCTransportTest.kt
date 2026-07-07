@@ -4,8 +4,6 @@ import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.UserVerificationHandler
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
 import com.webauthn4j.util.Base64UrlUtil
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 
@@ -15,9 +13,8 @@ internal class NFCTransportTest {
         mock(UserVerificationHandler::class.java)
     )
 
-    @ExperimentalCoroutinesApi
     @Test
-    fun processApduCommand_test() = runTest {
+    suspend fun processApduCommand_test() {
         val apdu = Base64UrlUtil.decode("gBAAAAEEAA")
         target.onCommandAPDUReceived(CommandAPDU.parse(apdu))
     }

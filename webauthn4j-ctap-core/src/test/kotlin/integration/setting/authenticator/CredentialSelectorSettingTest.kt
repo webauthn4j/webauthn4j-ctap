@@ -9,7 +9,6 @@ import com.webauthn4j.data.PublicKeyCredential
 import com.webauthn4j.data.extension.client.RegistrationExtensionClientOutput
 import com.webauthn4j.verifier.exception.BadSignatureException
 import integration.usecase.testcase.PasswordlessTestCase
-import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -22,7 +21,7 @@ class CredentialSelectorSettingTest {
     @Nested
     inner class credentialSelector_authenticator {
         @Test
-        fun correct_selection_test() = runTest {
+        suspend fun correct_selection_test() {
             var publicKeyCredential: PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput>? =
                 null
 
@@ -42,7 +41,7 @@ class CredentialSelectorSettingTest {
         }
 
         @Test
-        fun incorrect_selection_test() = runTest {
+        suspend fun incorrect_selection_test() {
             var publicKeyCredential: PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput>? =
                 null
 
@@ -71,7 +70,7 @@ class CredentialSelectorSettingTest {
     inner class credentialSelector_client_platform {
 
         @Test
-        fun correct_selection_test() = runTest {
+        suspend fun correct_selection_test() {
 
             var publicKeyCredential: PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput>? =
                 null
@@ -90,7 +89,7 @@ class CredentialSelectorSettingTest {
         }
 
         @Test
-        fun incorrect_selection_test() = runTest {
+        suspend fun incorrect_selection_test() {
             var publicKeyCredential: PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput>? =
                 null
 

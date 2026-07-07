@@ -36,7 +36,7 @@ import org.mockito.kotlin.spy
 internal class MakeCredentialExecutionTest {
 
     @Test
-    fun test() = runTest {
+    suspend fun test() {
         val ctapAuthenticator = CtapAuthenticator()
         val connection = ctapAuthenticator.createSession()
 
@@ -74,7 +74,7 @@ internal class MakeCredentialExecutionTest {
     }
 
     @Test
-    fun store_full_test() = runTest {
+    suspend fun store_full_test() {
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.authenticatorPropertyStore = spy<InMemoryAuthenticatorPropertyStore> {
             onGeneric {
@@ -124,11 +124,11 @@ internal class MakeCredentialExecutionTest {
             "NEVER, CTAP2_OK, 0",
         ]
     )
-    fun options_null_residentKey_variation_test(
+    suspend fun options_null_residentKey_variation_test(
         residentKeySetting: ResidentKeySetting,
         statusCode: CtapStatusCode,
         createdResidentKeyCount: Int
-    ) = runTest {
+    ) {
         val clientDataHash = ByteArray(0)
         val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
         val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
@@ -179,12 +179,12 @@ internal class MakeCredentialExecutionTest {
             "false, NEVER, CTAP2_ERR_UNSUPPORTED_OPTION, 0",
         ]
     )
-    fun rk_and_residentKey_matrix_test(
+    suspend fun rk_and_residentKey_matrix_test(
         rk: Boolean,
         residentKeySetting: ResidentKeySetting,
         statusCode: CtapStatusCode,
         createdResidentKeyCount: Int
-    ) = runTest {
+    ) {
         val clientDataHash = ByteArray(0)
         val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
         val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
@@ -235,11 +235,11 @@ internal class MakeCredentialExecutionTest {
             "false, NOT_SUPPORTED, CTAP2_OK",
         ]
     )
-    fun uv_and_userVerification_test(
+    suspend fun uv_and_userVerification_test(
         uv: Boolean,
         userVerificationSetting: UserVerificationSetting,
         statusCode: CtapStatusCode
-    ) = runTest {
+    ) {
         val clientDataHash = ByteArray(0)
         val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
         val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
@@ -284,48 +284,47 @@ internal class MakeCredentialExecutionTest {
             "NOT_SUPPORTED, CTAP2_ERR_INVALID_OPTION",
         ]
     )
-    fun userPresence_test(userPresenceSetting: UserPresenceSetting, statusCode: CtapStatusCode) =
-        runTest {
-            val clientDataHash = ByteArray(0)
-            val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
-            val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
-            val pubKeyCredParams = listOf(
-                PublicKeyCredentialParameters(
-                    PublicKeyCredentialType.PUBLIC_KEY,
-                    COSEAlgorithmIdentifier.ES256
-                )
+    suspend fun userPresence_test(userPresenceSetting: UserPresenceSetting, statusCode: CtapStatusCode) {
+        val clientDataHash = ByteArray(0)
+        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
+        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
+        val pubKeyCredParams = listOf(
+            PublicKeyCredentialParameters(
+                PublicKeyCredentialType.PUBLIC_KEY,
+                COSEAlgorithmIdentifier.ES256
             )
-            val excludeList: List<PublicKeyCredentialDescriptor> = emptyList()
-            val extensions =
-                AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>()
-            val options = AuthenticatorMakeCredentialRequest.Options(rk = true, uv = false)
-            val pinUvAuthParam: ByteArray? = null
-            val pinUvAuthProtocol: PinProtocolVersion? = null
-            val command = AuthenticatorMakeCredentialRequest(
-                clientDataHash,
-                rp,
-                user,
-                pubKeyCredParams,
-                excludeList,
-                extensions,
-                options,
-                pinUvAuthParam,
-                pinUvAuthProtocol
-            )
+        )
+        val excludeList: List<PublicKeyCredentialDescriptor> = emptyList()
+        val extensions =
+            AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>()
+        val options = AuthenticatorMakeCredentialRequest.Options(rk = true, uv = false)
+        val pinUvAuthParam: ByteArray? = null
+        val pinUvAuthProtocol: PinProtocolVersion? = null
+        val command = AuthenticatorMakeCredentialRequest(
+            clientDataHash,
+            rp,
+            user,
+            pubKeyCredParams,
+            excludeList,
+            extensions,
+            options,
+            pinUvAuthParam,
+            pinUvAuthProtocol
+        )
 
-            val ctapAuthenticator = CtapAuthenticator()
-            ctapAuthenticator.userPresence = userPresenceSetting
-            ctapAuthenticator.userVerification = UserVerificationSetting.NOT_SUPPORTED
-            ctapAuthenticator.clientPIN = ClientPINSetting.DISABLED
-            val connection = ctapAuthenticator.createSession()
+        val ctapAuthenticator = CtapAuthenticator()
+        ctapAuthenticator.userPresence = userPresenceSetting
+        ctapAuthenticator.userVerification = UserVerificationSetting.NOT_SUPPORTED
+        ctapAuthenticator.clientPIN = ClientPINSetting.DISABLED
+        val connection = ctapAuthenticator.createSession()
 
-            val response = connection.makeCredential(command)
-            assertThat(response).isInstanceOf(AuthenticatorMakeCredentialResponse::class.java)
-            assertThat(response.statusCode).isEqualTo(statusCode)
-        }
+        val response = connection.makeCredential(command)
+        assertThat(response).isInstanceOf(AuthenticatorMakeCredentialResponse::class.java)
+        assertThat(response.statusCode).isEqualTo(statusCode)
+    }
 
     @Test
-    fun userConsent_false_test() = runTest {
+    suspend fun userConsent_false_test() {
         val clientDataHash = ByteArray(0)
         val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
         val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
@@ -367,7 +366,7 @@ internal class MakeCredentialExecutionTest {
     }
 
     @Test
-    fun unsupported_alg_test() = runTest {
+    suspend fun unsupported_alg_test() {
         val clientDataHash = ByteArray(0)
         val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
         val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")

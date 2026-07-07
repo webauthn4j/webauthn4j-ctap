@@ -31,7 +31,7 @@ class AlgorithmsTest {
         }
 
         @Test
-        fun authenticator_supports_ES256_test() = runTest {
+        suspend fun authenticator_supports_ES256_test() {
             passwordlessTestCase.authenticator.algorithms = setOf(COSEAlgorithmIdentifier.ES256)
             passwordlessTestCase.step1_createCredential()
             val registrationData = passwordlessTestCase.step2_validateCredentialForRegistration()
@@ -78,7 +78,7 @@ class AlgorithmsTest {
         }
 
         @Test
-        fun authenticator_supports_RS256_test() = runTest {
+        suspend fun authenticator_supports_RS256_test() {
             passwordlessTestCase.authenticator.algorithms = setOf(COSEAlgorithmIdentifier.RS256)
             passwordlessTestCase.step1_createCredential()
             val registrationData = passwordlessTestCase.step2_validateCredentialForRegistration()
@@ -103,7 +103,7 @@ class AlgorithmsTest {
         }
 
         @Test
-        fun authenticator_supports_RS1_test() = runTest {
+        suspend fun authenticator_supports_RS1_test() {
             passwordlessTestCase.authenticator.algorithms = setOf(COSEAlgorithmIdentifier.RS1)
             passwordlessTestCase.step1_createCredential()
             val registrationData = passwordlessTestCase.step2_validateCredentialForRegistration()

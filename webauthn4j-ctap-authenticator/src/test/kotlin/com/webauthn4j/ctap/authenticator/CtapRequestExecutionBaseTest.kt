@@ -4,16 +4,13 @@ import com.webauthn4j.ctap.authenticator.execution.CtapCommandExecutionBase
 import com.webauthn4j.ctap.core.data.CtapRequest
 import com.webauthn4j.ctap.core.data.CtapResponse
 import com.webauthn4j.ctap.core.data.CtapStatusCode
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
 
-@ExperimentalCoroutinesApi
 internal class CtapRequestExecutionBaseTest {
 
     @Test
-    fun unexpected_execution_error_test() = runTest {
+    suspend fun unexpected_execution_error_test() {
 
         val connection = CtapAuthenticator().createSession()
         val target = TestCtapCommandExecution(connection, mock(CtapRequest::class.java))
