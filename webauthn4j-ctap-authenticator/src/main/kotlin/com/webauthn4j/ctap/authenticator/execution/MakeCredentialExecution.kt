@@ -816,8 +816,8 @@ internal class MakeCredentialExecution :
             // TODO: credential store state not yet implemented
         } else {
             //spec| Step 18. Otherwise, if the "rk" option is false: the authenticator MUST create a non-discoverable credential.
-            val credentialKey = NonResidentCredentialKey(
-                algorithmIdentifier.toSignatureAlgorithm(),
+            val credentialKey = NonResidentCredentialKey.create(
+                algorithmIdentifier,
                 createCredentialKeyPair(algorithmIdentifier)
             )
             userCredentialBuilder.userCredentialKey(credentialKey)

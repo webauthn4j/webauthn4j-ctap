@@ -2,12 +2,11 @@ package com.webauthn4j.ctap.authenticator.store
 
 import tools.jackson.core.type.TypeReference
 import tools.jackson.dataformat.cbor.CBORMapper
-import tools.jackson.module.kotlin.KotlinModule
 
+import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.data.credential.NonResidentCredentialKey
 import com.webauthn4j.ctap.authenticator.data.credential.NonResidentUserCredential
-import com.webauthn4j.ctap.core.converter.jackson.PublicKeyCredentialSourceCBORModule
-import com.webauthn4j.data.SignatureAlgorithm
+import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import com.webauthn4j.util.ECUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -15,10 +14,7 @@ import java.time.Instant
 
 internal class NonResidentUserCredentialTest {
 
-    private val cborMapper: CBORMapper = CBORMapper.builder()
-        .addModule(PublicKeyCredentialSourceCBORModule())
-        .addModule(KotlinModule.Builder().build())
-        .build()
+    private val cborMapper: CBORMapper = CtapAuthenticator().objectConverter.cborMapper
 
     @Test
     fun serialize_test() {
@@ -39,7 +35,7 @@ internal class NonResidentUserCredentialTest {
     private fun createNonResidentUserCredential(): NonResidentUserCredential {
         val credentialId = ByteArray(32)
         val userCredentialKey =
-            NonResidentCredentialKey(SignatureAlgorithm.ES256, ECUtil.createKeyPair())
+            NonResidentCredentialKey.create(COSEAlgorithmIdentifier.ES256, ECUtil.createKeyPair())
         val userHandle = ByteArray(32)
         return NonResidentUserCredential(
             credentialId,
