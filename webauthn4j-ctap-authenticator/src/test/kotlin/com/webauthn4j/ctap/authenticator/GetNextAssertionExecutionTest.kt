@@ -17,15 +17,12 @@ import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthenticatorInput
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
 import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenticatorInput
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import java.time.Instant
 
-@ExperimentalCoroutinesApi
 class GetNextAssertionExecutionTest {
 
     @Test
@@ -40,7 +37,7 @@ class GetNextAssertionExecutionTest {
     }
 
     @Test
-    fun getNextAssertion_test() = runTest {
+    suspend fun getNextAssertion_test() {
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
         val connection = ctapAuthenticator.createSession()
@@ -70,7 +67,7 @@ class GetNextAssertionExecutionTest {
     }
 
     @Test
-    fun getNextAssertion_when_no_session_exist_test() = runTest {
+    suspend fun getNextAssertion_when_no_session_exist_test() {
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
         val connection = ctapAuthenticator.createSession()
@@ -81,7 +78,7 @@ class GetNextAssertionExecutionTest {
     }
 
     @Test
-    fun getNextAssertion_when_next_credential_does_not_exist_test() = runTest {
+    suspend fun getNextAssertion_when_next_credential_does_not_exist_test() {
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
         val connection = ctapAuthenticator.createSession()
@@ -113,7 +110,7 @@ class GetNextAssertionExecutionTest {
 
     @Disabled("Mockito.mockStatic doesn't work with JDK 21")
     @Test
-    fun expiration_test() = runTest {
+    suspend fun expiration_test() {
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
         val connection = ctapAuthenticator.createSession()

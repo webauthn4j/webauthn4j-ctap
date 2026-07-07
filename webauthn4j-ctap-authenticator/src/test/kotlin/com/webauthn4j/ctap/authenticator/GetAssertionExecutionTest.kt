@@ -21,8 +21,6 @@ import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthenticatorInput
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
 import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenticatorInput
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -30,7 +28,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.mockito.Mockito.mock
 
-@ExperimentalCoroutinesApi
 internal class GetAssertionExecutionTest {
 
     @Disabled
@@ -46,7 +43,7 @@ internal class GetAssertionExecutionTest {
     }
 
     @Test
-    fun getAssertion_test() = runTest {
+    suspend fun getAssertion_test() {
         val connection = CtapAuthenticator().createSession()
         makeCredential(connection)
 
@@ -72,7 +69,7 @@ internal class GetAssertionExecutionTest {
     }
 
     @Test
-    fun userConsent_false_test() = runTest {
+    suspend fun userConsent_false_test() {
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.userVerificationHandler = object : UserVerificationHandler {
             override fun getUserVerificationOption(rpId: String?): UserVerificationOption? {
@@ -107,7 +104,7 @@ internal class GetAssertionExecutionTest {
     }
 
     @Test
-    fun no_credentials_test() = runTest {
+    suspend fun no_credentials_test() {
         val ctapAuthenticator = CtapAuthenticator()
         val connection = ctapAuthenticator.createSession()
 
@@ -132,7 +129,7 @@ internal class GetAssertionExecutionTest {
     }
 
     @Test
-    fun options_null_test() = runTest {
+    suspend fun options_null_test() {
         val ctapAuthenticator = CtapAuthenticator()
         val connection = ctapAuthenticator.createSession()
         makeCredential(connection)
@@ -158,7 +155,7 @@ internal class GetAssertionExecutionTest {
     }
 
     @Test
-    fun store_full_test() = runTest {
+    suspend fun store_full_test() {
         var isFull = false
         val authenticatorPropertyStoreSpy =
             object : InMemoryAuthenticatorPropertyStore() {
@@ -204,11 +201,11 @@ internal class GetAssertionExecutionTest {
             "false, NOT_SUPPORTED, CTAP2_OK",
         ]
     )
-    fun up_userVerification_matrix_test(
+    suspend fun up_userVerification_matrix_test(
         up: Boolean,
         userPresenceSetting: UserPresenceSetting,
         statusCode: CtapStatusCode
-    ) = runTest {
+    ) {
         // Create a credential with default settings first,
         // then switch to the target userPresence setting for the GetAssertion test.
         val ctapAuthenticator = CtapAuthenticator()
@@ -250,11 +247,11 @@ internal class GetAssertionExecutionTest {
             "false, NOT_SUPPORTED, CTAP2_OK",
         ]
     )
-    fun uv_userVerification_matrix_test(
+    suspend fun uv_userVerification_matrix_test(
         uv: Boolean,
         userVerificationSetting: UserVerificationSetting,
         statusCode: CtapStatusCode
-    ) = runTest {
+    ) {
         // Create a credential with default settings (userVerification=READY) first,
         // then switch to the target userVerification setting for the GetAssertion test.
         // This is needed because MakeCredential requires UV on a UV-protected authenticator (Step 8).

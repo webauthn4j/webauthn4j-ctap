@@ -23,14 +23,14 @@ class ClientPINAndUserVerificationTest {
         }
 
         @Test
-        fun userVerification_ready_test() = runTest {
+        suspend fun userVerification_ready_test() {
             passwordlessTestCase.authenticator.userVerificationSetting =
                 UserVerificationSetting.READY
             passwordlessTestCase.run()
         }
 
         @Test
-        fun userVerification_not_ready_test() = runTest {
+        suspend fun userVerification_not_ready_test() {
             passwordlessTestCase.authenticator.userVerificationSetting =
                 UserVerificationSetting.NOT_READY
             passwordlessTestCase.run()
@@ -46,7 +46,7 @@ class ClientPINAndUserVerificationTest {
         }
 
         @Test
-        fun userVerification_ready_test() = runTest {
+        suspend fun userVerification_ready_test() {
             passwordlessTestCase.authenticator.userVerificationSetting = UserVerificationSetting.READY
             passwordlessTestCase.run()
         }

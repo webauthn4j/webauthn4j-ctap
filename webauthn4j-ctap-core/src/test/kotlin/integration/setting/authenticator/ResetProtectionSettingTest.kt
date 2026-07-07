@@ -25,7 +25,7 @@ internal class ResetProtectionSettingTest {
     }
 
     @Test
-    fun resetProtection_disabled_test() = runTest {
+    suspend fun resetProtection_disabled_test() {
         resetTestCase.authenticator.resetProtectionSetting = ResetProtectionSetting.DISABLED
         resetTestCase.run()
     }

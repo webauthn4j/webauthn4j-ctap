@@ -11,7 +11,6 @@ import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthen
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
 import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenticatorInput
 import com.webauthn4j.util.exception.UnexpectedCheckedException
-import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import java.util.concurrent.ExecutionException
@@ -21,7 +20,7 @@ internal class CtapClientTest {
     private val connection = CtapAuthenticator().createSession()
 
     @Test
-    fun getInfo_test() = runTest {
+    suspend fun getInfo_test() {
         val response = connection.getInfo()
         Assertions.assertThat(response.responseData).isNotNull
         Assertions.assertThat(response.responseData!!.aaguid).isEqualTo(CtapAuthenticator.AAGUID)
@@ -44,7 +43,7 @@ internal class CtapClientTest {
     }
 
     @Test
-    fun getAssertion_test() = runTest {
+    suspend fun getAssertion_test() {
         makeCredential()
         val clientDataHash = ByteArray(0)
         val allowList: List<PublicKeyCredentialDescriptor> = emptyList()
@@ -68,7 +67,7 @@ internal class CtapClientTest {
     }
 
     @Test
-    fun reset_test() = runTest {
+    suspend fun reset_test() {
         makeCredential()
         Assertions.assertThat(connection.authenticatorPropertyStore.loadUserCredentials(RP_ID))
             .hasSize(1)
