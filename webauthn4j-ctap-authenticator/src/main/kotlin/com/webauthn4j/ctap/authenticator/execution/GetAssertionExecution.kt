@@ -27,7 +27,9 @@ import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.ctap.core.validator.AuthenticatorGetAssertionRequestValidator
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialType
-import com.webauthn4j.data.SignatureAlgorithm
+import com.webauthn4j.data.attestation.authenticator.EC2COSEKey
+import java.security.KeyPair
+import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthenticatorInput
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
@@ -522,9 +524,10 @@ internal class GetAssertionExecution :
                     object : TypeReference<U2FKeyEnvelope>() {})!!
 
             val key = NonResidentCredentialKey(
-                SignatureAlgorithm.ES256,
-                u2fKeyEnvelope.keyPair.publicKey!!,
-                u2fKeyEnvelope.keyPair.privateKey!!
+                EC2COSEKey.create(
+                    KeyPair(u2fKeyEnvelope.keyPair.publicKey!!, u2fKeyEnvelope.keyPair.privateKey!!),
+                    COSEAlgorithmIdentifier.ES256
+                )
             )
             return U2FCredential(
                 descriptor.id,

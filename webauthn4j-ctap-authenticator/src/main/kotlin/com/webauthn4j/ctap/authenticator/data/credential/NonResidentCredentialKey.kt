@@ -4,64 +4,44 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.webauthn4j.data.SignatureAlgorithm
+import com.webauthn4j.data.attestation.authenticator.COSEKey
+import com.webauthn4j.data.attestation.authenticator.EC2COSEKey
+import com.webauthn4j.data.attestation.authenticator.RSACOSEKey
+import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import java.io.Serializable
 import java.security.KeyPair
-import java.security.PrivateKey
-import java.security.PublicKey
+import java.security.interfaces.ECPublicKey
+import java.security.interfaces.RSAPublicKey
 
-class NonResidentCredentialKey : CredentialKey, Serializable {
-    @JsonProperty("alg")
-    override var alg: SignatureAlgorithm
-        private set
+class NonResidentCredentialKey @JsonCreator constructor(
+    @JsonProperty("key") val coseKey: COSEKey
+) : CredentialKey, Serializable {
 
-    @JsonProperty("publicKey")
-    private var publicKey: PublicKey
+    @get:JsonIgnore
+    override val alg: SignatureAlgorithm
+        get() = coseKey.algorithm!!.toSignatureAlgorithm()
 
-    @JsonProperty("privateKey")
-    private var privateKey: PrivateKey
-
-    constructor(
-        alg: SignatureAlgorithm, keyPair: KeyPair
-    ) {
-        this.alg = alg
-        publicKey = keyPair.public
-        privateKey = keyPair.private
-    }
-
-    @JsonCreator
-    constructor(
-        @JsonProperty("alg") alg: SignatureAlgorithm,
-        @JsonProperty("publicKey") publicKey: PublicKey,
-        @JsonProperty("privateKey") privateKey: PrivateKey
-    ) {
-        this.alg = alg
-        this.publicKey = publicKey
-        this.privateKey = privateKey
-    }
-
+    @get:JsonIgnore
     override val keyPair: KeyPair
-        @JsonIgnore
-        get() = KeyPair(publicKey, privateKey)
+        get() = KeyPair(coseKey.publicKey, coseKey.privateKey)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
-
         other as NonResidentCredentialKey
-
-        if (alg != other.alg) return false
-        if (publicKey != other.publicKey) return false
-        if (privateKey != other.privateKey) return false
-
-        return true
+        return coseKey == other.coseKey
     }
 
-    override fun hashCode(): Int {
-        var result = alg.hashCode()
-        result = 31 * result + publicKey.hashCode()
-        result = 31 * result + privateKey.hashCode()
-        return result
+    override fun hashCode(): Int = coseKey.hashCode()
+
+    companion object {
+        fun create(algorithmIdentifier: COSEAlgorithmIdentifier, keyPair: KeyPair): NonResidentCredentialKey {
+            val coseKey: COSEKey = when (keyPair.public) {
+                is ECPublicKey -> EC2COSEKey.create(keyPair, algorithmIdentifier)
+                is RSAPublicKey -> RSACOSEKey.create(keyPair, algorithmIdentifier)
+                else -> throw IllegalArgumentException("Unsupported key type: ${keyPair.public.javaClass}")
+            }
+            return NonResidentCredentialKey(coseKey)
+        }
     }
-
-
 }
