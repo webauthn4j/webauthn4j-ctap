@@ -13,13 +13,13 @@ class ResidentKeySettingTest {
     private val passwordlessTestCase = PasswordlessTestCase()
 
     @Test
-    fun residentKey_always_test() = runTest {
+    suspend fun residentKey_always_test() {
         passwordlessTestCase.authenticator.residentKeySetting = ResidentKeySetting.ALWAYS
         passwordlessTestCase.run()
     }
 
     @Test
-    fun residentKey_if_required_test() = runTest {
+    suspend fun residentKey_if_required_test() {
         passwordlessTestCase.authenticator.residentKeySetting = ResidentKeySetting.IF_REQUIRED
         passwordlessTestCase.run()
     }

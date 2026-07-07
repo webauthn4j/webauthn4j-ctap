@@ -24,13 +24,13 @@ class RpIdTest {
         }
 
         @Test
-        fun frontend_rpId_null_test() = runTest {
+        suspend fun frontend_rpId_null_test() {
             passwordlessTestCase.relyingParty.registration.frontend.rpId = null
             passwordlessTestCase.run()
         }
 
         @Test
-        fun frontend_backend_rpId_match_test() = runTest {
+        suspend fun frontend_backend_rpId_match_test() {
             passwordlessTestCase.relyingParty.registration.backend.rpId = "example.com"
             passwordlessTestCase.run()
         }
@@ -56,13 +56,13 @@ class RpIdTest {
         }
 
         @Test
-        fun frontend_rpId_null_test() = runTest {
+        suspend fun frontend_rpId_null_test() {
             passwordlessTestCase.relyingParty.authentication.frontend.rpId = null
             passwordlessTestCase.run()
         }
 
         @Test
-        fun frontend_backend_rpId_match_test() = runTest {
+        suspend fun frontend_backend_rpId_match_test() {
             passwordlessTestCase.relyingParty.authentication.backend.rpId = "example.com"
             passwordlessTestCase.run()
         }

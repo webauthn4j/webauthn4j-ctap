@@ -33,14 +33,14 @@ class ClientPINTest {
         }
 
         @Test
-        fun pin_not_already_set_test() = runTest {
+        suspend fun pin_not_already_set_test() {
             clientPINTestCase.clientPlatform.ctapService.reset()
             clientPINTestCase.clientPlatform.ctapService.setPIN("new-PIN")
         }
     }
 
     @Test
-    fun changePIN_test() = runTest {
+    suspend fun changePIN_test() {
         clientPINTestCase.clientPlatform.ctapService.changePIN("clientPIN", "new-PIN")
     }
 
@@ -89,7 +89,7 @@ class ClientPINTest {
 
 
     @Test
-    fun getRetries_test() = runTest {
+    suspend fun getRetries_test() {
         assertThat(clientPINTestCase.clientPlatform.ctapService.getRetries()).isEqualTo(PinUvAuthManager.MAX_PIN_RETRIES)
         try {
             clientPINTestCase.clientPlatform.ctapService.changePIN("invalid-PIN", "invalid-PIN")
@@ -100,7 +100,7 @@ class ClientPINTest {
 
     @Disabled
     @Test
-    fun clientPINSetting_DISABLED_test() = runTest {
+    suspend fun clientPINSetting_DISABLED_test() {
         clientPINTestCase.authenticator.clientPINSetting = ClientPINSetting.ENABLED
         clientPINTestCase.clientPlatform.ctapService.setPIN("dummy")
     }

@@ -25,7 +25,7 @@ class AttachmentSettingTest {
 
         @Test
         @Throws(ExecutionException::class, InterruptedException::class)
-        fun platform_platform_test() = runTest {
+        suspend fun platform_platform_test() {
             passwordlessTestCase.authenticator.platformSetting = AttachmentSetting.PLATFORM
             passwordlessTestCase.run()
         }
@@ -63,7 +63,7 @@ class AttachmentSettingTest {
 
         @Test
         @Throws(ExecutionException::class, InterruptedException::class)
-        fun platform_cross_platform_test() = runTest {
+        suspend fun platform_cross_platform_test() {
             passwordlessTestCase.authenticator.platformSetting = AttachmentSetting.CROSS_PLATFORM
             passwordlessTestCase.run()
         }
@@ -79,14 +79,14 @@ class AttachmentSettingTest {
 
         @Test
         @Throws(ExecutionException::class, InterruptedException::class)
-        fun platform_platform_test() = runTest {
+        suspend fun platform_platform_test() {
             passwordlessTestCase.authenticator.platformSetting = AttachmentSetting.PLATFORM
             passwordlessTestCase.run()
         }
 
         @Test
         @Throws(ExecutionException::class, InterruptedException::class)
-        fun platform_cross_platform_test() = runTest {
+        suspend fun platform_cross_platform_test() {
             passwordlessTestCase.authenticator.platformSetting = AttachmentSetting.CROSS_PLATFORM
             passwordlessTestCase.run()
         }

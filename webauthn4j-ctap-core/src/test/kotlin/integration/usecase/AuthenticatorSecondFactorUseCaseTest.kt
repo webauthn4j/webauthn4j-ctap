@@ -20,13 +20,13 @@ internal class AuthenticatorSecondFactorUseCaseTest {
     internal inner class residentKey_setting_test {
 
         @Test
-        fun residentKey_always_test() = runTest {
+        suspend fun residentKey_always_test() {
             secondFactorTestCase.authenticator.residentKeySetting = ResidentKeySetting.ALWAYS
             secondFactorTestCase.run()
         }
 
         @Test
-        fun residentKey_if_required_test() = runTest {
+        suspend fun residentKey_if_required_test() {
             secondFactorTestCase.authenticator.residentKeySetting = ResidentKeySetting.IF_REQUIRED
             secondFactorTestCase.run()
         }
@@ -37,7 +37,7 @@ internal class AuthenticatorSecondFactorUseCaseTest {
         //  this test should pass without throwing and the @Disabled can be removed.
         @Disabled
         @Test
-        fun residentKey_never_test() = runTest {
+        suspend fun residentKey_never_test() {
             secondFactorTestCase.authenticator.residentKeySetting = ResidentKeySetting.NEVER
             secondFactorTestCase.run()
         }
@@ -46,7 +46,7 @@ internal class AuthenticatorSecondFactorUseCaseTest {
     @Nested
     internal inner class clientPIN_userVerification_setting_correlation_test {
         @Test
-        fun clientPIN_enabled_userVerification_ready_test() = runTest {
+        suspend fun clientPIN_enabled_userVerification_ready_test() {
             secondFactorTestCase.authenticator.clientPINSetting = ClientPINSetting.ENABLED
             secondFactorTestCase.authenticator.userVerificationSetting =
                 UserVerificationSetting.READY
@@ -54,7 +54,7 @@ internal class AuthenticatorSecondFactorUseCaseTest {
         }
 
         @Test
-        fun clientPIN_enabled_userVerification_not_ready_test() = runTest {
+        suspend fun clientPIN_enabled_userVerification_not_ready_test() {
             secondFactorTestCase.authenticator.clientPINSetting = ClientPINSetting.ENABLED
             secondFactorTestCase.authenticator.userVerificationSetting =
                 UserVerificationSetting.NOT_READY
@@ -62,7 +62,7 @@ internal class AuthenticatorSecondFactorUseCaseTest {
         }
 
         @Test
-        fun clientPIN_disabled_userVerification_ready_test() = runTest {
+        suspend fun clientPIN_disabled_userVerification_ready_test() {
             secondFactorTestCase.authenticator.clientPINSetting = ClientPINSetting.DISABLED
             secondFactorTestCase.authenticator.userVerificationSetting =
                 UserVerificationSetting.READY
@@ -70,7 +70,7 @@ internal class AuthenticatorSecondFactorUseCaseTest {
         }
 
         @Test
-        fun clientPIN_disabled_userVerification_not_ready_test() = runTest {
+        suspend fun clientPIN_disabled_userVerification_not_ready_test() {
             secondFactorTestCase.authenticator.clientPINSetting = ClientPINSetting.DISABLED
             secondFactorTestCase.authenticator.userVerificationSetting =
                 UserVerificationSetting.NOT_READY
@@ -78,7 +78,7 @@ internal class AuthenticatorSecondFactorUseCaseTest {
         }
 
         @Test
-        fun clientPIN_disabled_userVerification_not_supported_test() = runTest {
+        suspend fun clientPIN_disabled_userVerification_not_supported_test() {
             secondFactorTestCase.authenticator.clientPINSetting = ClientPINSetting.DISABLED
             secondFactorTestCase.authenticator.userVerificationSetting =
                 UserVerificationSetting.NOT_SUPPORTED
@@ -89,7 +89,7 @@ internal class AuthenticatorSecondFactorUseCaseTest {
     @Nested
     internal inner class userPresence_setting_test {
         @Test
-        fun userPresence_supported_test() = runTest {
+        suspend fun userPresence_supported_test() {
             secondFactorTestCase.authenticator.userPresenceSetting = UserPresenceSetting.SUPPORTED
             secondFactorTestCase.run()
         }

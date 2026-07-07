@@ -12,7 +12,7 @@ class UserPresenceSettingTest {
     private val passwordlessTestCase = PasswordlessTestCase()
 
     @Test
-    fun userPresence_supported_test() = runTest {
+    suspend fun userPresence_supported_test() {
         passwordlessTestCase.authenticator.userPresenceSetting = UserPresenceSetting.SUPPORTED
         passwordlessTestCase.run()
     }

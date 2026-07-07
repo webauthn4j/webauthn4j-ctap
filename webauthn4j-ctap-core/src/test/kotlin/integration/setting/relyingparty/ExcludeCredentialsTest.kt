@@ -44,7 +44,7 @@ class ExcludeCredentialsTest {
     }
 
     @Test
-    fun excludeCredentials_other_authenticator_test() = runTest {
+    suspend fun excludeCredentials_other_authenticator_test() {
         var result: PublicKeyCredential<AuthenticatorAttestationResponse, RegistrationExtensionClientOutput>? =
             null
         passwordlessTestCase.authenticator.credentialSelectorSetting =
