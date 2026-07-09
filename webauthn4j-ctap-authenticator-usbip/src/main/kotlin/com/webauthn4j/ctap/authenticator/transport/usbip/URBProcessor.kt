@@ -52,15 +52,15 @@ class URBProcessor(private val session: USBIPSession) {
     private suspend fun processURBs(urbQueue: Channel<UrbRequest>) {
         while (true) {
             select {
+                if (pendingIns.isNotEmpty()) {
+                    session.interruptEndpoint.responses.onReceive { data ->
+                        completeInterruptIn(data)
+                    }
+                }
                 urbQueue.onReceive { urb ->
                     when (urb) {
                         is SubmitRequest -> handleSubmit(urb)
                         is UnlinkRequest -> handleUnlink(urb)
-                    }
-                }
-                if (pendingIns.isNotEmpty()) {
-                    session.interruptEndpoint.responses.onReceive { data ->
-                        completeInterruptIn(data)
                     }
                 }
             }
