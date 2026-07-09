@@ -13,13 +13,13 @@ data class UserVerificationMgmtPreviewOption constructor(@get:JsonValue val valu
         val NOT_PROVISIONED = UserVerificationMgmtPreviewOption(false)
 
         @JvmField
-        val NULL: UserVerificationMgmtPreviewOption? = null
+        val NOT_SUPPORTED: UserVerificationMgmtPreviewOption? = null
 
         @JvmStatic
         @JsonCreator
         fun create(value: Boolean?): UserVerificationMgmtPreviewOption? {
             return when {
-                value == null -> NULL
+                value == null -> NOT_SUPPORTED
                 value -> PROVISIONED
                 else -> NOT_PROVISIONED
             }

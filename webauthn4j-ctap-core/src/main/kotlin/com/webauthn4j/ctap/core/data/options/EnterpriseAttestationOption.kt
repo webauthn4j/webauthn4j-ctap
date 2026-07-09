@@ -13,13 +13,13 @@ data class EnterpriseAttestationOption constructor(@get:JsonValue val value: Boo
         val DISABLED = EnterpriseAttestationOption(false)
 
         @JvmField
-        val NULL: EnterpriseAttestationOption? = null
+        val NOT_SUPPORTED: EnterpriseAttestationOption? = null
 
         @JvmStatic
         @JsonCreator
         fun create(value: Boolean?): EnterpriseAttestationOption? {
             return when {
-                value == null -> NULL
+                value == null -> NOT_SUPPORTED
                 value -> ENABLED
                 else -> DISABLED
             }

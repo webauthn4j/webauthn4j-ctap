@@ -3,7 +3,7 @@ package com.webauthn4j.ctap.authenticator.data.settings
 /**
  * Controls the makeCredUvNotRqd option reported in authenticatorGetInfo.
  *
- * When [ENABLED], the authenticator allows creating non-discoverable credentials
+ * When [UV_NOT_REQUIRED], the authenticator allows creating non-discoverable credentials
  * without user verification. Discoverable credentials (rk=true) still require UV.
  * This option is overridden to false when alwaysUv is enabled.
  *
@@ -11,16 +11,16 @@ package com.webauthn4j.ctap.authenticator.data.settings
  */
 enum class MakeCredUvNotRqdSetting(val value: Boolean) {
     /** Non-discoverable credentials can be created without user verification. */
-    ENABLED(true),
+    UV_NOT_REQUIRED(true),
     /** All credentials require user verification when the authenticator is protected. */
-    DISABLED(false);
+    UV_REQUIRED(false);
 
     companion object {
         @JvmStatic
         fun create(value: Boolean): MakeCredUvNotRqdSetting {
             return when {
-                value -> ENABLED
-                else -> DISABLED
+                value -> UV_NOT_REQUIRED
+                else -> UV_REQUIRED
             }
         }
     }

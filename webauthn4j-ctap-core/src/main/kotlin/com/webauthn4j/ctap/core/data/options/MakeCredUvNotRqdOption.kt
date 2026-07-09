@@ -7,10 +7,10 @@ data class MakeCredUvNotRqdOption constructor(@get:JsonValue val value: Boolean)
 
     companion object {
         @JvmField
-        val ENABLED = MakeCredUvNotRqdOption(true)
+        val UV_NOT_REQUIRED = MakeCredUvNotRqdOption(true)
 
         @JvmField
-        val DISABLED = MakeCredUvNotRqdOption(false)
+        val UV_REQUIRED = MakeCredUvNotRqdOption(false)
 
         @JvmField
         val NULL: MakeCredUvNotRqdOption? = null
@@ -20,8 +20,8 @@ data class MakeCredUvNotRqdOption constructor(@get:JsonValue val value: Boolean)
         fun create(value: Boolean?): MakeCredUvNotRqdOption? {
             return when {
                 value == null -> NULL
-                value -> ENABLED
-                else -> DISABLED
+                value -> UV_NOT_REQUIRED
+                else -> UV_REQUIRED
             }
         }
     }

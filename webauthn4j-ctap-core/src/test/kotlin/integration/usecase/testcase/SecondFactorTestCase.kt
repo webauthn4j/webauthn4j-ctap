@@ -21,7 +21,7 @@ class SecondFactorTestCase : IntegrationTestCaseBase() {
         //  Without makeCredUvNotRqd, Step 8 rejects all uv=false requests on UV-protected authenticators.
         //  With PREFERRED, the client sends rk=true and Step 7 rejects it without UV.
         //  Once the client supports PUAT_REQUIRED retry, these can be removed.
-        authenticator.makeCredUvNotRqdSetting = MakeCredUvNotRqdSetting.ENABLED
+        authenticator.makeCredUvNotRqdSetting = MakeCredUvNotRqdSetting.UV_NOT_REQUIRED
         relyingParty.registration.frontend.requireResidentKey = false
         relyingParty.registration.frontend.residentKey = ResidentKeyRequirement.DISCOURAGED
         relyingParty.registration.frontend.userVerification =

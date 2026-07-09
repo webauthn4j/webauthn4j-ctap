@@ -77,7 +77,7 @@ abstract class IntegrationTestCaseBase {
             TestParameter { UserVerificationSetting.READY }
         private val algorithmsParameter = TestParameter { setOf(COSEAlgorithmIdentifier.ES256) }
         private val makeCredUvNotRqdSettingParameter =
-            TestParameter { MakeCredUvNotRqdSetting.DISABLED }
+            TestParameter { MakeCredUvNotRqdSetting.UV_REQUIRED }
         private val credentialSelectorSettingParameter =
             TestParameter { CredentialSelectorSetting.CLIENT_PLATFORM }
 
