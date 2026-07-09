@@ -6,6 +6,9 @@ import java.nio.ByteOrder
 /** USBIP_RET_SUBMIT — server response after processing a submitted URB. */
 class SubmitResponse(
     val seqnum: Int,
+    val devid: Int,
+    val direction: TransferDirection,
+    val ep: Int,
     val status: UrbStatus,
     val actualLength: Int,
     val startFrame: Int,
@@ -13,9 +16,6 @@ class SubmitResponse(
     val errorCount: Int,
     val transferBuffer: ByteArray
 ) {
-    val devid: Int = 0
-    val direction: TransferDirection = TransferDirection.OUT
-    val ep: Int = 0
 
     companion object {
         const val COMMAND = 0x00000003
@@ -24,12 +24,14 @@ class SubmitResponse(
 
         fun ok(request: SubmitRequest, transferBuffer: ByteArray, actualLength: Int = transferBuffer.size): SubmitResponse = SubmitResponse(
             seqnum = request.seqnum,
+            devid = request.devid, direction = request.direction, ep = request.ep,
             status = UrbStatus.SUCCESS, actualLength = actualLength,
             startFrame = 0, numberOfPackets = 0, errorCount = 0, transferBuffer = transferBuffer
         )
 
         fun error(request: SubmitRequest, status: UrbStatus): SubmitResponse = SubmitResponse(
             seqnum = request.seqnum,
+            devid = request.devid, direction = request.direction, ep = request.ep,
             status = status, actualLength = 0,
             startFrame = 0, numberOfPackets = 0, errorCount = 0, transferBuffer = ByteArray(0)
         )
