@@ -7,7 +7,7 @@ ktor = "3.5.1"
 
 quarkus = "3.37.2"
 
-webauthn4j = "0.31.8.RELEASE"
+webauthn4j = "master-SNAPSHOT"
 
 slf4j = "2.0.18"
 
@@ -44,9 +44,9 @@ kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 ktor-network = { group = "io.ktor", name = "ktor-network", version.ref = "ktor" }
 
 # WebAuthn4J
-webauthn4j-core = { module = "com.webauthn4j:webauthn4j-core", version.ref = "webauthn4j" }
-webauthn4j-metadata = { module = "com.webauthn4j:webauthn4j-metadata", version.ref = "webauthn4j" }
-webauthn4j-test = { module = "com.webauthn4j:webauthn4j-test", version.ref = "webauthn4j" }
+webauthn4j-core = { module = "com.github.webauthn4j.webauthn4j:webauthn4j-core", version.ref = "webauthn4j" }
+webauthn4j-metadata = { module = "com.github.webauthn4j.webauthn4j:webauthn4j-metadata", version.ref = "webauthn4j" }
+webauthn4j-test = { module = "com.github.webauthn4j.webauthn4j:webauthn4j-test", version.ref = "webauthn4j" }
 
 # Third-party libraries
 
