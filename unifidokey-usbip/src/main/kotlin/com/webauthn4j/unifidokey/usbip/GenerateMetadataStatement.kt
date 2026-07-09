@@ -7,11 +7,15 @@ import com.webauthn4j.ctap.authenticator.attestation.DemoAttestationConstants
 import com.webauthn4j.ctap.authenticator.attestation.PackedBasicAttestationStatementProvider
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
 import com.webauthn4j.ctap.core.data.options.ClientPINOption
+import com.webauthn4j.ctap.core.data.options.MakeCredUvNotRqdOption
+import com.webauthn4j.ctap.core.data.options.PinUvAuthTokenOption
 import com.webauthn4j.ctap.core.data.options.PlatformOption
 import com.webauthn4j.ctap.core.data.options.ResidentKeyOption
 import com.webauthn4j.ctap.core.data.options.UserPresenceOption
 import com.webauthn4j.ctap.core.data.options.UserVerificationOption
+import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.data.AttachmentHint
+import com.webauthn4j.data.PublicKeyCredentialParameters
 import com.webauthn4j.data.AuthenticationAlgorithm
 import com.webauthn4j.data.AuthenticatorAttestationType
 import com.webauthn4j.data.KeyProtectionType
@@ -51,7 +55,8 @@ class GenerateMetadataStatement : Runnable {
     override fun run() {
         val authenticator = CtapAuthenticator(
             attestationStatementProvider = PackedBasicAttestationStatementProvider.createWithDemoAttestationKey(),
-            userVerificationHandler = ConsoleUserVerificationHandler()
+            userVerificationHandler = ConsoleUserVerificationHandler(),
+            transports = setOf(AuthenticatorTransport.USB)
         )
         val session = authenticator.createSession()
         val getInfoResponse = runBlocking { session.getInfo() }
@@ -130,7 +135,32 @@ class GenerateMetadataStatement : Runnable {
                 getInfo.aaguid,
                 getInfo.options?.let { toMetadataOptions(it) },
                 getInfo.maxMsgSize?.toInt(),
-                getInfo.pinUvAuthProtocols?.map { PinProtocolVersion.create(it.value.toInt()) }
+                getInfo.pinUvAuthProtocols?.map { PinProtocolVersion.create(it.value.toInt()) },
+                getInfo.maxCredentialCountInList?.toInt(),
+                getInfo.maxCredentialIdLength?.toInt(),
+                getInfo.transports?.map { AuthenticatorTransport.create(it.value) },
+                getInfo.algorithms?.map { PublicKeyCredentialParameters(it.type, it.alg) },
+                null, // maxSerializedLargeBlobArray
+                null, // forcePINChange
+                getInfo.minPINLength?.toInt(),
+                null, // firmwareVersion
+                null, // maxCredBlobLength
+                null, // maxRPIDsForSetMinPINLength
+                null, // preferredPlatformUvAttempts
+                null, // uvModality
+                null, // certifications
+                null, // remainingDiscoverableCredentials
+                null, // vendorPrototypeConfigCommands
+                null, // attestationFormats
+                null, // uvCountSinceLastPinEntry
+                null, // longTouchForReset
+                null, // encIdentifier
+                null, // transportsForReset
+                null, // pinComplexityPolicy
+                null, // pinComplexityPolicyURL
+                null, // maxPINLength
+                null, // encCredStoreState
+                null  // authenticatorConfigCommands
             )
         }
 
@@ -158,8 +188,27 @@ class GenerateMetadataStatement : Runnable {
                     UserVerificationOption.NOT_READY -> Options.UserVerificationOption.NOT_READY
                     else -> null
                 },
-                null,
-                null
+                when (options.pinUvAuthToken) {
+                    PinUvAuthTokenOption.SUPPORTED -> Options.PinUvAuthTokenOption.SUPPORTED
+                    else -> null
+                },
+                null, // noMcGaPermissionsWithClientPin
+                null, // largeBlobs
+                null, // ep
+                null, // bioEnroll
+                null, // userVerificationMgmtPreview
+                null, // uvBioEnroll
+                null, // authnrCfg
+                null, // uvAcfg
+                null, // credMgmt
+                null, // perCredMgmtRO
+                null, // credentialMgmtPreview
+                null, // setMinPINLength
+                when (options.makeCredUvNotRqd) {
+                    MakeCredUvNotRqdOption.ENABLED -> Options.MakeCredUvNotRqdOption.UV_NOT_REQUIRED
+                    else -> null
+                },
+                null  // alwaysUv
             )
         }
     }
