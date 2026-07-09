@@ -1,6 +1,7 @@
 package com.webauthn4j.ctap.authenticator
 
 import tools.jackson.databind.json.JsonMapper
+import com.webauthn4j.ctap.core.data.CtapVersion
 import tools.jackson.dataformat.cbor.CBORMapper
 import tools.jackson.module.kotlin.KotlinModule
 import com.webauthn4j.converter.util.ObjectConverter
@@ -58,12 +59,9 @@ class CtapAuthenticator(
     companion object{
         @JvmField
         val AAGUID = AAGUID("33c1642b-b5e9-423d-9add-5a0119c2a8b8")
-        const val VERSION_U2F_V2 = "U2F_V2"
-        const val VERSION_FIDO_2_0 = "FIDO_2_0"
-        const val VERSION_FIDO_2_1_PRE = "FIDO_2_1_PRE"
-
         @JvmField
-        val VERSIONS = listOf(VERSION_U2F_V2, VERSION_FIDO_2_0)
+        val VERSIONS = listOf(CtapVersion.U2F_V2, CtapVersion.FIDO_2_0)
+
 
         private fun createObjectConverter(): ObjectConverter {
             val jsonMapper = JsonMapper()

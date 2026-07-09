@@ -8,6 +8,7 @@ import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
+import com.webauthn4j.ctap.core.data.CtapVersion
 import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.core.data.options.ClientPINOption
 import com.webauthn4j.ctap.core.data.options.PlatformOption
@@ -32,7 +33,7 @@ internal class AuthenticatorGetInfoResponseDataSerializerTest {
     @Test
     fun integer_keys_should_be_encoded_as_cbor_unsigned_integer() {
         val original = AuthenticatorGetInfoResponseData(
-            listOf("FIDO_2_0"), null,
+            listOf(CtapVersion.FIDO_2_0), null,
             CtapAuthenticator.AAGUID,
             null, null, null, null, null, null
         )
@@ -46,7 +47,7 @@ internal class AuthenticatorGetInfoResponseDataSerializerTest {
     @Test
     fun test() {
         val original = AuthenticatorGetInfoResponseData(
-            listOf("FIDO_2_0"), emptyList(),
+            listOf(CtapVersion.FIDO_2_0), emptyList(),
             CtapAuthenticator.AAGUID,
             AuthenticatorGetInfoResponseData.Options(
                 PlatformOption.CROSS_PLATFORM,

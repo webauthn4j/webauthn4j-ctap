@@ -125,7 +125,7 @@ class GenerateMetadataStatement : Runnable {
     companion object {
         private fun toMetadataGetInfo(getInfo: AuthenticatorGetInfoResponseData): AuthenticatorGetInfo {
             return AuthenticatorGetInfo(
-                getInfo.versions,
+                getInfo.versions.map { it.versionString },
                 getInfo.extensions ?: emptyList(),
                 getInfo.aaguid,
                 getInfo.options?.let { toMetadataOptions(it) },

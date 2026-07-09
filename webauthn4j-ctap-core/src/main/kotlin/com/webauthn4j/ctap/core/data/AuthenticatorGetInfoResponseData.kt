@@ -17,7 +17,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
         @JvmStatic
         @JsonCreator
         fun createFromCbor(
-            @JsonProperty("1") versions: List<String>,
+            @JsonProperty("1") versions: List<CtapVersion>,
             @JsonProperty("2") extensions: List<String>?,
             @JsonProperty("3") aaguid: AAGUID,
             @JsonProperty("4") options: Options?,
@@ -86,7 +86,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
     }
 
     // §6.4 versions (0x01): Required
-    val versions: List<String>
+    val versions: List<CtapVersion>
     // §6.4 extensions (0x02): Optional
     val extensions: List<String>?
     // §6.4 aaguid (0x03): Required
@@ -149,7 +149,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
     val authenticatorConfigCommands: List<UInt>?
 
     constructor(
-        versions: List<String>,
+        versions: List<CtapVersion>,
         extensions: List<String>?,
         aaguid: AAGUID,
         options: Options?,
