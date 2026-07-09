@@ -157,7 +157,7 @@ internal class MakeCredentialExecutionTest {
 
         val ctapAuthenticator = CtapAuthenticator()
         ctapAuthenticator.residentKey = residentKeySetting
-        ctapAuthenticator.makeCredUvNotRqd = MakeCredUvNotRqdSetting.ENABLED
+        ctapAuthenticator.makeCredUvNotRqd = MakeCredUvNotRqdSetting.UV_NOT_REQUIRED
         val connection = ctapAuthenticator.createSession()
 
         val response = connection.makeCredential(command)

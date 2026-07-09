@@ -13,13 +13,13 @@ data class AlwaysUvOption constructor(@get:JsonValue val value: Boolean) {
         val DISABLED = AlwaysUvOption(false)
 
         @JvmField
-        val NULL: AlwaysUvOption? = null
+        val NOT_SUPPORTED: AlwaysUvOption? = null
 
         @JvmStatic
         @JsonCreator
         fun create(value: Boolean?): AlwaysUvOption? {
             return when {
-                value == null -> NULL
+                value == null -> NOT_SUPPORTED
                 value -> ENABLED
                 else -> DISABLED
             }

@@ -162,7 +162,7 @@ internal class MakeCredentialExecution :
         // TODO: Step 4: Create a new response structure. Currently represented by field declarations (upResult=false, uvResult=false).
         execStep5ProcessOptions()
         // Initialize from authenticator setting; Step 6.1 may override to false when alwaysUv is enabled.
-        makeCredUvNotRqd = ctapAuthenticatorSession.makeCredUvNotRqd == MakeCredUvNotRqdSetting.ENABLED
+        makeCredUvNotRqd = ctapAuthenticatorSession.makeCredUvNotRqd == MakeCredUvNotRqdSetting.UV_NOT_REQUIRED
         execStep6ProcessAlwaysUv()
         execStep7And8ProcessMakeCredUvNotRqd()
         // TODO: Step 9: enterpriseAttestation processing

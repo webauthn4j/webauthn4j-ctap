@@ -13,13 +13,13 @@ data class BioEnrollOption constructor(@get:JsonValue val value: Boolean) {
         val NOT_PROVISIONED = BioEnrollOption(false)
 
         @JvmField
-        val NULL: BioEnrollOption? = null
+        val NOT_SUPPORTED: BioEnrollOption? = null
 
         @JvmStatic
         @JsonCreator
         fun create(value: Boolean?): BioEnrollOption? {
             return when {
-                value == null -> NULL
+                value == null -> NOT_SUPPORTED
                 value -> PROVISIONED
                 else -> NOT_PROVISIONED
             }

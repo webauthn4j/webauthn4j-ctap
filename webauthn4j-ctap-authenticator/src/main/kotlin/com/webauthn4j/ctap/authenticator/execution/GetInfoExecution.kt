@@ -108,8 +108,8 @@ internal class GetInfoExecution(
             AlwaysUvSetting.DISABLED -> null
         }
         val makeCredUvNotRqd: MakeCredUvNotRqdOption? = when (ctapAuthenticatorSession.makeCredUvNotRqd) {
-            MakeCredUvNotRqdSetting.ENABLED -> MakeCredUvNotRqdOption.ENABLED
-            MakeCredUvNotRqdSetting.DISABLED -> null
+            MakeCredUvNotRqdSetting.UV_NOT_REQUIRED -> MakeCredUvNotRqdOption.UV_NOT_REQUIRED
+            MakeCredUvNotRqdSetting.UV_REQUIRED -> null
         }
         val extensions = ctapAuthenticatorSession.extensionProcessors.map { it.extensionId }
 
