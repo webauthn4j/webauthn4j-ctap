@@ -14,12 +14,4 @@ enum class PinUvAuthTokenPermission(val value: Int) {
     BE(0x08),
     LBW(0x10),
     ACFG(0x20);
-
-    companion object {
-        fun fromBitfield(bitfield: Int): Set<PinUvAuthTokenPermission> =
-            entries.filter { bitfield and it.value != 0 }.toSet()
-
-        fun toBitfield(permissions: Set<PinUvAuthTokenPermission>): Int =
-            permissions.fold(0) { acc, p -> acc or p.value }
-    }
 }
