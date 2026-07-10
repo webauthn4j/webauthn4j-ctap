@@ -36,6 +36,7 @@ class HIDTransport(
     private var u2fAPDUProcessor = createU2FAPDUProcessor()
 
     private val hidPacketConverter = HIDPacketConverter()
+    // Allocated logical channels, keyed by channel ID. Access is serialized by consumerDispatcher.
     private val hidChannels: MutableMap<HIDChannelId, HIDChannel> = HashMap()
     private val secureRandom = SecureRandom()
 
@@ -68,8 +69,7 @@ class HIDTransport(
         }
         override suspend fun resyncChannel(channelId: HIDChannelId) {
             val old = hidChannels.remove(channelId)
-            old?.cancelAndAwaitCbor()
-            old?.close()
+            old?.cancel()
             hidChannels[channelId] = createChannel(channelId)
         }
     })
@@ -90,7 +90,6 @@ class HIDTransport(
     override fun close() {
         incomingPackets.close()
         consumerJob?.cancel()
-        hidChannels.values.forEach { it.close() }
         hidChannels.clear()
     }
 
@@ -99,7 +98,6 @@ class HIDTransport(
         u2fAPDUProcessor = createU2FAPDUProcessor()
         cancelHandler = HIDCancelCommandHandler(ctapAuthenticatorSession)
         winkHandler = HIDWinkCommandHandler(ctapAuthenticatorSession)
-        hidChannels.values.forEach { it.close() }
         hidChannels.clear()
     }
 
@@ -140,7 +138,7 @@ class HIDTransport(
                     val activeChannel = activeTransactionChannelId
                     if (activeChannel != null) {
                         logger.debug("Cancelling ongoing CBOR on channel {} before processing broadcast INIT", activeChannel)
-                        hidChannels[activeChannel]?.cancelAndAwaitCbor()
+                        hidChannels[activeChannel]?.cancel()
                     }
                     val tempChannel = createChannel(channelId)
                     tempChannel.handlePacket(hidPacket) { responsePacket ->
@@ -223,23 +221,20 @@ class HIDTransport(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
     private fun createChannel(channelId: HIDChannelId): HIDChannel {
-        val keepAliveWorker = newSingleThreadContext("hid-keepalive-worker-" + HexUtil.encodeToString(channelId.value))
         val msgHandler = HIDMsgCommandHandler(u2fAPDUProcessor, u2fConfirmationWorker)
         val perChannelCborHandler = HIDCborCommandHandler(
             CtapRequestConverter(ctapAuthenticatorSession.objectConverter),
             CtapResponseConverter(ctapAuthenticatorSession.objectConverter),
             ctapAuthenticatorSession,
-            keepAliveWorker
         )
         return HIDChannel(
             channelId = channelId,
             scope = scope,
             packetSize = packetSize,
-            keepAliveWorker = keepAliveWorker,
             activeTransactionChannelIdSetter = { activeTransactionChannelId = it },
             commandTimeSetter = { currentCommandStartTimeMs = it },
+            ctapAuthenticatorSession = ctapAuthenticatorSession,
             initHandler = initHandler,
             cborHandler = perChannelCborHandler,
             msgHandler = msgHandler,

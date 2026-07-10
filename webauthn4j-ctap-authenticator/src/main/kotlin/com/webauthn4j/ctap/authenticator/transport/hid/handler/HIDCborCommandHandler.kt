@@ -9,17 +9,15 @@ import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.ctap.core.data.hid.HIDCBORRequestMessage
 import com.webauthn4j.ctap.core.data.hid.HIDCBORResponseMessage
 import com.webauthn4j.ctap.core.data.hid.HIDKEEPALIVEResponseMessage
+import com.webauthn4j.ctap.core.data.hid.HIDChannelId
 import com.webauthn4j.ctap.core.data.hid.HIDResponseMessage
 import com.webauthn4j.ctap.core.data.hid.HIDStatusCode
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
+import org.slf4j.LoggerFactory
 
 // @see <a href="https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html#usb-hid-cbor">8.1.9.1.2. CTAPHID_CBOR</a>
 //spec| This command sends an encapsulated CTAP CBOR encoded message. The semantics of the data
@@ -29,56 +27,45 @@ class HIDCborCommandHandler(
     private val ctapRequestConverter: CtapRequestConverter,
     private val ctapResponseConverter: CtapResponseConverter,
     private val ctapAuthenticatorSession: CtapAuthenticatorSession,
-    private val keepAliveWorker: CoroutineContext
 ) {
 
     companion object {
-        //spec| This command code is sent while processing a CTAPHID_MSG. It should be sent at least
-        //spec| every 100ms and whenever the status changes.
         private const val KEEPALIVE_INTERVAL = 100L
     }
 
-    fun handle(
-        scope: CoroutineScope,
+    private val logger = LoggerFactory.getLogger(HIDCborCommandHandler::class.java)
+
+    suspend fun handle(
         hidMessage: HIDCBORRequestMessage,
         responseCallback: (HIDResponseMessage) -> Unit,
-        onComplete: () -> Unit
-    ): CompletableDeferred<Unit> {
-        val completion = CompletableDeferred<Unit>()
-        scope.launch(Dispatchers.Default) {
-            try {
-                coroutineScope {
-                    val keepAliveJob = launch(keepAliveWorker) {
-                        while (true) {
-                            //spec| STATUS_PROCESSING 1 The authenticator is still processing the current request.
-                            //spec| STATUS_UPNEEDED 2 The authenticator is waiting for user presence.
-                            val statusCode = if (ctapAuthenticatorSession.isWaitingForUserPresence) {
-                                HIDStatusCode.UPNEEDED
-                            } else {
-                                HIDStatusCode.PROCESSING
-                            }
-                            responseCallback(HIDKEEPALIVEResponseMessage(hidMessage.channelId, statusCode))
-                            delay(KEEPALIVE_INTERVAL)
-                        }
-                    }
-                    val ctapCommand = ctapRequestConverter.convert(hidMessage.data)
-                    val ctapResponse: CtapResponse = ctapAuthenticatorSession.invokeCommand(ctapCommand)
-                    val cbor = ctapResponseConverter.convertToResponseDataBytes(ctapResponse)
-                    val responseMessage = HIDCBORResponseMessage(hidMessage.channelId, ctapResponse.statusCode, cbor)
-                    keepAliveJob.cancelAndJoin()
-                    responseCallback(responseMessage)
-                }
-            } catch (_: CancellationException) {
-                responseCallback(HIDCBORResponseMessage(hidMessage.channelId, CtapStatusCode.CTAP2_ERR_KEEPALIVE_CANCEL, ByteArray(0)))
-            } catch (e: CtapCommandExecutionException) {
-                responseCallback(HIDCBORResponseMessage(hidMessage.channelId, e.statusCode, ByteArray(0)))
-            } catch (_: Exception) {
-                responseCallback(HIDCBORResponseMessage(hidMessage.channelId, CtapStatusCode.CTAP1_ERR_OTHER, ByteArray(0)))
-            } finally {
-                onComplete()
-                completion.complete(Unit)
+    ) {
+        val ctapCommand = ctapRequestConverter.convert(hidMessage.data)
+        try {
+            coroutineScope {
+                startKeepAlive(hidMessage.channelId, responseCallback)
+                val response: CtapResponse = ctapAuthenticatorSession.invokeCommand(ctapCommand)
+                val cbor = ctapResponseConverter.convertToResponseDataBytes(response)
+                responseCallback(HIDCBORResponseMessage(hidMessage.channelId, response.statusCode, cbor))
+            }
+        } catch (_: CancellationException) {
+            responseCallback(HIDCBORResponseMessage(hidMessage.channelId, CtapStatusCode.CTAP2_ERR_KEEPALIVE_CANCEL, ByteArray(0)))
+        } catch (e: CtapCommandExecutionException) {
+            responseCallback(HIDCBORResponseMessage(hidMessage.channelId, e.statusCode, ByteArray(0)))
+        } catch (e: Exception) {
+            logger.error("Unexpected exception while processing CTAP CBOR command", e)
+            responseCallback(HIDCBORResponseMessage(hidMessage.channelId, CtapStatusCode.CTAP1_ERR_OTHER, ByteArray(0)))
+        }
+    }
+
+    // Launches a child coroutine that sends CTAPHID_KEEPALIVE every 100ms until the parent scope completes.
+    private fun CoroutineScope.startKeepAlive(channelId: HIDChannelId, responseCallback: (HIDResponseMessage) -> Unit) {
+        launch {
+            while (true) {
+                delay(KEEPALIVE_INTERVAL)
+                val status = if (ctapAuthenticatorSession.isWaitingForUserPresence)
+                    HIDStatusCode.UPNEEDED else HIDStatusCode.PROCESSING
+                responseCallback(HIDKEEPALIVEResponseMessage(channelId, status))
             }
         }
-        return completion
     }
 }

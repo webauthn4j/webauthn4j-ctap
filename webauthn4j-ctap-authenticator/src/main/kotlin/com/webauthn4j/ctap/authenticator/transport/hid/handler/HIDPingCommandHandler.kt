@@ -9,7 +9,7 @@ import com.webauthn4j.ctap.core.data.hid.HIDResponseMessage
 //spec| is defined to be a uniform function for debugging, latency and performance measurements.
 class HIDPingCommandHandler {
 
-    fun handle(hidMessage: HIDPINGRequestMessage): HIDResponseMessage {
+    suspend fun handle(hidMessage: HIDPINGRequestMessage): HIDResponseMessage {
         return HIDPINGResponseMessage(hidMessage.channelId, hidMessage.data)
     }
 }

@@ -19,7 +19,7 @@ class HIDLockCommandHandler(
         private const val MAX_LOCK_SECONDS = 10
     }
 
-    fun handle(hidMessage: HIDLOCKRequestMessage, channelId: HIDChannelId): HIDLOCKResponseMessage {
+    suspend fun handle(hidMessage: HIDLOCKRequestMessage, channelId: HIDChannelId): HIDLOCKResponseMessage {
         val seconds = hidMessage.seconds.toInt().coerceIn(0, MAX_LOCK_SECONDS)
         if (seconds == 0) {
             lockState.ownerChannelId = null
