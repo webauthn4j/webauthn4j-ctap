@@ -14,6 +14,8 @@ import com.webauthn4j.ctap.core.data.hid.HIDResponseMessage
 import com.webauthn4j.ctap.core.data.hid.HIDStatusCode
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -39,11 +41,12 @@ class HIDCborCommandHandler(
         hidMessage: HIDCBORRequestMessage,
         responseCallback: (HIDResponseMessage) -> Unit,
     ) {
-        val ctapCommand = ctapRequestConverter.convert(hidMessage.data)
         try {
+            val ctapCommand = ctapRequestConverter.convert(hidMessage.data)
             coroutineScope {
-                startKeepAlive(hidMessage.channelId, responseCallback)
+                val keepAliveJob = startKeepAlive(hidMessage.channelId, responseCallback)
                 val response: CtapResponse = ctapAuthenticatorSession.invokeCommand(ctapCommand)
+                keepAliveJob.cancelAndJoin()
                 val cbor = ctapResponseConverter.convertToResponseDataBytes(response)
                 responseCallback(HIDCBORResponseMessage(hidMessage.channelId, response.statusCode, cbor))
             }
@@ -57,9 +60,9 @@ class HIDCborCommandHandler(
         }
     }
 
-    // Launches a child coroutine that sends CTAPHID_KEEPALIVE every 100ms until the parent scope completes.
-    private fun CoroutineScope.startKeepAlive(channelId: HIDChannelId, responseCallback: (HIDResponseMessage) -> Unit) {
-        launch {
+    // Launches a child coroutine that sends CTAPHID_KEEPALIVE every 100ms until explicitly cancelled.
+    private fun CoroutineScope.startKeepAlive(channelId: HIDChannelId, responseCallback: (HIDResponseMessage) -> Unit): Job {
+        return launch {
             while (true) {
                 delay(KEEPALIVE_INTERVAL)
                 val status = if (ctapAuthenticatorSession.isWaitingForUserPresence)
