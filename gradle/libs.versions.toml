@@ -7,7 +7,7 @@ ktor = "3.5.1"
 
 quarkus = "3.37.2"
 
-webauthn4j = "0.31.8.RELEASE"
+webauthn4j = "master-SNAPSHOT"
 
 slf4j = "2.0.18"
 
