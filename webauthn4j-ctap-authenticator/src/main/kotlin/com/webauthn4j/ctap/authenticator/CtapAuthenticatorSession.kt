@@ -20,10 +20,12 @@ import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlin.coroutines.coroutineContext
 import org.slf4j.LoggerFactory
 
 /**
@@ -86,8 +88,10 @@ class CtapAuthenticatorSession internal constructor(
 
     var onGoingGetAssertionSession: GetAssertionSession? = null
 
+    // The Job of the currently executing command, used by cancelOnGoingTransaction() to cancel it.
+    // Set after mutex acquisition to avoid race conditions; cleared in finally.
     @Volatile
-    private var onGoingJob: Job? = null
+    private var activeTransaction: Job? = null
 
     @Volatile
     var isWaitingForUserPresence: Boolean = false
@@ -102,94 +106,100 @@ class CtapAuthenticatorSession internal constructor(
         }
     }
 
-    suspend fun <TC : AuthenticatorRequest, TR : AuthenticatorResponse?> invokeCommand(request: TC): TR {
-        onGoingJob = coroutineContext[Job]
-        try {
-            val response = when (request) {
-                is AuthenticatorMakeCredentialRequest -> makeCredential(request)
-                is AuthenticatorGetAssertionRequest -> getAssertion(request)
-                is AuthenticatorGetNextAssertionRequest -> getNextAssertion(request)
-                is AuthenticatorGetInfoRequest -> getInfo(request)
-                is AuthenticatorClientPINRequest -> clientPIN(request)
-                is AuthenticatorResetRequest -> reset(request)
-                is U2FRegistrationRequest -> u2fRegister(request)
-                is U2FAuthenticationRequest -> u2fSign(request)
-                else -> throw IllegalStateException(
-                    String.format(
-                        "unknown command %s is invoked.",
-                        request::class.java.toString()
-                    )
-                )
-            }
-            @Suppress("UNCHECKED_CAST")
-            return response as TR
-        } finally {
-            onGoingJob = null
-        }
+    @Suppress("UNCHECKED_CAST")
+    suspend fun <TC : AuthenticatorRequest, TR : AuthenticatorResponse?> invokeCommand(
+        request: TC
+    ): TR {
+        return when (request) {
+            is AuthenticatorMakeCredentialRequest -> makeCredential(request)
+            is AuthenticatorGetAssertionRequest -> getAssertion(request)
+            is AuthenticatorGetNextAssertionRequest -> getNextAssertion(request)
+            is AuthenticatorGetInfoRequest -> getInfo(request)
+            is AuthenticatorClientPINRequest -> clientPIN(request)
+            is AuthenticatorResetRequest -> reset(request)
+            is U2FRegistrationRequest -> u2fRegister(request)
+            is U2FAuthenticationRequest -> u2fSign(request)
+            else -> throw IllegalStateException("unknown command ${request::class.java}")
+        } as TR
     }
 
     suspend fun makeCredential(authenticatorMakeCredentialCommand: AuthenticatorMakeCredentialRequest): AuthenticatorMakeCredentialResponse {
-        mutex.withLock {
-            return MakeCredentialExecution(this, authenticatorMakeCredentialCommand).execute()
+        return withTransaction {
+            MakeCredentialExecution(this, authenticatorMakeCredentialCommand).execute()
         }
     }
 
     suspend fun getAssertion(authenticatorGetAssertionCommand: AuthenticatorGetAssertionRequest): AuthenticatorGetAssertionResponse {
-        mutex.withLock {
-            return GetAssertionExecution(this, authenticatorGetAssertionCommand).execute()
+        return withTransaction {
+            GetAssertionExecution(this, authenticatorGetAssertionCommand).execute()
         }
     }
 
     @JvmOverloads
     suspend fun getNextAssertion(authenticatorGetNextAssertionCommand: AuthenticatorGetNextAssertionRequest = AuthenticatorGetNextAssertionRequest()): AuthenticatorGetNextAssertionResponse {
-        mutex.withLock {
-            return GetNextAssertionExecution(this, authenticatorGetNextAssertionCommand).execute()
+        return withTransaction {
+            GetNextAssertionExecution(this, authenticatorGetNextAssertionCommand).execute()
         }
     }
 
     @JvmOverloads
     suspend fun getInfo(authenticatorGetInfoCommand: AuthenticatorGetInfoRequest = AuthenticatorGetInfoRequest()): AuthenticatorGetInfoResponse {
-        mutex.withLock {
-            return GetInfoExecution(this, authenticatorGetInfoCommand).execute()
+        return withTransaction {
+            GetInfoExecution(this, authenticatorGetInfoCommand).execute()
         }
     }
 
     suspend fun clientPIN(authenticatorClientPINCommand: AuthenticatorClientPINRequest): AuthenticatorClientPINResponse {
-        mutex.withLock {
-            return ClientPINExecution(this, authenticatorClientPINCommand).execute()
+        return withTransaction {
+            ClientPINExecution(this, authenticatorClientPINCommand).execute()
         }
     }
 
     @JvmOverloads
     suspend fun reset(authenticatorResetCommand: AuthenticatorResetRequest = AuthenticatorResetRequest()): AuthenticatorResetResponse {
-        mutex.withLock {
-            return ResetExecution(this, authenticatorResetCommand).execute()
+        return withTransaction {
+            ResetExecution(this, authenticatorResetCommand).execute()
         }
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
     suspend fun u2fRegister(u2fRegistrationRequest: U2FRegistrationRequest): U2FRegistrationResponse {
-        mutex.withLock {
-            return U2FRegisterExecution(this, u2fRegistrationRequest).execute()
+        return withTransaction {
+            U2FRegisterExecution(this, u2fRegistrationRequest).execute()
         }
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
     suspend fun u2fSign(u2fAuthenticationRequest: U2FAuthenticationRequest): U2FAuthenticationResponse {
-        mutex.withLock {
-            return U2FAuthenticationExecution(this, u2fAuthenticationRequest).execute()
+        return withTransaction {
+            U2FAuthenticationExecution(this, u2fAuthenticationRequest).execute()
         }
     }
 
     suspend fun wink() {
-        mutex.withLock {
-            winkHandler.onWink()
+        withTransaction { winkHandler.onWink() }
+    }
+
+    // Serializes command execution with mutex and tracks the active Job for cancellation.
+    // Uses async(LAZY) so that activeTransaction is set before the command starts.
+    private suspend fun <T> withTransaction(block: suspend () -> T): T {
+        return mutex.withLock {
+            coroutineScope {
+                val commandJob = async(start = CoroutineStart.LAZY) { block() }
+                activeTransaction = commandJob
+                commandJob.start()
+                try {
+                    commandJob.await()
+                } finally {
+                    activeTransaction = null
+                }
+            }
         }
     }
 
-    fun cancelOnGoingTransaction() {
+    suspend fun cancelOnGoingTransaction() {
         logger.debug("Cancel ongoing transaction requested")
-        onGoingJob?.cancel()
+        activeTransaction?.cancelAndJoin()
         onGoingGetAssertionSession = null
     }
 
