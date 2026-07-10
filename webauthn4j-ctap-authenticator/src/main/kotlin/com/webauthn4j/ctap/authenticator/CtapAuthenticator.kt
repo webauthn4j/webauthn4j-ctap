@@ -60,8 +60,7 @@ class CtapAuthenticator(
         @JvmField
         val AAGUID = AAGUID("33c1642b-b5e9-423d-9add-5a0119c2a8b8")
         @JvmField
-        val VERSIONS = listOf(CtapVersion.U2F_V2, CtapVersion.FIDO_2_0)
-
+        val VERSIONS = listOf(CtapVersion.U2F_V2, CtapVersion.FIDO_2_0, CtapVersion.FIDO_2_1_PRE, CtapVersion.FIDO_2_1)
 
         private fun createObjectConverter(): ObjectConverter {
             val jsonMapper = JsonMapper()
@@ -106,7 +105,7 @@ class CtapAuthenticator(
     var userPresence: UserPresenceSetting = UserPresenceSetting.SUPPORTED
     var userVerification: UserVerificationSetting = UserVerificationSetting.READY
     var alwaysUv: AlwaysUvSetting = AlwaysUvSetting.DISABLED
-    var makeCredUvNotRqd: MakeCredUvNotRqdSetting = MakeCredUvNotRqdSetting.UV_REQUIRED
+    var makeCredUvNotRqd: MakeCredUvNotRqdSetting = MakeCredUvNotRqdSetting.UV_NOT_REQUIRED
     var credentialSelector: CredentialSelectorSetting = CredentialSelectorSetting.AUTHENTICATOR
 
     fun createSession(
