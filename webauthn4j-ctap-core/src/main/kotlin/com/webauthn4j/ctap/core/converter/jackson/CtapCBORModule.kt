@@ -2,6 +2,7 @@ package com.webauthn4j.ctap.core.converter.jackson
 
 import tools.jackson.databind.module.SimpleModule
 import com.webauthn4j.ctap.core.converter.jackson.deserializer.CoercionLessByteArrayDeserializer
+import com.webauthn4j.ctap.core.converter.jackson.deserializer.PinUvAuthTokenPermissionsDeserializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorClientPINRequestSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorClientPINResponseDataSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorGetAssertionRequestOptionsSerializer
@@ -17,6 +18,7 @@ import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorMakeCr
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorMakeCredentialResponseDataSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorResetRequestSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorResetResponseDataSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.PinUvAuthTokenPermissionsSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.CtapPublicKeyCredentialRpEntitySerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.CtapPublicKeyCredentialUserEntitySerializer
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINRequest
@@ -33,6 +35,7 @@ import com.webauthn4j.ctap.core.data.AuthenticatorResetRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorResetResponseData
 import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
 import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
+import com.webauthn4j.ctap.core.data.PinUvAuthTokenPermissions
 
 class CtapCBORModule : SimpleModule("CtapCBORModule") {
     init {
@@ -105,6 +108,9 @@ class CtapCBORModule : SimpleModule("CtapCBORModule") {
             CtapPublicKeyCredentialUserEntitySerializer()
         )
 
+        this.addSerializer(PinUvAuthTokenPermissions::class.java, PinUvAuthTokenPermissionsSerializer())
+
         this.addDeserializer(ByteArray::class.java, CoercionLessByteArrayDeserializer())
+        this.addDeserializer(PinUvAuthTokenPermissions::class.java, PinUvAuthTokenPermissionsDeserializer())
     }
 }
