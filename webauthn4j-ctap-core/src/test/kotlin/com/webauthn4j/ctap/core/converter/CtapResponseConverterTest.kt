@@ -8,6 +8,7 @@ import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
+import com.webauthn4j.ctap.core.data.CtapVersion
 import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialResponse
 import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.data.PinProtocolVersion
@@ -37,7 +38,7 @@ internal class CtapResponseConverterTest {
     @Test
     fun convert_AuthenticatorGetInfoResponseData_test() {
         val responseData = AuthenticatorGetInfoResponseData(
-            listOf("FIDO_2_0"), emptyList(),
+            listOf(CtapVersion.FIDO_2_0), emptyList(),
             CtapAuthenticator.AAGUID,
             AuthenticatorGetInfoResponseData.Options(
                 PlatformOption.CROSS_PLATFORM,

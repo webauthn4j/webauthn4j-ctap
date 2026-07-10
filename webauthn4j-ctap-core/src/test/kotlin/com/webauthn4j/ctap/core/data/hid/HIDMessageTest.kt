@@ -4,6 +4,7 @@ import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.transport.hid.HIDResponseMessageBuilder
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
+import com.webauthn4j.ctap.core.data.CtapVersion
 import com.webauthn4j.ctap.core.data.CtapStatusCode.Companion.CTAP2_OK
 import com.webauthn4j.ctap.core.data.options.ClientPINOption
 import com.webauthn4j.ctap.core.data.options.PlatformOption
@@ -23,7 +24,7 @@ internal class HIDMessageTest {
             AuthenticatorGetInfoResponse(
                 CTAP2_OK,
                 AuthenticatorGetInfoResponseData(
-                    listOf("FIDO_2_0"),
+                    listOf(CtapVersion.FIDO_2_0),
                     listOf(),
                     AAGUID(UUID.randomUUID()),
                     AuthenticatorGetInfoResponseData.Options(
