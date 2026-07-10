@@ -12,7 +12,7 @@ class HIDCancelCommandHandler(
     private val ctapAuthenticatorSession: CtapAuthenticatorSession
 ) {
 
-    fun handle() {
+    suspend fun handle() {
         ctapAuthenticatorSession.cancelOnGoingTransaction()
     }
 }

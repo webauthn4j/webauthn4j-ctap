@@ -1,21 +1,21 @@
 package com.webauthn4j.ctap.authenticator.transport.hid
 
+import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
 import com.webauthn4j.ctap.authenticator.transport.hid.handler.*
 import com.webauthn4j.ctap.core.data.hid.*
 import com.webauthn4j.ctap.core.data.hid.HIDMessage.Companion.DEFAULT_PACKET_SIZE
-import kotlinx.coroutines.CloseableCoroutineDispatcher
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
-import java.io.Closeable
 
 class HIDChannel(
     private val channelId: HIDChannelId,
     private val scope: CoroutineScope,
     private val packetSize: Int = DEFAULT_PACKET_SIZE,
-    private val keepAliveWorker: CloseableCoroutineDispatcher,
     private val activeTransactionChannelIdSetter: (HIDChannelId?) -> Unit,
     private val commandTimeSetter: (Long) -> Unit,
+    private val ctapAuthenticatorSession: CtapAuthenticatorSession,
     private val initHandler: HIDInitCommandHandler,
     private val cborHandler: HIDCborCommandHandler,
     private val msgHandler: HIDMsgCommandHandler,
@@ -23,11 +23,14 @@ class HIDChannel(
     private val cancelHandler: HIDCancelCommandHandler,
     private val winkHandler: HIDWinkCommandHandler,
     private val lockHandler: HIDLockCommandHandler
-) : Closeable {
+) {
 
     private val logger = LoggerFactory.getLogger(HIDChannel::class.java)
     private val hidRequestMessageBuilder = HIDRequestMessageBuilder(packetSize)
-    private var cborCompletion: CompletableDeferred<Unit>? = null
+
+    // The coroutine Job running the current CBOR command (keepalive + command execution + response sending).
+    // Used by cancel() to await full completion before the channel is reused or replaced.
+    private var activeCborJob: Job? = null
 
     suspend fun handlePacket(
         hidPacket: HIDPacket,
@@ -89,17 +92,18 @@ class HIDChannel(
             }
             HIDCommand.CTAPHID_CBOR -> {
                 commandTimeSetter(System.currentTimeMillis())
-                cborCompletion = cborHandler.handle(scope, hidMessage as HIDCBORRequestMessage,
-                    responseCallback = {
-                        logger.debug("CTAP Response HID Message: {}", it)
-                        responseCallback(it)
-                    },
-                    onComplete = {
+                activeCborJob = scope.launch {
+                    try {
+                        cborHandler.handle(hidMessage as HIDCBORRequestMessage) {
+                            logger.debug("CTAP Response HID Message: {}", it)
+                            responseCallback(it)
+                        }
+                    } finally {
                         commandTimeSetter(0)
                         activeTransactionChannelIdSetter(null)
-                        cborCompletion = null
+                        activeCborJob = null
                     }
-                )
+                }
             }
             HIDCommand.CTAPHID_CANCEL -> {
                 //spec| Cancel any outstanding requests on this CID. If there is an outstanding request that can be
@@ -108,7 +112,6 @@ class HIDChannel(
                 //spec| Whether a request was cancelled or not, the authenticator MUST NOT reply to the CTAPHID_CANCEL
                 //spec| message itself.
                 cancelHandler.handle()
-                cborCompletion?.await()
             }
             HIDCommand.CTAPHID_INIT -> {
                 val response = initHandler.handle(hidMessage as HIDINITRequestMessage)
@@ -141,13 +144,8 @@ class HIDChannel(
         }
     }
 
-    suspend fun cancelAndAwaitCbor() {
-        val completion = cborCompletion ?: return
-        cancelHandler.handle()
-        completion.await()
-    }
-
-    override fun close() {
-        keepAliveWorker.close()
+    suspend fun cancel() {
+        ctapAuthenticatorSession.cancelOnGoingTransaction()
+        activeCborJob?.join()
     }
 }
