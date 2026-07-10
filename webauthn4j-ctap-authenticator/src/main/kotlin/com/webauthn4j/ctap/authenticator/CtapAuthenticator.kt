@@ -61,7 +61,7 @@ class CtapAuthenticator(
         @JvmField
         val AAGUID = AAGUID("33c1642b-b5e9-423d-9add-5a0119c2a8b8")
         @JvmField
-        val VERSIONS = listOf(CtapVersion.U2F_V2, CtapVersion.FIDO_2_0, CtapVersion.FIDO_2_1_PRE, CtapVersion.FIDO_2_1)
+        val VERSIONS = listOf(CtapVersion.U2F_V2, CtapVersion.FIDO_2_0, CtapVersion.FIDO_2_1_PRE, CtapVersion.FIDO_2_1, CtapVersion.FIDO_2_3)
 
         private fun createObjectConverter(): ObjectConverter {
             val jsonMapper = JsonMapper()
