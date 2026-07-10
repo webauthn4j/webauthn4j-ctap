@@ -15,6 +15,8 @@ import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
 import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
+import com.webauthn4j.ctap.authenticator.extension.GetAssertionCredentialFilter
+import com.webauthn4j.ctap.authenticator.extension.GetAssertionCredentialFilterContext
 import com.webauthn4j.ctap.authenticator.extension.AuthenticationExtensionContext
 import com.webauthn4j.ctap.authenticator.extension.AuthenticationExtensionProcessor
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
@@ -465,9 +467,16 @@ internal class GetAssertionExecution :
         }
 
         //spec| 7.4 Iterate through the applicable credentials list, and if credential protection for a credential is marked as userVerificationRequired, and the "uv" bit is false in the response, remove that credential from the applicable credentials list.
-        // TODO: credProtect filtering (userVerificationRequired) not yet implemented.
         //spec| 7.5 Iterate through the applicable credentials list, and if credential protection for a credential is marked as userVerificationOptionalWithCredentialIDList and there is no allowList passed by the client and the "uv" bit is false in the response, remove that credential from the applicable credentials list.
-        // TODO: credProtect filtering (userVerificationOptionalWithCredentialIDList) not yet implemented.
+        // Actual filtering logic is delegated to GetAssertionCredentialFilter implementations (e.g., CredProtectExtensionProcessor).
+        val credentialFilters = ctapAuthenticatorSession.extensionProcessors
+            .filterIsInstance<GetAssertionCredentialFilter>()
+        if (credentialFilters.isNotEmpty()) {
+            credentials = credentials.filter { credential ->
+                val context = GetAssertionCredentialFilterContext(authenticatorGetAssertionRequest, credential, uvResult)
+                credentialFilters.all { it.test(context) }
+            }
+        }
 
         //spec| 7.6 If the applicable credentials list is empty, return CTAP2_ERR_NO_CREDENTIALS.
         if (credentials.isEmpty()) {
