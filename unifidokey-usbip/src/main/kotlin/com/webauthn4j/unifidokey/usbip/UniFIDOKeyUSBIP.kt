@@ -3,9 +3,9 @@ package com.webauthn4j.unifidokey.usbip
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.attestation.PackedBasicAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
-import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.ctap.authenticator.transport.usbip.USBIPDevice
 import com.webauthn4j.ctap.authenticator.transport.usbip.USBIPDeviceConfig
+import com.webauthn4j.data.AuthenticatorTransport
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -26,15 +26,21 @@ class UniFIDOKeyUSBIP : Runnable {
 
     private val logger = Logger.getLogger(UniFIDOKeyUSBIP::class.java)
 
+    companion object {
+        fun createAuthenticator(): CtapAuthenticator {
+            return CtapAuthenticator(
+                attestationStatementProvider = PackedBasicAttestationStatementProvider.createWithDemoAttestationKey(),
+                userVerificationHandler = ConsoleUserVerificationHandler(),
+                transports = setOf(AuthenticatorTransport.USB)
+            ).apply {
+                credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
+            }
+        }
+    }
+
     override fun run() {
         val config = USBIPDeviceConfig(host = host, port = port)
-        val authenticator = CtapAuthenticator(
-            attestationStatementProvider = PackedBasicAttestationStatementProvider.createWithDemoAttestationKey(),
-            userVerificationHandler = ConsoleUserVerificationHandler(),
-            transports = setOf(AuthenticatorTransport.USB)
-        ).apply {
-            credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
-        }
+        val authenticator = createAuthenticator()
         val device = USBIPDevice(authenticator, config)
         val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
