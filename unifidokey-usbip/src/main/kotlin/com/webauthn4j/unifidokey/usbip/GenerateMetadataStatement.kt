@@ -2,18 +2,12 @@ package com.webauthn4j.unifidokey.usbip
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.webauthn4j.converter.util.ObjectConverter
-import com.webauthn4j.ctap.authenticator.CtapAuthenticator
-import com.webauthn4j.ctap.authenticator.attestation.DemoAttestationConstants
-import com.webauthn4j.ctap.authenticator.attestation.PackedBasicAttestationStatementProvider
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
-import com.webauthn4j.ctap.core.data.options.ClientPINOption
-import com.webauthn4j.ctap.core.data.options.PlatformOption
-import com.webauthn4j.ctap.core.data.options.ResidentKeyOption
-import com.webauthn4j.ctap.core.data.options.UserPresenceOption
-import com.webauthn4j.ctap.core.data.options.UserVerificationOption
+import com.webauthn4j.ctap.core.data.options.*
 import com.webauthn4j.data.AttachmentHint
 import com.webauthn4j.data.AuthenticationAlgorithm
 import com.webauthn4j.data.AuthenticatorAttestationType
+import com.webauthn4j.data.AuthenticatorTransport
 import com.webauthn4j.data.KeyProtectionType
 import com.webauthn4j.data.MatcherProtectionType
 import com.webauthn4j.data.PinProtocolVersion
@@ -23,10 +17,13 @@ import com.webauthn4j.data.attestation.authenticator.AAGUID
 import com.webauthn4j.metadata.converter.jackson.WebAuthnMetadataJSONModule
 import com.webauthn4j.metadata.data.statement.AuthenticatorGetInfo
 import com.webauthn4j.metadata.data.statement.AuthenticatorGetInfo.Options
+import com.webauthn4j.metadata.data.statement.ExtensionDescriptor
+import com.webauthn4j.metadata.data.statement.FriendlyNames
 import com.webauthn4j.metadata.data.statement.MetadataStatement
 import com.webauthn4j.metadata.data.statement.VerificationMethodANDCombinations
 import com.webauthn4j.metadata.data.statement.VerificationMethodDescriptor
 import com.webauthn4j.metadata.data.statement.Version
+import com.webauthn4j.ctap.authenticator.attestation.DemoAttestationConstants
 import com.webauthn4j.util.HexUtil
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
@@ -49,27 +46,27 @@ class GenerateMetadataStatement : Runnable {
     lateinit var outputFile: File
 
     override fun run() {
-        val authenticator = CtapAuthenticator(
-            attestationStatementProvider = PackedBasicAttestationStatementProvider.createWithDemoAttestationKey(),
-            userVerificationHandler = ConsoleUserVerificationHandler()
-        )
+        val authenticator = UniFIDOKeyUSBIP.createAuthenticator()
         val session = authenticator.createSession()
         val getInfoResponse = runBlocking { session.getInfo() }
         val getInfo = getInfoResponse.responseData!!
 
         val metadataGetInfo = toMetadataGetInfo(getInfo)
 
+        val supportedExtensions = getInfo.extensions?.map { ExtensionDescriptor(it, null, null, false) }
+
         val metadataStatement = MetadataStatement(
             null, // legalHeader
             null, // aaid
             getInfo.aaguid,
             null, // attestationCertificateKeyIdentifiers
+            null as FriendlyNames?, // friendlyNames
             "UniFIDOKey USB-IP Virtual FIDO2 Authenticator", // description
             null, // alternativeDescriptions
             2,    // authenticatorVersion
             "fido2", // protocolFamily
             3,    // schema
-            listOf(Version(1, 0)), // upv
+            getInfo.versions.map { Version(it.major, it.minor) }.distinct(), // upv
             listOf(AuthenticationAlgorithm.SECP256R1_ECDSA_SHA256_RAW), // authenticationAlgorithms
             listOf(PublicKeyRepresentationFormat.COSE), // publicKeyAlgAndEncodings
             listOf(AuthenticatorAttestationType.BASIC_FULL), // attestationTypes
@@ -96,8 +93,13 @@ class GenerateMetadataStatement : Runnable {
             listOf(DemoAttestationConstants.DEMO_ROOT_CA_CERTIFICATE), // attestationRootCertificates
             null, // ecdaaTrustAnchors
             "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", // icon (1x1 transparent PNG)
-            null, // supportedExtensions
-            metadataGetInfo
+            null, // authenticatorDataProtection
+            null, // authenticatorDataDeletionPolicy
+            null, // authenticatorDataDeletionURL
+            supportedExtensions,
+            null, // multiDeviceCredentialSupport
+            metadataGetInfo,
+            null  // statusReports
         )
 
         val objectConverter = ObjectConverter()
@@ -130,7 +132,32 @@ class GenerateMetadataStatement : Runnable {
                 getInfo.aaguid,
                 getInfo.options?.let { toMetadataOptions(it) },
                 getInfo.maxMsgSize?.toInt(),
-                getInfo.pinUvAuthProtocols?.map { PinProtocolVersion.create(it.value.toInt()) }
+                getInfo.pinUvAuthProtocols?.map { PinProtocolVersion.create(it.value.toInt()) },
+                getInfo.maxCredentialCountInList?.toInt(),
+                getInfo.maxCredentialIdLength?.toInt(),
+                getInfo.transports?.map { it.value }?.let { values -> values.map { AuthenticatorTransport.create(it) } },
+                getInfo.algorithms,
+                null, // maxSerializedLargeBlobArray
+                null, // forcePINChange
+                null, // minPINLength
+                null, // firmwareVersion
+                null, // maxCredBlobLength
+                null, // maxRPIDsForSetMinPINLength
+                null, // preferredPlatformUvAttempts
+                null, // uvModality
+                null, // certifications
+                null, // remainingDiscoverableCredentials
+                null, // vendorPrototypeConfigCommands
+                null, // attestationFormats
+                null, // uvCountSinceLastPinEntry
+                null, // longTouchForReset
+                null, // encIdentifier
+                null, // transportsForReset
+                null, // pinComplexityPolicy
+                null, // pinComplexityPolicyURL
+                null, // maxPINLength
+                null, // encCredStoreState
+                null  // authenticatorConfigCommands
             )
         }
 
@@ -158,8 +185,21 @@ class GenerateMetadataStatement : Runnable {
                     UserVerificationOption.NOT_READY -> Options.UserVerificationOption.NOT_READY
                     else -> null
                 },
-                null,
-                null
+                if (options.pinUvAuthToken?.value == true) Options.PinUvAuthTokenOption.SUPPORTED else null,
+                null, // noMcGaPermissionsWithClientPin
+                null, // largeBlobs
+                null, // ep
+                null, // bioEnroll
+                null, // userVerificationMgmtPreview
+                null, // uvBioEnroll
+                null, // authnrCfg
+                null, // uvAcfg
+                null, // credMgmt
+                null, // perCredMgmtRO
+                null, // credentialMgmtPreview
+                null, // setMinPINLength
+                if (options.makeCredUvNotRqd?.value == true) Options.MakeCredUvNotRqdOption.UV_NOT_REQUIRED else null,
+                null  // alwaysUv
             )
         }
     }
