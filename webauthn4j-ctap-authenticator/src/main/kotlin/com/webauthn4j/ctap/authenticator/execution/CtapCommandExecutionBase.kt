@@ -17,9 +17,8 @@ abstract class CtapCommandExecutionBase<TC : CtapRequest, TR : CtapResponse>(pri
     suspend fun execute(): TR {
         logger.info("CTAP Command {}", ctapCommand.toString())
 
-        validate()
-
         val ctapResponse = try {
+            validate()
             doExecute()
         } catch (e: CancellationException) {
             throw e
