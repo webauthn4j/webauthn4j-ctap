@@ -17,7 +17,6 @@ import com.webauthn4j.data.attestation.authenticator.AAGUID
 import com.webauthn4j.metadata.converter.jackson.WebAuthnMetadataJSONModule
 import com.webauthn4j.metadata.data.statement.AuthenticatorGetInfo
 import com.webauthn4j.metadata.data.statement.AuthenticatorGetInfo.Options
-import com.webauthn4j.metadata.data.statement.ExtensionDescriptor
 import com.webauthn4j.metadata.data.statement.FriendlyNames
 import com.webauthn4j.metadata.data.statement.MetadataStatement
 import com.webauthn4j.metadata.data.statement.VerificationMethodANDCombinations
@@ -53,7 +52,9 @@ class GenerateMetadataStatement : Runnable {
 
         val metadataGetInfo = toMetadataGetInfo(getInfo)
 
-        val supportedExtensions = getInfo.extensions?.map { ExtensionDescriptor(it, null, null, false) }
+        // supportedExtensions is a UAF-only field; FIDO2 declares extensions via authenticatorGetInfo
+        @Suppress("UNUSED_VARIABLE")
+        val supportedExtensions = null
 
         val metadataStatement = MetadataStatement(
             null, // legalHeader
@@ -137,27 +138,27 @@ class GenerateMetadataStatement : Runnable {
                 getInfo.maxCredentialIdLength?.toInt(),
                 getInfo.transports?.map { it.value }?.let { values -> values.map { AuthenticatorTransport.create(it) } },
                 getInfo.algorithms,
-                null, // maxSerializedLargeBlobArray
-                null, // forcePINChange
-                null, // minPINLength
-                null, // firmwareVersion
-                null, // maxCredBlobLength
-                null, // maxRPIDsForSetMinPINLength
-                null, // preferredPlatformUvAttempts
-                null, // uvModality
-                null, // certifications
-                null, // remainingDiscoverableCredentials
-                null, // vendorPrototypeConfigCommands
-                null, // attestationFormats
-                null, // uvCountSinceLastPinEntry
-                null, // longTouchForReset
-                null, // encIdentifier
-                null, // transportsForReset
-                null, // pinComplexityPolicy
-                null, // pinComplexityPolicyURL
-                null, // maxPINLength
-                null, // encCredStoreState
-                null  // authenticatorConfigCommands
+                getInfo.maxSerializedLargeBlobArray?.toInt(),
+                getInfo.forcePINChange,
+                getInfo.minPINLength?.toInt(),
+                getInfo.firmwareVersion?.toInt(),
+                getInfo.maxCredBlobLength?.toInt(),
+                getInfo.maxRPIDsForSetMinPINLength?.toInt(),
+                getInfo.preferredPlatformUvAttempts?.toInt(),
+                getInfo.uvModality,
+                getInfo.certifications,
+                getInfo.remainingDiscoverableCredentials?.toInt(),
+                getInfo.vendorPrototypeConfigCommands?.map { it.toInt() },
+                getInfo.attestationFormats,
+                getInfo.uvCountSinceLastPinEntry?.toInt(),
+                getInfo.longTouchForReset,
+                getInfo.encIdentifier,
+                getInfo.transportsForReset?.map { it },
+                getInfo.pinComplexityPolicy,
+                getInfo.pinComplexityPolicyURL,
+                getInfo.maxPINLength?.toInt(),
+                getInfo.encCredStoreState,
+                getInfo.authenticatorConfigCommands?.map { it.toInt() }
             )
         }
 
