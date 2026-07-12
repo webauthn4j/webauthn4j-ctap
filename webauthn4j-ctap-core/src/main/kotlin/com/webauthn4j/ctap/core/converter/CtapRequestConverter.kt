@@ -21,21 +21,21 @@ class CtapRequestConverter(objectConverter: ObjectConverter) {
         val commandType = source.first().toUByte()
         val commandParameters = source.copyOfRange(1, source.size)
         return when (commandType) {
-            0x01.toUByte() -> cborMapper.readValue(
+            CtapCommand.MAKE_CREDENTIAL.value.toUByte() -> cborMapper.readValue(
                 commandParameters,
                 AuthenticatorMakeCredentialRequest::class.java
             )!!
-            0x02.toUByte() -> cborMapper.readValue(
+            CtapCommand.GET_ASSERTION.value.toUByte() -> cborMapper.readValue(
                 commandParameters,
                 AuthenticatorGetAssertionRequest::class.java
             )!!
-            0x04.toUByte() -> AuthenticatorGetInfoRequest()
-            0x06.toUByte() -> cborMapper.readValue(
+            CtapCommand.GET_INFO.value.toUByte() -> AuthenticatorGetInfoRequest()
+            CtapCommand.CLIENT_PIN.value.toUByte() -> cborMapper.readValue(
                 commandParameters,
                 AuthenticatorClientPINRequest::class.java
             )!!
-            0x07.toUByte() -> AuthenticatorResetRequest()
-            0x08.toUByte() -> AuthenticatorGetNextAssertionRequest()
+            CtapCommand.RESET.value.toUByte() -> AuthenticatorResetRequest()
+            CtapCommand.GET_NEXT_ASSERTION.value.toUByte() -> AuthenticatorGetNextAssertionRequest()
             else -> throw IllegalArgumentException(
                 String.format(
                     "unknown command type 0x%x is provided.",

@@ -5,7 +5,7 @@ data class CtapCommand(val value: Byte) {
     companion object {
         val MAKE_CREDENTIAL = CtapCommand(0x01)
         val GET_ASSERTION = CtapCommand(0x02)
-        val GET_NEXT_ASSERTION = CtapCommand(0x03)
+        val GET_NEXT_ASSERTION = CtapCommand(0x08)
         val GET_INFO = CtapCommand(0x04)
         val CLIENT_PIN = CtapCommand(0x06)
         val RESET = CtapCommand(0x07)
