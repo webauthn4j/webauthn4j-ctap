@@ -26,6 +26,8 @@ internal class CtapStatusCodeTest {
         assertThat(CtapStatusCode.create("CTAP2_ERR_MISSING_PARAMETER")).isEqualTo(CtapStatusCode.CTAP2_ERR_MISSING_PARAMETER)
         assertThat(CtapStatusCode.create("CTAP2_ERR_LIMIT_EXCEEDED")).isEqualTo(CtapStatusCode.CTAP2_ERR_LIMIT_EXCEEDED)
         assertThat(CtapStatusCode.create("CTAP2_ERR_UNSUPPORTED_EXTENSION")).isEqualTo(CtapStatusCode.CTAP2_ERR_UNSUPPORTED_EXTENSION)
+        assertThat(CtapStatusCode.create("CTAP2_ERR_FP_DATABASE_FULL")).isEqualTo(CtapStatusCode.CTAP2_ERR_FP_DATABASE_FULL)
+        assertThat(CtapStatusCode.create("CTAP2_ERR_LARGE_BLOB_STORAGE_FULL")).isEqualTo(CtapStatusCode.CTAP2_ERR_LARGE_BLOB_STORAGE_FULL)
         assertThat(CtapStatusCode.create("CTAP2_ERR_CREDENTIAL_EXCLUDED")).isEqualTo(CtapStatusCode.CTAP2_ERR_CREDENTIAL_EXCLUDED)
         assertThat(CtapStatusCode.create("CTAP2_ERR_PROCESSING")).isEqualTo(CtapStatusCode.CTAP2_ERR_PROCESSING)
         assertThat(CtapStatusCode.create("CTAP2_ERR_INVALID_CREDENTIAL")).isEqualTo(CtapStatusCode.CTAP2_ERR_INVALID_CREDENTIAL)
@@ -53,6 +55,11 @@ internal class CtapStatusCodeTest {
         assertThat(CtapStatusCode.create("CTAP2_ERR_REQUEST_TOO_LARGE")).isEqualTo(CtapStatusCode.CTAP2_ERR_REQUEST_TOO_LARGE)
         assertThat(CtapStatusCode.create("CTAP2_ERR_ACTION_TIMEOUT")).isEqualTo(CtapStatusCode.CTAP2_ERR_ACTION_TIMEOUT)
         assertThat(CtapStatusCode.create("CTAP2_ERR_UP_REQUIRED")).isEqualTo(CtapStatusCode.CTAP2_ERR_UP_REQUIRED)
+        assertThat(CtapStatusCode.create("CTAP2_ERR_UV_BLOCKED")).isEqualTo(CtapStatusCode.CTAP2_ERR_UV_BLOCKED)
+        assertThat(CtapStatusCode.create("CTAP2_ERR_INTEGRITY_FAILURE")).isEqualTo(CtapStatusCode.CTAP2_ERR_INTEGRITY_FAILURE)
+        assertThat(CtapStatusCode.create("CTAP2_ERR_INVALID_SUBCOMMAND")).isEqualTo(CtapStatusCode.CTAP2_ERR_INVALID_SUBCOMMAND)
+        assertThat(CtapStatusCode.create("CTAP2_ERR_UV_INVALID")).isEqualTo(CtapStatusCode.CTAP2_ERR_UV_INVALID)
+        assertThat(CtapStatusCode.create("CTAP2_ERR_UNAUTHORIZED_PERMISSION")).isEqualTo(CtapStatusCode.CTAP2_ERR_UNAUTHORIZED_PERMISSION)
         assertThat(CtapStatusCode.create("CTAP1_ERR_OTHER")).isEqualTo(CtapStatusCode.CTAP1_ERR_OTHER)
     }
 
