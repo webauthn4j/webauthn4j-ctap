@@ -618,7 +618,7 @@ internal class MakeCredentialExecution :
                         isUserVerification = false
                     )
                     ctapAuthenticatorSession.withUserPresenceWait {
-                        ctapAuthenticatorSession.userVerificationHandler.onMakeCredentialConsentRequested(
+                        ctapAuthenticatorSession.makeCredentialConsentHandler.onMakeCredentialConsentRequested(
                             makeCredentialConsentRequest
                         )
                     }
@@ -730,7 +730,7 @@ internal class MakeCredentialExecution :
             isUserVerification = true
         )
         return ctapAuthenticatorSession.withUserPresenceWait {
-            ctapAuthenticatorSession.userVerificationHandler.onMakeCredentialConsentRequested(makeCredentialConsentRequest)
+            ctapAuthenticatorSession.makeCredentialConsentHandler.onMakeCredentialConsentRequested(makeCredentialConsentRequest)
         }
     }
 
@@ -742,7 +742,7 @@ internal class MakeCredentialExecution :
             isUserVerification = false
         )
         return ctapAuthenticatorSession.withUserPresenceWait {
-            ctapAuthenticatorSession.userVerificationHandler.onMakeCredentialConsentRequested(makeCredentialConsentRequest)
+            ctapAuthenticatorSession.makeCredentialConsentHandler.onMakeCredentialConsentRequested(makeCredentialConsentRequest)
         }
     }
 

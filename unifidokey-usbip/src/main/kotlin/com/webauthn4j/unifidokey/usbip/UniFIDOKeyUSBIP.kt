@@ -28,9 +28,12 @@ class UniFIDOKeyUSBIP : Runnable {
 
     companion object {
         fun createAuthenticator(): CtapAuthenticator {
+            val consentHandler = ConsoleUserConsentHandler()
             return CtapAuthenticator(
                 attestationStatementProvider = PackedBasicAttestationStatementProvider.createWithDemoAttestationKey(),
-                userVerificationHandler = ConsoleUserVerificationHandler(),
+                userVerificationCapabilityProvider = consentHandler,
+                makeCredentialConsentHandler = consentHandler,
+                getAssertionConsentHandler = consentHandler,
                 transports = setOf(AuthenticatorTransport.USB)
             ).apply {
                 credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM

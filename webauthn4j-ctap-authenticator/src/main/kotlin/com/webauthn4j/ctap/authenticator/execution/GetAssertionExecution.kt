@@ -628,14 +628,14 @@ internal class GetAssertionExecution :
     private suspend fun performBuiltInUv(): Boolean {
         val request = GetAssertionConsentRequest(rpId, isUserPresence = true, isUserVerification = true)
         return ctapAuthenticatorSession.withUserPresenceWait {
-            ctapAuthenticatorSession.userVerificationHandler.onGetAssertionConsentRequested(request)
+            ctapAuthenticatorSession.getAssertionConsentHandler.onGetAssertionConsentRequested(request)
         }
     }
 
     private suspend fun performBuiltInUp(): Boolean {
         val request = GetAssertionConsentRequest(rpId, isUserPresence = true, isUserVerification = false)
         return ctapAuthenticatorSession.withUserPresenceWait {
-            ctapAuthenticatorSession.userVerificationHandler.onGetAssertionConsentRequested(request)
+            ctapAuthenticatorSession.getAssertionConsentHandler.onGetAssertionConsentRequested(request)
         }
     }
 

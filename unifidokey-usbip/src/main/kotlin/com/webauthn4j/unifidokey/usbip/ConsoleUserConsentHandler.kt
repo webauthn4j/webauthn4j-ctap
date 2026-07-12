@@ -1,19 +1,20 @@
 package com.webauthn4j.unifidokey.usbip
 
+import com.webauthn4j.ctap.authenticator.GetAssertionConsentHandler
 import com.webauthn4j.ctap.authenticator.GetAssertionConsentRequest
+import com.webauthn4j.ctap.authenticator.MakeCredentialConsentHandler
 import com.webauthn4j.ctap.authenticator.MakeCredentialConsentRequest
-import com.webauthn4j.ctap.authenticator.UserVerificationHandler
+import com.webauthn4j.ctap.authenticator.UserVerificationCapabilityProvider
 import com.webauthn4j.ctap.core.data.options.UserVerificationOption
 import kotlinx.coroutines.delay
 import org.slf4j.LoggerFactory
 
-/**
- * A UserVerificationHandler that auto-approves after a delay.
- * The delay ensures CTAPHID_KEEPALIVE messages are sent by the HID transport layer.
- */
-class ConsoleUserVerificationHandler : UserVerificationHandler {
+class ConsoleUserConsentHandler :
+    UserVerificationCapabilityProvider,
+    MakeCredentialConsentHandler,
+    GetAssertionConsentHandler {
 
-    private val logger = LoggerFactory.getLogger(ConsoleUserVerificationHandler::class.java)
+    private val logger = LoggerFactory.getLogger(ConsoleUserConsentHandler::class.java)
 
     companion object {
         private const val APPROVAL_DELAY_MS = 1000L

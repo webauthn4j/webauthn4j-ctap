@@ -33,7 +33,9 @@ import org.slf4j.LoggerFactory
  */
 class CtapAuthenticatorSession internal constructor(
     ctapAuthenticator: CtapAuthenticator,
-    userVerificationHandler: UserVerificationHandler?
+    userVerificationCapabilityProvider: UserVerificationCapabilityProvider?,
+    makeCredentialConsentHandler: MakeCredentialConsentHandler?,
+    getAssertionConsentHandler: GetAssertionConsentHandler?,
 ) {
 
     private val logger = LoggerFactory.getLogger(CtapAuthenticatorSession::class.java)
@@ -46,7 +48,9 @@ class CtapAuthenticatorSession internal constructor(
     val transports: Set<AuthenticatorTransport> = ctapAuthenticator.transports
     val extensionProcessors: List<ExtensionProcessor> = ctapAuthenticator.extensionProcessors
     val authenticatorPropertyStore: AuthenticatorPropertyStore = ctapAuthenticator.authenticatorPropertyStore
-    val userVerificationHandler: UserVerificationHandler = userVerificationHandler ?: ctapAuthenticator.userVerificationHandler
+    val userVerificationCapabilityProvider: UserVerificationCapabilityProvider = userVerificationCapabilityProvider ?: ctapAuthenticator.userVerificationCapabilityProvider
+    val makeCredentialConsentHandler: MakeCredentialConsentHandler = makeCredentialConsentHandler ?: ctapAuthenticator.makeCredentialConsentHandler
+    val getAssertionConsentHandler: GetAssertionConsentHandler = getAssertionConsentHandler ?: ctapAuthenticator.getAssertionConsentHandler
     val credentialSelectionHandler: CredentialSelectionHandler = ctapAuthenticator.credentialSelectionHandler
     val winkHandler: WinkHandler = ctapAuthenticator.winkHandler
     val eventListeners: List<EventListener> = ctapAuthenticator.eventListeners.toList()

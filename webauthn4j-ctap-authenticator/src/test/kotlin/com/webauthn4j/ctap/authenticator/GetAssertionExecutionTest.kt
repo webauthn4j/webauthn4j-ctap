@@ -71,16 +71,11 @@ internal class GetAssertionExecutionTest {
     @Test
     suspend fun userConsent_false_test() {
         val ctapAuthenticator = CtapAuthenticator()
-        ctapAuthenticator.userVerificationHandler = object : UserVerificationHandler {
-            override fun getUserVerificationOption(rpId: String?): UserVerificationOption? {
-                TODO("Not yet implemented")
+        val connection = ctapAuthenticator.createSession(
+            getAssertionConsentHandler = object : GetAssertionConsentHandler {
+                override suspend fun onGetAssertionConsentRequested(getAssertionConsentRequest: GetAssertionConsentRequest): Boolean = false
             }
-
-            override suspend fun onMakeCredentialConsentRequested(makeCredentialConsentRequest: MakeCredentialConsentRequest): Boolean = true
-
-            override suspend fun onGetAssertionConsentRequested(getAssertionConsentRequest: GetAssertionConsentRequest): Boolean = false
-        }
-        val connection = ctapAuthenticator.createSession()
+        )
         makeCredential(connection)
 
         val clientDataHash = ByteArray(0)

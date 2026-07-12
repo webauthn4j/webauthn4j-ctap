@@ -4,20 +4,14 @@ import ch.qos.logback.core.encoder.ByteArrayUtil
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.GetAssertionConsentRequest
 import com.webauthn4j.ctap.authenticator.MakeCredentialConsentRequest
-import com.webauthn4j.ctap.authenticator.UserVerificationHandler
 import com.webauthn4j.ctap.authenticator.transport.nfc.NFCTransport
 import com.webauthn4j.ctap.core.data.nfc.CommandAPDU
-import com.webauthn4j.ctap.core.data.options.UserVerificationOption
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.mock
 
 internal class SelectCommandAPDUProcessorTest {
-    private val target = NFCTransport(
-        CtapAuthenticator(),
-        mock(UserVerificationHandler::class.java)
-    ).selectCommandAPDUProcessor
+    private val target = NFCTransport(CtapAuthenticator()).selectCommandAPDUProcessor
 
     @Disabled
     @Test

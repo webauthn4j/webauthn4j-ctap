@@ -1,7 +1,9 @@
 package com.webauthn4j.ctap.authenticator.transport.nfc
 
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
-import com.webauthn4j.ctap.authenticator.UserVerificationHandler
+import com.webauthn4j.ctap.authenticator.GetAssertionConsentHandler
+import com.webauthn4j.ctap.authenticator.MakeCredentialConsentHandler
+import com.webauthn4j.ctap.authenticator.UserVerificationCapabilityProvider
 import com.webauthn4j.ctap.authenticator.transport.Transport
 import com.webauthn4j.ctap.authenticator.transport.nfc.apdu.CTAPAPDUProcessor
 import com.webauthn4j.ctap.authenticator.transport.nfc.apdu.CommandAPDUProcessor
@@ -19,7 +21,9 @@ import java.util.*
 @Suppress("MemberVisibilityCanBePrivate")
 class NFCTransport(
     private val ctapAuthenticator: CtapAuthenticator,
-    private val userVerificationHandler: UserVerificationHandler
+    private val userVerificationCapabilityProvider: UserVerificationCapabilityProvider = ctapAuthenticator.userVerificationCapabilityProvider,
+    private val makeCredentialConsentHandler: MakeCredentialConsentHandler = ctapAuthenticator.makeCredentialConsentHandler,
+    private val getAssertionConsentHandler: GetAssertionConsentHandler = ctapAuthenticator.getAssertionConsentHandler
 ) : Transport {
 
     companion object {
@@ -99,7 +103,7 @@ class NFCTransport(
 
         override suspend fun process(command: CommandAPDU): ResponseAPDU {
             logger.debug("Processing Select APDU command")
-            val connection = ctapAuthenticator.createSession(userVerificationHandler)
+            val connection = ctapAuthenticator.createSession(userVerificationCapabilityProvider, makeCredentialConsentHandler, getAssertionConsentHandler)
             ctapAPDUProcessor.onConnect(connection)
             u2fAPDUProcessor.onConnect(connection)
             val response = if (Arrays.equals(command.dataIn, FIDO_AID)) {
