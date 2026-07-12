@@ -126,7 +126,7 @@ open class CtapService(protected val ctapClient: CtapClient) {
                 try {
                     clientPIN = makeCredentialContext.clientPINRequestHandler.onClientPINRequested()
                 } catch (e: ClientPINUserVerificationCanceledException) {
-                    throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_REQUIRED, e)
+                    throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PUAT_REQUIRED, e)
                 }
                 val pinToken: ByteArray = requestPINToken(clientPIN)
                 val pinAuth = MACUtil.calculateHmacSHA256(makeCredentialRequest.clientDataHash, pinToken, 16)
@@ -198,7 +198,7 @@ open class CtapService(protected val ctapClient: CtapClient) {
                 try {
                     clientPIN = getAssertionContext.clientPINRequestHandler.onClientPINRequested()
                 } catch (e: ClientPINUserVerificationCanceledException) {
-                    throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PIN_REQUIRED, e)
+                    throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_PUAT_REQUIRED, e)
                 }
                 val pinToken: ByteArray =
                     requestPINToken(clientPIN)

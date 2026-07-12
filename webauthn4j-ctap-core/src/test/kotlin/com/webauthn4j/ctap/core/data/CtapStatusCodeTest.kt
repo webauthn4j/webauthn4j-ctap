@@ -47,7 +47,7 @@ internal class CtapStatusCodeTest {
         assertThat(CtapStatusCode.create("CTAP2_ERR_PIN_AUTH_INVALID")).isEqualTo(CtapStatusCode.CTAP2_ERR_PIN_AUTH_INVALID)
         assertThat(CtapStatusCode.create("CTAP2_ERR_PIN_AUTH_BLOCKED")).isEqualTo(CtapStatusCode.CTAP2_ERR_PIN_AUTH_BLOCKED)
         assertThat(CtapStatusCode.create("CTAP2_ERR_PIN_NOT_SET")).isEqualTo(CtapStatusCode.CTAP2_ERR_PIN_NOT_SET)
-        assertThat(CtapStatusCode.create("CTAP2_ERR_PIN_REQUIRED")).isEqualTo(CtapStatusCode.CTAP2_ERR_PIN_REQUIRED)
+        assertThat(CtapStatusCode.create("CTAP2_ERR_PUAT_REQUIRED")).isEqualTo(CtapStatusCode.CTAP2_ERR_PUAT_REQUIRED)
         assertThat(CtapStatusCode.create("CTAP2_ERR_PIN_POLICY_VIOLATION")).isEqualTo(CtapStatusCode.CTAP2_ERR_PIN_POLICY_VIOLATION)
         assertThat(CtapStatusCode.create("CTAP2_ERR_PIN_TOKEN_EXPIRED")).isEqualTo(CtapStatusCode.CTAP2_ERR_PIN_TOKEN_EXPIRED)
         assertThat(CtapStatusCode.create("CTAP2_ERR_REQUEST_TOO_LARGE")).isEqualTo(CtapStatusCode.CTAP2_ERR_REQUEST_TOO_LARGE)
