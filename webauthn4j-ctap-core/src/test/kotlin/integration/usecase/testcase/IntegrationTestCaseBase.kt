@@ -7,9 +7,7 @@ import com.webauthn4j.WebAuthnManager
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.authenticator.CredentialSelectionHandler
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
-import com.webauthn4j.ctap.authenticator.GetAssertionConsentRequest
-import com.webauthn4j.ctap.authenticator.MakeCredentialConsentRequest
-import com.webauthn4j.ctap.authenticator.UserVerificationHandler
+import com.webauthn4j.ctap.authenticator.UserVerificationCapabilityProvider
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FBasicAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.PackedBasicAttestationStatementProvider
@@ -106,6 +104,11 @@ abstract class IntegrationTestCaseBase {
                 transports = emptySet(),
                 extensionProcessors = emptyList(),
                 authenticatorPropertyStore = authenticatorPropertyStore,
+                userVerificationCapabilityProvider = object : UserVerificationCapabilityProvider {
+                    override fun getUserVerificationOption(rpId: String?): UserVerificationOption? {
+                        return userVerificationSetting.toUserVerificationOption()
+                    }
+                },
                 credentialSelectionHandler = credentialSelectionHandler
             )
             ctapAuthenticator.aaguid = aaguid
@@ -145,24 +148,7 @@ abstract class IntegrationTestCaseBase {
         private val sessionParameter = TestParameter { ctapAuthenticator.createSession() }.depends(ctapAuthenticatorParameter)
 
         val transportParameter = TestParameter{
-            InternalTransport(authenticator.ctapAuthenticator, userVerificationHandler)
-        }
-
-        private val userVerificationHandlerParameter = TestParameter{
-            object : UserVerificationHandler {
-                override fun getUserVerificationOption(rpId: String?): UserVerificationOption? {
-                    return userVerificationSetting.toUserVerificationOption()
-                }
-
-                override suspend fun onMakeCredentialConsentRequested(makeCredentialConsentRequest: MakeCredentialConsentRequest): Boolean {
-                    return true
-                }
-
-                override suspend fun onGetAssertionConsentRequested(getAssertionConsentRequest: GetAssertionConsentRequest): Boolean {
-                    return true
-                }
-
-            }
+            InternalTransport(authenticator.ctapAuthenticator)
         }
 
         var attestationStatementGenerator by attestationStatementGeneratorParameter
@@ -188,7 +174,6 @@ abstract class IntegrationTestCaseBase {
         var ctapAuthenticator by ctapAuthenticatorParameter
         var session by sessionParameter
         var transport by transportParameter
-        val userVerificationHandler by userVerificationHandlerParameter
     }
 
     inner class ClientPlatform {

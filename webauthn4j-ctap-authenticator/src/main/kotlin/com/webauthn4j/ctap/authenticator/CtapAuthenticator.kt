@@ -42,16 +42,14 @@ class CtapAuthenticator(
     val extensionProcessors: List<ExtensionProcessor> = listOf(CredProtectExtensionProcessor()),
     // Handlers
     var authenticatorPropertyStore: AuthenticatorPropertyStore = InMemoryAuthenticatorPropertyStore(),
-    var userVerificationHandler: UserVerificationHandler = object : UserVerificationHandler {
+    val userVerificationCapabilityProvider: UserVerificationCapabilityProvider = object : UserVerificationCapabilityProvider {
         override fun getUserVerificationOption(rpId: String?): UserVerificationOption = UserVerificationOption.READY
-
-        override suspend fun onMakeCredentialConsentRequested(makeCredentialConsentRequest: MakeCredentialConsentRequest): Boolean {
-            return true
-        }
-
-        override suspend fun onGetAssertionConsentRequested(getAssertionConsentRequest: GetAssertionConsentRequest): Boolean {
-            return true
-        }
+    },
+    val makeCredentialConsentHandler: MakeCredentialConsentHandler = object : MakeCredentialConsentHandler {
+        override suspend fun onMakeCredentialConsentRequested(makeCredentialConsentRequest: MakeCredentialConsentRequest): Boolean = true
+    },
+    val getAssertionConsentHandler: GetAssertionConsentHandler = object : GetAssertionConsentHandler {
+        override suspend fun onGetAssertionConsentRequested(getAssertionConsentRequest: GetAssertionConsentRequest): Boolean = true
     },
     var credentialSelectionHandler: CredentialSelectionHandler = DefaultCredentialSelectionHandler(),
     var winkHandler: WinkHandler = NoopWinkHandler()
@@ -110,9 +108,11 @@ class CtapAuthenticator(
     var credentialSelector: CredentialSelectorSetting = CredentialSelectorSetting.AUTHENTICATOR
 
     fun createSession(
-        userVerificationHandler: UserVerificationHandler = this.userVerificationHandler
+        userVerificationCapabilityProvider: UserVerificationCapabilityProvider = this.userVerificationCapabilityProvider,
+        makeCredentialConsentHandler: MakeCredentialConsentHandler = this.makeCredentialConsentHandler,
+        getAssertionConsentHandler: GetAssertionConsentHandler = this.getAssertionConsentHandler,
     ) : CtapAuthenticatorSession{
-        return CtapAuthenticatorSession(this, userVerificationHandler)
+        return CtapAuthenticatorSession(this, userVerificationCapabilityProvider, makeCredentialConsentHandler, getAssertionConsentHandler)
     }
 
     fun registerEventListener(eventListener: EventListener) {

@@ -353,12 +353,11 @@ internal class MakeCredentialExecutionTest {
         )
 
         val ctapAuthenticator = CtapAuthenticator()
-        ctapAuthenticator.userVerificationHandler = object : UserVerificationHandler {
-            override fun getUserVerificationOption(rpId: String?): UserVerificationOption = UserVerificationOption.READY
-            override suspend fun onMakeCredentialConsentRequested(makeCredentialConsentRequest: MakeCredentialConsentRequest): Boolean = false
-            override suspend fun onGetAssertionConsentRequested(getAssertionConsentRequest: GetAssertionConsentRequest): Boolean = false
-        }
-        val connection = ctapAuthenticator.createSession()
+        val connection = ctapAuthenticator.createSession(
+            makeCredentialConsentHandler = object : MakeCredentialConsentHandler {
+                override suspend fun onMakeCredentialConsentRequested(makeCredentialConsentRequest: MakeCredentialConsentRequest): Boolean = false
+            }
+        )
 
         val response = connection.makeCredential(command)
         assertThat(response).isInstanceOf(AuthenticatorMakeCredentialResponse::class.java)

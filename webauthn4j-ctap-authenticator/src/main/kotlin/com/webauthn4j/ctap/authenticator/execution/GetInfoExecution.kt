@@ -86,7 +86,7 @@ internal class GetInfoExecution(
         //spec| not yet been configured will return this parameter set to false.
         //spec| If absent, it indicates that the device is not capable of user verification within itself.
         //spec| A device that can only do Client PIN will not return the "uv" parameter.
-        val uv: UserVerificationOption? = ctapAuthenticatorSession.userVerificationHandler.getUserVerificationOption(null)
+        val uv: UserVerificationOption? = ctapAuthenticatorSession.userVerificationCapabilityProvider.getUserVerificationOption(null)
         //spec| pinUvAuthToken: If pinUvAuthToken is:
         //spec| present and set to true, pinUvAuthToken is supported.
         //spec| present and set to false, or absent, pinUvAuthToken is not supported.

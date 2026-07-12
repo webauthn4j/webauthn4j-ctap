@@ -77,7 +77,7 @@ class ClientPINTest {
                 }
             }.isInstanceOf(CtapErrorException::class.java).hasMessageContaining("CTAP2_ERR_PIN_INVALID")
 
-            clientPINTestCase.authenticator.transport = InternalTransport(clientPINTestCase.authenticator.ctapAuthenticator, clientPINTestCase.authenticator.userVerificationHandler) //renew transport to reset session and reset volatile PIN retries
+            clientPINTestCase.authenticator.transport = InternalTransport(clientPINTestCase.authenticator.ctapAuthenticator) //renew transport to reset session and reset volatile PIN retries
         }
         assertThatThrownBy {
             runTest {
