@@ -753,14 +753,32 @@ class PinUvAuthManager(
         // Decapsulate the platform key-agreement key to obtain the shared secret
         // (implicit in the spec — needed for encrypt at Step 16)
         val sharedSecret = protocol.decapsulate(platformKeyAgreementKey)
-        // TODO: Step 8: request user consent if the authenticator has a display
 
-        //spec| Step 9: Let uvState be the result of calling performBuiltInUv(internalRetry)
-        //spec| Step 10: If uvState is error: return appropriate error.
-        // Our virtual authenticator's built-in UV always succeeds.
-        // A real authenticator would call performBuiltInUv(internalRetry) here,
-        // decrement uvRetries on failure, and return appropriate errors
-        // (CTAP2_ERR_UV_INVALID, CTAP2_ERR_UV_BLOCKED, CTAP2_ERR_USER_ACTION_TIMEOUT).
+        // TODO: Steps 8-9 (consent + built-in UV) are not yet implemented.
+        //
+        // The spec requires the authenticator to:
+        //   Step 8: If the authenticator has a display, request user consent for the
+        //           requested permissions. Return CTAP2_ERR_OPERATION_DENIED if denied.
+        //   Step 9: Perform built-in user verification (e.g. biometric).
+        //   Step 10: Handle UV failure (CTAP2_ERR_UV_INVALID, CTAP2_ERR_UV_BLOCKED,
+        //            CTAP2_ERR_USER_ACTION_TIMEOUT).
+        //
+        // Currently, UV always succeeds without any actual verification.
+        //
+        // On Android, performing UV here is problematic because:
+        //   - BiometricPrompt + CryptoObject ties biometric auth to key operations,
+        //     but credential keys do not exist yet at this point (for makeCredential).
+        //   - Only rpId and permissions are available as context; rp.name and
+        //     user.displayName are not provided until makeCredential, making it
+        //     difficult to show a meaningful consent dialog.
+        //
+        // A possible approach is "deferred UV": issue the pinUvAuthToken here without
+        // performing actual biometric verification, record in the token state that UV
+        // is pending (e.g. a uvDeferred flag on PinUvAuthTokenState), and perform the
+        // actual biometric check later during makeCredential/getAssertion at the UP
+        // step, where full operation context and CryptoObject binding are available.
+        // From the client's perspective, the result is identical — the credential is
+        // created with the UV bit set, and UV is performed before any key operation.
 
         // TODO: Step 11: pcmr permission handling (needed when authenticatorCredentialManagement is implemented)
 
