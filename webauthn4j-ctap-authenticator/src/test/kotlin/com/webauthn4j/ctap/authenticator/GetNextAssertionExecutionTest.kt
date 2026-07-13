@@ -38,8 +38,7 @@ class GetNextAssertionExecutionTest {
 
     @Test
     suspend fun getNextAssertion_test() {
-        val ctapAuthenticator = CtapAuthenticator()
-        ctapAuthenticator.credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
+        val ctapAuthenticator = CtapAuthenticator(credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM)
         val connection = ctapAuthenticator.createSession()
         makeCredential(connection, userId = byteArrayOf(0x01))
         makeCredential(connection, userId = byteArrayOf(0x02))
@@ -68,8 +67,7 @@ class GetNextAssertionExecutionTest {
 
     @Test
     suspend fun getNextAssertion_when_no_session_exist_test() {
-        val ctapAuthenticator = CtapAuthenticator()
-        ctapAuthenticator.credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
+        val ctapAuthenticator = CtapAuthenticator(credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM)
         val connection = ctapAuthenticator.createSession()
         makeCredential(connection)
 
@@ -79,8 +77,7 @@ class GetNextAssertionExecutionTest {
 
     @Test
     suspend fun getNextAssertion_when_next_credential_does_not_exist_test() {
-        val ctapAuthenticator = CtapAuthenticator()
-        ctapAuthenticator.credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
+        val ctapAuthenticator = CtapAuthenticator(credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM)
         val connection = ctapAuthenticator.createSession()
         makeCredential(connection, userId = byteArrayOf(0x01))
         makeCredential(connection, userId = byteArrayOf(0x02))
@@ -111,8 +108,7 @@ class GetNextAssertionExecutionTest {
     @Disabled("Mockito.mockStatic doesn't work with JDK 21")
     @Test
     suspend fun expiration_test() {
-        val ctapAuthenticator = CtapAuthenticator()
-        ctapAuthenticator.credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
+        val ctapAuthenticator = CtapAuthenticator(credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM)
         val connection = ctapAuthenticator.createSession()
         makeCredential(connection, userId = byteArrayOf(0x01))
         makeCredential(connection, userId = byteArrayOf(0x02))
