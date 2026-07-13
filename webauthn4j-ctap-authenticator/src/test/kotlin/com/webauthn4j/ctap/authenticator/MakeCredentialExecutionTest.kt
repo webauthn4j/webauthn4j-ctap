@@ -75,15 +75,16 @@ internal class MakeCredentialExecutionTest {
 
     @Test
     suspend fun store_full_test() {
-        val ctapAuthenticator = CtapAuthenticator()
-        ctapAuthenticator.authenticatorPropertyStore = spy<InMemoryAuthenticatorPropertyStore> {
-            onGeneric {
-                createUserCredentialKey(
-                    any(),
-                    any()
-                )
-            } doThrow StoreFullException("AuthenticatorPropertyStore is full")
-        }
+        val ctapAuthenticator = CtapAuthenticator(
+            authenticatorPropertyStore = spy<InMemoryAuthenticatorPropertyStore> {
+                onGeneric {
+                    createUserCredentialKey(
+                        any(),
+                        any()
+                    )
+                } doThrow StoreFullException("AuthenticatorPropertyStore is full")
+            }
+        )
         val connection = ctapAuthenticator.createSession()
 
         val clientDataHash = ByteArray(0)
@@ -155,9 +156,10 @@ internal class MakeCredentialExecutionTest {
             pinUvAuthProtocol
         )
 
-        val ctapAuthenticator = CtapAuthenticator()
-        ctapAuthenticator.residentKey = residentKeySetting
-        ctapAuthenticator.makeCredUvNotRqd = MakeCredUvNotRqdSetting.UV_NOT_REQUIRED
+        val ctapAuthenticator = CtapAuthenticator(
+            residentKey = residentKeySetting,
+            makeCredUvNotRqd = MakeCredUvNotRqdSetting.UV_NOT_REQUIRED,
+        )
         val connection = ctapAuthenticator.createSession()
 
         val response = connection.makeCredential(command)
@@ -212,8 +214,7 @@ internal class MakeCredentialExecutionTest {
             pinUvAuthProtocol
         )
 
-        val ctapAuthenticator = CtapAuthenticator()
-        ctapAuthenticator.residentKey = residentKeySetting
+        val ctapAuthenticator = CtapAuthenticator(residentKey = residentKeySetting)
         val connection = ctapAuthenticator.createSession()
 
         val response = connection.makeCredential(command)
@@ -267,8 +268,7 @@ internal class MakeCredentialExecutionTest {
             pinUvAuthProtocol
         )
 
-        val ctapAuthenticator = CtapAuthenticator()
-        ctapAuthenticator.userVerification = userVerificationSetting
+        val ctapAuthenticator = CtapAuthenticator(userVerification = userVerificationSetting)
         val connection = ctapAuthenticator.createSession()
 
 
@@ -312,10 +312,11 @@ internal class MakeCredentialExecutionTest {
             pinUvAuthProtocol
         )
 
-        val ctapAuthenticator = CtapAuthenticator()
-        ctapAuthenticator.userPresence = userPresenceSetting
-        ctapAuthenticator.userVerification = UserVerificationSetting.NOT_SUPPORTED
-        ctapAuthenticator.clientPIN = ClientPINSetting.DISABLED
+        val ctapAuthenticator = CtapAuthenticator(
+            userPresence = userPresenceSetting,
+            userVerification = UserVerificationSetting.NOT_SUPPORTED,
+            clientPIN = ClientPINSetting.DISABLED,
+        )
         val connection = ctapAuthenticator.createSession()
 
         val response = connection.makeCredential(command)

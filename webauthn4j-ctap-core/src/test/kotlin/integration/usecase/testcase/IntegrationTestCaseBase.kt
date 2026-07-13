@@ -97,7 +97,7 @@ abstract class IntegrationTestCaseBase {
                 }
             }.depends(clientPINParameter, algorithmsParameter)
         internal val ctapAuthenticatorParameter = TestParameter {
-            val ctapAuthenticator = CtapAuthenticator(
+            return@TestParameter CtapAuthenticator(
                 objectConverter = objectConverter,
                 attestationStatementProvider = attestationStatementGenerator,
                 fidoU2FBasicAttestationStatementGenerator = fidoU2FAttestationStatementGenerator,
@@ -109,20 +109,17 @@ abstract class IntegrationTestCaseBase {
                         return userVerificationSetting.toUserVerificationOption()
                     }
                 },
-                credentialSelectionHandler = credentialSelectionHandler
+                credentialSelectionHandler = credentialSelectionHandler,
+                aaguid = aaguid,
+                platform = platformSetting,
+                residentKey = residentKeySetting,
+                clientPIN = clientPINSetting,
+                resetProtection = resetProtectionSetting,
+                userPresence = userPresenceSetting,
+                userVerification = userVerificationSetting,
+                makeCredUvNotRqd = makeCredUvNotRqdSetting,
+                credentialSelector = credentialSelectorSetting,
             )
-            ctapAuthenticator.aaguid = aaguid
-            ctapAuthenticator.platform = platformSetting
-            ctapAuthenticator.platform = platformSetting
-            ctapAuthenticator.residentKey = residentKeySetting
-            ctapAuthenticator.clientPIN = clientPINSetting
-            ctapAuthenticator.resetProtection = resetProtectionSetting
-            ctapAuthenticator.userPresence = userPresenceSetting
-            ctapAuthenticator.userVerification = userVerificationSetting
-            ctapAuthenticator.makeCredUvNotRqd = makeCredUvNotRqdSetting
-            ctapAuthenticator.credentialSelector = credentialSelectorSetting
-
-            return@TestParameter ctapAuthenticator
         }.depends(
             attestationStatementGeneratorParameter,
             fidoU2FAttestationStatementGeneratorParameter,

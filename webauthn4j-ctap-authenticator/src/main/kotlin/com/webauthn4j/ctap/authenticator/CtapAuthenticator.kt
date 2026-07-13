@@ -33,15 +33,13 @@ import org.slf4j.LoggerFactory
 
 class CtapAuthenticator(
     val objectConverter: ObjectConverter = createObjectConverter(),
-    // Core logic delegates
-    // These are final as it should not be updated on the fly for integrity. To update these, new instance should be created.
-    var attestationStatementProvider: AttestationStatementProvider = NoneAttestationStatementProvider(),
-    var fidoU2FBasicAttestationStatementGenerator: FIDOU2FAttestationStatementProvider = FIDOU2FBasicAttestationStatementProvider.createWithDemoAttestationKey(),
+    val attestationStatementProvider: AttestationStatementProvider = NoneAttestationStatementProvider(),
+    val fidoU2FBasicAttestationStatementGenerator: FIDOU2FAttestationStatementProvider = FIDOU2FBasicAttestationStatementProvider.createWithDemoAttestationKey(),
     transports: Set<AuthenticatorTransport> = setOf(),
     pinProtocols: Set<PinProtocolVersion> = setOf(PinProtocolVersion.VERSION_2, PinProtocolVersion.VERSION_1),
     val extensionProcessors: List<ExtensionProcessor> = listOf(CredProtectExtensionProcessor()),
+    val authenticatorPropertyStore: AuthenticatorPropertyStore = InMemoryAuthenticatorPropertyStore(),
     // Handlers
-    var authenticatorPropertyStore: AuthenticatorPropertyStore = InMemoryAuthenticatorPropertyStore(),
     val userVerificationCapabilityProvider: UserVerificationCapabilityProvider = object : UserVerificationCapabilityProvider {
         override fun getUserVerificationOption(rpId: String?): UserVerificationOption = UserVerificationOption.READY
     },
@@ -54,8 +52,22 @@ class CtapAuthenticator(
     val selectionHandler: AuthenticatorSelectionHandler = object : AuthenticatorSelectionHandler {
         override suspend fun onSelectionRequested(): Boolean = true
     },
-    var credentialSelectionHandler: CredentialSelectionHandler = DefaultCredentialSelectionHandler(),
-    var winkHandler: WinkHandler = NoopWinkHandler()
+    val credentialSelectionHandler: CredentialSelectionHandler = DefaultCredentialSelectionHandler(),
+    val winkHandler: WinkHandler = NoopWinkHandler(),
+    // Settings
+    val aaguid: AAGUID = AAGUID,
+    val platform: AttachmentSetting = AttachmentSetting.CROSS_PLATFORM,
+    val residentKey: ResidentKeySetting = ResidentKeySetting.ALWAYS,
+    val clientPIN: ClientPINSetting = ClientPINSetting.ENABLED,
+    val resetProtection: ResetProtectionSetting = ResetProtectionSetting.DISABLED,
+    val userPresence: UserPresenceSetting = UserPresenceSetting.SUPPORTED,
+    val userVerification: UserVerificationSetting = UserVerificationSetting.READY,
+    val alwaysUv: AlwaysUvSetting = AlwaysUvSetting.DISABLED,
+    val makeCredUvNotRqd: MakeCredUvNotRqdSetting = MakeCredUvNotRqdSetting.UV_NOT_REQUIRED,
+    val credentialSelector: CredentialSelectorSetting = CredentialSelectorSetting.AUTHENTICATOR,
+    // Observers
+    eventListeners: List<EventListener> = emptyList(),
+    exceptionReporters: List<ExceptionReporter> = emptyList(),
 ) {
 
     companion object{
@@ -95,20 +107,8 @@ class CtapAuthenticator(
 
     val transports: MutableSet<AuthenticatorTransport> = transports.toMutableSet()
     val pinProtocols: Set<PinProtocolVersion> = pinProtocols
-    internal val eventListeners: MutableList<EventListener> = mutableListOf()
-    internal val exceptionReporters: MutableList<ExceptionReporter> = mutableListOf()
-
-    var aaguid: AAGUID = AAGUID
-
-    var platform: AttachmentSetting = AttachmentSetting.CROSS_PLATFORM
-    var residentKey: ResidentKeySetting = ResidentKeySetting.ALWAYS
-    var clientPIN: ClientPINSetting = ClientPINSetting.ENABLED
-    var resetProtection: ResetProtectionSetting = ResetProtectionSetting.DISABLED
-    var userPresence: UserPresenceSetting = UserPresenceSetting.SUPPORTED
-    var userVerification: UserVerificationSetting = UserVerificationSetting.READY
-    var alwaysUv: AlwaysUvSetting = AlwaysUvSetting.DISABLED
-    var makeCredUvNotRqd: MakeCredUvNotRqdSetting = MakeCredUvNotRqdSetting.UV_NOT_REQUIRED
-    var credentialSelector: CredentialSelectorSetting = CredentialSelectorSetting.AUTHENTICATOR
+    internal val eventListeners: MutableList<EventListener> = eventListeners.toMutableList()
+    internal val exceptionReporters: MutableList<ExceptionReporter> = exceptionReporters.toMutableList()
 
     fun createSession(
         userVerificationCapabilityProvider: UserVerificationCapabilityProvider = this.userVerificationCapabilityProvider,
@@ -118,6 +118,60 @@ class CtapAuthenticator(
     ) : CtapAuthenticatorSession{
         return CtapAuthenticatorSession(this, userVerificationCapabilityProvider, makeCredentialConsentHandler, getAssertionConsentHandler, selectionHandler)
     }
+
+    fun copy(
+        objectConverter: ObjectConverter = this.objectConverter,
+        attestationStatementProvider: AttestationStatementProvider = this.attestationStatementProvider,
+        fidoU2FBasicAttestationStatementGenerator: FIDOU2FAttestationStatementProvider = this.fidoU2FBasicAttestationStatementGenerator,
+        transports: Set<AuthenticatorTransport> = this.transports,
+        pinProtocols: Set<PinProtocolVersion> = this.pinProtocols,
+        extensionProcessors: List<ExtensionProcessor> = this.extensionProcessors,
+        authenticatorPropertyStore: AuthenticatorPropertyStore = this.authenticatorPropertyStore,
+        userVerificationCapabilityProvider: UserVerificationCapabilityProvider = this.userVerificationCapabilityProvider,
+        makeCredentialConsentHandler: MakeCredentialConsentHandler = this.makeCredentialConsentHandler,
+        getAssertionConsentHandler: GetAssertionConsentHandler = this.getAssertionConsentHandler,
+        selectionHandler: AuthenticatorSelectionHandler = this.selectionHandler,
+        credentialSelectionHandler: CredentialSelectionHandler = this.credentialSelectionHandler,
+        winkHandler: WinkHandler = this.winkHandler,
+        aaguid: AAGUID = this.aaguid,
+        platform: AttachmentSetting = this.platform,
+        residentKey: ResidentKeySetting = this.residentKey,
+        clientPIN: ClientPINSetting = this.clientPIN,
+        resetProtection: ResetProtectionSetting = this.resetProtection,
+        userPresence: UserPresenceSetting = this.userPresence,
+        userVerification: UserVerificationSetting = this.userVerification,
+        alwaysUv: AlwaysUvSetting = this.alwaysUv,
+        makeCredUvNotRqd: MakeCredUvNotRqdSetting = this.makeCredUvNotRqd,
+        credentialSelector: CredentialSelectorSetting = this.credentialSelector,
+        eventListeners: List<EventListener> = this.eventListeners,
+        exceptionReporters: List<ExceptionReporter> = this.exceptionReporters,
+    ): CtapAuthenticator = CtapAuthenticator(
+        objectConverter = objectConverter,
+        attestationStatementProvider = attestationStatementProvider,
+        fidoU2FBasicAttestationStatementGenerator = fidoU2FBasicAttestationStatementGenerator,
+        transports = transports,
+        pinProtocols = pinProtocols,
+        extensionProcessors = extensionProcessors,
+        authenticatorPropertyStore = authenticatorPropertyStore,
+        userVerificationCapabilityProvider = userVerificationCapabilityProvider,
+        makeCredentialConsentHandler = makeCredentialConsentHandler,
+        getAssertionConsentHandler = getAssertionConsentHandler,
+        selectionHandler = selectionHandler,
+        credentialSelectionHandler = credentialSelectionHandler,
+        winkHandler = winkHandler,
+        aaguid = aaguid,
+        platform = platform,
+        residentKey = residentKey,
+        clientPIN = clientPIN,
+        resetProtection = resetProtection,
+        userPresence = userPresence,
+        userVerification = userVerification,
+        alwaysUv = alwaysUv,
+        makeCredUvNotRqd = makeCredUvNotRqd,
+        credentialSelector = credentialSelector,
+        eventListeners = eventListeners,
+        exceptionReporters = exceptionReporters,
+    )
 
     fun registerEventListener(eventListener: EventListener) {
         eventListeners.add(eventListener)

@@ -35,10 +35,9 @@ class UniFIDOKeyUSBIP : Runnable {
                 makeCredentialConsentHandler = consentHandler,
                 getAssertionConsentHandler = consentHandler,
                 selectionHandler = consentHandler,
-                transports = setOf(AuthenticatorTransport.USB)
-            ).apply {
-                credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM
-            }
+                transports = setOf(AuthenticatorTransport.USB),
+                credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM,
+            )
         }
     }
 

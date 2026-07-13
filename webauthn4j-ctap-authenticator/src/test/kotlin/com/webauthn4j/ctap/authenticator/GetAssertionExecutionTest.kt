@@ -207,8 +207,7 @@ internal class GetAssertionExecutionTest {
         val setupConnection = ctapAuthenticator.createSession()
         makeCredential(setupConnection)
 
-        ctapAuthenticator.userPresence = userPresenceSetting
-        val connection = ctapAuthenticator.createSession()
+        val connection = ctapAuthenticator.copy(userPresence = userPresenceSetting).createSession()
 
         val clientDataHash = ByteArray(0)
         val allowList: List<PublicKeyCredentialDescriptor> = emptyList()
@@ -254,8 +253,7 @@ internal class GetAssertionExecutionTest {
         val setupConnection = ctapAuthenticator.createSession()
         makeCredential(setupConnection)
 
-        ctapAuthenticator.userVerification = userVerificationSetting
-        val connection = ctapAuthenticator.createSession()
+        val connection = ctapAuthenticator.copy(userVerification = userVerificationSetting).createSession()
 
         val clientDataHash = ByteArray(0)
         val allowList: List<PublicKeyCredentialDescriptor> = emptyList()
