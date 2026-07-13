@@ -4,7 +4,7 @@ import com.webauthn4j.ctap.authenticator.GetAssertionConsentHandler
 import com.webauthn4j.ctap.authenticator.GetAssertionConsentRequest
 import com.webauthn4j.ctap.authenticator.MakeCredentialConsentHandler
 import com.webauthn4j.ctap.authenticator.MakeCredentialConsentRequest
-import com.webauthn4j.ctap.authenticator.SelectionHandler
+import com.webauthn4j.ctap.authenticator.AuthenticatorSelectionHandler
 import com.webauthn4j.ctap.authenticator.UserVerificationCapabilityProvider
 import com.webauthn4j.ctap.core.data.options.UserVerificationOption
 import kotlinx.coroutines.delay
@@ -14,7 +14,7 @@ class ConsoleUserConsentHandler :
     UserVerificationCapabilityProvider,
     MakeCredentialConsentHandler,
     GetAssertionConsentHandler,
-    SelectionHandler {
+    AuthenticatorSelectionHandler {
 
     private val logger = LoggerFactory.getLogger(ConsoleUserConsentHandler::class.java)
 

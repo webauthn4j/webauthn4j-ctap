@@ -37,7 +37,7 @@ class CtapAuthenticatorSession internal constructor(
     userVerificationCapabilityProvider: UserVerificationCapabilityProvider?,
     makeCredentialConsentHandler: MakeCredentialConsentHandler?,
     getAssertionConsentHandler: GetAssertionConsentHandler?,
-    selectionHandler: SelectionHandler?,
+    selectionHandler: AuthenticatorSelectionHandler?,
 ) {
 
     private val logger = LoggerFactory.getLogger(CtapAuthenticatorSession::class.java)
@@ -53,7 +53,7 @@ class CtapAuthenticatorSession internal constructor(
     val userVerificationCapabilityProvider: UserVerificationCapabilityProvider = userVerificationCapabilityProvider ?: ctapAuthenticator.userVerificationCapabilityProvider
     val makeCredentialConsentHandler: MakeCredentialConsentHandler = makeCredentialConsentHandler ?: ctapAuthenticator.makeCredentialConsentHandler
     val getAssertionConsentHandler: GetAssertionConsentHandler = getAssertionConsentHandler ?: ctapAuthenticator.getAssertionConsentHandler
-    val selectionHandler: SelectionHandler = selectionHandler ?: ctapAuthenticator.selectionHandler
+    val selectionHandler: AuthenticatorSelectionHandler = selectionHandler ?: ctapAuthenticator.selectionHandler
     val credentialSelectionHandler: CredentialSelectionHandler = ctapAuthenticator.credentialSelectionHandler
     val winkHandler: WinkHandler = ctapAuthenticator.winkHandler
     val eventListeners: List<EventListener> = ctapAuthenticator.eventListeners.toList()

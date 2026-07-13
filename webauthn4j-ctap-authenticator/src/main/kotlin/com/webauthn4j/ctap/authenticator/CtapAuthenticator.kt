@@ -51,7 +51,7 @@ class CtapAuthenticator(
     val getAssertionConsentHandler: GetAssertionConsentHandler = object : GetAssertionConsentHandler {
         override suspend fun onGetAssertionConsentRequested(getAssertionConsentRequest: GetAssertionConsentRequest): Boolean = true
     },
-    val selectionHandler: SelectionHandler = object : SelectionHandler {
+    val selectionHandler: AuthenticatorSelectionHandler = object : AuthenticatorSelectionHandler {
         override suspend fun onSelectionRequested(): Boolean = true
     },
     var credentialSelectionHandler: CredentialSelectionHandler = DefaultCredentialSelectionHandler(),
@@ -114,7 +114,7 @@ class CtapAuthenticator(
         userVerificationCapabilityProvider: UserVerificationCapabilityProvider = this.userVerificationCapabilityProvider,
         makeCredentialConsentHandler: MakeCredentialConsentHandler = this.makeCredentialConsentHandler,
         getAssertionConsentHandler: GetAssertionConsentHandler = this.getAssertionConsentHandler,
-        selectionHandler: SelectionHandler = this.selectionHandler,
+        selectionHandler: AuthenticatorSelectionHandler = this.selectionHandler,
     ) : CtapAuthenticatorSession{
         return CtapAuthenticatorSession(this, userVerificationCapabilityProvider, makeCredentialConsentHandler, getAssertionConsentHandler, selectionHandler)
     }

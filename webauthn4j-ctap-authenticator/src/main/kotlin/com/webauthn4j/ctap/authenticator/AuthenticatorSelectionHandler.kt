@@ -1,5 +1,5 @@
 package com.webauthn4j.ctap.authenticator
 
-interface SelectionHandler {
+interface AuthenticatorSelectionHandler {
     suspend fun onSelectionRequested(): Boolean
 }
