@@ -12,6 +12,7 @@ import com.webauthn4j.ctap.authenticator.execution.GetInfoExecution
 import com.webauthn4j.ctap.authenticator.execution.GetNextAssertionExecution
 import com.webauthn4j.ctap.authenticator.execution.MakeCredentialExecution
 import com.webauthn4j.ctap.authenticator.execution.ResetExecution
+import com.webauthn4j.ctap.authenticator.execution.SelectionExecution
 import com.webauthn4j.ctap.authenticator.execution.U2FAuthenticationExecution
 import com.webauthn4j.ctap.authenticator.execution.U2FRegisterExecution
 import com.webauthn4j.ctap.authenticator.extension.ExtensionProcessor
@@ -36,6 +37,7 @@ class CtapAuthenticatorSession internal constructor(
     userVerificationCapabilityProvider: UserVerificationCapabilityProvider?,
     makeCredentialConsentHandler: MakeCredentialConsentHandler?,
     getAssertionConsentHandler: GetAssertionConsentHandler?,
+    selectionHandler: AuthenticatorSelectionHandler?,
 ) {
 
     private val logger = LoggerFactory.getLogger(CtapAuthenticatorSession::class.java)
@@ -51,6 +53,7 @@ class CtapAuthenticatorSession internal constructor(
     val userVerificationCapabilityProvider: UserVerificationCapabilityProvider = userVerificationCapabilityProvider ?: ctapAuthenticator.userVerificationCapabilityProvider
     val makeCredentialConsentHandler: MakeCredentialConsentHandler = makeCredentialConsentHandler ?: ctapAuthenticator.makeCredentialConsentHandler
     val getAssertionConsentHandler: GetAssertionConsentHandler = getAssertionConsentHandler ?: ctapAuthenticator.getAssertionConsentHandler
+    val selectionHandler: AuthenticatorSelectionHandler = selectionHandler ?: ctapAuthenticator.selectionHandler
     val credentialSelectionHandler: CredentialSelectionHandler = ctapAuthenticator.credentialSelectionHandler
     val winkHandler: WinkHandler = ctapAuthenticator.winkHandler
     val eventListeners: List<EventListener> = ctapAuthenticator.eventListeners.toList()
@@ -121,6 +124,7 @@ class CtapAuthenticatorSession internal constructor(
             is AuthenticatorGetInfoRequest -> getInfo(request)
             is AuthenticatorClientPINRequest -> clientPIN(request)
             is AuthenticatorResetRequest -> reset(request)
+            is AuthenticatorSelectionRequest -> selection(request)
             is U2FRegistrationRequest -> u2fRegister(request)
             is U2FAuthenticationRequest -> u2fSign(request)
             else -> throw IllegalStateException("unknown command ${request::class.java}")
@@ -156,6 +160,13 @@ class CtapAuthenticatorSession internal constructor(
     suspend fun clientPIN(authenticatorClientPINCommand: AuthenticatorClientPINRequest): AuthenticatorClientPINResponse {
         return withTransaction {
             ClientPINExecution(this, authenticatorClientPINCommand).execute()
+        }
+    }
+
+    @JvmOverloads
+    suspend fun selection(authenticatorSelectionRequest: AuthenticatorSelectionRequest = AuthenticatorSelectionRequest()): AuthenticatorSelectionResponse {
+        return withTransaction {
+            SelectionExecution(this, authenticatorSelectionRequest).execute()
         }
     }
 

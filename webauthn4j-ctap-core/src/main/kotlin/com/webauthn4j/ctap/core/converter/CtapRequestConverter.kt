@@ -36,6 +36,7 @@ class CtapRequestConverter(objectConverter: ObjectConverter) {
             )!!
             CtapCommand.RESET.value.toUByte() -> AuthenticatorResetRequest()
             CtapCommand.GET_NEXT_ASSERTION.value.toUByte() -> AuthenticatorGetNextAssertionRequest()
+            CtapCommand.SELECTION.value.toUByte() -> AuthenticatorSelectionRequest()
             else -> throw IllegalArgumentException(
                 String.format(
                     "unknown command type 0x%x is provided.",
