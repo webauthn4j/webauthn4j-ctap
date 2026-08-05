@@ -35,6 +35,6 @@ abstract class PackedAttestationStatementProviderBase(
     }
 
     protected abstract fun sign(credentialKey: KeyPair, toBeSigned: ByteArray): ByteArray
-    protected abstract fun createAttestationCertificatePath(attestationStatementRequest: AttestationStatementRequest): AttestationCertificatePath
+    protected abstract fun createAttestationCertificatePath(attestationStatementRequest: AttestationStatementRequest): AttestationCertificatePath?
 
 }
