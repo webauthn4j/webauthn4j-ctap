@@ -21,6 +21,7 @@ import com.webauthn4j.ctap.authenticator.data.settings.UserPresenceSetting
 import com.webauthn4j.ctap.authenticator.data.settings.UserVerificationSetting
 import com.webauthn4j.ctap.authenticator.extension.CredProtectExtensionProcessor
 import com.webauthn4j.ctap.authenticator.extension.ExtensionProcessor
+import com.webauthn4j.ctap.authenticator.extension.HMACSecretExtensionProcessor
 import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.authenticator.store.InMemoryAuthenticatorPropertyStore
 import com.webauthn4j.ctap.core.converter.jackson.CtapCBORModule
@@ -37,7 +38,7 @@ class CtapAuthenticator(
     val fidoU2FBasicAttestationStatementGenerator: FIDOU2FAttestationStatementProvider = FIDOU2FBasicAttestationStatementProvider.createWithDemoAttestationKey(),
     transports: Set<AuthenticatorTransport> = setOf(),
     pinProtocols: Set<PinProtocolVersion> = setOf(PinProtocolVersion.VERSION_2, PinProtocolVersion.VERSION_1),
-    val extensionProcessors: List<ExtensionProcessor> = listOf(CredProtectExtensionProcessor()),
+    val extensionProcessors: List<ExtensionProcessor> = listOf(CredProtectExtensionProcessor(), HMACSecretExtensionProcessor()),
     val authenticatorPropertyStore: AuthenticatorPropertyStore = InMemoryAuthenticatorPropertyStore(),
     // Handlers
     val userVerificationCapabilityProvider: UserVerificationCapabilityProvider = object : UserVerificationCapabilityProvider {
