@@ -5,7 +5,9 @@ import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.core.data.options.*
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialParameters
+import com.webauthn4j.data.PublicKeyCredentialRpEntity
 import com.webauthn4j.data.PublicKeyCredentialType
+import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionAuthenticatorInput
 import com.webauthn4j.data.extension.authenticator.AuthenticationExtensionsAuthenticatorInputs
@@ -79,8 +81,8 @@ internal class CtapClientTest {
 
     private suspend fun makeCredential(): AuthenticatorMakeCredentialResponse {
         val clientDataHash = ByteArray(0)
-        val rp = CtapPublicKeyCredentialRpEntity(RP_ID, "example", "rpIcon")
-        val user = CtapPublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe", "icon")
+        val rp = PublicKeyCredentialRpEntity(RP_ID, "example")
+        val user = PublicKeyCredentialUserEntity(byteArrayOf(0x01, 0x23), "John.doe", "John Doe")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,

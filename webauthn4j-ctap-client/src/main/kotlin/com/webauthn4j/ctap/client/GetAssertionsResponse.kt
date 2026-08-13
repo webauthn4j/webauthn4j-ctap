@@ -1,7 +1,7 @@
 package com.webauthn4j.ctap.client
 
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
-import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
+import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 
 data class GetAssertionsResponse(
@@ -13,7 +13,7 @@ data class GetAssertionsResponse(
         val credential: PublicKeyCredentialDescriptor?,
         val authData: ByteArray,
         val signature: ByteArray,
-        val user: CtapPublicKeyCredentialUserEntity?
+        val user: PublicKeyCredentialUserEntity?
     ) {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
+import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import com.webauthn4j.util.ArrayUtil
 
 @Suppress("CanBePrimaryConstructorProperty")
@@ -11,7 +12,7 @@ class AuthenticatorGetAssertionResponseData @JsonCreator constructor(
     @JsonProperty("1") credential: PublicKeyCredentialDescriptor?,
     @JsonProperty("2") authData: ByteArray,
     @JsonProperty("3") signature: ByteArray,
-    @JsonProperty("4") user: CtapPublicKeyCredentialUserEntity?,
+    @JsonProperty("4") user: PublicKeyCredentialUserEntity?,
     @JsonProperty("5") numberOfCredentials: Int?,
     @JsonProperty("6") userSelected: Boolean?
     // TODO: largeBlobKey (0x07) - "The contents of the associated largeBlobKey if present for the asserted credential,
@@ -24,7 +25,7 @@ class AuthenticatorGetAssertionResponseData @JsonCreator constructor(
         credential: PublicKeyCredentialDescriptor?,
         authData: ByteArray,
         signature: ByteArray,
-        user: CtapPublicKeyCredentialUserEntity?,
+        user: PublicKeyCredentialUserEntity?,
         numberOfCredentials: Int?
     ) : this(credential, authData, signature, user, numberOfCredentials, null)
 
@@ -33,7 +34,7 @@ class AuthenticatorGetAssertionResponseData @JsonCreator constructor(
         get() = ArrayUtil.clone(field)
     val signature: ByteArray = ArrayUtil.clone(signature)
         get() = ArrayUtil.clone(field)
-    val user: CtapPublicKeyCredentialUserEntity? = user
+    val user: PublicKeyCredentialUserEntity? = user
     val numberOfCredentials: Int? = numberOfCredentials
     val userSelected: Boolean? = userSelected
 

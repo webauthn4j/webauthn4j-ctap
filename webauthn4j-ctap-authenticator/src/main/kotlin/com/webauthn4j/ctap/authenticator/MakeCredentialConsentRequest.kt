@@ -1,15 +1,15 @@
 package com.webauthn4j.ctap.authenticator
 
-import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
-import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
+import com.webauthn4j.data.PublicKeyCredentialRpEntity
+import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import com.webauthn4j.util.MessageDigestUtil
 import java.io.Serializable
 
 class MakeCredentialConsentRequest : Serializable{
 
     val applicationParameter: ByteArray
-    val rp: CtapPublicKeyCredentialRpEntity? // rp can be null while processing FIDO-U2F request
-    val user: CtapPublicKeyCredentialUserEntity? //user can be null while processing FIDO-U2F request
+    val rp: PublicKeyCredentialRpEntity? // rp can be null while processing FIDO-U2F request
+    val user: PublicKeyCredentialUserEntity? //user can be null while processing FIDO-U2F request
     val isUserPresenceRequired: Boolean
     val isUserVerificationRequired: Boolean
 
@@ -26,12 +26,12 @@ class MakeCredentialConsentRequest : Serializable{
     }
 
     constructor(
-        rp: CtapPublicKeyCredentialRpEntity,
-        user: CtapPublicKeyCredentialUserEntity?,
+        rp: PublicKeyCredentialRpEntity,
+        user: PublicKeyCredentialUserEntity?,
         isUserPresence: Boolean,
         isUserVerification: Boolean
     ) {
-        val rpIdHash = MessageDigestUtil.createSHA256().digest(rp.id.toByteArray())
+        val rpIdHash = MessageDigestUtil.createSHA256().digest(rp.id!!.toByteArray())
         this.applicationParameter = rpIdHash
         this.rp = rp
         this.user = user

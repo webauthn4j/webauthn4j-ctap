@@ -29,6 +29,7 @@ import com.webauthn4j.ctap.core.util.internal.HexUtil
 import com.webauthn4j.ctap.core.validator.AuthenticatorGetAssertionRequestValidator
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialType
+import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import com.webauthn4j.data.attestation.authenticator.EC2COSEKey
 import java.security.KeyPair
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
@@ -815,17 +816,15 @@ internal class GetAssertionExecution :
         )
         val user = when (credential) {
             is UserCredential -> when (assertionObject.maskUserIdentifiableInfo) {
-                true -> CtapPublicKeyCredentialUserEntity(
+                true -> PublicKeyCredentialUserEntity(
                     credential.userHandle,
-                    null,
-                    null,
-                    null
+                    "",
+                    ""
                 )
-                false -> CtapPublicKeyCredentialUserEntity(
+                false -> PublicKeyCredentialUserEntity(
                     credential.userHandle,
-                    credential.username,
-                    credential.displayName,
-                    credential.icon
+                    credential.username ?: "",
+                    credential.displayName ?: ""
                 )
             }
             else -> null

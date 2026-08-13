@@ -6,8 +6,8 @@ import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialRequest
-import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
-import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
+import com.webauthn4j.data.PublicKeyCredentialRpEntity
+import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
@@ -157,8 +157,8 @@ class GetNextAssertionExecutionTest {
         userId: ByteArray = byteArrayOf(0x01, 0x23)
     ) {
         val clientDataHash = ByteArray(0)
-        val rp = CtapPublicKeyCredentialRpEntity("example.com", "example", "rpIcon")
-        val user = CtapPublicKeyCredentialUserEntity(userId, "John.doe", "John Doe", "icon")
+        val rp = PublicKeyCredentialRpEntity("example.com", "example")
+        val user = PublicKeyCredentialUserEntity(userId, "John.doe", "John Doe")
         val pubKeyCredParams = listOf(
             PublicKeyCredentialParameters(
                 PublicKeyCredentialType.PUBLIC_KEY,

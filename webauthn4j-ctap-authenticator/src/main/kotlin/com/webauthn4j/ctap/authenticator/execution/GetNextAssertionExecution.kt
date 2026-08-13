@@ -8,10 +8,10 @@ import com.webauthn4j.ctap.authenticator.store.StoreFullException
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponseData
-import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
 import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.data.PublicKeyCredentialDescriptor
 import com.webauthn4j.data.PublicKeyCredentialType
+import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData
 import java.nio.ByteBuffer
 
@@ -82,17 +82,15 @@ internal class GetNextAssertionExecution(
         //spec| if user verification was not done by the authenticator in the original authenticatorGetAssertion call.
         val user = when (credential) {
             is UserCredential -> when (assertionObject.maskUserIdentifiableInfo) {
-                true -> CtapPublicKeyCredentialUserEntity(
+                true -> PublicKeyCredentialUserEntity(
                     credential.userHandle,
-                    null,
-                    null,
-                    null
+                    "",
+                    ""
                 )
-                false -> CtapPublicKeyCredentialUserEntity(
+                false -> PublicKeyCredentialUserEntity(
                     credential.userHandle,
-                    credential.username,
-                    credential.displayName,
-                    credential.icon
+                    credential.username ?: "",
+                    credential.displayName ?: ""
                 )
             }
             else -> null

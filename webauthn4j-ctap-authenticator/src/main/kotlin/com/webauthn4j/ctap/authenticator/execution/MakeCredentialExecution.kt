@@ -28,6 +28,8 @@ import com.webauthn4j.ctap.authenticator.store.StoreFullException
 import com.webauthn4j.ctap.core.data.*
 import com.webauthn4j.ctap.core.data.PinUvAuthTokenPermission
 import com.webauthn4j.data.PinProtocolVersion
+import com.webauthn4j.data.PublicKeyCredentialRpEntity
+import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import java.util.Arrays
 import com.webauthn4j.ctap.core.util.internal.CipherUtil
 import com.webauthn4j.ctap.core.validator.AuthenticatorMakeCredentialRequestValidator
@@ -75,9 +77,9 @@ internal class MakeCredentialExecution :
 
     // command properties
     private val clientDataHash: ByteArray
-    private val rp: CtapPublicKeyCredentialRpEntity
+    private val rp: PublicKeyCredentialRpEntity
     private val rpId: String
-    private val user: CtapPublicKeyCredentialUserEntity
+    private val user: PublicKeyCredentialUserEntity
     private val pubKeyCredParams: List<PublicKeyCredentialParameters>
     private val excludeList: List<PublicKeyCredentialDescriptor>?
     private val registrationExtensionAuthenticatorInputs: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>?
@@ -125,7 +127,7 @@ internal class MakeCredentialExecution :
         // command properties initialization and validation
         this.clientDataHash = authenticatorMakeCredentialCommand.clientDataHash
         this.rp = authenticatorMakeCredentialCommand.rp
-        this.rpId = rp.id
+        this.rpId = rp.id!!
         this.user = authenticatorMakeCredentialCommand.user
         this.pubKeyCredParams = authenticatorMakeCredentialCommand.pubKeyCredParams
         this.excludeList = authenticatorMakeCredentialCommand.excludeList
@@ -143,10 +145,8 @@ internal class MakeCredentialExecution :
         userCredentialBuilder.userHandle(user.id)
         userCredentialBuilder.username(user.name)
         userCredentialBuilder.displayName(user.displayName)
-        userCredentialBuilder.icon(user.icon)
         userCredentialBuilder.rpId(rpId)
         userCredentialBuilder.rpName(rp.name)
-        userCredentialBuilder.rpIcon(rp.icon)
         userCredentialBuilder.counter(counter)
         userCredentialBuilder.otherUI(null)
     }
@@ -592,7 +592,7 @@ internal class MakeCredentialExecution :
         //spec| that is bound to the specified rp.id:
         excludeList.let {
             if (it != null && it.isNotEmpty()) {
-                val rpId = rp.id
+                val rpId = rp.id!!
                 val userCredentials = authenticatorPropertyStore.loadUserCredentials(rpId)
                 val credentialFilters = ctapAuthenticatorSession.extensionProcessors
                     .filterIsInstance<MakeCredentialCredentialFilter>()

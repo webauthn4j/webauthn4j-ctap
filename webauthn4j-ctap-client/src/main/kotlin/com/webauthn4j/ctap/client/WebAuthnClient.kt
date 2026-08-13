@@ -4,8 +4,8 @@ import com.webauthn4j.converter.AttestationObjectConverter
 import com.webauthn4j.converter.CollectedClientDataConverter
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.client.exception.WebAuthnClientException
-import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
-import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
+import com.webauthn4j.data.PublicKeyCredentialRpEntity
+import com.webauthn4j.data.PublicKeyCredentialUserEntity
 import com.webauthn4j.ctap.core.data.options.ClientPINOption
 import com.webauthn4j.ctap.core.data.options.PlatformOption
 import com.webauthn4j.ctap.core.data.options.PlatformOption.Companion.CROSS_PLATFORM
@@ -66,12 +66,11 @@ class WebAuthnClient(
         val rpId = publicKeyCredentialCreationOptions.rp.id ?: publicKeyCredentialCreationContext.origin.host
         ?: throw WebAuthnClientException("WebAuthn client must have origin.")
         val rp =
-            CtapPublicKeyCredentialRpEntity(rpId, publicKeyCredentialCreationOptions.rp.name, null)
-        val user = CtapPublicKeyCredentialUserEntity(
+            PublicKeyCredentialRpEntity(rpId, publicKeyCredentialCreationOptions.rp.name)
+        val user = PublicKeyCredentialUserEntity(
             publicKeyCredentialCreationOptions.user.id,
             publicKeyCredentialCreationOptions.user.name,
-            publicKeyCredentialCreationOptions.user.displayName,
-            null
+            publicKeyCredentialCreationOptions.user.displayName
         )
         val authenticatorExtensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>? =
             null //TODO: implement extension handling
