@@ -6,7 +6,9 @@ import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatement
 import com.webauthn4j.ctap.authenticator.data.event.Event
 import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.authenticator.data.settings.*
+import com.webauthn4j.ctap.authenticator.data.credential.ResidentUserCredential
 import com.webauthn4j.ctap.authenticator.execution.ClientPINExecution
+import com.webauthn4j.ctap.authenticator.execution.CredentialManagementExecution
 import com.webauthn4j.ctap.authenticator.execution.GetAssertionExecution
 import com.webauthn4j.ctap.authenticator.execution.GetInfoExecution
 import com.webauthn4j.ctap.authenticator.execution.GetNextAssertionExecution
@@ -94,6 +96,8 @@ class CtapAuthenticatorSession internal constructor(
 
 
     var onGoingGetAssertionSession: GetAssertionSession? = null
+    var onGoingCredentialManagementRpSession: CredentialManagementSession<String>? = null
+    var onGoingCredentialManagementCredentialSession: CredentialManagementSession<ResidentUserCredential>? = null
 
     // The Job of the currently executing command, used by cancelOnGoingTransaction() to cancel it.
     // Set after mutex acquisition to avoid race conditions; cleared in finally.
@@ -123,6 +127,7 @@ class CtapAuthenticatorSession internal constructor(
             is AuthenticatorGetNextAssertionRequest -> getNextAssertion(request)
             is AuthenticatorGetInfoRequest -> getInfo(request)
             is AuthenticatorClientPINRequest -> clientPIN(request)
+            is AuthenticatorCredentialManagementRequest -> credentialManagement(request)
             is AuthenticatorResetRequest -> reset(request)
             is AuthenticatorSelectionRequest -> selection(request)
             is U2FRegistrationRequest -> u2fRegister(request)
@@ -160,6 +165,12 @@ class CtapAuthenticatorSession internal constructor(
     suspend fun clientPIN(authenticatorClientPINCommand: AuthenticatorClientPINRequest): AuthenticatorClientPINResponse {
         return withTransaction {
             ClientPINExecution(this, authenticatorClientPINCommand).execute()
+        }
+    }
+
+    suspend fun credentialManagement(authenticatorCredentialManagementRequest: AuthenticatorCredentialManagementRequest): AuthenticatorCredentialManagementResponse {
+        return withTransaction {
+            CredentialManagementExecution(this, authenticatorCredentialManagementRequest).execute()
         }
     }
 
@@ -216,6 +227,8 @@ class CtapAuthenticatorSession internal constructor(
         logger.debug("Cancel ongoing transaction requested")
         activeTransaction?.cancelAndJoin()
         onGoingGetAssertionSession = null
+        onGoingCredentialManagementRpSession = null
+        onGoingCredentialManagementCredentialSession = null
     }
 
     internal fun publishEvent(event: Event) {

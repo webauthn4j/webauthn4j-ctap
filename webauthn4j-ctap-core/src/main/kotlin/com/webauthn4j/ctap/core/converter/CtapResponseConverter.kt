@@ -4,6 +4,8 @@ package com.webauthn4j.ctap.core.converter
 import com.webauthn4j.converter.util.ObjectConverter
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponseData
+import com.webauthn4j.ctap.core.data.AuthenticatorCredentialManagementResponse
+import com.webauthn4j.ctap.core.data.AuthenticatorCredentialManagementResponseData
 import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionResponseData
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponse
@@ -78,6 +80,13 @@ class CtapResponseConverter(objectConverter: ObjectConverter) {
                     AuthenticatorGetNextAssertionResponseData::class.java
                 )
                 AuthenticatorGetNextAssertionResponse(statusCode, responseData)
+            }
+            AuthenticatorCredentialManagementResponse::class.java -> {
+                val responseData = cborMapper.readValue(
+                    responseDataBytes,
+                    AuthenticatorCredentialManagementResponseData::class.java
+                )
+                AuthenticatorCredentialManagementResponse(statusCode, responseData)
             }
             else -> throw IllegalArgumentException("Unsupported response type is provided.")
         }

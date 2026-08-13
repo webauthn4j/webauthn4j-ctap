@@ -550,8 +550,7 @@ class PinUvAuthManager(
                     // Always authorized for PIN-based token issuance
                 }
                 PinUvAuthTokenPermission.CM -> {
-                    // TODO: check credMgmt option when authenticatorCredentialManagement is implemented
-                    return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_UNAUTHORIZED_PERMISSION)
+                    // credMgmt is supported; CM permission is authorized
                 }
                 PinUvAuthTokenPermission.BE -> {
                     // TODO: check bioEnroll option when authenticatorBioEnrollment is implemented
@@ -619,7 +618,7 @@ class PinUvAuthManager(
         volatilePinRetryCounter = MAX_VOLATILE_PIN_RETRIES
 
         // TODO: Step 11: forcePINChange check (needed when authenticatorConfig setMinPINLength is implemented)
-        // TODO: Step 12: pcmr permission handling (needed when authenticatorCredentialManagement is implemented)
+        // TODO: Step 12: pcmr permission handling
 
         //spec| Step 13: Create a new pinUvAuthToken by calling resetPinUvAuthToken() for all
         //spec| pinUvAuthProtocols supported by this authenticator.
@@ -725,8 +724,7 @@ class PinUvAuthManager(
                     // Always authorized for UV-based token issuance
                 }
                 PinUvAuthTokenPermission.CM -> {
-                    // TODO: check credMgmt option when authenticatorCredentialManagement is implemented
-                    return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_UNAUTHORIZED_PERMISSION)
+                    // credMgmt is supported; CM permission is authorized
                 }
                 PinUvAuthTokenPermission.BE -> {
                     // TODO: check uvBioEnroll option when authenticatorBioEnrollment is implemented
@@ -780,7 +778,7 @@ class PinUvAuthManager(
         // From the client's perspective, the result is identical — the credential is
         // created with the UV bit set, and UV is performed before any key operation.
 
-        // TODO: Step 11: pcmr permission handling (needed when authenticatorCredentialManagement is implemented)
+        // TODO: Step 11: pcmr permission handling
 
         //spec| Step 12: Create a new pinUvAuthToken by calling resetPinUvAuthToken() for all
         //spec| pinUvAuthProtocols supported by this authenticator.

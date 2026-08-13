@@ -83,5 +83,19 @@ interface AuthenticatorPropertyStore {
      */
     fun clear()
 
+    /**
+     * Load all RP IDs that have at least one stored credential
+     *
+     * @return set of RP IDs
+     */
+    fun loadAllRpIds(): Set<String> = emptySet()
+
+    /**
+     * Count all stored user credentials across all RPs
+     *
+     * @return total number of user credentials
+     */
+    fun countAllUserCredentials(): Int = 0
+
     var algorithms: Set<COSEAlgorithmIdentifier>
 }
