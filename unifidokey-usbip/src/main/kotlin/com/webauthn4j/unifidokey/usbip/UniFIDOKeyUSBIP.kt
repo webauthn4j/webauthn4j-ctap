@@ -3,6 +3,8 @@ package com.webauthn4j.unifidokey.usbip
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.attestation.PackedBasicAttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.data.settings.CredentialSelectorSetting
+import com.webauthn4j.ctap.authenticator.extension.CredProtectExtensionProcessor
+import com.webauthn4j.ctap.authenticator.extension.HMACSecretExtensionProcessor
 import com.webauthn4j.ctap.authenticator.transport.usbip.USBIPDevice
 import com.webauthn4j.ctap.authenticator.transport.usbip.USBIPDeviceConfig
 import com.webauthn4j.data.AuthenticatorTransport
@@ -36,6 +38,7 @@ class UniFIDOKeyUSBIP : Runnable {
                 getAssertionConsentHandler = consentHandler,
                 selectionHandler = consentHandler,
                 transports = setOf(AuthenticatorTransport.USB),
+                extensionProcessors = listOf(CredProtectExtensionProcessor(), HMACSecretExtensionProcessor()),
                 credentialSelector = CredentialSelectorSetting.CLIENT_PLATFORM,
             )
         }
