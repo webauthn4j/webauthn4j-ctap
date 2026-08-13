@@ -10,7 +10,7 @@ data class CtapVersion(@get:JsonValue val versionString: String, val major: Int,
         val FIDO_2_0 = CtapVersion("FIDO_2_0", 1, 0)
         val FIDO_2_1_PRE = CtapVersion("FIDO_2_1_PRE", 1, 0)
         val FIDO_2_1 = CtapVersion("FIDO_2_1", 1, 1)
-        val FIDO_2_3 = CtapVersion("FIDO_2_3", 1, 2)
+        val FIDO_2_3 = CtapVersion("FIDO_2_3", 1, 3)
 
         @JvmStatic
         @JsonCreator
