@@ -7,15 +7,12 @@ import com.webauthn4j.ctap.core.data.options.*
 import com.webauthn4j.data.AttachmentHint
 import com.webauthn4j.data.AuthenticationAlgorithm
 import com.webauthn4j.data.AuthenticatorAttestationType
-import com.webauthn4j.data.AuthenticatorConfigSubCommand
 import com.webauthn4j.data.AuthenticatorTransport
-import com.webauthn4j.data.CertificationType
 import com.webauthn4j.data.KeyProtectionType
 import com.webauthn4j.data.MatcherProtectionType
 import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.data.PublicKeyRepresentationFormat
 import com.webauthn4j.data.UserVerificationMethod
-import com.webauthn4j.data.VendorCommandId
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 import com.webauthn4j.metadata.converter.jackson.WebAuthnMetadataJSONModule
 import com.webauthn4j.metadata.data.statement.AuthenticatorGetInfo
@@ -149,9 +146,9 @@ class GenerateMetadataStatement : Runnable {
                 getInfo.maxRPIDsForSetMinPINLength?.toInt(),
                 getInfo.preferredPlatformUvAttempts?.toInt(),
                 getInfo.uvModality,
-                getInfo.certifications?.mapKeys { (k, _) -> CertificationType.create(k) }?.mapValues { (_, v) -> (v as Number).toInt() },
+                getInfo.certifications,
                 getInfo.remainingDiscoverableCredentials?.toInt(),
-                getInfo.vendorPrototypeConfigCommands?.map { VendorCommandId(it.toLong()) },
+                getInfo.vendorPrototypeConfigCommands,
                 getInfo.attestationFormats,
                 getInfo.uvCountSinceLastPinEntry?.toInt(),
                 getInfo.longTouchForReset,
@@ -161,7 +158,7 @@ class GenerateMetadataStatement : Runnable {
                 getInfo.pinComplexityPolicyURL,
                 getInfo.maxPINLength?.toInt(),
                 getInfo.encCredStoreState,
-                getInfo.authenticatorConfigCommands?.map { AuthenticatorConfigSubCommand.create(it.toInt()) }
+                getInfo.authenticatorConfigCommands
             )
         }
 
