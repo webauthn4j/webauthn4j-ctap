@@ -18,6 +18,8 @@ import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorMakeCr
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorMakeCredentialResponseDataSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorResetRequestSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorResetResponseDataSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorSelectionRequestSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorSelectionResponseDataSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.PinUvAuthTokenPermissionsSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.CtapPublicKeyCredentialRpEntitySerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.CtapPublicKeyCredentialUserEntitySerializer
@@ -33,6 +35,8 @@ import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialResponseData
 import com.webauthn4j.ctap.core.data.AuthenticatorResetRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorResetResponseData
+import com.webauthn4j.ctap.core.data.AuthenticatorSelectionRequest
+import com.webauthn4j.ctap.core.data.AuthenticatorSelectionResponseData
 import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
 import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
 import com.webauthn4j.ctap.core.data.PinUvAuthTokenPermissions
@@ -98,6 +102,14 @@ class CtapCBORModule : SimpleModule("CtapCBORModule") {
         this.addSerializer(
             AuthenticatorResetResponseData::class.java,
             AuthenticatorResetResponseDataSerializer()
+        )
+        this.addSerializer(
+            AuthenticatorSelectionRequest::class.java,
+            AuthenticatorSelectionRequestSerializer()
+        )
+        this.addSerializer(
+            AuthenticatorSelectionResponseData::class.java,
+            AuthenticatorSelectionResponseDataSerializer()
         )
         this.addSerializer(
             CtapPublicKeyCredentialRpEntity::class.java,
