@@ -36,6 +36,10 @@ class CtapRequestConverter(objectConverter: ObjectConverter) {
             )!!
             CtapCommand.RESET.value.toUByte() -> AuthenticatorResetRequest()
             CtapCommand.GET_NEXT_ASSERTION.value.toUByte() -> AuthenticatorGetNextAssertionRequest()
+            CtapCommand.CREDENTIAL_MANAGEMENT.value.toUByte() -> cborMapper.readValue(
+                commandParameters,
+                AuthenticatorCredentialManagementRequest::class.java
+            )!!
             CtapCommand.SELECTION.value.toUByte() -> AuthenticatorSelectionRequest()
             else -> throw IllegalArgumentException(
                 String.format(

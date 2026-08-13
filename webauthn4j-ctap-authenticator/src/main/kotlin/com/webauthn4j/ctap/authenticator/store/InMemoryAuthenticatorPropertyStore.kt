@@ -70,14 +70,24 @@ open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
         return map[rpId]?.values?.toList() ?: emptyList()
     }
 
+    override fun loadAllRpIds(): Set<String> {
+        return map.keys.filter { map[it]?.isNotEmpty() == true }.toSet()
+    }
+
+    override fun countAllUserCredentials(): Int {
+        return map.values.sumOf { it.size }
+    }
+
     override fun removeUserCredential(credentialId: ByteArray) {
-        map.keys.forEach(Consumer { rpId: String ->
-            val userCredentials =
-                map[rpId] ?: throw RelyingPartyNotFoundException("Relying party not found")
-            userCredentials[credentialId]
-                ?: throw CredentialNotFoundException("Credential not found")
-            userCredentials.remove(credentialId)
-        })
+        for (rpId in map.keys) {
+            val userCredentials = map[rpId] ?: continue
+            val key = userCredentials.keys.firstOrNull { it.contentEquals(credentialId) }
+            if (key != null) {
+                userCredentials.remove(key)
+                return
+            }
+        }
+        throw CredentialNotFoundException("Credential not found")
     }
 
     override fun supports(alg: COSEAlgorithmIdentifier): Boolean {

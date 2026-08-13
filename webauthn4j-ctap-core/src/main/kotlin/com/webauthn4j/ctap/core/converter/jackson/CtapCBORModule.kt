@@ -5,6 +5,9 @@ import com.webauthn4j.ctap.core.converter.jackson.deserializer.CoercionLessByteA
 import com.webauthn4j.ctap.core.converter.jackson.deserializer.PinUvAuthTokenPermissionsDeserializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorClientPINRequestSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorClientPINResponseDataSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorCredentialManagementRequestSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorCredentialManagementRequestSubCommandParamsSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorCredentialManagementResponseDataSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorGetAssertionRequestOptionsSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorGetAssertionRequestSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorGetAssertionResponseDataSerializer
@@ -21,10 +24,12 @@ import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorResetR
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorSelectionRequestSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorSelectionResponseDataSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.PinUvAuthTokenPermissionsSerializer
-import com.webauthn4j.ctap.core.converter.jackson.serializer.CtapPublicKeyCredentialRpEntitySerializer
-import com.webauthn4j.ctap.core.converter.jackson.serializer.CtapPublicKeyCredentialUserEntitySerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.PublicKeyCredentialRpEntitySerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.PublicKeyCredentialUserEntitySerializer
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponseData
+import com.webauthn4j.ctap.core.data.AuthenticatorCredentialManagementRequest
+import com.webauthn4j.ctap.core.data.AuthenticatorCredentialManagementResponseData
 import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionResponseData
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoRequest
@@ -37,9 +42,9 @@ import com.webauthn4j.ctap.core.data.AuthenticatorResetRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorResetResponseData
 import com.webauthn4j.ctap.core.data.AuthenticatorSelectionRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorSelectionResponseData
-import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialRpEntity
-import com.webauthn4j.ctap.core.data.CtapPublicKeyCredentialUserEntity
 import com.webauthn4j.ctap.core.data.PinUvAuthTokenPermissions
+import com.webauthn4j.data.PublicKeyCredentialRpEntity
+import com.webauthn4j.data.PublicKeyCredentialUserEntity
 
 class CtapCBORModule : SimpleModule("CtapCBORModule") {
     init {
@@ -50,6 +55,18 @@ class CtapCBORModule : SimpleModule("CtapCBORModule") {
         this.addSerializer(
             AuthenticatorClientPINResponseData::class.java,
             AuthenticatorClientPINResponseDataSerializer()
+        )
+        this.addSerializer(
+            AuthenticatorCredentialManagementRequest::class.java,
+            AuthenticatorCredentialManagementRequestSerializer()
+        )
+        this.addSerializer(
+            AuthenticatorCredentialManagementRequest.SubCommandParams::class.java,
+            AuthenticatorCredentialManagementRequestSubCommandParamsSerializer()
+        )
+        this.addSerializer(
+            AuthenticatorCredentialManagementResponseData::class.java,
+            AuthenticatorCredentialManagementResponseDataSerializer()
         )
         this.addSerializer(
             AuthenticatorGetAssertionRequest::class.java,
@@ -112,12 +129,12 @@ class CtapCBORModule : SimpleModule("CtapCBORModule") {
             AuthenticatorSelectionResponseDataSerializer()
         )
         this.addSerializer(
-            CtapPublicKeyCredentialRpEntity::class.java,
-            CtapPublicKeyCredentialRpEntitySerializer()
+            PublicKeyCredentialRpEntity::class.java,
+            PublicKeyCredentialRpEntitySerializer()
         )
         this.addSerializer(
-            CtapPublicKeyCredentialUserEntity::class.java,
-            CtapPublicKeyCredentialUserEntitySerializer()
+            PublicKeyCredentialUserEntity::class.java,
+            PublicKeyCredentialUserEntitySerializer()
         )
 
         this.addSerializer(PinUvAuthTokenPermissions::class.java, PinUvAuthTokenPermissionsSerializer())
