@@ -7,6 +7,8 @@ class AuthenticatorClientPINResponseDataSerializer :
         AuthenticatorClientPINResponseData::class.java, listOf(
             FieldSerializationRule(1, AuthenticatorClientPINResponseData::keyAgreement),
             FieldSerializationRule(2, AuthenticatorClientPINResponseData::pinToken),
-            FieldSerializationRule(3, AuthenticatorClientPINResponseData::retries)
+            FieldSerializationRule(3, AuthenticatorClientPINResponseData::retries),
+            FieldSerializationRule(4, AuthenticatorClientPINResponseData::powerCycleState),
+            FieldSerializationRule(5, AuthenticatorClientPINResponseData::uvRetries)
         )
     )
