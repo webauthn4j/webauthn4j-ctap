@@ -9,6 +9,7 @@ class AuthenticatorGetAssertionResponseDataSerializer :
             FieldSerializationRule(2, AuthenticatorGetAssertionResponseData::authData),
             FieldSerializationRule(3, AuthenticatorGetAssertionResponseData::signature),
             FieldSerializationRule(4, AuthenticatorGetAssertionResponseData::user),
-            FieldSerializationRule(5, AuthenticatorGetAssertionResponseData::numberOfCredentials)
+            FieldSerializationRule(5, AuthenticatorGetAssertionResponseData::numberOfCredentials),
+            FieldSerializationRule(6, AuthenticatorGetAssertionResponseData::userSelected)
         )
     )
