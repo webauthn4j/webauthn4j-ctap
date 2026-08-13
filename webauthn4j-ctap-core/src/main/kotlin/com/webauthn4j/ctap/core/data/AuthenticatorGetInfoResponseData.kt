@@ -4,9 +4,12 @@ import com.webauthn4j.data.PinProtocolVersion
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.webauthn4j.ctap.core.data.options.*
+import com.webauthn4j.data.AuthenticatorConfigSubCommand
 import com.webauthn4j.data.AuthenticatorTransport
+import com.webauthn4j.data.CertificationType
 import com.webauthn4j.data.PublicKeyCredentialParameters
 import com.webauthn4j.data.UserVerificationMethod
+import com.webauthn4j.data.VendorCommandId
 import com.webauthn4j.data.attestation.authenticator.AAGUID
 
 // §6.4 authenticatorGetInfo (0x04)
@@ -37,7 +40,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
             @JsonProperty("18") uvModality: Set<UserVerificationMethod>?,
             @JsonProperty("19") certifications: Map<String, Any>?,
             @JsonProperty("20") remainingDiscoverableCredentials: Long?,
-            @JsonProperty("21") vendorPrototypeConfigCommands: List<Long>?,
+            @JsonProperty("21") vendorPrototypeConfigCommands: List<Number>?,
             @JsonProperty("22") attestationFormats: List<String>?,
             @JsonProperty("23") uvCountSinceLastPinEntry: Long?,
             @JsonProperty("24") longTouchForReset: Boolean?,
@@ -47,7 +50,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
             @JsonProperty("28") pinComplexityPolicyURL: String?,
             @JsonProperty("29") maxPINLength: Long?,
             @JsonProperty("30") encCredStoreState: String?,
-            @JsonProperty("31") authenticatorConfigCommands: List<Long>?
+            @JsonProperty("31") authenticatorConfigCommands: List<Number>?
         ): AuthenticatorGetInfoResponseData {
             return AuthenticatorGetInfoResponseData(
                 versions,
@@ -68,9 +71,9 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
                 maxRPIDsForSetMinPINLength?.toUInt(),
                 preferredPlatformUvAttempts?.toUInt(),
                 uvModality,
-                certifications,
+                certifications?.mapKeys { (k, _) -> CertificationType.create(k) }?.mapValues { (_, v) -> (v as Number).toInt() },
                 remainingDiscoverableCredentials?.toUInt(),
-                vendorPrototypeConfigCommands?.map { it.toUInt() },
+                vendorPrototypeConfigCommands?.map { VendorCommandId(it.toLong()) },
                 attestationFormats,
                 uvCountSinceLastPinEntry?.toUInt(),
                 longTouchForReset,
@@ -80,7 +83,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
                 pinComplexityPolicyURL,
                 maxPINLength?.toUInt(),
                 encCredStoreState,
-                authenticatorConfigCommands?.map { it.toUInt() }
+                authenticatorConfigCommands?.map { AuthenticatorConfigSubCommand.create(it.toInt()) }
             )
         }
     }
@@ -122,11 +125,11 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
     // §6.4 uvModality (0x12): Optional
     val uvModality: Set<UserVerificationMethod>?
     // §6.4 certifications (0x13): Optional
-    val certifications: Map<String, Any>?
+    val certifications: Map<CertificationType, Int>?
     // §6.4 remainingDiscoverableCredentials (0x14): Optional
     val remainingDiscoverableCredentials: UInt?
     // §6.4 vendorPrototypeConfigCommands (0x15): Optional
-    val vendorPrototypeConfigCommands: List<UInt>?
+    val vendorPrototypeConfigCommands: List<VendorCommandId>?
     // §6.4 attestationFormats (0x16): Optional
     val attestationFormats: List<String>?
     // §6.4 uvCountSinceLastPinEntry (0x17): Optional
@@ -146,7 +149,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
     // §6.4 encCredStoreState (0x1E): Optional
     val encCredStoreState: String?
     // §6.4 authenticatorConfigCommands (0x1F): Optional
-    val authenticatorConfigCommands: List<UInt>?
+    val authenticatorConfigCommands: List<AuthenticatorConfigSubCommand>?
 
     constructor(
         versions: List<CtapVersion>,
@@ -167,9 +170,9 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
         maxRPIDsForSetMinPINLength: UInt? = null,
         preferredPlatformUvAttempts: UInt? = null,
         uvModality: Set<UserVerificationMethod>? = null,
-        certifications: Map<String, Any>? = null,
+        certifications: Map<CertificationType, Int>? = null,
         remainingDiscoverableCredentials: UInt? = null,
-        vendorPrototypeConfigCommands: List<UInt>? = null,
+        vendorPrototypeConfigCommands: List<VendorCommandId>? = null,
         attestationFormats: List<String>? = null,
         uvCountSinceLastPinEntry: UInt? = null,
         longTouchForReset: Boolean? = null,
@@ -179,7 +182,7 @@ class AuthenticatorGetInfoResponseData : CtapResponseData {
         pinComplexityPolicyURL: String? = null,
         maxPINLength: UInt? = null,
         encCredStoreState: String? = null,
-        authenticatorConfigCommands: List<UInt>? = null
+        authenticatorConfigCommands: List<AuthenticatorConfigSubCommand>? = null
     ) {
         this.versions = versions.toList()
         this.extensions = extensions?.toList()

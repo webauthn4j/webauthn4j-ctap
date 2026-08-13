@@ -148,7 +148,7 @@ class GenerateMetadataStatement : Runnable {
                 getInfo.uvModality,
                 getInfo.certifications,
                 getInfo.remainingDiscoverableCredentials?.toInt(),
-                getInfo.vendorPrototypeConfigCommands?.map { it.toInt() },
+                getInfo.vendorPrototypeConfigCommands,
                 getInfo.attestationFormats,
                 getInfo.uvCountSinceLastPinEntry?.toInt(),
                 getInfo.longTouchForReset,
@@ -158,7 +158,7 @@ class GenerateMetadataStatement : Runnable {
                 getInfo.pinComplexityPolicyURL,
                 getInfo.maxPINLength?.toInt(),
                 getInfo.encCredStoreState,
-                getInfo.authenticatorConfigCommands?.map { it.toInt() }
+                getInfo.authenticatorConfigCommands
             )
         }
 
