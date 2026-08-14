@@ -6,6 +6,7 @@ import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatement
 import com.webauthn4j.ctap.authenticator.data.event.Event
 import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.authenticator.data.settings.*
+import com.webauthn4j.ctap.authenticator.execution.AuthenticatorConfigExecution
 import com.webauthn4j.ctap.authenticator.execution.ClientPINExecution
 import com.webauthn4j.ctap.authenticator.execution.GetAssertionExecution
 import com.webauthn4j.ctap.authenticator.execution.GetInfoExecution
@@ -125,6 +126,7 @@ class CtapAuthenticatorSession internal constructor(
             is AuthenticatorClientPINRequest -> clientPIN(request)
             is AuthenticatorResetRequest -> reset(request)
             is AuthenticatorSelectionRequest -> selection(request)
+            is AuthenticatorConfigRequest -> authenticatorConfig(request)
             is U2FRegistrationRequest -> u2fRegister(request)
             is U2FAuthenticationRequest -> u2fSign(request)
             else -> throw IllegalStateException("unknown command ${request::class.java}")
@@ -167,6 +169,12 @@ class CtapAuthenticatorSession internal constructor(
     suspend fun selection(authenticatorSelectionRequest: AuthenticatorSelectionRequest = AuthenticatorSelectionRequest()): AuthenticatorSelectionResponse {
         return withTransaction {
             SelectionExecution(this, authenticatorSelectionRequest).execute()
+        }
+    }
+
+    suspend fun authenticatorConfig(authenticatorConfigRequest: AuthenticatorConfigRequest): AuthenticatorConfigResponse {
+        return withTransaction {
+            AuthenticatorConfigExecution(this, authenticatorConfigRequest).execute()
         }
     }
 
