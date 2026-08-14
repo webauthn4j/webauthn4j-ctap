@@ -8,11 +8,17 @@ import com.webauthn4j.util.ArrayUtil
 import java.io.Serializable
 
 /**
- * [CtapPublicKeyCredentialUserEntity] is a CTAP variant of [PublicKeyCredentialUserEntity]
+ * CTAP variant of [PublicKeyCredentialUserEntity] with nullable name and displayName.
  *
- * @see [
- * §5.4.3. User Account Parameters for Credential Generation
-](https://www.w3.org/TR/webauthn-1/.dictdef-publickeycredentialuserentity) */
+ * WebAuthn Level 3 defines name and displayName as required in PublicKeyCredentialUserEntity,
+ * but CTAP 2.3 §6.2 requires that "User identifiable information (name, DisplayName, icon)
+ * MUST NOT be returned if user verification is not done by the authenticator." This means the
+ * authenticator must be able to omit these fields from the CBOR response, which requires them
+ * to be nullable — something the webauthn4j-core type does not allow.
+ *
+ * @see [§5.4.3. User Account Parameters for Credential Generation](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialuserentity)
+ * @see [§6.2 authenticatorGetAssertion](https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#authenticatorGetAssertion)
+ */
 class CtapPublicKeyCredentialUserEntity : Serializable {
 
     /**
