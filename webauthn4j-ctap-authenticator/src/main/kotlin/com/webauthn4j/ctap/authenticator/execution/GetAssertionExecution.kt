@@ -818,14 +818,12 @@ internal class GetAssertionExecution :
                 true -> CtapPublicKeyCredentialUserEntity(
                     credential.userHandle,
                     null,
-                    null,
                     null
                 )
                 false -> CtapPublicKeyCredentialUserEntity(
                     credential.userHandle,
                     credential.username,
-                    credential.displayName,
-                    credential.icon
+                    credential.displayName
                 )
             }
             else -> null
