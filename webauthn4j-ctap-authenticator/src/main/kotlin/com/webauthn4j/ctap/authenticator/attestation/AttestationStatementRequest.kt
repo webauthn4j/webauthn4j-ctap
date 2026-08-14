@@ -2,6 +2,7 @@ package com.webauthn4j.ctap.authenticator.attestation
 
 import com.webauthn4j.ctap.authenticator.data.credential.CredentialKey
 import com.webauthn4j.data.attestation.authenticator.AuthenticatorData
+import com.webauthn4j.data.attestation.authenticator.AKPCOSEKey
 import com.webauthn4j.data.attestation.authenticator.COSEKey
 import com.webauthn4j.data.attestation.authenticator.EC2COSEKey
 import com.webauthn4j.data.attestation.authenticator.RSACOSEKey
@@ -56,6 +57,10 @@ class AttestationStatementRequest(
                     )
                     "RSA" -> RSACOSEKey.create(
                         (it.public as RSAPublicKey),
+                        COSEAlgorithmIdentifier.create(this.credentialKey.alg!!)
+                    )
+                    "ML-DSA" -> AKPCOSEKey.create(
+                        it.public,
                         COSEAlgorithmIdentifier.create(this.credentialKey.alg!!)
                     )
                     else -> throw IllegalArgumentException(
