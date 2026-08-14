@@ -19,37 +19,25 @@ import java.io.Serializable
  */
 class CtapPublicKeyCredentialRpEntity : Serializable {
 
-    // ~ Instance fields
-    // ================================================================================================
     val id: String
     val name: String?
-    val icon: String?
 
-    // ~ Constructor
-    // ========================================================================================================
-    /**
-     * @param id   id
-     * @param name name
-     */
     @JsonCreator
     constructor(
         @JsonProperty("id") id: String,
-        @JsonProperty("name") name: String?,
-        @JsonProperty("icon") icon: String?
+        @JsonProperty("name") name: String?
     ) {
         this.id = id
         this.name = name
-        this.icon = icon
     }
 
     constructor(id: String) {
         this.id = id
         this.name = null
-        this.icon = null
     }
 
     override fun toString(): String {
-        return "PublicKeyCredentialRpEntity(id=${id}, name=$name, icon=$icon)"
+        return "CtapPublicKeyCredentialRpEntity(id=$id, name=$name)"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -58,7 +46,6 @@ class CtapPublicKeyCredentialRpEntity : Serializable {
 
         if (id != other.id) return false
         if (name != other.name) return false
-        if (icon != other.icon) return false
 
         return true
     }
@@ -66,9 +53,6 @@ class CtapPublicKeyCredentialRpEntity : Serializable {
     override fun hashCode(): Int {
         var result = id.hashCode()
         result = 31 * result + (name?.hashCode() ?: 0)
-        result = 31 * result + (icon?.hashCode() ?: 0)
         return result
     }
-
-
 }

@@ -66,12 +66,11 @@ class WebAuthnClient(
         val rpId = publicKeyCredentialCreationOptions.rp.id ?: publicKeyCredentialCreationContext.origin.host
         ?: throw WebAuthnClientException("WebAuthn client must have origin.")
         val rp =
-            CtapPublicKeyCredentialRpEntity(rpId, publicKeyCredentialCreationOptions.rp.name, null)
+            CtapPublicKeyCredentialRpEntity(rpId, publicKeyCredentialCreationOptions.rp.name)
         val user = CtapPublicKeyCredentialUserEntity(
             publicKeyCredentialCreationOptions.user.id,
             publicKeyCredentialCreationOptions.user.name,
-            publicKeyCredentialCreationOptions.user.displayName,
-            null
+            publicKeyCredentialCreationOptions.user.displayName
         )
         val authenticatorExtensions: AuthenticationExtensionsAuthenticatorInputs<RegistrationExtensionAuthenticatorInput>? =
             null //TODO: implement extension handling

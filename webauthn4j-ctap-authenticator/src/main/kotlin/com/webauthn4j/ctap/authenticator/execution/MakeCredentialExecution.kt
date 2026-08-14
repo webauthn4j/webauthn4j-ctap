@@ -143,10 +143,8 @@ internal class MakeCredentialExecution :
         userCredentialBuilder.userHandle(user.id)
         userCredentialBuilder.username(user.name)
         userCredentialBuilder.displayName(user.displayName)
-        userCredentialBuilder.icon(user.icon)
         userCredentialBuilder.rpId(rpId)
         userCredentialBuilder.rpName(rp.name)
-        userCredentialBuilder.rpIcon(rp.icon)
         userCredentialBuilder.counter(counter)
         userCredentialBuilder.otherUI(null)
     }
