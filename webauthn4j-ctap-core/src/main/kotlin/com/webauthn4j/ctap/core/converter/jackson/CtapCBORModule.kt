@@ -5,6 +5,9 @@ import com.webauthn4j.ctap.core.converter.jackson.deserializer.CoercionLessByteA
 import com.webauthn4j.ctap.core.converter.jackson.deserializer.PinUvAuthTokenPermissionsDeserializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorClientPINRequestSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorClientPINResponseDataSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorConfigRequestSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorConfigRequestSubCommandParamsSerializer
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorConfigResponseDataSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorGetAssertionRequestOptionsSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorGetAssertionRequestSerializer
 import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorGetAssertionResponseDataSerializer
@@ -25,6 +28,8 @@ import com.webauthn4j.ctap.core.converter.jackson.serializer.CtapPublicKeyCreden
 import com.webauthn4j.ctap.core.converter.jackson.serializer.CtapPublicKeyCredentialUserEntitySerializer
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponseData
+import com.webauthn4j.ctap.core.data.AuthenticatorConfigRequest
+import com.webauthn4j.ctap.core.data.AuthenticatorConfigResponseData
 import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionRequest
 import com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionResponseData
 import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoRequest
@@ -50,6 +55,18 @@ class CtapCBORModule : SimpleModule("CtapCBORModule") {
         this.addSerializer(
             AuthenticatorClientPINResponseData::class.java,
             AuthenticatorClientPINResponseDataSerializer()
+        )
+        this.addSerializer(
+            AuthenticatorConfigRequest::class.java,
+            AuthenticatorConfigRequestSerializer()
+        )
+        this.addSerializer(
+            AuthenticatorConfigRequest.SubCommandParams::class.java,
+            AuthenticatorConfigRequestSubCommandParamsSerializer()
+        )
+        this.addSerializer(
+            AuthenticatorConfigResponseData::class.java,
+            AuthenticatorConfigResponseDataSerializer()
         )
         this.addSerializer(
             AuthenticatorGetAssertionRequest::class.java,

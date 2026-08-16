@@ -2,6 +2,7 @@ package com.webauthn4j.ctap.authenticator.execution
 
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
+import com.webauthn4j.ctap.authenticator.PinUvAuthManager
 import com.webauthn4j.ctap.authenticator.data.settings.AlwaysUvSetting
 import com.webauthn4j.ctap.authenticator.data.settings.AttachmentSetting
 import com.webauthn4j.ctap.authenticator.data.settings.ClientPINSetting
@@ -15,11 +16,14 @@ import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.ctap.core.data.options.AlwaysUvOption
 import com.webauthn4j.ctap.core.data.options.ClientPINOption
 import com.webauthn4j.ctap.core.data.options.MakeCredUvNotRqdOption
+import com.webauthn4j.ctap.core.data.options.AuthnrCfgOption
 import com.webauthn4j.ctap.core.data.options.PinUvAuthTokenOption
 import com.webauthn4j.ctap.core.data.options.PlatformOption
 import com.webauthn4j.ctap.core.data.options.ResidentKeyOption
+import com.webauthn4j.ctap.core.data.options.SetMinPINLengthOption
 import com.webauthn4j.ctap.core.data.options.UserPresenceOption
 import com.webauthn4j.ctap.core.data.options.UserVerificationOption
+import com.webauthn4j.data.AuthenticatorConfigSubCommand
 import com.webauthn4j.data.PublicKeyCredentialParameters
 import com.webauthn4j.data.PublicKeyCredentialType
 import org.slf4j.LoggerFactory
@@ -97,12 +101,10 @@ internal class GetInfoExecution(
         // TODO: §6.4 bioEnroll — authenticatorBioEnrollment command not yet implemented
         // TODO: §6.4 userVerificationMgmtPreview — FIDO_2_1_PRE prototype, not yet implemented
         // TODO: §6.4 uvBioEnroll — depends on bioEnroll, not yet implemented
-        // TODO: §6.4 authnrCfg — authenticatorConfig command not yet implemented
         // TODO: §6.4 uvAcfg — depends on authnrCfg, not yet implemented
         // TODO: §6.4 credMgmt — authenticatorCredentialManagement command not yet implemented
         // TODO: §6.4 perCredMgmtRO — depends on credMgmt, not yet implemented
         // TODO: §6.4 credentialMgmtPreview — FIDO_2_1_PRE prototype, not yet implemented
-        // TODO: §6.4 setMinPINLength — depends on authnrCfg, not yet implemented
         val alwaysUv: AlwaysUvOption? = when (ctapAuthenticatorSession.alwaysUv) {
             AlwaysUvSetting.ENABLED -> AlwaysUvOption.ENABLED
             AlwaysUvSetting.DISABLED -> null
@@ -118,9 +120,15 @@ internal class GetInfoExecution(
             PublicKeyCredentialParameters(PublicKeyCredentialType.PUBLIC_KEY, alg)
         }
 
+        // §6.4 forcePINChange (0x0C)
+        val forcePINChange: Boolean? = ctapAuthenticatorSession.authenticatorPropertyStore
+            .loadProperty("forcePINChange")?.toBooleanStrictOrNull()
+
         // §6.4 minPINLength (0x0D)
         val minPINLength: UInt? = when (ctapAuthenticatorSession.clientPIN) {
-            ClientPINSetting.ENABLED -> ctapAuthenticatorSession.pinUvAuthManager.minPINLength.toUInt()
+            ClientPINSetting.ENABLED -> ctapAuthenticatorSession.authenticatorPropertyStore
+                .loadProperty("minPINLength")?.toUIntOrNull()
+                ?: PinUvAuthManager.DEFAULT_MIN_PIN_LENGTH.toUInt()
             ClientPINSetting.DISABLED -> null
         }
 
@@ -139,12 +147,12 @@ internal class GetInfoExecution(
                     null, // bioEnroll
                     null, // userVerificationMgmtPreview
                     null, // uvBioEnroll
-                    null, // authnrCfg
+                    AuthnrCfgOption.SUPPORTED, // authnrCfg
                     null, // uvAcfg
                     null, // credMgmt
                     null, // perCredMgmtRO
                     null, // credentialMgmtPreview
-                    null, // setMinPINLength
+                    SetMinPINLengthOption.SUPPORTED, // setMinPINLength
                     makeCredUvNotRqd,
                     alwaysUv
                 ),                                 // options (0x04): Optional
@@ -155,11 +163,13 @@ internal class GetInfoExecution(
                 ctapAuthenticatorSession.transports, // transports (0x09): Optional
                 algorithms,                        // algorithms (0x0A): Optional
                 // TODO: §6.4 maxSerializedLargeBlobArray (0x0B) — depends on largeBlobs
-                // TODO: §6.4 forcePINChange (0x0C) — depends on authenticatorConfig setMinPINLength
+                forcePINChange = forcePINChange,    // forcePINChange (0x0C): Optional
                 minPINLength = minPINLength,        // minPINLength (0x0D): Optional
                 // TODO: §6.4 firmwareVersion (0x0E)
                 // TODO: §6.4 maxCredBlobLength (0x0F) — depends on credBlob extension
+                maxRPIDsForSetMinPINLength = 8u,   // maxRPIDsForSetMinPINLength (0x10): Optional
                 // TODO: §6.4 remainingDiscoverableCredentials (0x14) — store has no capacity concept
+                authenticatorConfigCommands = listOf(AuthenticatorConfigSubCommand.SET_MIN_PIN_LENGTH), // authenticatorConfigCommands (0x1F): Optional
             )
         )
     }
