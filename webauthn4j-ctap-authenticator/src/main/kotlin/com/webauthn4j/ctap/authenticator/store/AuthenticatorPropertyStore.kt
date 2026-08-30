@@ -69,14 +69,32 @@ interface AuthenticatorPropertyStore {
      * @return clientPIN
      */
     fun loadClientPIN(): ByteArray?
-    fun savePINRetries(pinRetries: UInt)
-    fun loadPINRetries(): UInt
+    /**
+     * Save a generic property by key
+     *
+     * @param key property key
+     * @param value property value, or null to remove
+     */
+    fun saveProperty(key: String, value: String?) {
+        // default no-op for backward compatibility
+    }
 
-    fun saveUVRetries(uvRetries: UInt)
-    fun loadUVRetries(): UInt
+    /**
+     * Load a generic property by key
+     *
+     * @param key property key
+     * @return property value, or null if not found
+     */
+    fun loadProperty(key: String): String? = null
 
-    fun loadDeviceWideCounter(): UInt
-    fun saveDeviceWideCounter(deviceWideCounter: UInt)
+    fun savePINRetries(pinRetries: UInt) { saveProperty("pinRetries", pinRetries.toString()) }
+    fun loadPINRetries(): UInt = loadProperty("pinRetries")?.toUIntOrNull() ?: 8u
+
+    fun saveUVRetries(uvRetries: UInt) { saveProperty("uvRetries", uvRetries.toString()) }
+    fun loadUVRetries(): UInt = loadProperty("uvRetries")?.toUIntOrNull() ?: 3u
+
+    fun saveDeviceWideCounter(deviceWideCounter: UInt) { saveProperty("deviceWideCounter", deviceWideCounter.toString()) }
+    fun loadDeviceWideCounter(): UInt = loadProperty("deviceWideCounter")?.toUIntOrNull() ?: 0u
 
     /**
      * Clear all user credentials and client PIN

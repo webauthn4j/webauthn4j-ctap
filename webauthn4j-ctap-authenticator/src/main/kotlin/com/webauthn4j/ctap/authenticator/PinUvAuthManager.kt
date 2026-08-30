@@ -41,9 +41,8 @@ class PinUvAuthManager(
     }
 
     // §6.4 minPINLength (0x0D)
-    // TODO: update via authenticatorConfig setMinPINLength subcommand when implemented
-    var minPINLength: Int = DEFAULT_MIN_PIN_LENGTH
-        private set
+    val minPINLength: Int
+        get() = authenticatorPropertyStore.loadProperty("minPINLength")?.toIntOrNull() ?: DEFAULT_MIN_PIN_LENGTH
 
     private var volatilePinRetryCounter = MAX_VOLATILE_PIN_RETRIES
 
@@ -173,7 +172,7 @@ class PinUvAuthManager(
         }
         //spec| Step 9: The authenticator checks the length of newPin against the current minimum PIN length,
         //spec| returning CTAP2_ERR_PIN_POLICY_VIOLATION if it is too short.
-        if (trimmedNewPIN.size < 4) {
+        if (trimmedNewPIN.size < minPINLength) {
             return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_POLICY_VIOLATION)
         }
         //spec| Step 10: An authenticator MAY impose arbitrary, additional constraints on PINs. If newPin fails to
@@ -181,7 +180,7 @@ class PinUvAuthManager(
         if (trimmedNewPIN.size > 63) {
             return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_POLICY_VIOLATION)
         }
-        // TODO: Step 11: remember newPin length as PINCodePointLength (needed when authenticatorConfig setMinPINLength is implemented)
+        // TODO: Step 11: remember newPin length as PINCodePointLength
         //spec| Step 12: The authenticator stores LEFT(SHA-256(newPin), 16) internally as CurrentStoredPIN,
         //spec| sets the pinRetries counter to maximum count, and returns CTAP2_OK.
         authenticatorPropertyStore.saveClientPIN(
@@ -323,17 +322,27 @@ class PinUvAuthManager(
         val trimmedNewPIN = newPIN.copyOf(sentinelPos)
         //spec| Step 12: The authenticator checks the length of newPin against the current minimum PIN length,
         //spec| returning CTAP2_ERR_PIN_POLICY_VIOLATION if it is too short.
-        if (trimmedNewPIN.size < 4) {
+        if (trimmedNewPIN.size < minPINLength) {
             return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_POLICY_VIOLATION)
         }
-        // TODO: Step 13: forcePINChange check (needed when authenticatorConfig setMinPINLength is implemented)
+        //spec| Step 13: If the forcePINChange member of the authenticatorGetInfo response is true and
+        //spec| LEFT(SHA-256(newPin), 16) is equal to its internal stored LEFT(SHA-256(curPin), 16) then
+        //spec| authenticator returns CTAP2_ERR_PIN_POLICY_VIOLATION.
+        if (authenticatorPropertyStore.loadProperty("forcePINChange")?.toBooleanStrictOrNull() == true) {
+            val newPinHash = Arrays.copyOf(MessageDigestUtil.createSHA256().digest(trimmedNewPIN), 16)
+            if (Arrays.equals(newPinHash, storedPinHash)) {
+                return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_POLICY_VIOLATION)
+            }
+        }
         //spec| Step 14: An authenticator MAY impose arbitrary, additional constraints on PINs. If newPin fails to
         //spec| satisfy such additional constraints, the authenticator returns CTAP2_ERR_PIN_POLICY_VIOLATION.
         if (trimmedNewPIN.size > 63) {
             return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_POLICY_VIOLATION)
         }
-        // TODO: Step 15: remember newPin length as PINCodePointLength (needed when authenticatorConfig setMinPINLength is implemented)
-        // TODO: Step 16: set forcePINChange to false (needed when authenticatorConfig setMinPINLength is implemented)
+        // TODO: Step 15: remember newPin length as PINCodePointLength
+        //spec| Step 16: The authenticator sets the value of the forcePINChange member of the
+        //spec| authenticatorGetInfo response to false.
+        authenticatorPropertyStore.saveProperty("forcePINChange", null)
         //spec| Step 17: The authenticator stores LEFT(SHA-256(newPin), 16) internally as the new value of CurrentStoredPIN.
         authenticatorPropertyStore.saveClientPIN(
             Arrays.copyOf(MessageDigestUtil.createSHA256().digest(trimmedNewPIN), 16)
@@ -449,7 +458,11 @@ class PinUvAuthManager(
         authenticatorPropertyStore.savePINRetries(MAX_PIN_RETRIES)
         authenticatorPropertyStore.saveUVRetries(MAX_UV_RETRIES)
         volatilePinRetryCounter = MAX_VOLATILE_PIN_RETRIES
-        // TODO: Step 11: forcePINChange check (needed when authenticatorConfig setMinPINLength is implemented)
+        //spec| Step 11: If the value of the forcePINChange member of the authenticatorGetInfo response is true,
+        //spec| authenticator returns CTAP2_ERR_PIN_INVALID error.
+        if (authenticatorPropertyStore.loadProperty("forcePINChange")?.toBooleanStrictOrNull() == true) {
+            return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_INVALID)
+        }
         //spec| Step 12: Create a new pinUvAuthToken by calling resetPinUvAuthToken() for all pinUvAuthProtocols
         //spec| supported by this authenticator.
         pinUvAuthProtocols.forEach { it.resetPinUvAuthToken() }
@@ -562,8 +575,7 @@ class PinUvAuthManager(
                     return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_UNAUTHORIZED_PERMISSION)
                 }
                 PinUvAuthTokenPermission.ACFG -> {
-                    // TODO: check authnrCfg option when authenticatorConfig is implemented
-                    return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_UNAUTHORIZED_PERMISSION)
+                    // authnrCfg is supported; ACFG permission is authorized
                 }
             }
         }
@@ -618,7 +630,13 @@ class PinUvAuthManager(
         authenticatorPropertyStore.saveUVRetries(MAX_UV_RETRIES)
         volatilePinRetryCounter = MAX_VOLATILE_PIN_RETRIES
 
-        // TODO: Step 11: forcePINChange check (needed when authenticatorConfig setMinPINLength is implemented)
+        //spec| Step 11: If the value of the forcePINChange member of the authenticatorGetInfo response is true,
+        //spec| authenticator returns CTAP2_ERR_PIN_POLICY_VIOLATION.
+        //spec| Platform on receiving such error response SHOULD direct the user to change the PIN.
+        if (authenticatorPropertyStore.loadProperty("forcePINChange")?.toBooleanStrictOrNull() == true) {
+            return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_PIN_POLICY_VIOLATION)
+        }
+
         // TODO: Step 12: pcmr permission handling (needed when authenticatorCredentialManagement is implemented)
 
         //spec| Step 13: Create a new pinUvAuthToken by calling resetPinUvAuthToken() for all
@@ -737,8 +755,7 @@ class PinUvAuthManager(
                     return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_UNAUTHORIZED_PERMISSION)
                 }
                 PinUvAuthTokenPermission.ACFG -> {
-                    // TODO: check uvAcfg option when authenticatorConfig is implemented
-                    return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_UNAUTHORIZED_PERMISSION)
+                    // authnrCfg is supported; ACFG permission is authorized
                 }
             }
         }
