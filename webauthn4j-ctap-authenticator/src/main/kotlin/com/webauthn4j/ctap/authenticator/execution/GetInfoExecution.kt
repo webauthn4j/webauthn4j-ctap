@@ -14,6 +14,7 @@ import com.webauthn4j.ctap.core.data.AuthenticatorGetInfoResponseData
 import com.webauthn4j.ctap.core.data.CtapStatusCode
 import com.webauthn4j.ctap.core.data.options.AlwaysUvOption
 import com.webauthn4j.ctap.core.data.options.ClientPINOption
+import com.webauthn4j.ctap.core.data.options.CredMgmtOption
 import com.webauthn4j.ctap.core.data.options.MakeCredUvNotRqdOption
 import com.webauthn4j.ctap.core.data.options.PinUvAuthTokenOption
 import com.webauthn4j.ctap.core.data.options.PlatformOption
@@ -99,7 +100,6 @@ internal class GetInfoExecution(
         // TODO: §6.4 uvBioEnroll — depends on bioEnroll, not yet implemented
         // TODO: §6.4 authnrCfg — authenticatorConfig command not yet implemented
         // TODO: §6.4 uvAcfg — depends on authnrCfg, not yet implemented
-        // TODO: §6.4 credMgmt — authenticatorCredentialManagement command not yet implemented
         // TODO: §6.4 perCredMgmtRO — depends on credMgmt, not yet implemented
         // TODO: §6.4 credentialMgmtPreview — FIDO_2_1_PRE prototype, not yet implemented
         // TODO: §6.4 setMinPINLength — depends on authnrCfg, not yet implemented
@@ -141,7 +141,7 @@ internal class GetInfoExecution(
                     null, // uvBioEnroll
                     null, // authnrCfg
                     null, // uvAcfg
-                    null, // credMgmt
+                    CredMgmtOption.SUPPORTED, // credMgmt
                     null, // perCredMgmtRO
                     null, // credentialMgmtPreview
                     null, // setMinPINLength

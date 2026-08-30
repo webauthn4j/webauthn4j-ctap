@@ -8,7 +8,7 @@ description = "Sample application demonstrating CTAP USB-IP server"
 repositories {
     mavenLocal()
     mavenCentral()
-    maven(url = "https://jitpack.io")
+    maven(url = "https://central.sonatype.com/repository/maven-snapshots/")
 }
 
 dependencies {

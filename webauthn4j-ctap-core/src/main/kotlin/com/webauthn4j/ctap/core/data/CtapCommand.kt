@@ -9,6 +9,7 @@ data class CtapCommand(val value: Byte) {
         val GET_INFO = CtapCommand(0x04)
         val CLIENT_PIN = CtapCommand(0x06)
         val RESET = CtapCommand(0x07)
+        val CREDENTIAL_MANAGEMENT = CtapCommand(0x0A)
         val SELECTION = CtapCommand(0x0B)
     }
 
@@ -20,6 +21,7 @@ data class CtapCommand(val value: Byte) {
             GET_INFO -> "GET_INFO"
             CLIENT_PIN -> "CLIENT_PIN"
             RESET -> "RESET"
+            CREDENTIAL_MANAGEMENT -> "CREDENTIAL_MANAGEMENT"
             SELECTION -> "SELECTION"
             else -> "UNKNOWN_%02X".format(value)
         }
