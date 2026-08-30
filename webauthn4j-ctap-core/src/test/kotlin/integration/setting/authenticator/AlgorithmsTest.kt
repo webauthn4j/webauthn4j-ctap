@@ -3,6 +3,7 @@ package integration.setting.authenticator
 import com.webauthn4j.ctap.client.exception.CtapErrorException
 import com.webauthn4j.data.PublicKeyCredentialParameters
 import com.webauthn4j.data.PublicKeyCredentialType
+import com.webauthn4j.data.attestation.authenticator.AKPCOSEKey
 import com.webauthn4j.data.attestation.authenticator.EC2COSEKey
 import com.webauthn4j.data.attestation.authenticator.RSACOSEKey
 import com.webauthn4j.data.attestation.statement.COSEAlgorithmIdentifier
@@ -12,6 +13,8 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledForJreRange
+import org.junit.jupiter.api.condition.JRE
 
 @Suppress("EXPERIMENTAL_API_USAGE", "ClassName")
 class AlgorithmsTest {
@@ -84,6 +87,32 @@ class AlgorithmsTest {
             val registrationData = passwordlessTestCase.step2_validateCredentialForRegistration()
             Assertions.assertThat(registrationData.attestationObject!!.authenticatorData.attestedCredentialData!!.coseKey)
                 .isInstanceOf(RSACOSEKey::class.java)
+            passwordlessTestCase.step3_getCredential()
+            passwordlessTestCase.step4_validateCredentialForAuthentication()
+        }
+    }
+
+    @Nested
+    @EnabledForJreRange(min = JRE.JAVA_24)
+    internal inner class rp_requests_ML_DSA_65 {
+        @BeforeEach
+        fun setup() {
+            passwordlessTestCase.relyingParty.registration.frontend.pubKeyCredParams =
+                listOf(
+                    PublicKeyCredentialParameters(
+                        PublicKeyCredentialType.PUBLIC_KEY,
+                        COSEAlgorithmIdentifier.ML_DSA_65
+                    )
+                )
+        }
+
+        @Test
+        fun authenticator_supports_ML_DSA_65_test() = runTest {
+            passwordlessTestCase.authenticator.algorithms = setOf(COSEAlgorithmIdentifier.ML_DSA_65)
+            passwordlessTestCase.step1_createCredential()
+            val registrationData = passwordlessTestCase.step2_validateCredentialForRegistration()
+            Assertions.assertThat(registrationData.attestationObject!!.authenticatorData.attestedCredentialData!!.coseKey)
+                .isInstanceOf(AKPCOSEKey::class.java)
             passwordlessTestCase.step3_getCredential()
             passwordlessTestCase.step4_validateCredentialForAuthentication()
         }
