@@ -34,7 +34,7 @@ logbackClassic = "1.6.3"
 
 sonarqube = "7.4.0.8496"
 
-jreleaser = "1.25.0"
+jreleaser = "1.26.0"
 
 [libraries]
 # Kotlin
