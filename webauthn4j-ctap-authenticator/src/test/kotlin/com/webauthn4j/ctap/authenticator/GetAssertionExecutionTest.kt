@@ -275,6 +275,40 @@ internal class GetAssertionExecutionTest {
         Assertions.assertThat(response.statusCode).isEqualTo(statusCode)
     }
 
+    @Test
+    suspend fun `getAssertion masks user-identifying fields without UV when allowList is present`() {
+        val propertyStore = InMemoryAuthenticatorPropertyStore()
+        val authenticator = CtapAuthenticator(authenticatorPropertyStore = propertyStore)
+        makeCredential(authenticator.createSession())
+        val credential = propertyStore.loadUserCredentials("example.com").single()
+        val connection = authenticator
+            .copy(userVerification = UserVerificationSetting.NOT_SUPPORTED)
+            .createSession()
+        val command = AuthenticatorGetAssertionRequest(
+            "example.com",
+            ByteArray(0),
+            listOf(
+                PublicKeyCredentialDescriptor(
+                    PublicKeyCredentialType.PUBLIC_KEY,
+                    credential.credentialId,
+                    null,
+                )
+            ),
+            AuthenticationExtensionsAuthenticatorInputs<AuthenticationExtensionAuthenticatorInput>(),
+            AuthenticatorGetAssertionRequest.Options(up = true, uv = false),
+            null,
+            null,
+        )
+
+        val response = connection.getAssertion(command)
+
+        Assertions.assertThat(response.statusCode).isEqualTo(CtapStatusCode.CTAP2_OK)
+        Assertions.assertThat(response.responseData!!.user!!.id)
+            .containsExactly(*credential.userHandle)
+        Assertions.assertThat(response.responseData!!.user!!.name).isNull()
+        Assertions.assertThat(response.responseData!!.user!!.displayName).isNull()
+    }
+
 
     private suspend fun makeCredential(
         ctapAuthenticatorSession: CtapAuthenticatorSession,
