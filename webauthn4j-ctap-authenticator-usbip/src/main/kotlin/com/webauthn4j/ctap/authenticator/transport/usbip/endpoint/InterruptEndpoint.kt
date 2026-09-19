@@ -37,7 +37,11 @@ class InterruptEndpoint(
             logger.debug("Queued response: {} bytes", responseBytes.size)
         }
 
-        return SubmitResponse.ok(request, ByteArray(0))
+        return SubmitResponse.ok(
+            request,
+            ByteArray(0),
+            actualLength = request.transferBuffer.size,
+        )
     }
 
     fun close() {
