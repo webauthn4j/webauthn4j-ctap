@@ -773,12 +773,14 @@ internal class GetAssertionExecution :
                 }
             }
 
-            //spec| 12.3 Update the response to include the selected credential's publicKeyCredentialUserEntity information.
-            //spec| User identifiable information (name, DisplayName, icon) inside the publicKeyCredentialUserEntity MUST NOT be returned if user verification is not done by the authenticator.
-            if (!uvResult) {
-                onGoingGetAssertionSession.assertionObjects.forEach {
-                    it.maskUserIdentifiableInfo = true
-                }
+        }
+
+        //spec| 12.3 Update the response to include the selected credential's publicKeyCredentialUserEntity information.
+        //spec| User identifiable information (name, DisplayName, icon) inside the publicKeyCredentialUserEntity MUST NOT be returned if user verification is not done by the authenticator.
+        // This applies whether or not allowList was present.
+        if (!uvResult) {
+            onGoingGetAssertionSession.assertionObjects.forEach {
+                it.maskUserIdentifiableInfo = true
             }
         }
     }
