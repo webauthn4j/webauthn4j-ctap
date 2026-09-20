@@ -12,6 +12,7 @@ import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorGetNextAssertionResponseData
 import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorMakeCredentialResponseData
+import com.webauthn4j.ctap.core.data.AuthenticatorConfigResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorResetResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorSelectionResponse
 import com.webauthn4j.ctap.core.data.CtapResponse
@@ -71,6 +72,9 @@ class CtapResponseConverter(objectConverter: ObjectConverter) {
             }
             AuthenticatorSelectionResponse::class.java -> {
                 AuthenticatorSelectionResponse(statusCode)
+            }
+            AuthenticatorConfigResponse::class.java -> {
+                AuthenticatorConfigResponse(statusCode)
             }
             AuthenticatorGetNextAssertionResponse::class.java -> {
                 val responseData = cborMapper.readValue(
