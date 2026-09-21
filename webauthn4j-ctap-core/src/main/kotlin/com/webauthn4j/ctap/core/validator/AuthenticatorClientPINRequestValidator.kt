@@ -7,7 +7,14 @@ import com.webauthn4j.ctap.core.data.PinSubCommand
 class AuthenticatorClientPINRequestValidator {
 
     fun validate(value: AuthenticatorClientPINRequest) {
-        val pinProtocol = value.pinProtocol
+        if (value.subCommand == PinSubCommand.GET_PIN_RETRIES ||
+            value.subCommand == PinSubCommand.GET_UV_RETRIES
+        ) {
+            return
+        }
+        val pinProtocol = requireNotNull(value.pinProtocol) {
+            "pinUvAuthProtocol is required for ${value.subCommand}"
+        }
         require(pinProtocol == PinProtocolVersion.VERSION_1 || pinProtocol == PinProtocolVersion.VERSION_2) {
             "PIN Protocol version ${pinProtocol.value} is not supported"
         }
@@ -18,9 +25,7 @@ class AuthenticatorClientPINRequestValidator {
             else -> throw IllegalArgumentException("Unsupported PIN protocol version: ${pinProtocol.value}")
         }
         when (value.subCommand) {
-            PinSubCommand.GET_PIN_RETRIES -> {
-                // nop
-            }
+            PinSubCommand.GET_PIN_RETRIES -> error("handled before pinUvAuthProtocol validation")
             PinSubCommand.GET_KEY_AGREEMENT -> {
                 // nop
             }
@@ -55,9 +60,7 @@ class AuthenticatorClientPINRequestValidator {
                 requireNotNull(value.permissions)
             }
             //spec| getUVRetries (0x07)
-            PinSubCommand.GET_UV_RETRIES -> {
-                // nop - no required parameters beyond pinProtocol and subCommand
-            }
+            PinSubCommand.GET_UV_RETRIES -> error("handled before pinUvAuthProtocol validation")
             //spec| getPinUvAuthTokenUsingPinWithPermissions (0x09)
             //spec| Platform sends:
             //spec|   pinUvAuthProtocol, keyAgreement, pinHashEnc, permissions

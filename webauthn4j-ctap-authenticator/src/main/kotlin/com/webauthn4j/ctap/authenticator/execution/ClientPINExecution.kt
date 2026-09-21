@@ -29,6 +29,9 @@ internal class ClientPINExecution(
     override suspend fun doExecute(): AuthenticatorClientPINResponse {
         val pinUvAuthManager = ctapAuthenticatorSession.pinUvAuthManager
         val pinProtocol = authenticatorClientPINRequest.pinProtocol
+        fun requiredPinProtocol() = requireNotNull(pinProtocol) {
+            "pinUvAuthProtocol is required for ${authenticatorClientPINRequest.subCommand}"
+        }
         val platformKeyAgreementKey = authenticatorClientPINRequest.keyAgreement
         val pinAuth = authenticatorClientPINRequest.pinAuth
         val newPinEnc = authenticatorClientPINRequest.newPinEnc
@@ -42,28 +45,28 @@ internal class ClientPINExecution(
             }
             PinSubCommand.GET_KEY_AGREEMENT -> {
                 logger.debug("Processing clientPIN getKeyAgreement sub-command (protocol={})", pinProtocol)
-                pinUvAuthManager.getKeyAgreement(pinProtocol)
+                pinUvAuthManager.getKeyAgreement(requiredPinProtocol())
             }
             PinSubCommand.SET_PIN -> {
                 logger.debug("Processing clientPIN setPIN sub-command (protocol={})", pinProtocol)
-                pinUvAuthManager.setPIN(pinProtocol, platformKeyAgreementKey, pinAuth, newPinEnc)
+                pinUvAuthManager.setPIN(requiredPinProtocol(), platformKeyAgreementKey, pinAuth, newPinEnc)
             }
             PinSubCommand.CHANGE_PIN -> {
                 logger.debug("Processing clientPIN changePIN sub-command (protocol={})", pinProtocol)
-                pinUvAuthManager.changePIN(pinProtocol, platformKeyAgreementKey, pinAuth, newPinEnc, pinHashEnc)
+                pinUvAuthManager.changePIN(requiredPinProtocol(), platformKeyAgreementKey, pinAuth, newPinEnc, pinHashEnc)
             }
             PinSubCommand.GET_PIN_TOKEN -> {
                 logger.debug("Processing clientPIN getPINToken sub-command (protocol={})", pinProtocol)
-                pinUvAuthManager.getPinToken(pinProtocol, platformKeyAgreementKey, pinHashEnc)
+                pinUvAuthManager.getPinToken(requiredPinProtocol(), platformKeyAgreementKey, pinHashEnc)
             }
             PinSubCommand.GET_PIN_UV_AUTH_TOKEN_USING_PIN_WITH_PERMISSIONS -> {
                 logger.debug("Processing clientPIN getPinUvAuthTokenUsingPinWithPermissions sub-command (protocol={})", pinProtocol)
-                pinUvAuthManager.getPinUvAuthTokenUsingPinWithPermissions(pinProtocol, platformKeyAgreementKey, pinHashEnc, permissions, rpId)
+                pinUvAuthManager.getPinUvAuthTokenUsingPinWithPermissions(requiredPinProtocol(), platformKeyAgreementKey, pinHashEnc, permissions, rpId)
             }
             PinSubCommand.GET_PIN_UV_AUTH_TOKEN_USING_UV_WITH_PERMISSIONS -> {
                 logger.debug("Processing clientPIN getPinUvAuthTokenUsingUvWithPermissions sub-command (protocol={})", pinProtocol)
                 ctapAuthenticatorSession.withUserPresenceWait {
-                    pinUvAuthManager.getPinUvAuthTokenUsingUvWithPermissions(pinProtocol, platformKeyAgreementKey, permissions, rpId)
+                    pinUvAuthManager.getPinUvAuthTokenUsingUvWithPermissions(requiredPinProtocol(), platformKeyAgreementKey, permissions, rpId)
                 }
             }
             PinSubCommand.GET_UV_RETRIES -> {

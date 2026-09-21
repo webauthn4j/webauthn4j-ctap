@@ -9,7 +9,7 @@ import com.webauthn4j.util.ArrayUtil
 
 @Suppress("CanBePrimaryConstructorProperty")
 class AuthenticatorClientPINRequest @JsonCreator constructor(
-    @JsonProperty("1") pinProtocol: PinProtocolVersion,
+    @JsonProperty("1") pinProtocol: PinProtocolVersion?,
     @JsonProperty("2") subCommand: PinSubCommand,
     @JsonProperty("3") keyAgreement: COSEKey?,
     @JsonProperty("4") pinAuth: ByteArray?,
@@ -21,7 +21,7 @@ class AuthenticatorClientPINRequest @JsonCreator constructor(
 
     override val command: CtapCommand = CtapCommand.CLIENT_PIN
 
-    val pinProtocol: PinProtocolVersion = pinProtocol
+    val pinProtocol: PinProtocolVersion? = pinProtocol
     val subCommand: PinSubCommand = subCommand
     val keyAgreement: COSEKey? = keyAgreement
     val pinAuth: ByteArray? = ArrayUtil.clone(pinAuth)
@@ -180,7 +180,7 @@ class AuthenticatorClientPINRequest @JsonCreator constructor(
     }
 
     override fun hashCode(): Int {
-        var result = pinProtocol.hashCode()
+        var result = pinProtocol?.hashCode() ?: 0
         result = 31 * result + subCommand.hashCode()
         result = 31 * result + (keyAgreement?.hashCode() ?: 0)
         return result
