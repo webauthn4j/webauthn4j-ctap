@@ -3,7 +3,7 @@ kotlin = "2.4.20"
 
 kotlinx-coroutines = "1.11.0"
 
-ktor = "3.5.2"
+ktor = "3.6.0"
 
 quarkus = "3.39.4"
 
