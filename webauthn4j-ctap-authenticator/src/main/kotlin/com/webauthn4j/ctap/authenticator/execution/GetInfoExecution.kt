@@ -159,6 +159,7 @@ internal class GetInfoExecution(
                 minPINLength = minPINLength,        // minPINLength (0x0D): Optional
                 // TODO: §6.4 firmwareVersion (0x0E)
                 // TODO: §6.4 maxCredBlobLength (0x0F) — depends on credBlob extension
+                preferredPlatformUvAttempts = ctapAuthenticatorSession.preferredPlatformUvAttempts,
                 // TODO: §6.4 remainingDiscoverableCredentials (0x14) — store has no capacity concept
             )
         )

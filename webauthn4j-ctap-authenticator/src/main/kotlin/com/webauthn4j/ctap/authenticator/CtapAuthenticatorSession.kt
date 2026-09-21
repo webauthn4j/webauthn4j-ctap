@@ -38,6 +38,8 @@ class CtapAuthenticatorSession internal constructor(
     makeCredentialConsentHandler: MakeCredentialConsentHandler?,
     getAssertionConsentHandler: GetAssertionConsentHandler?,
     selectionHandler: AuthenticatorSelectionHandler?,
+    pinUvAuthTokenConsentHandler: PinUvAuthTokenConsentHandler?,
+    builtInUserVerificationHandler: BuiltInUserVerificationHandler?,
 ) {
 
     private val logger = LoggerFactory.getLogger(CtapAuthenticatorSession::class.java)
@@ -54,6 +56,10 @@ class CtapAuthenticatorSession internal constructor(
     val makeCredentialConsentHandler: MakeCredentialConsentHandler = makeCredentialConsentHandler ?: ctapAuthenticator.makeCredentialConsentHandler
     val getAssertionConsentHandler: GetAssertionConsentHandler = getAssertionConsentHandler ?: ctapAuthenticator.getAssertionConsentHandler
     val selectionHandler: AuthenticatorSelectionHandler = selectionHandler ?: ctapAuthenticator.selectionHandler
+    val pinUvAuthTokenConsentHandler: PinUvAuthTokenConsentHandler =
+        pinUvAuthTokenConsentHandler ?: ctapAuthenticator.pinUvAuthTokenConsentHandler
+    val builtInUserVerificationHandler: BuiltInUserVerificationHandler =
+        builtInUserVerificationHandler ?: ctapAuthenticator.builtInUserVerificationHandler
     val credentialSelectionHandler: CredentialSelectionHandler = ctapAuthenticator.credentialSelectionHandler
     val winkHandler: WinkHandler = ctapAuthenticator.winkHandler
     val eventListeners: List<EventListener> = ctapAuthenticator.eventListeners.toList()
@@ -72,7 +78,12 @@ class CtapAuthenticatorSession internal constructor(
                 PinProtocolVersion.VERSION_2 -> PinUvAuthProtocolV2()
                 else -> throw IllegalArgumentException("Unsupported PIN protocol version: $version")
             }
-        }
+        },
+        this.userVerificationCapabilityProvider,
+        this.pinUvAuthTokenConsentHandler,
+        this.builtInUserVerificationHandler,
+        ctapAuthenticator.preferredPlatformUvAttempts,
+        ctapAuthenticator.maxUvAttemptsForInternalRetries,
     )
 
     val isClientPINReady: Boolean
@@ -88,6 +99,7 @@ class CtapAuthenticatorSession internal constructor(
     val userVerification: UserVerificationSetting = ctapAuthenticator.userVerification
     val alwaysUv: AlwaysUvSetting = ctapAuthenticator.alwaysUv
     val makeCredUvNotRqd: MakeCredUvNotRqdSetting = ctapAuthenticator.makeCredUvNotRqd
+    val preferredPlatformUvAttempts: UInt? = ctapAuthenticator.preferredPlatformUvAttempts
 
     // Authenticator properties
     val aaguid: AAGUID = ctapAuthenticator.aaguid
@@ -231,4 +243,3 @@ class CtapAuthenticatorSession internal constructor(
     }
 
 }
-
