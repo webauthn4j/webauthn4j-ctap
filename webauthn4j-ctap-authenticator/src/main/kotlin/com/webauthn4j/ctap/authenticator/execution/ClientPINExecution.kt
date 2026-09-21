@@ -62,7 +62,9 @@ internal class ClientPINExecution(
             }
             PinSubCommand.GET_PIN_UV_AUTH_TOKEN_USING_UV_WITH_PERMISSIONS -> {
                 logger.debug("Processing clientPIN getPinUvAuthTokenUsingUvWithPermissions sub-command (protocol={})", pinProtocol)
-                pinUvAuthManager.getPinUvAuthTokenUsingUvWithPermissions(pinProtocol, platformKeyAgreementKey, permissions, rpId)
+                ctapAuthenticatorSession.withUserPresenceWait {
+                    pinUvAuthManager.getPinUvAuthTokenUsingUvWithPermissions(pinProtocol, platformKeyAgreementKey, permissions, rpId)
+                }
             }
             PinSubCommand.GET_UV_RETRIES -> {
                 logger.debug("Processing clientPIN getUVRetries sub-command")
