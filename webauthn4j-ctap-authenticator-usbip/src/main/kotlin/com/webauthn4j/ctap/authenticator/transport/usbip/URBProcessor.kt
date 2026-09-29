@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory
  * response channel, dispatching each URB to the appropriate endpoint and
  * fulfilling pending Interrupt IN requests in FIFO order.
  */
-class URBProcessor(private val session: USBIPSession) {
+internal class URBProcessor(private val session: USBIPSession) {
 
     private val logger = LoggerFactory.getLogger(URBProcessor::class.java)
     private val pendingIns = LinkedHashMap<Int, SubmitRequest>()
