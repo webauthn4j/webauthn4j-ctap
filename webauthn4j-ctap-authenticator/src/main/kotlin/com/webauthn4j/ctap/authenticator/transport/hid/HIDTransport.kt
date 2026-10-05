@@ -91,6 +91,8 @@ class HIDTransport(
         incomingPackets.close()
         consumerJob?.cancel()
         hidChannels.clear()
+        consumerDispatcher.close()
+        u2fConfirmationWorker.close()
     }
 
     fun onDeviceAttached() {

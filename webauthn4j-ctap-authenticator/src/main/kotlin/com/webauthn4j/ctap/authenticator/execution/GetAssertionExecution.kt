@@ -2,6 +2,7 @@ package com.webauthn4j.ctap.authenticator.execution
 
 import tools.jackson.core.type.TypeReference
 import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
+import com.webauthn4j.ctap.authenticator.BuiltInUserVerificationResult
 import com.webauthn4j.ctap.authenticator.CredentialSelectionCanceledException
 import com.webauthn4j.ctap.authenticator.GetAssertionConsentRequest
 import com.webauthn4j.ctap.authenticator.GetAssertionSession
@@ -81,9 +82,8 @@ internal class GetAssertionExecution :
     private var upResult = false
 
     private lateinit var protocol: PinUvAuthProtocol
-    // Step 6.2: result of performBuiltInUv(). When true (success), Step 8 sets UP from the UV
-    // evidence and Step 9 (explicit UP test) is skipped.
-    private var uvState = false
+    // Step 6.2: whether built-in UV supplied evidence of user presence.
+    private var userPresenceFromUv = false
 
     // Step 11.2: set to true when allowList is present (numberOfCredentials is deleted from response).
     private var suppressNumberOfCredentials = false
@@ -140,7 +140,7 @@ internal class GetAssertionExecution :
         execStep6ProcessUserVerification()
         execStep7LocateCredentials()
         execStep8SetUserPresenceFromBuiltInUv()
-        if (!uvState) {
+        if (!userPresenceFromUv) {
             execStep9TestUserPresence()
         }
         execStep10ProcessExtensions()
@@ -417,20 +417,17 @@ internal class GetAssertionExecution :
             if (shouldPerformUv) {
                 //spec| 6.2.1 Let internalRetry be true.
                 //spec| 6.2.2 Let uvState be the result of calling performBuiltInUv(internalRetry)
-                uvState = performBuiltInUv()
-                if (!uvState) {
-                    //spec| 6.2.3 If uvState is error:
-                    //spec|   6.2.3.1 If the error reason is a user action timeout, then return CTAP2_ERR_USER_ACTION_TIMEOUT.
-                    //spec|   6.2.3.2 If the ClientPin option ID is true and the noMcGaPermissionsWithClientPin option ID is absent or false, end the operation by returning CTAP2_ERR_PUAT_REQUIRED.
-                    //spec|   6.2.3.3 If the uvRetries counter is 0, return CTAP2_ERR_PIN_BLOCKED.
-                    //spec|   6.2.3.4 Otherwise, end the operation by returning CTAP2_ERR_OPERATION_DENIED.
-                    // Simplified: performBuiltInUv() returns a boolean; detailed error reasons
-                    // (timeout, blocked, PUAT) are not yet distinguished.
-                    throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
-                } else {
-                    //spec| 6.2.4 If uvState is success:
-                    //spec|   6.2.4.1 Set the "uv" bit to true in the response.
-                    uvResult = true
+                when (val result = performBuiltInUv()) {
+                    is BuiltInUserVerificationResult.Verified -> {
+                        uvResult = true
+                        userPresenceFromUv = result.userPresent
+                    }
+                    BuiltInUserVerificationResult.UserActionTimeout ->
+                        throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_USER_ACTION_TIMEOUT)
+                    BuiltInUserVerificationResult.Blocked ->
+                        throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_UV_BLOCKED)
+                    BuiltInUserVerificationResult.Invalid ->
+                        throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
                 }
             }
         }
@@ -559,7 +556,7 @@ internal class GetAssertionExecution :
     // @see https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#sctn-getAssert-authnr-alg
     private fun execStep8SetUserPresenceFromBuiltInUv() {
         //spec| Step 8. If evidence of user interaction was provided as part of Step 6.2 (i.e., by invoking performBuiltInUv()):
-        if (uvState) {
+        if (userPresenceFromUv) {
             //spec| 8.1 Set the "up" bit to true in the response.
             upResult = true
             //spec| 8.2 Go to Step 10
@@ -625,10 +622,17 @@ internal class GetAssertionExecution :
         }
     }
 
-    private suspend fun performBuiltInUv(): Boolean {
+    private suspend fun performBuiltInUv(): BuiltInUserVerificationResult {
         val request = GetAssertionConsentRequest(rpId, isUserPresence = true, isUserVerification = true)
         return ctapAuthenticatorSession.withUserPresenceWait {
-            ctapAuthenticatorSession.getAssertionConsentHandler.onGetAssertionConsentRequested(request)
+            val approved = ctapAuthenticatorSession.getAssertionConsentHandler
+                .onGetAssertionConsentRequested(request)
+            if (!approved) {
+                throw CtapCommandExecutionException(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
+            }
+            ctapAuthenticatorSession.pinUvAuthManager.performBuiltInUserVerification(
+                internalRetry = true
+            )
         }
     }
 

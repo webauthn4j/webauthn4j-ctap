@@ -107,9 +107,12 @@ internal class GetInfoExecution(
             AlwaysUvSetting.ENABLED -> AlwaysUvOption.ENABLED
             AlwaysUvSetting.DISABLED -> null
         }
-        val makeCredUvNotRqd: MakeCredUvNotRqdOption? = when (ctapAuthenticatorSession.makeCredUvNotRqd) {
-            MakeCredUvNotRqdSetting.UV_NOT_REQUIRED -> MakeCredUvNotRqdOption.UV_NOT_REQUIRED
-            MakeCredUvNotRqdSetting.UV_REQUIRED -> null
+        val makeCredUvNotRqd: MakeCredUvNotRqdOption? = when {
+            ctapAuthenticatorSession.alwaysUv == AlwaysUvSetting.ENABLED ->
+                MakeCredUvNotRqdOption.UV_REQUIRED
+            ctapAuthenticatorSession.makeCredUvNotRqd == MakeCredUvNotRqdSetting.UV_NOT_REQUIRED ->
+                MakeCredUvNotRqdOption.UV_NOT_REQUIRED
+            else -> null
         }
         val extensions = ctapAuthenticatorSession.extensionProcessors.map { it.extensionId }
 
@@ -159,6 +162,7 @@ internal class GetInfoExecution(
                 minPINLength = minPINLength,        // minPINLength (0x0D): Optional
                 // TODO: §6.4 firmwareVersion (0x0E)
                 // TODO: §6.4 maxCredBlobLength (0x0F) — depends on credBlob extension
+                preferredPlatformUvAttempts = ctapAuthenticatorSession.preferredPlatformUvAttempts,
                 // TODO: §6.4 remainingDiscoverableCredentials (0x14) — store has no capacity concept
             )
         )

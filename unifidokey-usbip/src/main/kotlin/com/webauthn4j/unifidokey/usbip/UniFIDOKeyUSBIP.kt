@@ -7,6 +7,7 @@ import com.webauthn4j.ctap.authenticator.extension.CredProtectExtensionProcessor
 import com.webauthn4j.ctap.authenticator.extension.HMACSecretExtensionProcessor
 import com.webauthn4j.ctap.authenticator.transport.usbip.USBIPDevice
 import com.webauthn4j.ctap.authenticator.transport.usbip.USBIPDeviceConfig
+import com.webauthn4j.ctap.authenticator.transport.usbip.USBIPServer
 import com.webauthn4j.data.AuthenticatorTransport
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -45,21 +46,23 @@ class UniFIDOKeyUSBIP : Runnable {
     }
 
     override fun run() {
-        val config = USBIPDeviceConfig(host = host, port = port)
+        val config = USBIPDeviceConfig()
         val authenticator = createAuthenticator()
         val device = USBIPDevice(authenticator, config)
+        val server = USBIPServer(host, port)
+        server.addDevice(device)
         val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
         Runtime.getRuntime().addShutdownHook(Thread {
-            runBlocking { device.stop() }
+            runBlocking { server.stop() }
         })
 
         runBlocking {
-            device.start(scope)
+            server.start(scope)
         }
 
         logger.info("USB-IP Virtual FIDO2 Device is running")
-        logger.infof("  Server: %s:%d", config.host, config.port)
+        logger.infof("  Server: %s:%d", host, port)
         logger.infof("  Bus ID: %s", config.busId)
 
         // Keep running until interrupted

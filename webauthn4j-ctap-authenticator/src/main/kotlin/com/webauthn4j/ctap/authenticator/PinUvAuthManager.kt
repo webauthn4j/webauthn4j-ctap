@@ -7,6 +7,7 @@ import com.webauthn4j.ctap.authenticator.store.AuthenticatorPropertyStore
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponse
 import com.webauthn4j.ctap.core.data.AuthenticatorClientPINResponseData
 import com.webauthn4j.ctap.core.data.CtapStatusCode
+import com.webauthn4j.ctap.core.data.options.UserVerificationOption
 import com.webauthn4j.data.PinProtocolVersion
 import com.webauthn4j.ctap.core.util.internal.ArrayUtil
 import com.webauthn4j.data.attestation.authenticator.COSEKey
@@ -29,8 +30,27 @@ import java.util.Arrays
  */
 class PinUvAuthManager(
     private val authenticatorPropertyStore: AuthenticatorPropertyStore,
-    val pinUvAuthProtocols: List<PinUvAuthProtocol> = listOf(PinUvAuthProtocolV1())
+    val pinUvAuthProtocols: List<PinUvAuthProtocol> = listOf(PinUvAuthProtocolV1()),
+    private val userVerificationCapabilityProvider: UserVerificationCapabilityProvider =
+        object : UserVerificationCapabilityProvider {
+            override fun getUserVerificationOption(rpId: String?): UserVerificationOption =
+                UserVerificationOption.READY
+        },
+    private val pinUvAuthTokenConsentHandler: PinUvAuthTokenConsentHandler =
+        PinUvAuthTokenConsentHandler { true },
+    private val builtInUserVerificationHandler: BuiltInUserVerificationHandler =
+        BuiltInUserVerificationHandler {
+            BuiltInUserVerificationAttemptResult.Verified(userPresent = true)
+        },
+    private val preferredPlatformUvAttempts: UInt? = null,
+    private val maxUvAttemptsForInternalRetries: UInt = 3u,
 ) {
+
+    init {
+        require(maxUvAttemptsForInternalRetries in 1u..MAX_UV_RETRIES) {
+            "maxUvAttemptsForInternalRetries must be between 1 and $MAX_UV_RETRIES"
+        }
+    }
 
     companion object {
         const val MAX_PIN_RETRIES: UInt = 8u
@@ -38,6 +58,46 @@ class PinUvAuthManager(
         const val MAX_UV_RETRIES: UInt = 3u
         // §6.4 minPINLength (0x0D): default minimum PIN length in Unicode code points
         const val DEFAULT_MIN_PIN_LENGTH = 4
+    }
+
+    suspend fun performBuiltInUserVerification(
+        internalRetry: Boolean
+    ): BuiltInUserVerificationResult {
+        if (authenticatorPropertyStore.loadPINRetries() == 0u) {
+            authenticatorPropertyStore.saveUVRetries(0u)
+            return BuiltInUserVerificationResult.Blocked
+        }
+
+        var attemptsRemaining = if (internalRetry) maxUvAttemptsForInternalRetries else 1u
+        while (attemptsRemaining > 0u) {
+            val retriesBeforeAttempt = authenticatorPropertyStore.loadUVRetries()
+            if (retriesBeforeAttempt == 0u) {
+                return BuiltInUserVerificationResult.Blocked
+            }
+
+            authenticatorPropertyStore.saveUVRetries(retriesBeforeAttempt - 1u)
+            attemptsRemaining--
+
+            when (val result = builtInUserVerificationHandler.performBuiltInUserVerification()) {
+                is BuiltInUserVerificationAttemptResult.Verified -> {
+                    authenticatorPropertyStore.saveUVRetries(MAX_UV_RETRIES)
+                    return BuiltInUserVerificationResult.Verified(result.userPresent)
+                }
+                BuiltInUserVerificationAttemptResult.UserActionTimeout -> {
+                    authenticatorPropertyStore.saveUVRetries(retriesBeforeAttempt)
+                    return BuiltInUserVerificationResult.UserActionTimeout
+                }
+                BuiltInUserVerificationAttemptResult.Invalid -> {
+                    if (authenticatorPropertyStore.loadUVRetries() == 0u) {
+                        return BuiltInUserVerificationResult.Blocked
+                    }
+                    if (attemptsRemaining == 0u) {
+                        return BuiltInUserVerificationResult.Invalid
+                    }
+                }
+            }
+        }
+        error("unreachable")
     }
 
     // §6.4 minPINLength (0x0D)
@@ -698,7 +758,7 @@ class PinUvAuthManager(
     //spec|   16. The authenticator returns the encrypted pinUvAuthToken for the specified pinUvAuthProtocol, i.e.
     //spec|       encrypt(shared secret, pinUvAuthToken).
     // @see <a href="https://fidoalliance.org/specs/fido-v2.3-ps-20260226/fido-client-to-authenticator-protocol-v2.3-ps-20260226.html#getPinUvAuthTokenUsingUvWithPermissions">§6.5.5.7.3</a>
-    fun getPinUvAuthTokenUsingUvWithPermissions(
+    suspend fun getPinUvAuthTokenUsingUvWithPermissions(
         pinProtocol: PinProtocolVersion,
         platformKeyAgreementKey: COSEKey?,
         permissions: PinUvAuthTokenPermissions?,
@@ -742,8 +802,13 @@ class PinUvAuthManager(
                 }
             }
         }
-        // TODO: Step 5: check if built-in UV is configured, return CTAP2_ERR_NOT_ALLOWED if not
-        // TODO: Step 6: determine internalRetry based on preferredPlatformUvAttempts
+        //spec| Step 5: A supported but unconfigured built-in UV method cannot issue a token.
+        if (userVerificationCapabilityProvider.getUserVerificationOption(rpId) != UserVerificationOption.READY) {
+            return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_NOT_ALLOWED)
+        }
+
+        //spec| Step 6: Let internalRetry reflect whether the authenticator should retry UV itself.
+        val internalRetry = preferredPlatformUvAttempts == null || preferredPlatformUvAttempts <= 1u
 
         //spec| Step 7: If the uvRetries counter is 0, return CTAP2_ERR_UV_BLOCKED error.
         if (authenticatorPropertyStore.loadUVRetries() == 0u) {
@@ -754,31 +819,23 @@ class PinUvAuthManager(
         // (implicit in the spec — needed for encrypt at Step 16)
         val sharedSecret = protocol.decapsulate(platformKeyAgreementKey)
 
-        // TODO: Steps 8-9 (consent + built-in UV) are not yet implemented.
-        //
-        // The spec requires the authenticator to:
-        //   Step 8: If the authenticator has a display, request user consent for the
-        //           requested permissions. Return CTAP2_ERR_OPERATION_DENIED if denied.
-        //   Step 9: Perform built-in user verification (e.g. biometric).
-        //   Step 10: Handle UV failure (CTAP2_ERR_UV_INVALID, CTAP2_ERR_UV_BLOCKED,
-        //            CTAP2_ERR_USER_ACTION_TIMEOUT).
-        //
-        // Currently, UV always succeeds without any actual verification.
-        //
-        // On Android, performing UV here is problematic because:
-        //   - BiometricPrompt + CryptoObject ties biometric auth to key operations,
-        //     but credential keys do not exist yet at this point (for makeCredential).
-        //   - Only rpId and permissions are available as context; rp.name and
-        //     user.displayName are not provided until makeCredential, making it
-        //     difficult to show a meaningful consent dialog.
-        //
-        // A possible approach is "deferred UV": issue the pinUvAuthToken here without
-        // performing actual biometric verification, record in the token state that UV
-        // is pending (e.g. a uvDeferred flag on PinUvAuthTokenState), and perform the
-        // actual biometric check later during makeCredential/getAssertion at the UP
-        // step, where full operation context and CryptoObject binding are available.
-        // From the client's perspective, the result is identical — the credential is
-        // created with the UV bit set, and UV is performed before any key operation.
+        //spec| Step 8: If the authenticator has a display, request consent for the permissions.
+        val consentRequest = PinUvAuthTokenConsentRequest(permissions, rpId)
+        if (!pinUvAuthTokenConsentHandler.onPinUvAuthTokenConsentRequested(consentRequest)) {
+            return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_OPERATION_DENIED)
+        }
+
+        //spec| Steps 9-10: Perform built-in UV and translate its result.
+        val verificationResult = performBuiltInUserVerification(internalRetry)
+        val userPresent = when (verificationResult) {
+            is BuiltInUserVerificationResult.Verified -> verificationResult.userPresent
+            BuiltInUserVerificationResult.UserActionTimeout ->
+                return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_USER_ACTION_TIMEOUT)
+            BuiltInUserVerificationResult.Invalid ->
+                return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_UV_INVALID)
+            BuiltInUserVerificationResult.Blocked ->
+                return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_UV_BLOCKED)
+        }
 
         // TODO: Step 11: pcmr permission handling (needed when authenticatorCredentialManagement is implemented)
 
@@ -792,8 +849,7 @@ class PinUvAuthManager(
         //spec| then call beginUsingPinUvAuthToken(userIsPresent: true).
         //spec| Otherwise (implying that user presence was not collected),
         //spec| call beginUsingPinUvAuthToken(userIsPresent: false).
-        // Our virtual authenticator's UV always implies user interaction
-        protocol.tokenState.beginUsingPinUvAuthToken(true)
+        protocol.tokenState.beginUsingPinUvAuthToken(userPresent)
 
         //spec| Step 14: Assign the requested permissions to the pinUvAuthToken, ignoring any undefined permissions.
         protocol.tokenState.permissions = permissions
@@ -804,7 +860,6 @@ class PinUvAuthManager(
         }
 
         // Reset retries counters after successful UV verification
-        authenticatorPropertyStore.savePINRetries(MAX_PIN_RETRIES)
         authenticatorPropertyStore.saveUVRetries(MAX_UV_RETRIES)
 
         //spec| Step 16: The authenticator returns the encrypted pinUvAuthToken for the specified pinUvAuthProtocol,

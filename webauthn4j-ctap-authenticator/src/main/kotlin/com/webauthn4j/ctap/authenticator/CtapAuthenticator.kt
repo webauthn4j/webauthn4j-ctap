@@ -43,6 +43,12 @@ class CtapAuthenticator(
     val userVerificationCapabilityProvider: UserVerificationCapabilityProvider = object : UserVerificationCapabilityProvider {
         override fun getUserVerificationOption(rpId: String?): UserVerificationOption = UserVerificationOption.READY
     },
+    val pinUvAuthTokenConsentHandler: PinUvAuthTokenConsentHandler =
+        PinUvAuthTokenConsentHandler { true },
+    val builtInUserVerificationHandler: BuiltInUserVerificationHandler =
+        BuiltInUserVerificationHandler {
+            BuiltInUserVerificationAttemptResult.Verified(userPresent = true)
+        },
     val makeCredentialConsentHandler: MakeCredentialConsentHandler = object : MakeCredentialConsentHandler {
         override suspend fun onMakeCredentialConsentRequested(makeCredentialConsentRequest: MakeCredentialConsentRequest): Boolean = true
     },
@@ -65,6 +71,8 @@ class CtapAuthenticator(
     val alwaysUv: AlwaysUvSetting = AlwaysUvSetting.DISABLED,
     val makeCredUvNotRqd: MakeCredUvNotRqdSetting = MakeCredUvNotRqdSetting.UV_NOT_REQUIRED,
     val credentialSelector: CredentialSelectorSetting = CredentialSelectorSetting.AUTHENTICATOR,
+    val preferredPlatformUvAttempts: UInt? = null,
+    val maxUvAttemptsForInternalRetries: UInt = 3u,
     // Observers
     eventListeners: List<EventListener> = emptyList(),
     exceptionReporters: List<ExceptionReporter> = emptyList(),
@@ -115,8 +123,18 @@ class CtapAuthenticator(
         makeCredentialConsentHandler: MakeCredentialConsentHandler = this.makeCredentialConsentHandler,
         getAssertionConsentHandler: GetAssertionConsentHandler = this.getAssertionConsentHandler,
         selectionHandler: AuthenticatorSelectionHandler = this.selectionHandler,
+        pinUvAuthTokenConsentHandler: PinUvAuthTokenConsentHandler = this.pinUvAuthTokenConsentHandler,
+        builtInUserVerificationHandler: BuiltInUserVerificationHandler = this.builtInUserVerificationHandler,
     ) : CtapAuthenticatorSession{
-        return CtapAuthenticatorSession(this, userVerificationCapabilityProvider, makeCredentialConsentHandler, getAssertionConsentHandler, selectionHandler)
+        return CtapAuthenticatorSession(
+            this,
+            userVerificationCapabilityProvider,
+            makeCredentialConsentHandler,
+            getAssertionConsentHandler,
+            selectionHandler,
+            pinUvAuthTokenConsentHandler,
+            builtInUserVerificationHandler,
+        )
     }
 
     fun copy(
@@ -128,6 +146,8 @@ class CtapAuthenticator(
         extensionProcessors: List<ExtensionProcessor> = this.extensionProcessors,
         authenticatorPropertyStore: AuthenticatorPropertyStore = this.authenticatorPropertyStore,
         userVerificationCapabilityProvider: UserVerificationCapabilityProvider = this.userVerificationCapabilityProvider,
+        pinUvAuthTokenConsentHandler: PinUvAuthTokenConsentHandler = this.pinUvAuthTokenConsentHandler,
+        builtInUserVerificationHandler: BuiltInUserVerificationHandler = this.builtInUserVerificationHandler,
         makeCredentialConsentHandler: MakeCredentialConsentHandler = this.makeCredentialConsentHandler,
         getAssertionConsentHandler: GetAssertionConsentHandler = this.getAssertionConsentHandler,
         selectionHandler: AuthenticatorSelectionHandler = this.selectionHandler,
@@ -143,6 +163,8 @@ class CtapAuthenticator(
         alwaysUv: AlwaysUvSetting = this.alwaysUv,
         makeCredUvNotRqd: MakeCredUvNotRqdSetting = this.makeCredUvNotRqd,
         credentialSelector: CredentialSelectorSetting = this.credentialSelector,
+        preferredPlatformUvAttempts: UInt? = this.preferredPlatformUvAttempts,
+        maxUvAttemptsForInternalRetries: UInt = this.maxUvAttemptsForInternalRetries,
         eventListeners: List<EventListener> = this.eventListeners,
         exceptionReporters: List<ExceptionReporter> = this.exceptionReporters,
     ): CtapAuthenticator = CtapAuthenticator(
@@ -154,6 +176,8 @@ class CtapAuthenticator(
         extensionProcessors = extensionProcessors,
         authenticatorPropertyStore = authenticatorPropertyStore,
         userVerificationCapabilityProvider = userVerificationCapabilityProvider,
+        pinUvAuthTokenConsentHandler = pinUvAuthTokenConsentHandler,
+        builtInUserVerificationHandler = builtInUserVerificationHandler,
         makeCredentialConsentHandler = makeCredentialConsentHandler,
         getAssertionConsentHandler = getAssertionConsentHandler,
         selectionHandler = selectionHandler,
@@ -169,6 +193,8 @@ class CtapAuthenticator(
         alwaysUv = alwaysUv,
         makeCredUvNotRqd = makeCredUvNotRqd,
         credentialSelector = credentialSelector,
+        preferredPlatformUvAttempts = preferredPlatformUvAttempts,
+        maxUvAttemptsForInternalRetries = maxUvAttemptsForInternalRetries,
         eventListeners = eventListeners,
         exceptionReporters = exceptionReporters,
     )
