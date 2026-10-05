@@ -30,7 +30,7 @@ mockito = "5.8.0"
 
 mockito-kotlin = "6.4.0"
 
-logbackClassic = "1.6.4"
+logbackClassic = "1.6.5"
 
 sonarqube = "7.5.0.8588"
 
