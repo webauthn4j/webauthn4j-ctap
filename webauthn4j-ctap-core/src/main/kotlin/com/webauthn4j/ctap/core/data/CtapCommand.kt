@@ -10,6 +10,7 @@ data class CtapCommand(val value: Byte) {
         val CLIENT_PIN = CtapCommand(0x06)
         val RESET = CtapCommand(0x07)
         val SELECTION = CtapCommand(0x0B)
+        val AUTHENTICATOR_CONFIG = CtapCommand(0x0D)
     }
 
     override fun toString(): String {
@@ -21,6 +22,7 @@ data class CtapCommand(val value: Byte) {
             CLIENT_PIN -> "CLIENT_PIN"
             RESET -> "RESET"
             SELECTION -> "SELECTION"
+            AUTHENTICATOR_CONFIG -> "AUTHENTICATOR_CONFIG"
             else -> "UNKNOWN_%02X".format(value)
         }
     }

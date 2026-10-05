@@ -1,6 +1,5 @@
 package com.webauthn4j.ctap.authenticator.store
 
-import com.webauthn4j.ctap.authenticator.PinUvAuthManager
 import com.webauthn4j.ctap.authenticator.data.credential.ResidentCredentialKey
 import com.webauthn4j.ctap.authenticator.data.credential.ResidentUserCredential
 import com.webauthn4j.ctap.authenticator.internal.KeyPairUtil.createCredentialKeyPair
@@ -19,17 +18,10 @@ open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
 
     private val map: MutableMap<String, MutableMap<ByteArray, ResidentUserCredential>> =
         HashMap()
+    private val properties: MutableMap<String, String> = HashMap()
     private lateinit var credentialSourceEncryptionKey: SecretKey
     private lateinit var credentialSourceEncryptionIV: ByteArray
     private var clientPIN: ByteArray? = null
-    private var pinRetries: UInt = DEFAULT_MAX_PIN_RETRIES
-    private var uvRetries: UInt = DEFAULT_MAX_UV_RETRIES
-    private var deviceWideCounter = 0u
-
-    companion object {
-        const val DEFAULT_MAX_PIN_RETRIES: UInt = 8u
-        const val DEFAULT_MAX_UV_RETRIES: UInt = 3u
-    }
 
     init {
         initializeKeys()
@@ -37,11 +29,10 @@ open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
 
     private fun initializeKeys() {
         map.clear()
+        properties.clear()
         credentialSourceEncryptionKey = generateAESKey()
         credentialSourceEncryptionIV = generateIV()
         clientPIN = null
-        pinRetries = DEFAULT_MAX_PIN_RETRIES
-        uvRetries = DEFAULT_MAX_UV_RETRIES
     }
 
     override fun createUserCredentialKey(
@@ -100,28 +91,16 @@ open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
         return ArrayUtil.clone(clientPIN)
     }
 
-    override fun loadPINRetries(): UInt {
-        return pinRetries
+    override fun saveProperty(key: String, value: String?) {
+        if (value != null) {
+            properties[key] = value
+        } else {
+            properties.remove(key)
+        }
     }
 
-    override fun loadDeviceWideCounter(): UInt {
-        return deviceWideCounter
-    }
-
-    override fun saveDeviceWideCounter(deviceWideCounter: UInt) {
-        this.deviceWideCounter = deviceWideCounter
-    }
-
-    override fun savePINRetries(pinRetries: UInt) {
-        this.pinRetries = pinRetries
-    }
-
-    override fun saveUVRetries(uvRetries: UInt) {
-        this.uvRetries = uvRetries
-    }
-
-    override fun loadUVRetries(): UInt {
-        return uvRetries
+    override fun loadProperty(key: String): String? {
+        return properties[key]
     }
 
     override fun clear() {
