@@ -11,7 +11,8 @@ class AuthenticatorGetNextAssertionResponseData @JsonCreator constructor(
     @JsonProperty("1") credential: PublicKeyCredentialDescriptor?,
     @JsonProperty("2") authData: ByteArray,
     @JsonProperty("3") signature: ByteArray,
-    @JsonProperty("4") user: CtapPublicKeyCredentialUserEntity?
+    @JsonProperty("4") user: CtapPublicKeyCredentialUserEntity?,
+    @JsonProperty("8") val unsignedExtensionOutputs: Map<String,Any>? = null
 ) : AssertionResponseData {
 
     override val credential: PublicKeyCredentialDescriptor? = credential

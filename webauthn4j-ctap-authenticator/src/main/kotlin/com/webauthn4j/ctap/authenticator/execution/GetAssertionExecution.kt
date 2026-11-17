@@ -723,7 +723,7 @@ internal class GetAssertionExecution :
         //spec| Step 11. If the allowList parameter is present:
         if (allowList != null && allowList.isNotEmpty()) {
             //spec| 11.1 Select any credential from the applicable credentials list.
-            onGoingGetAssertionSession = GetAssertionSession(assertionObjects, clientDataHash)
+            onGoingGetAssertionSession = GetAssertionSession(assertionObjects, clientDataHash).also { it.request=authenticatorGetAssertionRequest }
             ctapAuthenticatorSession.onGoingGetAssertionSession = onGoingGetAssertionSession
             //spec| 11.2 Delete the numberOfCredentials member.
             suppressNumberOfCredentials = true
@@ -735,7 +735,7 @@ internal class GetAssertionExecution :
             //spec| 12.1 If numberOfCredentials is one:
             if (numberOfCredentials == 1) {
                 //spec| 12.1.1 Select that credential.
-                onGoingGetAssertionSession = GetAssertionSession(assertionObjects, clientDataHash)
+                onGoingGetAssertionSession = GetAssertionSession(assertionObjects, clientDataHash).also { it.request=authenticatorGetAssertionRequest }
                 ctapAuthenticatorSession.onGoingGetAssertionSession = onGoingGetAssertionSession
             }
             //spec| 12.2 If numberOfCredentials is more than one:
@@ -751,7 +751,7 @@ internal class GetAssertionExecution :
                     //spec| This counter signifies the next credential to be returned by the authenticator, assuming zero-based indexing.
                     //spec| 12.2.2.3 Start a timer. This is used during authenticatorGetNextAssertion command. This step is OPTIONAL if transport is done over NFC.
                     //spec| 12.2.2.4 Select the first credential.
-                    onGoingGetAssertionSession = GetAssertionSession(assertionObjects, clientDataHash)
+                    onGoingGetAssertionSession = GetAssertionSession(assertionObjects, clientDataHash).also { it.request=authenticatorGetAssertionRequest }
                     ctapAuthenticatorSession.onGoingGetAssertionSession = onGoingGetAssertionSession
                 }
                 //spec| 12.2.3 If the authenticator has a display and at least one of the "uv" and "up" options is true:
@@ -772,7 +772,7 @@ internal class GetAssertionExecution :
                     userSelected = true
                     suppressNumberOfCredentials = true
                     //spec| 12.2.3.5 Select the credential indicated by the user.
-                    onGoingGetAssertionSession = GetAssertionSession(listOf(selectedAssertionObject), clientDataHash)
+                    onGoingGetAssertionSession = GetAssertionSession(listOf(selectedAssertionObject), clientDataHash).also { it.request=authenticatorGetAssertionRequest }
                     ctapAuthenticatorSession.onGoingGetAssertionSession = onGoingGetAssertionSession
                 }
             }
@@ -842,7 +842,8 @@ internal class GetAssertionExecution :
             signature,
             user,
             numberOfCredentials,
-            if (userSelected) true else null
+            if (userSelected) true else null,
+            ctapAuthenticatorSession.unsignedAuthenticationOutputs(authenticatorGetAssertionRequest, credential, uvResult, upResult)
         )
 
         // update counter

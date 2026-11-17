@@ -16,6 +16,7 @@ class GetAssertionSession(
     private var index = 0
     // 12.2.2.3: timer for GetNextAssertion expiration (30 seconds)
     private var instant: Instant
+    var request: com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionRequest? = null
     val clientDataHash: ByteArray
 
     init {
@@ -48,7 +49,7 @@ class GetAssertionSession(
     }
 
     fun withAssertionObjects(assertionObjects: List<AssertionObject>): GetAssertionSession {
-        return GetAssertionSession(assertionObjects, clientDataHash)
+        return GetAssertionSession(assertionObjects, clientDataHash).also { it.request=request }
     }
 
     data class AssertionObject(

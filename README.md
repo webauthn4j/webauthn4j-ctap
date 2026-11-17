@@ -69,3 +69,11 @@ WebAuthn4J CTAP is Open Source software released under the
 Interested in helping out with WebAuthn4J? Great! Your participation in the community is much
 appreciated!
 Please feel free to open issues and send pull-requests.
+
+## Inline large-blob storage
+
+Add a `LargeBlobExtensionProcessor` to the authenticator's `extensionProcessors` list to advertise CTAP's inline `largeBlob` extension. This is the alternative to `largeBlobKey` and `authenticatorLargeBlobs`; the two mechanisms must not be advertised together.
+
+Registration accepts `support: preferred|required` for discoverable credentials. Authentication accepts either `read: true` or `write` plus `originalSize`. The platform compresses and decompresses the opaque data; the authenticator stores it with the resident credential. The processor bounds the compressed size and returns `written: false` when storage is unavailable.
+
+Outputs use the unsigned CTAP response fields (makeCredential key 6; getAssertion/getNextAssertion key 8), leaving signed authenticator-data extensions untouched. Authentication processing runs after successful user authorization, and reading a discoverable credential's blob does not require another assertion.

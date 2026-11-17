@@ -131,7 +131,7 @@ internal class GetNextAssertionExecution(
         getAssertionSession.incrementCredentialCounter()
 
         val responseData =
-            AuthenticatorGetNextAssertionResponseData(descriptor, authData, signature, user)
+            AuthenticatorGetNextAssertionResponseData(descriptor, authData, signature, user, getAssertionSession.request?.let { ctapAuthenticatorSession.unsignedAuthenticationOutputs(it,credential,assertionObject.flags.toInt() and 4 != 0,assertionObject.flags.toInt() and 1 != 0) })
         return AuthenticatorGetNextAssertionResponse(CtapStatusCode.CTAP2_OK, responseData)
     }
 

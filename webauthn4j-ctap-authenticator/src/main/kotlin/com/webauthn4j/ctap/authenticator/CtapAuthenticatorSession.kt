@@ -242,4 +242,13 @@ class CtapAuthenticatorSession internal constructor(
     suspend fun lock(timeMillis: Long) {
     }
 
+    internal fun unsignedAuthenticationOutputs(request: com.webauthn4j.ctap.core.data.AuthenticatorGetAssertionRequest, credential: com.webauthn4j.ctap.authenticator.data.credential.Credential, uv: Boolean, up: Boolean): Map<String,Any>? {
+        val context=com.webauthn4j.ctap.authenticator.extension.AuthenticationExtensionContext(this,request,credential,uv,up)
+        return extensionProcessors
+            .filterIsInstance<com.webauthn4j.ctap.authenticator.extension.AuthenticationUnsignedExtensionProcessor>()
+            .mapNotNull { processor ->
+                processor.processAuthentication(context)?.let { processor.extensionId to it }
+            }.toMap().takeIf { it.isNotEmpty() }
+    }
+
 }

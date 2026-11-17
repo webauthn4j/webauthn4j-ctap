@@ -7,6 +7,7 @@ class AuthenticatorMakeCredentialResponseDataSerializer :
         AuthenticatorMakeCredentialResponseData::class.java, listOf(
             FieldSerializationRule(1, AuthenticatorMakeCredentialResponseData::format),
             FieldSerializationRule(2, AuthenticatorMakeCredentialResponseData::authenticatorData),
-            FieldSerializationRule(3, AuthenticatorMakeCredentialResponseData::attestationStatement)
+            FieldSerializationRule(3, AuthenticatorMakeCredentialResponseData::attestationStatement),
+            FieldSerializationRule(6, AuthenticatorMakeCredentialResponseData::unsignedExtensionOutputs)
         )
     )
