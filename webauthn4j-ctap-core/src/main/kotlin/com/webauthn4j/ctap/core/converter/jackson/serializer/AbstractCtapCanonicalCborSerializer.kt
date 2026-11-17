@@ -29,9 +29,25 @@ abstract class AbstractCtapCanonicalCborSerializer<T>(
                 }
                 else -> throw IllegalStateException("Unexpected field type")
             }
-            serializationContext.writeValue(generator, nonNullValue.value)
+            writeFieldValue(generator, serializationContext, nonNullValue.value)
         }
         generator.writeEndObject()
+    }
+
+    // Jackson's generic Map serializer emits indefinite-length CBOR maps.
+    // Extension outputs must use definite lengths too, including nested maps.
+    private fun writeFieldValue(generator: CBORGenerator, context: SerializationContext, value: Any?) {
+        if (value is Map<*, *> && value.keys.all { it is String }) {
+            val entries = value.entries.sortedWith(compareBy({ (it.key as String).toByteArray(Charsets.UTF_8).size }, { it.key as String }))
+            generator.writeStartObject(value, entries.size)
+            for ((key, item) in entries) {
+                generator.writeName(key as String)
+                writeFieldValue(generator, context, item)
+            }
+            generator.writeEndObject()
+        } else {
+            context.writeValue(generator, value)
+        }
     }
 
     private class KeyValue(val name: Any, val value: Any?)
