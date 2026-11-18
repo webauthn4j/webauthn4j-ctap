@@ -14,11 +14,8 @@ class AuthenticatorGetAssertionResponseData @JsonCreator constructor(
     @JsonProperty("4") user: CtapPublicKeyCredentialUserEntity?,
     @JsonProperty("5") numberOfCredentials: Int?,
     @JsonProperty("6") userSelected: Boolean?,
-    @JsonProperty("8") val unsignedExtensionOutputs: Map<String,Any>? = null
-    // TODO: largeBlobKey (0x07) - "The contents of the associated largeBlobKey if present for the asserted credential,
-    //  and if largeBlobKey was true in the extensions input."
-    // TODO: unsignedExtensionOutputs (0x08) - "A map, keyed by extension identifiers, to unsigned outputs of extensions, if any.
-    //  Authenticators SHOULD omit this field if no processed extensions define unsigned outputs."
+    @JsonProperty("8") val unsignedExtensionOutputs: Map<String,Any>? = null,
+    @JsonProperty("7") val largeBlobKey: ByteArray? = null
 ) : CtapResponseData {
 
     constructor(

@@ -11,6 +11,7 @@ class AuthenticatorGetAssertionResponseDataSerializer :
             FieldSerializationRule(4, AuthenticatorGetAssertionResponseData::user),
             FieldSerializationRule(5, AuthenticatorGetAssertionResponseData::numberOfCredentials),
             FieldSerializationRule(6, AuthenticatorGetAssertionResponseData::userSelected),
+            FieldSerializationRule(7, AuthenticatorGetAssertionResponseData::largeBlobKey),
             FieldSerializationRule(8, AuthenticatorGetAssertionResponseData::unsignedExtensionOutputs)
         )
     )

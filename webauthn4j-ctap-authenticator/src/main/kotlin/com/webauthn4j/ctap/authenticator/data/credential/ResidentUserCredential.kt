@@ -22,6 +22,7 @@ class ResidentUserCredential @JsonCreator constructor(
     @JsonProperty("details") override val details: Map<String, String>
 ) : UserCredential {
 
+    var largeBlobKey: ByteArray? = null
     var largeBlob: LargeBlobData? = null
 
     override val rpIdHash: ByteArray

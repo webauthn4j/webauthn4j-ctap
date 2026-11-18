@@ -1,5 +1,7 @@
 package com.webauthn4j.ctap.authenticator.execution
 
+import com.webauthn4j.ctap.authenticator.LargeBlobsCommand
+import com.webauthn4j.ctap.core.data.options.LargeBlobsOption
 import com.webauthn4j.ctap.authenticator.CtapAuthenticator
 import com.webauthn4j.ctap.authenticator.CtapAuthenticatorSession
 import com.webauthn4j.ctap.authenticator.data.settings.AlwaysUvSetting
@@ -92,7 +94,6 @@ internal class GetInfoExecution(
         //spec| present and set to false, or absent, pinUvAuthToken is not supported.
         val pinUvAuthToken: PinUvAuthTokenOption = PinUvAuthTokenOption.SUPPORTED
         // TODO: §6.4 noMcGaPermissionsWithClientPin — mc/ga permission restriction not yet implemented
-        // TODO: §6.4 largeBlobs — authenticatorLargeBlobs command not yet implemented
         // TODO: §6.4 ep — enterprise attestation not yet implemented
         // TODO: §6.4 bioEnroll — authenticatorBioEnrollment command not yet implemented
         // TODO: §6.4 userVerificationMgmtPreview — FIDO_2_1_PRE prototype, not yet implemented
@@ -137,7 +138,7 @@ internal class GetInfoExecution(
                     plat, rk, clientPin, up, uv,
                     pinUvAuthToken,
                     null, // noMcGaPermissionsWithClientPin
-                    null, // largeBlobs
+                    if (ctapAuthenticatorSession.largeBlobKeyProcessor != null) LargeBlobsOption.SUPPORTED else null,
                     null, // ep
                     null, // bioEnroll
                     null, // userVerificationMgmtPreview
@@ -151,13 +152,13 @@ internal class GetInfoExecution(
                     makeCredUvNotRqd,
                     alwaysUv
                 ),                                 // options (0x04): Optional
-                2048u,                             // maxMsgSize (0x05): Optional
+                LargeBlobsCommand.MAX_MESSAGE_SIZE.toUInt(),                             // maxMsgSize (0x05): Optional
                 ctapAuthenticatorSession.pinProtocols,   // pinUvAuthProtocols (0x06): Optional
                 null,                              // maxCredentialCountInList (0x07): Optional
                 null,                              // maxCredentialIdLength (0x08): Optional
                 ctapAuthenticatorSession.transports, // transports (0x09): Optional
                 algorithms,                        // algorithms (0x0A): Optional
-                // TODO: §6.4 maxSerializedLargeBlobArray (0x0B) — depends on largeBlobs
+                maxSerializedLargeBlobArray = if (ctapAuthenticatorSession.largeBlobKeyProcessor != null) LargeBlobsCommand.CAPACITY.toUInt() else null,
                 // TODO: §6.4 forcePINChange (0x0C) — depends on authenticatorConfig setMinPINLength
                 minPINLength = minPINLength,        // minPINLength (0x0D): Optional
                 // TODO: §6.4 firmwareVersion (0x0E)

@@ -1,5 +1,9 @@
 package com.webauthn4j.ctap.core.converter.jackson
 
+import com.webauthn4j.ctap.core.data.AuthenticatorLargeBlobsRequest
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorLargeBlobsRequestSerializer
+import com.webauthn4j.ctap.core.data.AuthenticatorLargeBlobsResponseData
+import com.webauthn4j.ctap.core.converter.jackson.serializer.AuthenticatorLargeBlobsResponseDataSerializer
 import tools.jackson.databind.module.SimpleModule
 import com.webauthn4j.ctap.core.converter.jackson.deserializer.CoercionLessByteArrayDeserializer
 import com.webauthn4j.ctap.core.converter.jackson.deserializer.PinUvAuthTokenPermissionsDeserializer
@@ -43,6 +47,8 @@ import com.webauthn4j.ctap.core.data.PinUvAuthTokenPermissions
 
 class CtapCBORModule : SimpleModule("CtapCBORModule") {
     init {
+        addSerializer(AuthenticatorLargeBlobsResponseData::class.java, AuthenticatorLargeBlobsResponseDataSerializer())
+        addSerializer(AuthenticatorLargeBlobsRequest::class.java, AuthenticatorLargeBlobsRequestSerializer())
         this.addSerializer(
             AuthenticatorClientPINRequest::class.java,
             AuthenticatorClientPINRequestSerializer()

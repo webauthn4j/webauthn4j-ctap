@@ -13,7 +13,10 @@ import java.util.function.Consumer
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 
-open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
+open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore, LargeBlobArrayStore {
+
+    @Volatile
+    override var serializedLargeBlobArray = byteArrayOf()
 
     override var algorithms = setOf(COSEAlgorithmIdentifier.ES256)
 
@@ -36,6 +39,8 @@ open class InMemoryAuthenticatorPropertyStore : AuthenticatorPropertyStore {
     }
 
     private fun initializeKeys() {
+        val emptyArray = byteArrayOf(0x80.toByte())
+        serializedLargeBlobArray = emptyArray + java.security.MessageDigest.getInstance("SHA-256").digest(emptyArray).copyOf(16)
         map.clear()
         credentialSourceEncryptionKey = generateAESKey()
         credentialSourceEncryptionIV = generateIV()

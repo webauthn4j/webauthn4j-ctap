@@ -1,5 +1,7 @@
 package com.webauthn4j.ctap.authenticator
 
+import com.webauthn4j.ctap.authenticator.store.LargeBlobArrayStore
+import com.webauthn4j.ctap.authenticator.extension.LargeBlobKeyExtensionProcessor
 import com.webauthn4j.converter.AuthenticatorDataConverter
 import com.webauthn4j.ctap.authenticator.attestation.AttestationStatementProvider
 import com.webauthn4j.ctap.authenticator.attestation.FIDOU2FAttestationStatementProvider
@@ -70,6 +72,15 @@ class CtapAuthenticatorSession internal constructor(
     val pinProtocols: List<PinProtocolVersion> = ctapAuthenticator.pinProtocols
         .sortedByDescending { it.value }
 
+    internal val largeBlobKeyProcessor = extensionProcessors.filterIsInstance<LargeBlobKeyExtensionProcessor>().singleOrNull()
+    init {
+        if (largeBlobKeyProcessor != null) {
+            require(extensionProcessors.none { it.extensionId == "largeBlob" })
+            require(authenticatorPropertyStore is LargeBlobArrayStore)
+        }
+    }
+    private val largeBlobs = LargeBlobsCommand(this)
+
     val pinUvAuthManager: PinUvAuthManager = PinUvAuthManager(
         authenticatorPropertyStore,
         pinProtocols.map { version ->
@@ -84,6 +95,7 @@ class CtapAuthenticatorSession internal constructor(
         this.builtInUserVerificationHandler,
         ctapAuthenticator.preferredPlatformUvAttempts,
         ctapAuthenticator.maxUvAttemptsForInternalRetries,
+        largeBlobKeyProcessor != null,
     )
 
     val isClientPINReady: Boolean
@@ -136,6 +148,7 @@ class CtapAuthenticatorSession internal constructor(
             is AuthenticatorGetInfoRequest -> getInfo(request)
             is AuthenticatorClientPINRequest -> clientPIN(request)
             is AuthenticatorResetRequest -> reset(request)
+            is AuthenticatorLargeBlobsRequest -> withTransaction { largeBlobs.execute(request) }
             is AuthenticatorSelectionRequest -> selection(request)
             is U2FRegistrationRequest -> u2fRegister(request)
             is U2FAuthenticationRequest -> u2fSign(request)

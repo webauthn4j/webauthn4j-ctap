@@ -17,6 +17,8 @@ import com.webauthn4j.ctap.core.data.AuthenticatorSelectionResponse
 import com.webauthn4j.ctap.core.data.CtapResponse
 import com.webauthn4j.ctap.core.data.CtapStatusCode
 import tools.jackson.dataformat.cbor.CBORMapper
+import com.webauthn4j.ctap.core.data.AuthenticatorLargeBlobsResponse
+import com.webauthn4j.ctap.core.data.AuthenticatorLargeBlobsResponseData
 import java.nio.ByteBuffer
 import java.util.Arrays
 
@@ -66,6 +68,8 @@ class CtapResponseConverter(objectConverter: ObjectConverter) {
                 )
                 AuthenticatorClientPINResponse(statusCode, responseData)
             }
+            AuthenticatorLargeBlobsResponse::class.java -> AuthenticatorLargeBlobsResponse(statusCode,
+                responseDataBytes.takeIf { it.isNotEmpty() }?.let { cborMapper.readValue(it, AuthenticatorLargeBlobsResponseData::class.java) })
             AuthenticatorResetResponse::class.java -> {
                 AuthenticatorResetResponse(statusCode)
             }

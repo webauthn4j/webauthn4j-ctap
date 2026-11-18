@@ -843,7 +843,8 @@ internal class GetAssertionExecution :
             user,
             numberOfCredentials,
             if (userSelected) true else null,
-            ctapAuthenticatorSession.unsignedAuthenticationOutputs(authenticatorGetAssertionRequest, credential, uvResult, upResult)
+            ctapAuthenticatorSession.unsignedAuthenticationOutputs(authenticatorGetAssertionRequest, credential, uvResult, upResult),
+            ctapAuthenticatorSession.largeBlobKeyProcessor?.read(authenticatorGetAssertionRequest, credential)
         )
 
         // update counter

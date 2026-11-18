@@ -8,6 +8,7 @@ class AuthenticatorMakeCredentialResponseDataSerializer :
             FieldSerializationRule(1, AuthenticatorMakeCredentialResponseData::format),
             FieldSerializationRule(2, AuthenticatorMakeCredentialResponseData::authenticatorData),
             FieldSerializationRule(3, AuthenticatorMakeCredentialResponseData::attestationStatement),
+            FieldSerializationRule(5, AuthenticatorMakeCredentialResponseData::largeBlobKey),
             FieldSerializationRule(6, AuthenticatorMakeCredentialResponseData::unsignedExtensionOutputs)
         )
     )

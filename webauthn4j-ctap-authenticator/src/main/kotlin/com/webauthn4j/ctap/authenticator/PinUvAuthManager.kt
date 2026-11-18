@@ -44,6 +44,7 @@ class PinUvAuthManager(
         },
     private val preferredPlatformUvAttempts: UInt? = null,
     private val maxUvAttemptsForInternalRetries: UInt = 3u,
+    private val largeBlobsSupported: Boolean = false,
 ) {
 
     init {
@@ -618,8 +619,7 @@ class PinUvAuthManager(
                     return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_UNAUTHORIZED_PERMISSION)
                 }
                 PinUvAuthTokenPermission.LBW -> {
-                    // TODO: check largeBlobs option when authenticatorLargeBlobs is implemented
-                    return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_UNAUTHORIZED_PERMISSION)
+                    if (!largeBlobsSupported) return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_UNAUTHORIZED_PERMISSION)
                 }
                 PinUvAuthTokenPermission.ACFG -> {
                     // TODO: check authnrCfg option when authenticatorConfig is implemented
@@ -793,8 +793,7 @@ class PinUvAuthManager(
                     return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_UNAUTHORIZED_PERMISSION)
                 }
                 PinUvAuthTokenPermission.LBW -> {
-                    // TODO: check largeBlobs option when authenticatorLargeBlobs is implemented
-                    return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_UNAUTHORIZED_PERMISSION)
+                    if (!largeBlobsSupported) return AuthenticatorClientPINResponse(CtapStatusCode.CTAP2_ERR_UNAUTHORIZED_PERMISSION)
                 }
                 PinUvAuthTokenPermission.ACFG -> {
                     // TODO: check uvAcfg option when authenticatorConfig is implemented

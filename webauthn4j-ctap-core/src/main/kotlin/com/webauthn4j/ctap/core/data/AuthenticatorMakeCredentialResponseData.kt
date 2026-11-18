@@ -11,6 +11,7 @@ import com.webauthn4j.data.extension.authenticator.RegistrationExtensionAuthenti
 
 class AuthenticatorMakeCredentialResponseData : CtapResponseData {
     //~ Instance fields ================================================================================================
+    val largeBlobKey: ByteArray?
     val unsignedExtensionOutputs: Map<String,Any>?
 
     val authenticatorData: AuthenticatorData<RegistrationExtensionAuthenticatorOutput>
@@ -26,16 +27,18 @@ class AuthenticatorMakeCredentialResponseData : CtapResponseData {
     constructor(
         @JsonProperty("2") authenticatorData: AuthenticatorData<RegistrationExtensionAuthenticatorOutput>,
         @JsonProperty("3") attestationStatement: AttestationStatement,
-        @JsonProperty("6") unsignedExtensionOutputs: Map<String,Any>? = null
+        @JsonProperty("6") unsignedExtensionOutputs: Map<String,Any>? = null,
+        @JsonProperty("5") largeBlobKey: ByteArray? = null
         // TODO: epAtt (0x04) - §6.1 "true if an enterprise attestation was returned"
-        // TODO: largeBlobKey (0x05) - §6.1 "The largeBlobKey for the credential"
     ) {
+        this.largeBlobKey = largeBlobKey
         this.unsignedExtensionOutputs = unsignedExtensionOutputs?.toMap()
         this.authenticatorData = authenticatorData
         this.attestationStatement = attestationStatement
     }
 
     constructor(attestationObject: AttestationObject) {
+        largeBlobKey = null
         unsignedExtensionOutputs = null
         authenticatorData = attestationObject.authenticatorData
         attestationStatement = attestationObject.attestationStatement
